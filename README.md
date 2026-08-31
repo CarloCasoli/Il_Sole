@@ -1,2 +1,2 @@
 # Il_Sole
-Sorgenti da utilizzare per il loro di Astrofisica solare
+Sorgenti da utilizzare per il libro di Astrofisica solare
