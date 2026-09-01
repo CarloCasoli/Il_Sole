@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Tubi di flusso magnetico — vista 3D</title>
+<style>
+  html, body { margin:0; padding:0; background:#f2e4c9; font-family: -apple-system, "Segoe UI", Arial, sans-serif; overflow:hidden; }
+  #app { position:relative; width:100vw; height:100vh; }
+  #mount { width:100%; height:100%; }
+  .panel {
+    position:absolute; top:14px; left:14px; display:flex; gap:8px; flex-wrap:wrap;
+    background:rgba(255,255,255,0.85); backdrop-filter:blur(4px);
+    padding:8px; border-radius:10px; border:1px solid #e2d9c8;
+  }
+  button {
+    padding:7px 12px; font-size:13px; border-radius:7px; border:1px solid #d8cbb0;
+    background:#fff; color:#3d2b1a; cursor:pointer;
+  }
+  button:hover { background:#f3e9d6; }
+  button.active { background:#3d2b1a; color:#fff; border-color:#3d2b1a; }
+  .hint {
+    position:absolute; bottom:14px; left:14px; font-size:12px; color:#7a6a52;
+    background:rgba(255,255,255,0.8); padding:6px 10px; border-radius:8px;
+  }
+  #errbox {
+    display:none; position:absolute; inset:0; align-items:center; justify-content:center;
+    background:#faf6ee; color:#712B13; font-size:14px; text-align:center; padding:2rem;
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="mount"></div>
+  <div id="errbox">Impossibile caricare la libreria 3D (three.js) da rete in questo ambiente.<br>Prova ad aprire il file in un browser normale (Chrome, Safari, Firefox) invece che nel visualizzatore integrato.</div>
+  <div class="panel">
+    <button id="btn-top">Vista dall'alto</button>
+    <button id="btn-iso">Vista 3D</button>
+    <button id="btn-side">Vista laterale</button>
+    <button id="btn-spin">Rotazione auto: off</button>
+  </div>
+  <div class="hint">Trascina per ruotare · rotellina per zoom · tasto destro per pan</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+window.addEventListener('load', function(){
+  if (typeof THREE === 'undefined' || typeof THREE.OrbitControls === 'undefined'){
+    document.getElementById('errbox').style.display = 'flex';
+    return;
+  }
+  try { init(); } catch(e){
+    document.getElementById('errbox').style.display = 'flex';
+    document.getElementById('errbox').innerHTML = 'Errore nella scena 3D: ' + e.message;
+    console.error(e);
+  }
+});
+
+function init(){
+  var mount = document.getElementById('mount');
+  var width = mount.clientWidth;
+  var height = mount.clientHeight;
+
+  var scene = new THREE.Scene();
+  scene.background = null;
+  // nebbia rimossa su richiesta: copriva le parti piu' lontane della scena
+
+  var camera = new THREE.PerspectiveCamera(42, width/height, 1, 5000);
+
+  var renderer = new THREE.WebGLRenderer({ antialias:true, alpha:true });
+  renderer.setSize(width, height);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  mount.appendChild(renderer.domElement);
+
+  var controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.target.set(0, 0, -60);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.08;
+  controls.minDistance = 80;
+  controls.maxDistance = 1200;
+
+  scene.add(new THREE.AmbientLight(0xffffff, 0.7));
+  var dl = new THREE.DirectionalLight(0xffffff, 0.85);
+  dl.position.set(250, 500, 300);
+  scene.add(dl);
+  var dl2 = new THREE.DirectionalLight(0xffe8c0, 0.3);
+  dl2.position.set(-200, 200, -200);
+  scene.add(dl2);
+
+  var groundGeo = new THREE.PlaneGeometry(20000, 20000);
+  var groundTexData = 'data:image/jpeg;base64,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';
+  var groundTex = new THREE.TextureLoader().load(groundTexData);
+  groundTex.wrapS = THREE.MirroredRepeatWrapping;
+  groundTex.wrapT = THREE.MirroredRepeatWrapping;
+  groundTex.repeat.set(35, 35);
+  var groundMat = new THREE.MeshStandardMaterial({ map: groundTex, color: 0xffffff, roughness:0.95, metalness:0 });
+  var ground = new THREE.Mesh(groundGeo, groundMat);
+  ground.rotation.x = -Math.PI/2;
+  ground.position.y = -1.2;
+  scene.add(ground);
+
+  // Curva "spina dorsale" nel piano orizzontale (vista dall'alto), a forma di S,
+  // simile all'andamento del filamento osservato nell'immagine H-alpha.
+  var spineCtrl = [
+    {x:-40,z:20},
+    {x:-10,z:-40},
+    {x:20,z:-110},
+    {x:90,z:-150},
+    {x:190,z:-150},
+    {x:280,z:-120},
+    {x:380,z:-85},
+    {x:480,z:-60}
+  ];
+
+  function catmullRom2D(ctrl, nSamples){
+    var pts = [ctrl[0]].concat(ctrl).concat([ctrl[ctrl.length-1]]);
+    var result = [];
+    for (var i=1;i<pts.length-2;i++){
+      var p0=pts[i-1],p1=pts[i],p2=pts[i+1],p3=pts[i+2];
+      var segN = Math.max(2, Math.floor(nSamples/(pts.length-3)));
+      for (var s=0;s<segN;s++){
+        var t = s/segN;
+        var t2=t*t,t3=t2*t;
+        var x = 0.5*((2*p1.x)+(-p0.x+p2.x)*t+(2*p0.x-5*p1.x+4*p2.x-p3.x)*t2+(-p0.x+3*p1.x-3*p2.x+p3.x)*t3);
+        var z = 0.5*((2*p1.z)+(-p0.z+p2.z)*t+(2*p0.z-5*p1.z+4*p2.z-p3.z)*t2+(-p0.z+3*p1.z-3*p2.z+p3.z)*t3);
+        result.push({x:x,z:z});
+      }
+    }
+    result.push(ctrl[ctrl.length-1]);
+    return result;
+  }
+
+  var spineSamples = catmullRom2D(spineCtrl, 240);
+  var cum = [0];
+  for (var si=1;si<spineSamples.length;si++){
+    var dxs=spineSamples[si].x-spineSamples[si-1].x, dzs=spineSamples[si].z-spineSamples[si-1].z;
+    cum.push(cum[si-1]+Math.sqrt(dxs*dxs+dzs*dzs));
+  }
+  var totalLen = cum[cum.length-1];
+
+  function spineAt(t){
+    var target = t*totalLen;
+    var idx = 0;
+    for (var i=0;i<cum.length-1;i++){
+      idx = i;
+      if (cum[i]<=target && cum[i+1]>=target) break;
+    }
+    var segLen = cum[idx+1]-cum[idx] || 1e-6;
+    var localT = (target-cum[idx])/segLen;
+    var p0=spineSamples[idx], p1=spineSamples[Math.min(idx+1,spineSamples.length-1)];
+    return { x: p0.x+(p1.x-p0.x)*localT, z: p0.z+(p1.z-p0.z)*localT };
+  }
+
+  function spineTangent(t){
+    var eps=0.01;
+    var t0=Math.max(0,t-eps), t1=Math.min(1,t+eps);
+    var a=spineAt(t0), b=spineAt(t1);
+    var dx=b.x-a.x, dz=b.z-a.z;
+    var len=Math.sqrt(dx*dx+dz*dz)||1e-6;
+    return {x:dx/len, z:dz/len};
+  }
+
+  function spineNormal(t){
+    var tan = spineTangent(t);
+    return { x: -tan.z, z: tan.x };
+  }
+
+  var N = 13;
+  var spacing = 9;
+  var cruiseJoinT = 0.10;
+  var cruiseEndT = 0.82;
+  var fanSpreadDeg = 92;
+  var fanSpreadRad = THREE.MathUtils.degToRad(fanSpreadDeg);
+  var landingRadiusExtra = 195;
+  var riseH = 55;
+  var plateauH = 95;
+
+  var tubeGroup = new THREE.Group();
+  var tubeMat = new THREE.MeshStandardMaterial({ color: 0x6b3a20, roughness:0.55, metalness:0.05 });
+  var glowMat = new THREE.MeshBasicMaterial({ color:0xffcc33 });
+
+  function buildVariableTube(curve, tubularSegments, radialSegments, radiusFn){
+    var frames = curve.computeFrenetFrames(tubularSegments, false);
+    var positions = [];
+    var normals = [];
+    var indices = [];
+
+    for (var i = 0; i <= tubularSegments; i++){
+      var t = i / tubularSegments;
+      var point = curve.getPointAt(t);
+      var N_ = frames.normals[i];
+      var B_ = frames.binormals[i];
+      var radius = radiusFn(t);
+
+      for (var j = 0; j <= radialSegments; j++){
+        var theta = (j / radialSegments) * Math.PI * 2;
+        var sin = Math.sin(theta), cos = -Math.cos(theta);
+        var nx = cos*N_.x + sin*B_.x;
+        var ny = cos*N_.y + sin*B_.y;
+        var nz = cos*N_.z + sin*B_.z;
+        positions.push(point.x + radius*nx, point.y + radius*ny, point.z + radius*nz);
+        normals.push(nx, ny, nz);
+      }
+    }
+
+    for (var i2 = 0; i2 < tubularSegments; i2++){
+      for (var j2 = 0; j2 < radialSegments; j2++){
+        var a = (radialSegments+1)*i2 + j2;
+        var b = (radialSegments+1)*(i2+1) + j2;
+        var c = (radialSegments+1)*(i2+1) + j2+1;
+        var d = (radialSegments+1)*i2 + j2+1;
+        indices.push(a,b,d, b,c,d);
+      }
+    }
+
+    var geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+    geo.setAttribute('normal', new THREE.Float32BufferAttribute(normals, 3));
+    geo.setIndex(indices);
+    return geo;
+  }
+
+  function radiusProfile(t){
+    var rMin = 2.0, rMax = 8.0;
+    var thresh = 0.28;
+    if (t < thresh) return rMin;
+    var u = (t-thresh)/(1-thresh);
+    var smooth = u*u*u*(u*(u*6-15)+10); // smoothstep quintico: transizione molto graduale
+    return rMin + (rMax-rMin) * smooth;
+  }
+
+  var baseCenterForMarker = spineAt(0.045);
+  var landingPoints = [];
+  var flowCurves = [];
+
+  for (var i=0;i<N;i++){
+    var tN = i/(N-1);
+    var dLane = (i-(N-1)/2)*spacing;
+    var fanAngle = (tN-0.5)*fanSpreadRad;
+
+    // punto di partenza: casuale dentro l'area del cerchio nero (macchia),
+    // non piu' allineato - distribuzione uniforme sull'area (sqrt del raggio)
+    var baseCircleR = 26;
+    var rAngle = Math.random()*Math.PI*2;
+    var rRad = Math.sqrt(Math.random())*baseCircleR;
+    var baseX = baseCenterForMarker.x + Math.cos(rAngle)*rRad;
+    var baseZ = (baseCenterForMarker.z-10) + Math.sin(rAngle)*rRad;
+
+    // tratto di crociera: parallelo agli altri tubi nella prima parte (offset dLane,
+    // costante, tubi ancora sottili), poi l'offset cresce progressivamente verso la
+    // fine del tratto - proprio dove i tubi iniziano a ingrossarsi - cosi' che la
+    // distanza tra un tubo e l'altro aumenti insieme al diametro ed evitino di toccarsi
+    var cJoin = spineAt(cruiseJoinT), nJoin = spineNormal(cruiseJoinT);
+    var cMid  = spineAt((cruiseJoinT+cruiseEndT)/2), nMid = spineNormal((cruiseJoinT+cruiseEndT)/2);
+    var preEndT = cruiseJoinT + (cruiseEndT-cruiseJoinT)*0.78;
+    var cPre = spineAt(preEndT), nPre = spineNormal(preEndT);
+    var cEnd  = spineAt(cruiseEndT), nEnd = spineNormal(cruiseEndT);
+
+    var joinPt = { x: cJoin.x + nJoin.x*dLane, z: cJoin.z + nJoin.z*dLane };
+    var midPt  = { x: cMid.x  + nMid.x*dLane,  z: cMid.z  + nMid.z*dLane  };
+    var prePt  = { x: cPre.x  + nPre.x*dLane*1.7,  z: cPre.z  + nPre.z*dLane*1.7  };
+    var endPt  = { x: cEnd.x  + nEnd.x*dLane*2.6,  z: cEnd.z  + nEnd.z*dLane*2.6  };
+
+    // solo ora, verso la fine, i tubi divergono su un arco piu' ampio -
+    // proiettando IN AVANTI rispetto alla direzione locale del tratto di crociera,
+    // cosi' da evitare il ripiegamento all'indietro sopra il tratto precedente
+    var forwardDist = 200;
+    var lateralSpread = landingRadiusExtra;
+
+    var landX = endPt.x + nEnd.x*lateralSpread*Math.sin(fanAngle) + (endPt.x-midPt.x)*0 + spineTangent(cruiseEndT).x*forwardDist*Math.cos(fanAngle);
+    var landZ = endPt.z + nEnd.z*lateralSpread*Math.sin(fanAngle) + spineTangent(cruiseEndT).z*forwardDist*Math.cos(fanAngle);
+
+    var fanMidX = endPt.x + nEnd.x*lateralSpread*0.5*Math.sin(fanAngle) + spineTangent(cruiseEndT).x*forwardDist*0.5;
+    var fanMidZ = endPt.z + nEnd.z*lateralSpread*0.5*Math.sin(fanAngle) + spineTangent(cruiseEndT).z*forwardDist*0.5;
+
+    var pts = [
+      new THREE.Vector3(baseX, 0, baseZ),
+      new THREE.Vector3(baseX, riseH*0.6, baseZ + (joinPt.z-baseZ)*0.15),
+      new THREE.Vector3(joinPt.x, plateauH, joinPt.z),
+      new THREE.Vector3(midPt.x, plateauH, midPt.z),
+      new THREE.Vector3(prePt.x, plateauH, prePt.z),
+      new THREE.Vector3(endPt.x, plateauH, endPt.z),
+      new THREE.Vector3(fanMidX, plateauH*0.6, fanMidZ),
+      new THREE.Vector3(landX, riseH*0.3, landZ*0.97),
+      new THREE.Vector3(landX, 0, landZ)
+    ];
+    var curve = new THREE.CatmullRomCurve3(pts);
+    flowCurves.push(curve);
+    var tubeGeo = buildVariableTube(curve, 100, 10, radiusProfile);
+    var mesh = new THREE.Mesh(tubeGeo, tubeMat);
+    tubeGroup.add(mesh);
+
+    landingPoints.push({x:landX, z:landZ});
+
+    var glow = new THREE.Mesh(new THREE.SphereGeometry(6.0,16,16), glowMat);
+    glow.position.set(landX, 2, landZ);
+    tubeGroup.add(glow);
+    var center = new THREE.Mesh(new THREE.SphereGeometry(3.0,14,14), new THREE.MeshBasicMaterial({ color:0xfff4b0 }));
+    center.position.set(landX, 3.5, landZ);
+    tubeGroup.add(center);
+    var halo = new THREE.Mesh(new THREE.SphereGeometry(12,16,16), new THREE.MeshBasicMaterial({ color:0xffcc33, transparent:true, opacity:0.22 }));
+    halo.position.copy(glow.position);
+    tubeGroup.add(halo);
+    var pl = new THREE.PointLight(0xffcc33, 0.5, 70);
+    pl.position.copy(glow.position);
+    tubeGroup.add(pl);
+  }
+
+  // base comune, di giallo meno intenso, sotto tutti i punti di atterraggio delle facole:
+  // una "salsiccia" curva (tubo sottile lungo l'arco di atterraggio) con due semisfere alle estremita'
+  var baseMatSausage = new THREE.MeshStandardMaterial({ color:0xf5da8a, roughness:0.9, transparent:true, opacity:0.75 });
+  var sausageRadius = 14;
+  if (landingPoints.length > 1){
+    var sausagePts = [];
+    for (var lp3=0; lp3<landingPoints.length; lp3++){
+      sausagePts.push(new THREE.Vector3(landingPoints[lp3].x, -0.6, landingPoints[lp3].z));
+    }
+    var sausageCurve = new THREE.CatmullRomCurve3(sausagePts);
+    var sausageGeo = new THREE.TubeGeometry(sausageCurve, 60, sausageRadius, 12, false);
+    var sausageMesh = new THREE.Mesh(sausageGeo, baseMatSausage);
+    tubeGroup.add(sausageMesh);
+
+    var capStart = new THREE.Mesh(new THREE.SphereGeometry(sausageRadius,16,16), baseMatSausage);
+    capStart.position.copy(sausagePts[0]);
+    tubeGroup.add(capStart);
+    var capEnd = new THREE.Mesh(new THREE.SphereGeometry(sausageRadius,16,16), baseMatSausage);
+    capEnd.position.copy(sausagePts[sausagePts.length-1]);
+    tubeGroup.add(capEnd);
+  }
+
+  var baseMesh = new THREE.Mesh(
+    new THREE.CylinderGeometry(34, 40, 6, 28),
+    new THREE.MeshStandardMaterial({ color:0x1c1310, roughness:0.85 })
+  );
+  baseMesh.position.set(baseCenterForMarker.x, -1.5, baseCenterForMarker.z-10);
+  tubeGroup.add(baseMesh);
+  var baseRing = new THREE.Mesh(
+    new THREE.RingGeometry(40, 58, 32),
+    new THREE.MeshStandardMaterial({ color:0xe08a55, roughness:0.9, side:THREE.DoubleSide })
+  );
+  baseRing.rotation.x = -Math.PI/2;
+  baseRing.position.set(baseCenterForMarker.x, -1, baseCenterForMarker.z-10);
+  tubeGroup.add(baseRing);
+
+  // particelle di flusso: piccole frecce che percorrono ciascun tubo
+  // dal polo nero (base) verso le facole (atterraggio), in loop continuo.
+  // depthTest disattivato cosi' restano visibili anche quando il tubo,
+  // ingrossandosi, le circonderebbe rendendole altrimenti nascoste.
+  var flowMat = new THREE.MeshBasicMaterial({
+    color:0xfff2a0, transparent:true, opacity:0.98,
+    blending:THREE.AdditiveBlending, depthTest:false, depthWrite:false
+  });
+  var arrowGeo = new THREE.ConeGeometry(2.6, 9, 8);
+  var particlesPerTube = 3;
+  var flowParticles = [];
+  for (var fc=0; fc<flowCurves.length; fc++){
+    for (var pp=0; pp<particlesPerTube; pp++){
+      var particle = new THREE.Mesh(arrowGeo, flowMat);
+      particle.renderOrder = 999;
+      particle.userData.curve = flowCurves[fc];
+      particle.userData.phase = Math.random();
+      particle.userData.speedMul = 0.8 + Math.random()*0.4;
+      tubeGroup.add(particle);
+      flowParticles.push(particle);
+    }
+  }
+
+  scene.add(tubeGroup);
+
+  var views = {
+    top:  { pos:[320, 850, -110],  target:[320,0,-110] },
+    iso:  { pos:[720, 380, -640], target:[320,0,-120] },
+    side: { pos:[1080, 150, -110], target:[320,50,-110] }
+  };
+
+  function setView(name){
+    var v = views[name];
+    camera.position.set(v.pos[0], v.pos[1], v.pos[2]);
+    controls.target.set(v.target[0], v.target[1], v.target[2]);
+    controls.update();
+    var btns = document.querySelectorAll('.panel button');
+    for (var k=0;k<btns.length;k++) btns[k].classList.remove('active');
+    var b = document.getElementById('btn-'+name);
+    if (b) b.classList.add('active');
+  }
+  setView('iso');
+
+  document.getElementById('btn-top').addEventListener('click', function(){ setView('top'); });
+  document.getElementById('btn-iso').addEventListener('click', function(){ setView('iso'); });
+  document.getElementById('btn-side').addEventListener('click', function(){ setView('side'); });
+
+  var autoSpin = false;
+  var spinBtn = document.getElementById('btn-spin');
+  spinBtn.addEventListener('click', function(){
+    autoSpin = !autoSpin;
+    spinBtn.textContent = 'Rotazione auto: ' + (autoSpin ? 'on' : 'off');
+    spinBtn.classList.toggle('active', autoSpin);
+  });
+
+  function animate(){
+    requestAnimationFrame(animate);
+    try {
+      if (autoSpin){
+        var tt = performance.now()*0.0002;
+        var radius = camera.position.distanceTo(controls.target);
+        camera.position.x = controls.target.x + radius*Math.sin(tt);
+        camera.position.z = controls.target.z + radius*Math.cos(tt);
+      }
+      var now = performance.now();
+      for (var fp=0; fp<flowParticles.length; fp++){
+        try {
+          var part = flowParticles[fp];
+          var t = (now*0.00016*part.userData.speedMul + part.userData.phase) % 1;
+          var pos = part.userData.curve.getPointAt(t);
+          if (pos && isFinite(pos.x) && isFinite(pos.y) && isFinite(pos.z)){
+            part.position.set(pos.x, pos.y, pos.z);
+            var tang = part.userData.curve.getTangentAt(Math.min(t, 0.999));
+            if (tang && isFinite(tang.x) && isFinite(tang.y) && isFinite(tang.z)){
+              part.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0), tang);
+            }
+          }
+        } catch(errParticle){ /* ignora la singola particella problematica */ }
+      }
+      controls.update();
+      renderer.render(scene, camera);
+    } catch(errFrame){ /* non bloccare mai il ciclo di animazione */ }
+  }
+  animate();
+
+  window.addEventListener('resize', function(){
+    width = mount.clientWidth;
+    height = mount.clientHeight;
+    camera.aspect = width/height;
+    camera.updateProjectionMatrix();
+    renderer.setSize(width, height);
+  });
+}
+</script>
+</body>
+</html>
