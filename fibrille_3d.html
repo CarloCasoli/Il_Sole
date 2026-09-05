@@ -22,10 +22,6 @@
     position:absolute; bottom:14px; left:14px; font-size:12px; color:#7a6a52;
     background:rgba(255,255,255,0.8); padding:6px 10px; border-radius:8px;
   }
-  .watermark {
-    position: absolute; right: 14px; bottom: 14px; font-size: 13px; color: rgba(0, 0, 0, 0.85);
-    background: rgba(255, 255, 255, 0.75); padding: 5px 10px; border-radius: 6px; pointer-events: none;
-  }
   #errbox {
     display:none; position:absolute; inset:0; align-items:center; justify-content:center;
     background:#faf6ee; color:#712B13; font-size:14px; text-align:center; padding:2rem;
@@ -43,7 +39,6 @@
     <button id="btn-spin">Rotazione auto: off</button>
   </div>
   <div class="hint">Trascina per ruotare · rotellina per zoom · tasto destro per pan</div>
-  <div class="watermark">&copy; 2026 Carlo Casoli &bull; Il Sole: Osservazione e Fisica<br>Codice rilasciato sotto licenza MIT.</div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
@@ -68,6 +63,7 @@ function init(){
 
   var scene = new THREE.Scene();
   scene.background = null;
+  // nebbia rimossa su richiesta: copriva le parti piu' lontane della scena
 
   var camera = new THREE.PerspectiveCamera(42, width/height, 1, 5000);
 
@@ -92,7 +88,7 @@ function init(){
   scene.add(dl2);
 
   var groundGeo = new THREE.PlaneGeometry(20000, 20000);
-  var groundTexData = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCAIAAgADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDmqKKK/Ij99A000ppDTQDTSHpSmkqkQxKKDRQIKQ9aWkNNCAU4U0U4UmA5aetNFPFQxoUUtApaRaENManmmNQhjG6Uxqe3SmNWkSWMNNpxptaIhhSikpRQxIeKeOtMFPWoSaJB0pwpo6Uo6VDKQ49KBR2oFSxhSGlpDQIRqY3SnNTGqkSxhqM1IajatESJSrSUq9abETx1Yi6VWjqxFWMxluM1OhqtGanQ1zSES54pjGlzSGoGiN6hapXqJq1iUiM1G1SGomrVFIYaiapTUZrRCIm6Uw1I3SozWqJY2gUUopsQ5akXpUa1ItQykSLT1pi1IKzYxR1pwpBTgKkhhSiilpCENJSmmmkMjoPSig9Ks1EpDS0hpoBp60lKaSqRDENFLSYoAKKKKBMKVaSlWhiHrT1pq05allIdSmkpxqRjT0prU4000IoY1RtUjUw1oiWRmmmnmmmrRDEpwpo604UMBy1ItMFPWpZSHilHSkp1QykFFFFIYZoopDQSI1ManmmNTQhhpjU9qYa0QhtKtJThTYiWOrEdVk61YjrKQFmOp0quhqdK55ASA0hopD0rMEMaomqVqhatIlIjbpUbVI3So2rVFIYelRmpDUbVohEbVGakao261oiWNpRSU4VTEOMpFqNakWoY0SLTx0pqinismUcCnAUgFOFYMoWiiikUKaSlpDQISkpKKACg0UUAJS0lFABRRRQAUtFFABRRRQAUtGlpKaAw0lFFABRRRTAKKKKQAp4ooNJQAh60UUhoASiiimAUUUUAFFFFAhKWiimAUlFFABRRRTAKlpaKAG0UUUAf/9k=';
+  var groundTexData = 'data:image/jpeg;base64,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';
   var groundTex = new THREE.TextureLoader().load(groundTexData);
   groundTex.wrapS = THREE.MirroredRepeatWrapping;
   groundTex.wrapT = THREE.MirroredRepeatWrapping;
@@ -103,6 +99,8 @@ function init(){
   ground.position.y = -1.2;
   scene.add(ground);
 
+  // Curva "spina dorsale" nel piano orizzontale (vista dall'alto), a forma di S,
+  // simile all'andamento del filamento osservato nell'immagine H-alpha.
   var spineCtrl = [
     {x:-40,z:20},
     {x:-10,z:-40},
@@ -178,8 +176,16 @@ function init(){
   var plateauH = 95;
 
   var tubeGroup = new THREE.Group();
-  var tubeMat = new THREE.MeshStandardMaterial({ color: 0x6b3a20, roughness:0.55, metalness:0.05 });
+
+  // === COLORI DELLE FIBRILLE ===
+  // Le fibrille "scure" (colore storico) si alternano a fibrille piu' chiare,
+  // giallo-arancione, secondo la teoria di formazione rivista.
+  var tubeColorDark  = 0x6b3a20; // fibrilla scura (colore originale)
+  var tubeColorLight = 0xffb347; // fibrilla chiara, giallo-arancione
+  // ==============================
+
   var glowMat = new THREE.MeshBasicMaterial({ color:0xffcc33 });
+  var tubeMeshesData = []; // un riferimento per ciascuna fibrilla, usato piu' sotto per gestire l'inversione di colore
 
   function buildVariableTube(curve, tubularSegments, radialSegments, radiusFn){
     var frames = curve.computeFrenetFrames(tubularSegments, false);
@@ -227,7 +233,7 @@ function init(){
     var thresh = 0.28;
     if (t < thresh) return rMin;
     var u = (t-thresh)/(1-thresh);
-    var smooth = u*u*u*(u*(u*6-15)+10);
+    var smooth = u*u*u*(u*(u*6-15)+10); // smoothstep quintico: transizione molto graduale
     return rMin + (rMax-rMin) * smooth;
   }
 
@@ -240,12 +246,18 @@ function init(){
     var dLane = (i-(N-1)/2)*spacing;
     var fanAngle = (tN-0.5)*fanSpreadRad;
 
+    // punto di partenza: casuale dentro l'area del cerchio nero (macchia),
+    // non piu' allineato - distribuzione uniforme sull'area (sqrt del raggio)
     var baseCircleR = 26;
     var rAngle = Math.random()*Math.PI*2;
     var rRad = Math.sqrt(Math.random())*baseCircleR;
     var baseX = baseCenterForMarker.x + Math.cos(rAngle)*rRad;
     var baseZ = (baseCenterForMarker.z-10) + Math.sin(rAngle)*rRad;
 
+    // tratto di crociera: parallelo agli altri tubi nella prima parte (offset dLane,
+    // costante, tubi ancora sottili), poi l'offset cresce progressivamente verso la
+    // fine del tratto - proprio dove i tubi iniziano a ingrossarsi - cosi' che la
+    // distanza tra un tubo e l'altro aumenti insieme al diametro ed evitino di toccarsi
     var cJoin = spineAt(cruiseJoinT), nJoin = spineNormal(cruiseJoinT);
     var cMid  = spineAt((cruiseJoinT+cruiseEndT)/2), nMid = spineNormal((cruiseJoinT+cruiseEndT)/2);
     var preEndT = cruiseJoinT + (cruiseEndT-cruiseJoinT)*0.78;
@@ -257,6 +269,9 @@ function init(){
     var prePt  = { x: cPre.x  + nPre.x*dLane*1.7,  z: cPre.z  + nPre.z*dLane*1.7  };
     var endPt  = { x: cEnd.x  + nEnd.x*dLane*2.6,  z: cEnd.z  + nEnd.z*dLane*2.6  };
 
+    // solo ora, verso la fine, i tubi divergono su un arco piu' ampio -
+    // proiettando IN AVANTI rispetto alla direzione locale del tratto di crociera,
+    // cosi' da evitare il ripiegamento all'indietro sopra il tratto precedente
     var forwardDist = 200;
     var lateralSpread = landingRadiusExtra;
 
@@ -280,8 +295,23 @@ function init(){
     var curve = new THREE.CatmullRomCurve3(pts);
     flowCurves.push(curve);
     var tubeGeo = buildVariableTube(curve, 100, 10, radiusProfile);
-    var mesh = new THREE.Mesh(tubeGeo, tubeMat);
+
+    // Fibrille alternate: indici pari = scure, indici dispari = chiare (giallo-arancione).
+    // Ogni fibrilla ha un proprio materiale (non condiviso) cosi' da poter cambiare
+    // colore individualmente durante l'animazione (vedi "inversione di colore" piu' sotto).
+    var isLightTube = (i % 2 === 1);
+    // eccezione: nel blocco centrale del ventaglio (attorno all'indice 7) l'alternanza
+    // pari/dispari lasciava un gruppo con troppe fibrille chiare vicine; questa fibrilla
+    // viene quindi forzata scura per spezzare l'addensamento di colore chiaro.
+    if (i === 7) isLightTube = false;
+    var tubeMatInstance = new THREE.MeshStandardMaterial({
+      color: isLightTube ? tubeColorLight : tubeColorDark,
+      roughness:0.55, metalness:0.05
+    });
+
+    var mesh = new THREE.Mesh(tubeGeo, tubeMatInstance);
     tubeGroup.add(mesh);
+    tubeMeshesData.push({ mesh:mesh, material:tubeMatInstance, isLight:isLightTube, flipping:false, flipStart:0, flipFrom:null, flipTo:null });
 
     landingPoints.push({x:landX, z:landZ});
 
@@ -299,6 +329,8 @@ function init(){
     tubeGroup.add(pl);
   }
 
+  // base comune, di giallo meno intenso, sotto tutti i punti di atterraggio delle facole:
+  // una "salsiccia" curva (tubo sottile lungo l'arco di atterraggio) con due semisfere alle estremita'
   var baseMatSausage = new THREE.MeshStandardMaterial({ color:0xf5da8a, roughness:0.9, transparent:true, opacity:0.75 });
   var sausageRadius = 14;
   if (landingPoints.length > 1){
@@ -333,6 +365,10 @@ function init(){
   baseRing.position.set(baseCenterForMarker.x, -1, baseCenterForMarker.z-10);
   tubeGroup.add(baseRing);
 
+  // particelle di flusso: piccole frecce che percorrono ciascun tubo
+  // dal polo nero (base) verso le facole (atterraggio), in loop continuo.
+  // depthTest disattivato cosi' restano visibili anche quando il tubo,
+  // ingrossandosi, le circonderebbe rendendole altrimenti nascoste.
   var flowMat = new THREE.MeshBasicMaterial({
     color:0xfff2a0, transparent:true, opacity:0.98,
     blending:THREE.AdditiveBlending, depthTest:false, depthWrite:false
@@ -349,6 +385,53 @@ function init(){
       particle.userData.speedMul = 0.8 + Math.random()*0.4;
       tubeGroup.add(particle);
       flowParticles.push(particle);
+    }
+  }
+
+  // ===================================================================================
+  // INVERSIONE DI COLORE DELLE FIBRILLE (da scura a chiara)
+  // Di tanto in tanto una fibrilla inizialmente scura transisce gradualmente al colore
+  // chiaro giallo-arancione, per rappresentare l'evoluzione dinamica del plasma prevista
+  // dalla teoria rivista. L'inversione avviene in ENTRAMBI i sensi (scuro->chiaro e
+  // chiaro->scuro), quindi il fenomeno si ripete indefinitamente senza che le fibrille
+  // scure "spariscano" col tempo. I tre parametri seguenti regolano FREQUENZA e DURATA
+  // dell'evento e sono pensati per essere modificati liberamente:
+  var FLIP_CHECK_INTERVAL_MS = 1000; // ogni quanti millisecondi si valuta un nuovo possibile evento
+  var FLIP_PROBABILITY       = 0.50; // probabilita' di innesco ad ogni controllo
+  var FLIP_TRANSITION_MS     = 1200; // durata (ms) della dissolvenza fra i due colori
+  // ===================================================================================
+  var lastFlipCheckTime = performance.now();
+  var flipColorDark  = new THREE.Color(tubeColorDark);
+  var flipColorLight = new THREE.Color(tubeColorLight);
+
+  function updateColorFlips(now){
+    // 1) verifica periodica (ogni FLIP_CHECK_INTERVAL_MS) se innescare un nuovo evento
+    if (now - lastFlipCheckTime >= FLIP_CHECK_INTERVAL_MS){
+      lastFlipCheckTime = now;
+      if (Math.random() < FLIP_PROBABILITY){
+        // sceglie una fibrilla qualsiasi non gia' in transizione: puo' essere sia
+        // scura (passera' a chiara) sia chiara (tornera' scura) - processo reversibile
+        var candidates = tubeMeshesData.filter(function(td){ return !td.flipping; });
+        if (candidates.length > 0){
+          var chosen = candidates[Math.floor(Math.random()*candidates.length)];
+          chosen.flipping = true;
+          chosen.flipStart = now;
+          chosen.flipFrom = chosen.isLight ? flipColorLight : flipColorDark;
+          chosen.flipTo   = chosen.isLight ? flipColorDark  : flipColorLight;
+        }
+      }
+    }
+    // 2) avanza le transizioni di colore attualmente in corso
+    for (var ti=0; ti<tubeMeshesData.length; ti++){
+      var td = tubeMeshesData[ti];
+      if (!td.flipping) continue;
+      var progress = (now - td.flipStart) / FLIP_TRANSITION_MS;
+      if (progress >= 1){
+        progress = 1;
+        td.flipping = false;
+        td.isLight = !td.isLight; // stato finale invertito rispetto a prima della transizione
+      }
+      td.material.color.lerpColors(td.flipFrom, td.flipTo, progress);
     }
   }
 
@@ -394,6 +477,7 @@ function init(){
         camera.position.z = controls.target.z + radius*Math.cos(tt);
       }
       var now = performance.now();
+      updateColorFlips(now);
       for (var fp=0; fp<flowParticles.length; fp++){
         try {
           var part = flowParticles[fp];
