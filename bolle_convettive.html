@@ -27,7 +27,7 @@ const canvas=document.getElementById('c');
 const ctx=canvas.getContext('2d');
 const bgc=document.getElementById('bgcv');
 const bctx=bgc.getContext('2d');
-let W,H,cx,cy,R,DPR=1;
+let W,H,cx,cy,R,DPR=1,isMobile=false;
 
 function resize(){
  const rect=canvas.parentElement.getBoundingClientRect();
@@ -36,7 +36,7 @@ function resize(){
  canvas.style.width=bgc.style.width=rect.width+'px';
  canvas.style.height=bgc.style.height=rect.height+'px';
  
- const isMobile = W < 600 * DPR;
+ isMobile = W < 600 * DPR;
  const padL = (isMobile ? 75 : 105) * DPR;
  const padT = 14 * DPR, padB = 14 * DPR, padR = 14 * DPR;
 
@@ -54,7 +54,6 @@ const zones=[
  {key:'l2',     rIn:0.80, rOut:0.91, cells:10, speed:0.07, size:13, label:'Strato intermedio', color:'#ffa64d'},
  {key:'l3',     rIn:0.91, rOut:0.985,cells:20, speed:0.09, size:8,  label:'Strato esterno',    color:'#ff7a3d'},
 ];
-const deepColor='#7a2a12';
 
 function polar(r,a){return {x:cx+r*R*Math.cos(a), y:cy+r*R*Math.sin(a)};}
 function cellPts(rIn,rOut,aC,aE){return [[rIn,aC],[rOut,aC],[rOut,aE],[rIn,aE]];}
@@ -188,13 +187,10 @@ function frame(now){
   const step=SWEEP/z.cells;
   const rMid=(z.rIn+z.rOut)/2;
   
-  // CORREZIONE DEFINITIVA SPAZIATURA: scala il raggio e lo spessore dell'arco 
-  // in base allo spazio effettivo della cella per evitare debordamenti a fianco.
-  const scaleFactor = Math.min(1, R / (600 * DPR));
-  const effectiveSize = z.size * (isMobile ? (0.75 + scaleFactor * 0.25) : 1);
-  
-  const radius = effectiveSize * DPR;
-  const lw = Math.max(effectiveSize * 0.24 * DPR, 1.5 * DPR);
+  // Riduciamo leggermente il raggio delle celle su mobile per evitare lo straripamento a fianco
+  const mobileFactor = isMobile ? 0.82 : 1.0;
+  const radius = z.size * 1.05 * mobileFactor * DPR;
+  const lw = Math.max(z.size * 0.26 * mobileFactor * DPR, 1.8 * DPR);
   const dashOff = -(t * z.speed * 260 * DPR);
 
   for(let j=0;j<z.cells;j++){
