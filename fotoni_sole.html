@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Il viaggio dei fotoni nel Sole</title>
+<style>
+:root{
+  --bg:#05070d; --panel:#0d1220; --panel2:#141b30; --text:#e8ecf5; --muted:#8b93ab;
+  --accent:#ffb347; --accent2:#ff6b35; --line:#232c47;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--text);
+  font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif;overflow:hidden;}
+#app{display:flex;height:100vh;width:100vw;}
+#stage{position:relative;flex:1;min-width:0;}
+canvas{display:block;width:100%;height:100%;background:radial-gradient(ellipse at center,#0a0e1c 0%,#05070d 70%);}
+#panel{width:280px;flex:none;background:var(--panel);border-left:1px solid var(--line);
+  padding:20px 18px;display:flex;flex-direction:column;gap:18px;overflow-y:auto;}
+#panel h1{font-size:15px;font-weight:600;margin:0 0 2px;letter-spacing:.2px;}
+#panel p.sub{margin:0;color:var(--muted);font-size:12px;line-height:1.5;}
+.ctrl{display:flex;flex-direction:column;gap:6px;}
+.ctrl label{font-size:12px;color:var(--muted);display:flex;justify-content:space-between;}
+.ctrl label b{color:var(--text);font-weight:500;}
+input[type=range]{width:100%;accent-color:var(--accent);}
+.two{display:flex;gap:10px;}
+.two>div{flex:1;}
+#toggleBtn{background:var(--accent2);color:#1a0d05;border:none;border-radius:8px;
+  padding:12px;font-size:14px;font-weight:600;cursor:pointer;letter-spacing:.2px;}
+#toggleBtn:active{transform:translateY(1px);}
+#resetBtn{background:transparent;color:var(--muted);border:1px solid var(--line);
+  border-radius:8px;padding:9px;font-size:12px;cursor:pointer;}
+#resetBtn:hover{color:var(--text);border-color:var(--muted);}
+.stats{background:var(--panel2);border-radius:8px;padding:12px 14px;display:flex;
+  flex-direction:column;gap:6px;font-size:12px;}
+.stats div{display:flex;justify-content:space-between;color:var(--muted);}
+.stats div b{color:var(--accent);font-weight:600;}
+hr{border:none;border-top:1px solid var(--line);margin:2px 0;}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="stage"><canvas id="cv"></canvas></div>
+  <div id="panel">
+    <div>
+      <h1>☀ Cammino casuale del fotone</h1>
+      <p class="sub">Dal nucleo alla superficie: miliardi di urti compressi in una passeggiata visiva.</p>
+    </div>
+    <button id="toggleBtn">▶ Avvia</button>
+    <button id="resetBtn">↺ Azzera scena</button>
+    <hr>
+    <div class="ctrl">
+      <label>Frequenza generazione <b id="freqVal"></b></label>
+      <input id="freq" type="range" min="0.2" max="20" step="0.2" value="3">
+    </div>
+    <div class="ctrl">
+      <label>Velocità simulazione <b id="speedVal"></b></label>
+      <input id="speed" type="range" min="1" max="60" step="1" value="8">
+    </div>
+    <div class="ctrl">
+      <label>Durata tratto (anni simulati)</label>
+      <div class="two">
+        <div><input id="durMin" type="range" min="1" max="5000" step="1" value="200"><span id="durMinVal" style="font-size:11px;color:var(--muted)"></span></div>
+        <div><input id="durMax" type="range" min="1" max="5000" step="1" value="1500"><span id="durMaxVal" style="font-size:11px;color:var(--muted)"></span></div>
+      </div>
+      <label style="justify-content:flex-start;gap:6px;color:var(--muted);font-size:11px;">min ↔ max per singolo urto (solo statistica)</label>
+    </div>
+    <div class="ctrl">
+      <label>Lunghezza tratto (pixel)</label>
+      <div class="two">
+        <div><input id="pxMin" type="range" min="0.1" max="15" step="0.1" value="0.6"><span id="pxMinVal" style="font-size:11px;color:var(--muted)"></span></div>
+        <div><input id="pxMax" type="range" min="0.1" max="15" step="0.1" value="2"><span id="pxMaxVal" style="font-size:11px;color:var(--muted)"></span></div>
+      </div>
+      <label style="justify-content:flex-start;gap:6px;color:var(--muted);font-size:11px;">più piccolo = più urti per uscire, bozzolo più lento</label>
+    </div>
+    <div class="ctrl">
+      <label>Velocità zona convettiva <b id="convVal"></b></label>
+      <input id="convMult" type="range" min="2" max="50" step="1" value="10">
+      <label style="justify-content:flex-start;gap:6px;color:var(--muted);font-size:11px;">moltiplicatore del passo oltre il confine interno</label>
+    </div>
+    <div class="ctrl">
+      <label>Fotoni massimi contemporanei <b id="maxVal"></b></label>
+      <input id="maxActive" type="range" min="100" max="6000" step="100" value="3000">
+    </div>
+    <hr>
+    <div class="stats">
+      <div>Fotoni attivi<b id="sActive">0</b></div>
+      <div>Fotoni usciti<b id="sExited">0</b></div>
+      <div>Tempo sim. medio<b id="sTime">–</b></div>
+      <div>Passi/frame (throttling)<b id="sThrottle">100%</b></div>
+    </div>
+  </div>
+</div>
+<script>
+const cv=document.getElementById('cv'), ctx=cv.getContext('2d');
+const stage=document.getElementById('stage');
+function resize(){cv.width=stage.clientWidth;cv.height=stage.clientHeight;drawBase();}
+window.addEventListener('resize',resize);
+
+let R, innerR, core, cx, cy;
+function drawBase(){
+  cx=cv.width/2; cy=cv.height/2;
+  R=Math.min(cv.width,cv.height)*0.44;
+  innerR=R*0.7; // confine radiativa/convettiva, proporzione realistica (~0.7 raggi solari)
+  core=R*0.06;
+  ctx.clearRect(0,0,cv.width,cv.height);
+  // zona convettiva (esterna): più chiara, moto turbolento
+  const gOut=ctx.createRadialGradient(cx,cy,innerR*0.8,cx,cy,R);
+  gOut.addColorStop(0,'#c98a3a'); gOut.addColorStop(0.6,'#a8621f'); gOut.addColorStop(1,'#7a3f10');
+  ctx.beginPath(); ctx.arc(cx,cy,R,0,7); ctx.fillStyle=gOut; ctx.fill();
+  // zona radiativa (interna): più densa e rossastra, diffusione lenta
+  const gIn=ctx.createRadialGradient(cx,cy,0,cx,cy,innerR);
+  gIn.addColorStop(0,'#e8c98a'); gIn.addColorStop(0.45,'#c98a40'); gIn.addColorStop(1,'#9a3f14');
+  ctx.beginPath(); ctx.arc(cx,cy,innerR,0,7); ctx.fillStyle=gIn; ctx.fill();
+  // confine tra le due zone
+  ctx.beginPath(); ctx.arc(cx,cy,innerR,0,7);
+  ctx.strokeStyle='rgba(20,8,0,0.35)'; ctx.lineWidth=1.5; ctx.stroke();
+  ctx.beginPath(); ctx.arc(cx,cy,core,0,7); ctx.fillStyle='#fff9ec';
+  ctx.shadowColor='#fff'; ctx.shadowBlur=15; ctx.fill(); ctx.shadowBlur=0;
+}
+
+let photons=[], running=false, exitedCount=0, exitedTimeSum=0, lastT=0, spawnAcc=0;
+let perfScale=1, targetMs=10; // budget di calcolo per frame (ms), lascia margine al rendering
+
+function newPhoton(){
+  const a=Math.random()*7;
+  const hue=Math.floor(Math.random()*256)/256*360;
+  return {
+    x:cx+Math.cos(a)*core*0.5, y:cy+Math.sin(a)*core*0.5,
+    color:`hsl(${hue.toFixed(0)},90%,60%)`,
+    exited:false, done:false, convAngle:null,
+    simTime:0, stopDist: R * (1.06 + Math.random()*0.09)
+  };
+}
+
+function segLen(){
+  const durMin=+document.getElementById('durMin').value;
+  const durMax=+document.getElementById('durMax').value;
+  const yrs = durMin + Math.random()*Math.max(1,durMax-durMin);
+  const pxMin=+document.getElementById('pxMin').value;
+  const pxMax=+document.getElementById('pxMax').value;
+  const px = pxMin + Math.random()*Math.max(0.01,pxMax-pxMin);
+  return {yrs, px};
+}
+
+function stepPhoton(p){
+  if(p.done) return;
+  const {yrs,px}=segLen();
+  p.simTime += yrs;
+  const convMult=+document.getElementById('convMult').value;
+  let nx, ny;
+  if(!p.exited){
+    const dist0=Math.hypot(p.x-cx,p.y-cy);
+    if(dist0>=innerR){
+      // zona convettiva: direzione sostanzialmente stabile, con lenta deriva (come una bolla che sale)
+      if(p.convAngle===null) p.convAngle=Math.atan2(p.y-cy,p.x-cx);
+      p.convAngle += (Math.random()-0.5)*0.06;
+      const rawStep = px*convMult*(0.4+Math.random()*0.6);
+      const maxStep = R*0.008; // tetto: niente oscillazioni enormi, granulazione fine
+      const step = Math.min(rawStep, maxStep);
+      const newDist=dist0 + step;
+      nx=cx+Math.cos(p.convAngle)*newDist; ny=cy+Math.sin(p.convAngle)*newDist;
+    } else {
+      const angle=Math.random()*Math.PI*2;
+      nx=p.x+Math.cos(angle)*px; ny=p.y+Math.sin(angle)*px;
+    }
+  } else {
+    nx=p.x+Math.cos(p.exitAngle)*Math.min(px*convMult,R*0.015); ny=p.y+Math.sin(p.exitAngle)*Math.min(px*convMult,R*0.015);
+  }
+  ctx.lineTo(nx,ny);
+  p.x=nx; p.y=ny;
+  const dist=Math.hypot(p.x-cx,p.y-cy);
+  if(!p.exited && dist>=R){
+    p.exited=true;
+    p.exitAngle=Math.atan2(p.y-cy,p.x-cx);
+  }
+  if(p.exited && dist>=p.stopDist){
+    p.done=true;
+    exitedCount++; exitedTimeSum+=p.simTime;
+  }
+}
+
+function loop(t){
+  if(!running){requestAnimationFrame(loop);return;}
+  if(!lastT) lastT=t;
+  const dt=(t-lastT)/1000; lastT=t;
+
+  const freq=+document.getElementById('freq').value;
+  const maxActive=+document.getElementById('maxActive').value;
+  spawnAcc+=freq*dt;
+  while(spawnAcc>=1 && photons.length<maxActive){ photons.push(newPhoton()); spawnAcc--; }
+
+  const speed=+document.getElementById('speed').value;
+  const effSteps=Math.max(1, Math.round(speed*perfScale));
+  const workStart=performance.now();
+  for(const p of photons){
+    ctx.beginPath(); ctx.moveTo(p.x,p.y);
+    ctx.strokeStyle=p.color; ctx.lineWidth=1.1; ctx.globalAlpha=p.exited?0.85:0.55;
+    for(let i=0;i<effSteps;i++){ if(!p.done) stepPhoton(p); else break; }
+    ctx.stroke();
+  }
+  ctx.globalAlpha=1;
+  const workMs=performance.now()-workStart;
+  if(workMs>targetMs) perfScale=Math.max(0.05, perfScale*0.85);
+  else if(workMs<targetMs*0.5) perfScale=Math.min(1, perfScale*1.05);
+  photons=photons.filter(p=>!p.done); // trail resta disegnata sul canvas, il fotone esce dalla lista attivi
+
+  document.getElementById('sActive').textContent=photons.length;
+  document.getElementById('sExited').textContent=exitedCount;
+  document.getElementById('sTime').textContent = exitedCount? Math.round(exitedTimeSum/exitedCount).toLocaleString('it-IT')+' anni' : '–';
+  document.getElementById('sThrottle').textContent = Math.round(perfScale*100)+'%';
+
+  requestAnimationFrame(loop);
+}
+
+function syncLabels(){
+  document.getElementById('freqVal').textContent=document.getElementById('freq').value+'/s';
+  document.getElementById('speedVal').textContent='×'+document.getElementById('speed').value;
+  document.getElementById('durMinVal').textContent=document.getElementById('durMin').value;
+  document.getElementById('durMaxVal').textContent=document.getElementById('durMax').value;
+  document.getElementById('pxMinVal').textContent=document.getElementById('pxMin').value;
+  document.getElementById('pxMaxVal').textContent=document.getElementById('pxMax').value;
+  document.getElementById('maxVal').textContent=document.getElementById('maxActive').value;
+  document.getElementById('convVal').textContent='×'+document.getElementById('convMult').value;
+}
+['freq','speed','durMin','durMax','pxMin','pxMax','maxActive','convMult'].forEach(id=>document.getElementById(id).addEventListener('input',syncLabels));
+syncLabels();
+
+document.getElementById('toggleBtn').addEventListener('click',()=>{
+  running=!running; lastT=0;
+  document.getElementById('toggleBtn').textContent = running? '⏸ Pausa' : '▶ Avvia';
+});
+document.getElementById('resetBtn').addEventListener('click',()=>{
+  photons=[]; exitedCount=0; exitedTimeSum=0; spawnAcc=0;
+  document.getElementById('sActive').textContent='0';
+  document.getElementById('sExited').textContent='0';
+  document.getElementById('sTime').textContent='–';
+  drawBase();
+});
+
+resize();
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
