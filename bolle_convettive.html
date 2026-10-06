@@ -10,12 +10,12 @@
  :root[data-theme="dark"]{--bg:#05070d;--text:#e8ecf5;--muted:#8b95ac;}
  :root[data-theme="light"]{--bg:#eef1f8;--text:#11141c;--muted:#5b6478;}
  *{box-sizing:border-box;}
- body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,Segoe UI,Roboto,sans-serif;display:flex;flex-direction:column;align-items:center;padding:10px;min-height:100vh;}
- .stage{position:relative;width:min(98vw,98vh*1.2,1100px);aspect-ratio:6/5;}
+ body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,Segoe UI,Roboto,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px;min-height:100vh;}
+ .stage{position:relative;width:100%;max-width:650px;aspect-ratio:1/1;}
  canvas{width:100%;height:100%;display:block;border-radius:14px;position:absolute;top:0;left:0;}
- .legend{display:flex;flex-wrap:wrap;gap:8px 18px;justify-content:center;margin-top:18px;max-width:600px;font-size:.78rem;color:var(--muted);}
- .legend span.item{display:inline-flex;align-items:center;gap:6px;}
- .dot{width:10px;height:10px;border-radius:50%;display:inline-block;flex:none;}
+ .legend{display:flex;flex-wrap:wrap;gap:6px 14px;justify-content:center;margin-top:14px;max-width:600px;font-size:.75rem;color:var(--muted);text-align:center;}
+ .legend span.item{display:inline-flex;align-items:center;gap:5px;}
+ .dot{width:9px;height:9px;border-radius:50%;display:inline-block;flex:none;}
 </style>
 </head>
 <body>
@@ -35,7 +35,7 @@ function resize(){
  W=canvas.width=bgc.width=rect.width*DPR; H=canvas.height=bgc.height=rect.height*DPR;
  canvas.style.width=bgc.style.width=rect.width+'px';
  canvas.style.height=bgc.style.height=rect.height+'px';
- const padL=105*DPR, padT=14*DPR, padB=14*DPR, padR=14*DPR;
+ const padL=85*DPR, padT=15*DPR, padB=15*DPR, padR=15*DPR;
  cx=padL; cy=H-padB;
  R=Math.min(W-padL-padR, H-padT-padB);
 }
@@ -50,7 +50,6 @@ const zones=[
  {key:'l2',     rIn:0.80, rOut:0.91, cells:10, speed:0.07, size:13, label:'Strato intermedio', color:'#ffa64d'},
  {key:'l3',     rIn:0.91, rOut:0.985,cells:20, speed:0.09, size:8,  label:'Strato esterno',    color:'#ff7a3d'},
 ];
-const deepColor='#7a2a12';
 
 function polar(r,a){return {x:cx+r*R*Math.cos(a), y:cy+r*R*Math.sin(a)};}
 function cellPts(rIn,rOut,aC,aE){return [[rIn,aC],[rOut,aC],[rOut,aE],[rIn,aE]];}
@@ -108,7 +107,6 @@ function drawStatic(){
  bctx.save();
  sectorClip(bctx);
 
- // riempimento settoriale di ogni zona
  zones.forEach(z=>{
   bctx.beginPath();
   if(z.rIn===0){
@@ -124,7 +122,6 @@ function drawStatic(){
   bctx.fill();
  });
 
- // nucleo con gradiente extra
  const nuc=zones[0];
  const nucGrad=bctx.createRadialGradient(cx,cy,0,cx,cy,nuc.rOut*R);
  nucGrad.addColorStop(0,'#fffaf0'); nucGrad.addColorStop(1,'#ffcf6b');
@@ -133,7 +130,6 @@ function drawStatic(){
  bctx.fillStyle=nucGrad; bctx.fill();
  bctx.restore();
 
- // traiettorie tratteggiate delle celle convettive
  bctx.setLineDash([4*DPR,4*DPR]);
  bctx.strokeStyle='rgba(255,255,255,0.35)';
  bctx.lineWidth=1*DPR;
@@ -149,8 +145,7 @@ function drawStatic(){
  bctx.setLineDash([]);
  bctx.restore();
 
- // confini del settore (archi, senza sporgere oltre il bordo retto)
- bctx.font=`${11*DPR}px -apple-system,Segoe UI,sans-serif`;
+ bctx.font=`${10*DPR}px -apple-system,Segoe UI,sans-serif`;
  bctx.textBaseline='middle';
  bctx.lineCap='butt';
  zones.forEach(z=>{
@@ -160,9 +155,9 @@ function drawStatic(){
 
  function labelAt(rFrac,text){
   const p=polar(rFrac, A0);
-  bctx.beginPath(); bctx.arc(p.x,p.y,2.2*DPR,0,7); bctx.fillStyle='#fff'; bctx.fill();
+  bctx.beginPath(); bctx.arc(p.x,p.y,2*DPR,0,7); bctx.fillStyle='#fff'; bctx.fill();
   bctx.fillStyle='#f3ede2'; bctx.textAlign='right';
-  bctx.fillText(text, p.x-8*DPR, p.y);
+  bctx.fillText(text, p.x-6*DPR, p.y);
  }
  labelAt((zones[0].rIn+zones[0].rOut)/2, zones[0].label);
  labelAt((zones[1].rIn+zones[1].rOut)/2, zones[1].label);
