@@ -36,8 +36,6 @@ function resize(){
  canvas.style.width=bgc.style.width=rect.width+'px';
  canvas.style.height=bgc.style.height=rect.height+'px';
  
- // ADATTAMENTO MIRATO: se lo schermo è stretto (es. iPhone), riduciamo proporzionalmente 
- // il padding sinistro per evitare che spinga via il grafico tagliandolo.
  const isMobile = W < 600 * DPR;
  const padL = (isMobile ? 75 : 105) * DPR;
  const padT = 14 * DPR, padB = 14 * DPR, padR = 14 * DPR;
@@ -189,9 +187,16 @@ function frame(now){
   if(!z.cells) return;
   const step=SWEEP/z.cells;
   const rMid=(z.rIn+z.rOut)/2;
-  const radius=z.size*1.05*DPR; // Usiamo esattamente la dimensione originale dello script!
-  const lw=Math.max(z.size*0.26*DPR,2*DPR);
-  const dashOff=-(t*z.speed*260*DPR);
+  
+  // CORREZIONE DEFINITIVA SPAZIATURA: scala il raggio e lo spessore dell'arco 
+  // in base allo spazio effettivo della cella per evitare debordamenti a fianco.
+  const scaleFactor = Math.min(1, R / (600 * DPR));
+  const effectiveSize = z.size * (isMobile ? (0.75 + scaleFactor * 0.25) : 1);
+  
+  const radius = effectiveSize * DPR;
+  const lw = Math.max(effectiveSize * 0.24 * DPR, 1.5 * DPR);
+  const dashOff = -(t * z.speed * 260 * DPR);
+
   for(let j=0;j<z.cells;j++){
    const aL=A0+j*step, aR=A0+(j+1)*step, aC=aL+step/2;
    const aLeftSub=(aL+aC)/2, aRightSub=(aC+aR)/2;
