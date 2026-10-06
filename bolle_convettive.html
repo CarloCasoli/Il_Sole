@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Zona Convettiva – Settore Radiale</title>
+<style>
+ :root{--bg:#05070d;--text:#e8ecf5;--muted:#8b95ac;}
+ @media (prefers-color-scheme: light){ :root:not([data-theme="dark"]){--bg:#eef1f8;--text:#11141c;--muted:#5b6478;} }
+ :root[data-theme="dark"]{--bg:#05070d;--text:#e8ecf5;--muted:#8b95ac;}
+ :root[data-theme="light"]{--bg:#eef1f8;--text:#11141c;--muted:#5b6478;}
+ *{box-sizing:border-box;}
+ body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,Segoe UI,Roboto,sans-serif;display:flex;flex-direction:column;align-items:center;padding:10px;min-height:100vh;}
+ .stage{position:relative;width:min(98vw,98vh*1.2,1100px);aspect-ratio:6/5;}
+ canvas{width:100%;height:100%;display:block;border-radius:14px;position:absolute;top:0;left:0;}
+ .legend{display:flex;flex-wrap:wrap;gap:8px 18px;justify-content:center;margin-top:18px;max-width:600px;font-size:.78rem;color:var(--muted);}
+ .legend span.item{display:inline-flex;align-items:center;gap:6px;}
+ .dot{width:10px;height:10px;border-radius:50%;display:inline-block;flex:none;}
+</style>
+</head>
+<body>
+<div class="stage"><canvas id="bgcv"></canvas><canvas id="c"></canvas></div>
+<div class="legend" id="legend"></div>
+<script>
+(function(){
+const canvas=document.getElementById('c');
+const ctx=canvas.getContext('2d');
+const bgc=document.getElementById('bgcv');
+const bctx=bgc.getContext('2d');
+let W,H,cx,cy,R,DPR=1;
+
+function resize(){
+ const rect=canvas.parentElement.getBoundingClientRect();
+ DPR=Math.min(window.devicePixelRatio||1,2);
+ W=canvas.width=bgc.width=rect.width*DPR; H=canvas.height=bgc.height=rect.height*DPR;
+ canvas.style.width=bgc.style.width=rect.width+'px';
+ canvas.style.height=bgc.style.height=rect.height+'px';
+ const padL=105*DPR, padT=14*DPR, padB=14*DPR, padR=14*DPR;
+ cx=padL; cy=H-padB;
+ R=Math.min(W-padL-padR, H-padT-padB);
+}
+window.addEventListener('resize',()=>{resize();drawStatic();}); resize();
+
+const A0=-Math.PI/2, A1=0, SWEEP=Math.PI/2;
+
+const zones=[
+ {key:'nucleo', rIn:0,    rOut:0.10, label:'Nucleo',            color:'#fff2c0'},
+ {key:'rad',    rIn:0.10, rOut:0.65, label:'Zona radiativa',    color:'#ffb454'},
+ {key:'l1',     rIn:0.65, rOut:0.80, cells:5,  speed:0.05, size:20, label:'Corona interna',    color:'#ffcf6b'},
+ {key:'l2',     rIn:0.80, rOut:0.91, cells:10, speed:0.07, size:13, label:'Strato intermedio', color:'#ffa64d'},
+ {key:'l3',     rIn:0.91, rOut:0.985,cells:20, speed:0.09, size:8,  label:'Strato esterno',    color:'#ff7a3d'},
+];
+const deepColor='#7a2a12';
+
+function polar(r,a){return {x:cx+r*R*Math.cos(a), y:cy+r*R*Math.sin(a)};}
+function cellPts(rIn,rOut,aC,aE){return [[rIn,aC],[rOut,aC],[rOut,aE],[rIn,aE]];}
+function lerpColor(a,b,t){
+ const ah=parseInt(a.slice(1),16),bh=parseInt(b.slice(1),16);
+ const ar=ah>>16,ag=(ah>>8)&255,ab=ah&255,br=bh>>16,bg=(bh>>8)&255,bb=bh&255;
+ const r=Math.round(ar+(br-ar)*t),g=Math.round(ag+(bg-ag)*t),bl=Math.round(ab+(bb-ab)*t);
+ return `rgb(${r},${g},${bl})`;
+}
+function drawLoopPath(g,pts){
+ const p1=polar(pts[1][0],pts[1][1]);
+ const p3=polar(pts[3][0],pts[3][1]);
+ g.beginPath();
+ g.moveTo(p1.x,p1.y);
+ g.arc(cx,cy,pts[1][0]*R,pts[1][1],pts[2][1],pts[2][1]<pts[1][1]);
+ g.lineTo(p3.x,p3.y);
+ g.arc(cx,cy,pts[3][0]*R,pts[3][1],pts[0][1],pts[0][1]>pts[3][1]);
+ g.stroke();
+}
+function drawFixedArc(g,x0,y0,radius,startAngle,sweep,color,lw,dashOffset,arrowAtStart){
+ const endAngle=startAngle+sweep;
+ g.save();
+ g.beginPath();
+ g.arc(x0,y0,radius,startAngle,endAngle,false);
+ g.strokeStyle=color; g.lineWidth=lw; g.lineCap='round';
+ g.setLineDash([lw*1.5, lw*1.2]);
+ g.lineDashOffset=dashOffset;
+ g.stroke();
+ g.restore();
+ const tipA = arrowAtStart?startAngle:endAngle;
+ const backA = arrowAtStart?startAngle+0.14:endAngle-0.14;
+ const p1x=x0+radius*Math.cos(backA), p1y=y0+radius*Math.sin(backA);
+ const p2x=x0+radius*Math.cos(tipA), p2y=y0+radius*Math.sin(tipA);
+ const ang=Math.atan2(p2y-p1y,p2x-p1x);
+ g.save(); g.translate(p2x,p2y); g.rotate(ang);
+ const ah=lw*1.7;
+ g.beginPath();
+ g.moveTo(ah*1.1,0);
+ g.lineTo(-ah*0.5, ah*0.8);
+ g.lineTo(-ah*0.5,-ah*0.8);
+ g.closePath(); g.fillStyle=color; g.fill();
+ g.restore();
+}
+
+function sectorClip(g){
+ g.beginPath();
+ g.moveTo(cx,cy);
+ g.arc(cx,cy,R*0.999,A0,A1,false);
+ g.closePath();
+ g.clip();
+}
+
+function drawStatic(){
+ bctx.clearRect(0,0,W,H);
+ bctx.save();
+ sectorClip(bctx);
+
+ // riempimento settoriale di ogni zona
+ zones.forEach(z=>{
+  bctx.beginPath();
+  if(z.rIn===0){
+   bctx.moveTo(cx,cy);
+   bctx.arc(cx,cy,z.rOut*R,A0,A1,false);
+   bctx.closePath();
+  } else {
+   bctx.arc(cx,cy,z.rOut*R,A0,A1,false);
+   bctx.arc(cx,cy,z.rIn*R,A1,A0,true);
+   bctx.closePath();
+  }
+  bctx.fillStyle=lerpColor('#0a0503', z.color, z.key==='nucleo'?0.55:z.key==='rad'?0.22:0.12);
+  bctx.fill();
+ });
+
+ // nucleo con gradiente extra
+ const nuc=zones[0];
+ const nucGrad=bctx.createRadialGradient(cx,cy,0,cx,cy,nuc.rOut*R);
+ nucGrad.addColorStop(0,'#fffaf0'); nucGrad.addColorStop(1,'#ffcf6b');
+ bctx.save();
+ bctx.beginPath(); bctx.moveTo(cx,cy); bctx.arc(cx,cy,nuc.rOut*R,A0,A1,false); bctx.closePath();
+ bctx.fillStyle=nucGrad; bctx.fill();
+ bctx.restore();
+
+ // traiettorie tratteggiate delle celle convettive
+ bctx.setLineDash([4*DPR,4*DPR]);
+ bctx.strokeStyle='rgba(255,255,255,0.35)';
+ bctx.lineWidth=1*DPR;
+ zones.forEach(z=>{
+  if(!z.cells) return;
+  const step=SWEEP/z.cells;
+  for(let j=0;j<z.cells;j++){
+   const aL=A0+j*step, aR=A0+(j+1)*step, aC=aL+step/2;
+   drawLoopPath(bctx, cellPts(z.rIn,z.rOut,aC,aR));
+   drawLoopPath(bctx, cellPts(z.rIn,z.rOut,aC,aL));
+  }
+ });
+ bctx.setLineDash([]);
+ bctx.restore();
+
+ // confini del settore (archi, senza sporgere oltre il bordo retto)
+ bctx.font=`${11*DPR}px -apple-system,Segoe UI,sans-serif`;
+ bctx.textBaseline='middle';
+ bctx.lineCap='butt';
+ zones.forEach(z=>{
+  bctx.beginPath(); bctx.arc(cx,cy,z.rOut*R,A0,A1,false);
+  bctx.strokeStyle='rgba(255,255,255,0.55)'; bctx.lineWidth=1.6*DPR; bctx.stroke();
+ });
+
+ function labelAt(rFrac,text){
+  const p=polar(rFrac, A0);
+  bctx.beginPath(); bctx.arc(p.x,p.y,2.2*DPR,0,7); bctx.fillStyle='#fff'; bctx.fill();
+  bctx.fillStyle='#f3ede2'; bctx.textAlign='right';
+  bctx.fillText(text, p.x-8*DPR, p.y);
+ }
+ labelAt((zones[0].rIn+zones[0].rOut)/2, zones[0].label);
+ labelAt((zones[1].rIn+zones[1].rOut)/2, zones[1].label);
+ const convIn=zones[2].rIn, convOut=zones[zones.length-1].rOut;
+ labelAt((convIn+convOut)/2, 'Zona convettiva');
+
+ bctx.textAlign='left';
+ bctx.lineCap='round';
+ bctx.beginPath();
+ bctx.moveTo(cx,cy); bctx.lineTo(polar(zones[zones.length-1].rOut,A0).x, polar(zones[zones.length-1].rOut,A0).y);
+ bctx.moveTo(cx,cy); bctx.lineTo(polar(zones[zones.length-1].rOut,A1).x, polar(zones[zones.length-1].rOut,A1).y);
+ bctx.strokeStyle='rgba(255,255,255,0.5)'; bctx.lineWidth=1.4*DPR; bctx.stroke();
+}
+drawStatic();
+
+function frame(now){
+ const t=now/1000;
+ ctx.clearRect(0,0,W,H);
+ ctx.save();
+ sectorClip(ctx);
+ zones.forEach(z=>{
+  if(!z.cells) return;
+  const step=SWEEP/z.cells;
+  const rMid=(z.rIn+z.rOut)/2;
+  const radius=z.size*1.05*DPR;
+  const lw=Math.max(z.size*0.26*DPR,2*DPR);
+  const dashOff=-(t*z.speed*260*DPR);
+  for(let j=0;j<z.cells;j++){
+   const aL=A0+j*step, aR=A0+(j+1)*step, aC=aL+step/2;
+   const aLeftSub=(aL+aC)/2, aRightSub=(aC+aR)/2;
+   const pL=polar(rMid,aLeftSub), pR=polar(rMid,aRightSub);
+   const delta=step/4;
+   const startR=aRightSub-delta;
+   const startL=aLeftSub-(Math.PI-delta)-Math.PI/2;
+   drawFixedArc(ctx,pR.x,pR.y,radius,startR,1.5*Math.PI,z.color,lw,dashOff,false);
+   drawFixedArc(ctx,pL.x,pL.y,radius,startL,1.5*Math.PI,z.color,lw,-dashOff,true);
+  }
+ });
+ ctx.restore();
+ requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+const legend=document.getElementById('legend');
+zones.forEach(z=>{
+ const s=document.createElement('span'); s.className='item';
+ s.innerHTML=`<span class="dot" style="background:${z.color}"></span>${z.label}${z.cells?` (${z.cells} celle)`:''}`;
+ legend.appendChild(s);
+});
+})();
+</script>
+</body>
+</html>
