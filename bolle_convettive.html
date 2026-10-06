@@ -10,12 +10,12 @@
  :root[data-theme="dark"]{--bg:#05070d;--text:#e8ecf5;--muted:#8b95ac;}
  :root[data-theme="light"]{--bg:#eef1f8;--text:#11141c;--muted:#5b6478;}
  *{box-sizing:border-box;}
- body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,Segoe UI,Roboto,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:6px;min-height:100vh;}
- .stage{position:relative;width:100%;max-width:520px;aspect-ratio:1/1;}
+ body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,Segoe UI,Roboto,sans-serif;display:flex;flex-direction:column;align-items:center;padding:10px;min-height:100vh;}
+ .stage{position:relative;width:min(98vw,98vh*1.2,1100px);aspect-ratio:6/5;}
  canvas{width:100%;height:100%;display:block;border-radius:14px;position:absolute;top:0;left:0;}
- .legend{display:flex;flex-wrap:wrap;gap:4px 10px;justify-content:center;margin-top:8px;max-width:520px;font-size:.7rem;color:var(--muted);text-align:center;}
- .legend span.item{display:inline-flex;align-items:center;gap:4px;}
- .dot{width:7px;height:7px;border-radius:50%;display:inline-block;flex:none;}
+ .legend{display:flex;flex-wrap:wrap;gap:8px 18px;justify-content:center;margin-top:18px;max-width:600px;font-size:.78rem;color:var(--muted);}
+ .legend span.item{display:inline-flex;align-items:center;gap:6px;}
+ .dot{width:10px;height:10px;border-radius:50%;display:inline-block;flex:none;}
 </style>
 </head>
 <body>
@@ -36,10 +36,14 @@ function resize(){
  canvas.style.width=bgc.style.width=rect.width+'px';
  canvas.style.height=bgc.style.height=rect.height+'px';
  
- // Margini proporzionali per far stare etichette e archi nel viewport dell'iPhone
- const padL=70*DPR, padT=10*DPR, padB=10*DPR, padR=10*DPR;
+ // ADATTAMENTO MIRATO: se lo schermo è stretto (es. iPhone), riduciamo proporzionalmente 
+ // il padding sinistro per evitare che spinga via il grafico tagliandolo.
+ const isMobile = W < 600 * DPR;
+ const padL = (isMobile ? 75 : 105) * DPR;
+ const padT = 14 * DPR, padB = 14 * DPR, padR = 14 * DPR;
+
  cx=padL; cy=H-padB;
- R=Math.min((W-padL-padR)/0.96, (H-padT-padB)/0.96);
+ R=Math.min(W-padL-padR, H-padT-padB);
 }
 window.addEventListener('resize',()=>{resize();drawStatic();}); resize();
 
@@ -48,10 +52,11 @@ const A0=-Math.PI/2, A1=0, SWEEP=Math.PI/2;
 const zones=[
  {key:'nucleo', rIn:0,    rOut:0.10, label:'Nucleo',            color:'#fff2c0'},
  {key:'rad',    rIn:0.10, rOut:0.65, label:'Zona radiativa',    color:'#ffb454'},
- {key:'l1',     rIn:0.65, rOut:0.80, cells:5,  speed:0.05, size:16, label:'Corona interna',    color:'#ffcf6b'},
- {key:'l2',     rIn:0.80, rOut:0.91, cells:10, speed:0.07, size:11, label:'Strato intermedio', color:'#ffa64d'},
- {key:'l3',     rIn:0.91, rOut:0.985,cells:20, speed:0.09, size:6,  label:'Strato esterno',    color:'#ff7a3d'},
+ {key:'l1',     rIn:0.65, rOut:0.80, cells:5,  speed:0.05, size:20, label:'Corona interna',    color:'#ffcf6b'},
+ {key:'l2',     rIn:0.80, rOut:0.91, cells:10, speed:0.07, size:13, label:'Strato intermedio', color:'#ffa64d'},
+ {key:'l3',     rIn:0.91, rOut:0.985,cells:20, speed:0.09, size:8,  label:'Strato esterno',    color:'#ff7a3d'},
 ];
+const deepColor='#7a2a12';
 
 function polar(r,a){return {x:cx+r*R*Math.cos(a), y:cy+r*R*Math.sin(a)};}
 function cellPts(rIn,rOut,aC,aE){return [[rIn,aC],[rOut,aC],[rOut,aE],[rIn,aE]];}
@@ -87,7 +92,7 @@ function drawFixedArc(g,x0,y0,radius,startAngle,sweep,color,lw,dashOffset,arrowA
  const p2x=x0+radius*Math.cos(tipA), p2y=y0+radius*Math.sin(tipA);
  const ang=Math.atan2(p2y-p1y,p2x-p1x);
  g.save(); g.translate(p2x,p2y); g.rotate(ang);
- const ah=lw*1.6;
+ const ah=lw*1.7;
  g.beginPath();
  g.moveTo(ah*1.1,0);
  g.lineTo(-ah*0.5, ah*0.8);
@@ -132,7 +137,7 @@ function drawStatic(){
  bctx.fillStyle=nucGrad; bctx.fill();
  bctx.restore();
 
- bctx.setLineDash([3*DPR,3*DPR]);
+ bctx.setLineDash([4*DPR,4*DPR]);
  bctx.strokeStyle='rgba(255,255,255,0.35)';
  bctx.lineWidth=1*DPR;
  zones.forEach(z=>{
@@ -147,19 +152,19 @@ function drawStatic(){
  bctx.setLineDash([]);
  bctx.restore();
 
- bctx.font=`${8.5*DPR}px -apple-system,Segoe UI,sans-serif`;
+ bctx.font=`${11*DPR}px -apple-system,Segoe UI,sans-serif`;
  bctx.textBaseline='middle';
  bctx.lineCap='butt';
  zones.forEach(z=>{
   bctx.beginPath(); bctx.arc(cx,cy,z.rOut*R,A0,A1,false);
-  bctx.strokeStyle='rgba(255,255,255,0.55)'; bctx.lineWidth=1.4*DPR; bctx.stroke();
+  bctx.strokeStyle='rgba(255,255,255,0.55)'; bctx.lineWidth=1.6*DPR; bctx.stroke();
  });
 
  function labelAt(rFrac,text){
   const p=polar(rFrac, A0);
-  bctx.beginPath(); bctx.arc(p.x,p.y,1.8*DPR,0,7); bctx.fillStyle='#fff'; bctx.fill();
+  bctx.beginPath(); bctx.arc(p.x,p.y,2.2*DPR,0,7); bctx.fillStyle='#fff'; bctx.fill();
   bctx.fillStyle='#f3ede2'; bctx.textAlign='right';
-  bctx.fillText(text, p.x-4*DPR, p.y);
+  bctx.fillText(text, p.x-8*DPR, p.y);
  }
  labelAt((zones[0].rIn+zones[0].rOut)/2, zones[0].label);
  labelAt((zones[1].rIn+zones[1].rOut)/2, zones[1].label);
@@ -171,7 +176,7 @@ function drawStatic(){
  bctx.beginPath();
  bctx.moveTo(cx,cy); bctx.lineTo(polar(zones[zones.length-1].rOut,A0).x, polar(zones[zones.length-1].rOut,A0).y);
  bctx.moveTo(cx,cy); bctx.lineTo(polar(zones[zones.length-1].rOut,A1).x, polar(zones[zones.length-1].rOut,A1).y);
- bctx.strokeStyle='rgba(255,255,255,0.5)'; bctx.lineWidth=1.2*DPR; bctx.stroke();
+ bctx.strokeStyle='rgba(255,255,255,0.5)'; bctx.lineWidth=1.4*DPR; bctx.stroke();
 }
 drawStatic();
 
@@ -184,10 +189,8 @@ function frame(now){
   if(!z.cells) return;
   const step=SWEEP/z.cells;
   const rMid=(z.rIn+z.rOut)/2;
-  // Scala proporzionalmente il raggio della cella tenendo conto del fattore di pixel ratio e risoluzione
-  const currentR = Math.min(W, H) / 450; 
-  const radius=z.size * currentR * DPR * 18;
-  const lw=Math.max(z.size*0.22*DPR, 1.8*DPR);
+  const radius=z.size*1.05*DPR; // Usiamo esattamente la dimensione originale dello script!
+  const lw=Math.max(z.size*0.26*DPR,2*DPR);
   const dashOff=-(t*z.speed*260*DPR);
   for(let j=0;j<z.cells;j++){
    const aL=A0+j*step, aR=A0+(j+1)*step, aC=aL+step/2;
