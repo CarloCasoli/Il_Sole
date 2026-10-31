@@ -29,7 +29,7 @@
     </style>
 </head>
 <body>
-    <div id="info">Animazione 3D: Formazione della Culla e Condensazione del Filamento <span class="cc-badge"><span class="cc-n">© 2026 Carlo Casoli ·</span> <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it" target="_blank" rel="license noopener">CC BY-NC-ND 4.0</a></span><br><small>Il campo si deforma; il plasma si condensa nella culla formata</small></div>
+    <div id="info">Animazione 3D: Formazione della Culla e Condensazione del Filamento <span class="cc-badge"><span class="cc-n">© 2026 Carlo Casoli ·</span> <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it" target="_blank" rel="license noopener">CC BY-NC-ND 4.0</a></span> <button type="button" id="btnRicomincia" class="cc-restart" title="Riparte dall'inizio">↺ Ricomincia</button><br><small>Il campo si deforma; il plasma si condensa nella culla formata</small></div>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
@@ -132,12 +132,34 @@
         plasmaFilament.position.set(0, 5.8, 0); // Già al suo posto definitivo, non si muove in verticale
         scene.add(plasmaFilament);
 
+        // ---------- Tempo dell'animazione: dall'inizio alla fine, poi resta ferma ----------
+        // Durata dello sviluppo in millisecondi (stessa velocità della versione precedente).
+        const culla = (function () {
+            const DUR = Math.PI / 1.0 * 1000;
+            const btn = document.getElementById('btnRicomincia');
+            let t0 = performance.now(), ended = false;
+            function check() {
+                if (!ended && performance.now() - t0 >= DUR) { ended = true; btn.classList.add('cc-end'); }
+            }
+            const api = {
+                // avanzamento 0 → 1, con partenza e arrivo dolci come nella versione precedente
+                cycle() { check(); const p = Math.min((performance.now() - t0) / DUR, 1); return (1 - Math.cos(Math.PI * p)) / 2; },
+                // secondi trascorsi dall'inizio; alla fine si fermano
+                elapsed() { return Math.min(performance.now() - t0, DUR) / 1000; },
+                isEnded() { check(); return ended; },
+                onRestart: null,
+                restart() { t0 = performance.now(); ended = false; btn.classList.remove('cc-end'); if (api.onRestart) api.onRestart(); }
+            };
+            btn.addEventListener('click', api.restart);
+            return api;
+        })();
+
         function animate() {
             requestAnimationFrame(animate);
             controls.update();
 
-            let time = Date.Now ? Date.now() * 0.001 : Date.now() * 0.001;
-            let cycle = (Math.sin(time * 1.0) + 1) / 2; // Ciclo tra 0 e 1
+            let time = culla.elapsed();
+            let cycle = culla.cycle(); // da 0 (inizio) a 1 (fine), poi resta a 1
 
             // 1. Il campo magnetico si deforma nel tempo
             tubeMeshes.forEach(item => {
@@ -164,6 +186,10 @@
         });
     </script>
 <style id="cc-copyright">
+.cc-restart{pointer-events:auto;cursor:pointer;margin-left:.5em;padding:3px 11px;border:1px solid rgba(255,255,255,.6);border-radius:999px;background:rgba(10,10,18,.55);color:#fff;font:600 12px/1.3 -apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;vertical-align:middle}
+.cc-restart:hover{border-color:#fff}
+.cc-restart.cc-end{background:#e8762c;border-color:#e8762c;animation:ccPulse 1.6s ease-in-out infinite}
+@keyframes ccPulse{50%{box-shadow:0 0 0 6px rgba(232,118,44,.25)}}
 .cc-badge{display:inline-block;vertical-align:middle;margin:0 0 0 .5em;padding:2px 8px;border:1px solid currentColor;border-radius:999px;font:400 11.5px/1.35 -apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;letter-spacing:0;text-transform:none;white-space:normal;max-width:100%;box-sizing:border-box;opacity:.8;color:inherit;text-shadow:none;pointer-events:auto}
 .cc-n,.cc-badge a{white-space:nowrap}
 .cc-badge a{color:inherit;text-decoration:underline;text-underline-offset:2px}
