@@ -26,7 +26,7 @@ button.on{background:var(--acc);border-color:var(--acc);color:#fff}
 input[type=range]{flex:1;min-width:160px;accent-color:var(--acc)}
 h2{font-size:1.15rem;margin:0 0 6px}
 </style></head><body><main>
-<h1>Evoluzione delle macchie: leading, trailing e ciclo solare</h1>
+<h1>Evoluzione delle macchie: leading, trailing e ciclo solare<span class="cc-badge"><span class="cc-n">© 2026 Carlo Casoli ·</span> <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it" target="_blank" rel="license noopener">CC BY-NC-ND 4.0</a></span></h1>
 <p class="sub">Il Sole visto di fronte, asse verticale, una coppia bipolare per emisfero. La rotazione solare porta le macchie da sinistra verso destra, e l'evoluzione si esaurisce dopo circa tre quarti del percorso. Muovi il cursore o lascia andare l'animazione.</p>
 
 <div class="card">
@@ -133,4 +133,11 @@ function tick(n){const dt=(n-last)/1000;last=n;
  requestAnimationFrame(tick)}
 document.getElementById('cyc').oninput=e=>{LAT=Math.round(35-30*e.target.value/100);document.getElementById('lat').textContent='emersione a '+LAT+'°';draw(T)};
 setT(0);requestAnimationFrame(tick);
-</script></main></body></html>
+</script></main><style id="cc-copyright">
+.cc-badge{display:inline-block;vertical-align:middle;margin:0 0 0 .5em;padding:2px 8px;border:1px solid currentColor;border-radius:999px;font:400 11.5px/1.35 -apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;letter-spacing:0;text-transform:none;white-space:normal;max-width:100%;box-sizing:border-box;opacity:.8;color:inherit;text-shadow:none;pointer-events:auto}
+.cc-n,.cc-badge a{white-space:nowrap}
+.cc-badge a{color:inherit;text-decoration:underline;text-underline-offset:2px}
+.cc-badge.cc-fixed{position:fixed;top:10px;right:10px;margin:0;z-index:2147483000;background:rgba(10,10,18,.62);color:#f2efe6;border-color:rgba(242,239,230,.45);opacity:1;backdrop-filter:blur(4px)}
+@media (max-width:520px){.cc-badge{font-size:11px;padding:2px 7px}}
+</style>
+</body></html>

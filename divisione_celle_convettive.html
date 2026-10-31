@@ -100,7 +100,7 @@ kbd{font:500 11px var(--ui);border:1px solid var(--line);border-radius:3px;paddi
 
   <aside class="panel">
     <div>
-      <h1>Una cella convettiva che si divide</h1>
+      <h1>Una cella convettiva che si divide<span class="cc-badge"><span class="cc-n">© 2026 Carlo Casoli ·</span> <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it" target="_blank" rel="license noopener">CC BY-NC-ND 4.0</a></span></h1>
       <p class="lead">Una grande bolla di gas caldo sale e rallenta. In cima si allarga, diventa orizzontale e piega i bordi verso il basso. Poi il bordo si instabilizza, corsie di gas freddo scendono dalla sommità e dividono il grande flusso in flussi più piccoli. Solo allora questi crescono come nuove celle. In ogni cella la maggior parte del gas ricircola sul posto: solo una piccola parte sale al livello successivo, mentre il gas raffreddato in superficie scende in getti stretti fino alla base. Gli strati sono sempre più sottili salendo verso la superficie.</p>
     </div>
 
@@ -705,4 +705,11 @@ rebuild(false);resize();requestAnimationFrame(frame);
 })();
 </script>
 
+<style id="cc-copyright">
+.cc-badge{display:inline-block;vertical-align:middle;margin:0 0 0 .5em;padding:2px 8px;border:1px solid currentColor;border-radius:999px;font:400 11.5px/1.35 -apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;letter-spacing:0;text-transform:none;white-space:normal;max-width:100%;box-sizing:border-box;opacity:.8;color:inherit;text-shadow:none;pointer-events:auto}
+.cc-n,.cc-badge a{white-space:nowrap}
+.cc-badge a{color:inherit;text-decoration:underline;text-underline-offset:2px}
+.cc-badge.cc-fixed{position:fixed;top:10px;right:10px;margin:0;z-index:2147483000;background:rgba(10,10,18,.62);color:#f2efe6;border-color:rgba(242,239,230,.45);opacity:1;backdrop-filter:blur(4px)}
+@media (max-width:520px){.cc-badge{font-size:11px;padding:2px 7px}}
+</style>
 </body></html>
