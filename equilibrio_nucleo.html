@@ -1,0 +1,193 @@
+<!doctype html>
+<!--
+  © 2026 Carlo Casoli — "Il Sole: Osservazione e Fisica"
+  Licenza CC BY-NC-ND 4.0: https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it
+  Vietati l'uso commerciale e la distribuzione di versioni modificate senza autorizzazione scritta dell'autore.
+-->
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Termostato del nucleo solare</title>
+<style>
+:root{--text-primary:#1f1e1d;--text-secondary:#5f5e5a;--border:rgba(0,0,0,.12);--border-strong:rgba(0,0,0,.25);--bg:#ffffff}
+@media (prefers-color-scheme:dark){:root{--text-primary:#f1efe8;--text-secondary:#b4b2a9;--border:rgba(255,255,255,.12);--border-strong:rgba(255,255,255,.28);--bg:#1f1f1e}}
+body{margin:0;padding:16px;background:var(--bg);color:var(--text-primary);font-family:-apple-system,"Segoe UI",Roboto,sans-serif}
+button{background:transparent;color:var(--text-primary);border:1px solid var(--border-strong);border-radius:8px;cursor:pointer;font-family:inherit}
+button:hover{background:rgba(127,127,127,.12)}
+</style></head><body>
+<style>
+.bar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:0 0 6px;font-size:12px;color:var(--text-secondary)}
+.bar button{font-size:12px;padding:3px 8px;height:auto;min-height:0}
+.bar input[type=range]{width:85px}
+.bar b{font-weight:500;color:var(--text-primary);min-width:30px;display:inline-block}
+.tab{font-size:13px!important;padding:6px 14px!important;border-radius:8px;transition:all .15s}
+</style>
+<div class="bar" style="padding-top:0.25rem;gap:8px">
+  <span style="font-size:13px;color:var(--text-secondary)">Modello:</span>
+  <button class="tab" id="mCore">Nucleo intero (termostato)</button>
+  <button class="tab" id="mBub">Bolla isolata</button>
+</div>
+<div style="margin:2px 0 8px">
+  <div id="mTitle" style="font-size:18px;font-weight:500;color:var(--text-primary)">–</div>
+  <div id="mAuth" style="font-size:13px;color:var(--text-primary);margin-top:2px">–</div>
+  <div id="mSub" style="font-size:13px;color:var(--text-secondary)">–</div>
+</div>
+<div class="bar">
+  <button id="bUp" style="border-color:#E24B4A">▲ Aumenta efficienza</button>
+  <button id="bDn" style="border-color:#378ADD">▼ Diminuisci efficienza</button>
+  <button id="bP" aria-label="Pausa" style="min-width:34px">❚❚</button>
+  <button id="bR" aria-label="Reset" style="min-width:34px">↺</button>
+  <label for="amp">Intensità</label><input type="range" id="amp" min="1" max="10" step="1" value="7"><b id="ampO">×2.05</b>
+  <label for="spd">Velocità</label><input type="range" id="spd" min="1" max="10" step="1" value="3"><b id="spdO">×1</b>
+  <label><input type="checkbox" id="real"> P rad reale (1/1500)</label>
+</div>
+<canvas id="sun" style="width:100%;height:680px;display:block"></canvas>
+<div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px;margin-top:8px">
+  <canvas id="trace" style="width:100%;height:180px;display:block"></canvas>
+  <canvas id="plot" style="width:100%;height:180px;display:block"></canvas>
+</div>
+<div style="margin-top:10px;font-size:12px;color:var(--text-secondary)">Modello qualitativo: le variazioni sono fortemente amplificate e i tempi accelerati rispetto al Sole reale.</div>
+<script>
+const cs=getComputedStyle(document.body);
+const C=n=>(getComputedStyle(document.body).getPropertyValue(n).trim()||getComputedStyle(document.documentElement).getPropertyValue(n).trim()||'#888');
+const $=id=>document.getElementById(id);
+const TAU=Math.PI*2;
+const sun=$('sun'),plot=$('plot'),trc=$('trace');
+const sx=sun.getContext('2d'),px=plot.getContext('2d'),tx=trc.getContext('2d');
+function fit(c,g){const r=c.getBoundingClientRect(),d=devicePixelRatio||1;c.width=r.width*d;c.height=r.height*d;g.setTransform(d,0,0,d,0,0);return[r.width,r.height]}
+let W1,H1,W2,H2,W3,H3;function rs(){[W1,H1]=fit(sun,sx);[W2,H2]=fit(plot,px);[W3,H3]=fit(trc,tx)}rs();addEventListener('resize',rs);
+const GPP='#1D9E75',GCN='#7F77DD',RED='#E24B4A',BLU='#378ADD',AMB='#BA7517',TCO='#D4537E',RHO='#888780';
+const CN=0.08,AA=6,DD=3,KR=1.0,TAUP=0.7,FMAX=1.8,SV=5,NMAX=3,SLIN=0.4,SLOG=1;
+let mode='core',x=1,v=0,th=1,t=0,pulse=null,run=true,flashes=[],spd=1,frame=0,tl=[],F=2.05;
+const AMP=()=>8, SS=()=>mode=='core'?0.14:0.1;
+const INFO={core:['Modello di Kippenhahn–Weigert: il termostato del nucleo','Stabilità della combustione nucleare basata sul teorema del viriale (Kippenhahn e Weigert, Stellar Structure and Evolution)','Il nucleo e gli strati sopra si muovono insieme: espandendosi cala il peso/area (∝ 1/r⁴), il gas deve raffreddarsi e le reazioni si spengono da sole.'],
+ bubble:['Modello di Schwarzschild–Härm: bolla a pressione costante','Caso analogo all\'instabilità dei gusci sottili scoperta da Schwarzschild e Härm (1965)','Gli strati sopra non si muovono: il peso resta costante. Cambiano T e ρ, non la pressione: la bolla scaldata resta calda, nessun termostato; torna in equilibrio solo perché la radiazione scambia calore con l\'ambiente.']};
+function styleTab(el,on){el.style.background=on?'#378ADD':'transparent';el.style.color=on?'#ffffff':'';el.style.borderColor=on?'#378ADD':'';el.style.fontWeight=on?'500':'400';el.setAttribute('aria-pressed',on)}
+function setMode(m){mode=m;styleTab($('mCore'),m=='core');styleTab($('mBub'),m=='bubble');$('mTitle').textContent=INFO[m][0];$('mAuth').textContent=INFO[m][1];$('mSub').textContent=INFO[m][2];reset()}
+$('mCore').onclick=()=>setMode('core');$('mBub').onclick=()=>setMode('bubble');
+const fr=()=>$('real').checked?6.7e-4:0.25;
+const spdMap=[0.33,0.5,1,1.5,2,3,4,5,6,8];$('spd').oninput=()=>{spd=spdMap[$('spd').value-1];$('spdO').textContent='×'+spd};
+$('amp').oninput=()=>{F=1+$('amp').value*0.15;$('ampO').textContent='×'+F.toFixed(2)};
+const N=110,ions=[];for(let i=0;i<N;i++){const a=Math.random()*TAU,r=Math.sqrt(Math.random())*0.9,b=Math.random()*TAU;ions.push({x:Math.cos(a)*r,y:Math.sin(a)*r,vx:Math.cos(b),vy:Math.sin(b)})}
+const upF=n=>1+(F-1)*(1+0.5*(n-1));
+const fl=()=>{if(!pulse)return 1;const u=1+(upF(pulse.n)-1)*Math.exp(-(t-pulse.t0)/TAUP);return pulse.s>0?u:1/u};
+const rpp=()=>th**4/x**3, rcn=()=>th**17/x**3, rtot=()=>(rpp()+CN*rcn())/(1+CN);
+const Lnuc=()=>Math.min(40,fl()*rtot());
+const Pw=()=>mode=='core'?1/x**4:1, Pg=()=>(1-fr())*th/x**3, Pr=()=>fr()*th**4;
+function step(dt){t+=dt;
+  v+=(AA*(Pg()+Pr()-Pw())*x*x-DD*v)*dt;x+=v*dt;
+  if(x<0.6){x=0.6;v=Math.max(0,v)}if(x>1.6){x=1.6;v=Math.min(0,v)}
+  const heat=mode=='core'?SS()*(Lnuc()-th**4*x):SS()*(Math.min(6,Lnuc())-1)-KR*(th**4-1)/4;
+  th+=(-2*th*v/x+heat)*dt;th=Math.max(0.5,Math.min(2,th));
+  if(pulse&&t-pulse.t0>8*TAUP)pulse=null}
+function reset(){x=1;v=0;th=1;pulse=null;tl=[];flashes=[]}
+function press(s){if(pulse&&pulse.s==s&&t-pulse.t0<3*TAUP){pulse.n=Math.min(NMAX,pulse.n+1);pulse.t0=t}else pulse={s,n:1,t0:t}}
+$('bUp').onclick=()=>press(1);$('bDn').onclick=()=>press(-1);$('bR').onclick=reset;
+const bP=$('bP');bP.onclick=()=>{run=!run;bP.textContent=run?'❚❚':'▶';bP.setAttribute('aria-label',run?'Pausa':'Avvia')};
+function bar(g,X,y0,y1,col,w,head){const len=y0-y1;if(Math.abs(len)<1.5)return;g.fillStyle=col;
+  const d=Math.sign(len),hh=head?Math.min(12,Math.abs(len)):0;
+  g.fillRect(X-w/2,Math.min(y0,y1+d*hh),w,Math.abs(len)-hh);
+  if(head){g.beginPath();g.moveTo(X,y1);g.lineTo(X-w/2-4,y1+d*hh);g.lineTo(X+w/2+4,y1+d*hh);g.closePath();g.fill()}}
+function pct(v){return (v>=0?'+':'')+(v*100).toFixed(1)+'%'}
+function tcol(){return th<0.95?'#85B7EB':th<0.99?'#EF9F27':(th<1.03?'#D85A30':'#E24B4A')}
+function draw(){
+  const g=sx,tp=C('--text-primary'),ts=C('--text-secondary'),bd=C('--border'),bs=C('--border-strong');g.clearRect(0,0,W1,H1);
+  const narrow=W1<560,VW=narrow?W1:W1*0.48,gx0=38,gx1=VW-6,split=gx0+(gx1-gx0)*0.72;
+  const n=5,gap=(split-4-gx0)/n,stag=gap<84,top=stag?96:60,botPad=40,base=(top+H1-botPad)/2,L0=(H1-botPad-top)/3.2;
+  const yv=f=>base-f*L0;
+  const G=Pg(),R=Pr(),Wt=Pw(),net=G+R-Wt;
+  g.font='11px sans-serif';g.textAlign='right';
+  for(let k=-16;k<=16;k++){const y=yv(k/10);
+    g.strokeStyle=k%5==0?bs:bd;g.lineWidth=k%5==0?0.8:0.5;g.beginPath();g.moveTo(gx0,y);g.lineTo(split-4,y);g.stroke();
+    if(k%5==0){g.fillStyle=ts;g.fillText((k*10)+'%',gx0-3,y+4)}}
+  g.textAlign='left';g.strokeStyle=tp;g.lineWidth=1.2;g.beginPath();g.moveTo(gx0,base);g.lineTo(split-4,base);g.stroke();
+  const w=Math.min(20,gap*0.42),cx=i=>gx0+gap*(i+0.5);
+  bar(g,cx(0),base,yv(-Wt),RED,w,true);
+  bar(g,cx(1),base,yv(G),BLU,w,true);
+  bar(g,cx(2),base,yv(R),AMB,w,true);
+  bar(g,cx(3),base,yv(G),BLU,w,false);bar(g,cx(3),yv(G),yv(G+R),AMB,w,true);
+  g.setLineDash([4,3]);g.strokeStyle=RED;g.lineWidth=1.4;g.beginPath();g.moveTo(cx(3)-w,yv(Wt));g.lineTo(cx(3)+w,yv(Wt));g.stroke();g.setLineDash([]);
+  if(Math.abs(net)<0.004){g.fillStyle=tp;g.beginPath();g.arc(cx(4),base,4,0,TAU);g.fill()}else bar(g,cx(4),base,yv(net),tp,w*0.7,true);
+  const labs=[[mode=='core'?'peso/area':'peso',RED,(Wt*100).toFixed(1)+'%'],['P gas',BLU,(G*100).toFixed(1)+'%'],['P rad',AMB,(R*100).toFixed(R<0.01?2:1)+'%'],['gas+rad',tp,((G+R)*100).toFixed(1)+'%'],['netta',tp,pct(net)]];
+  g.textAlign='center';
+  labs.forEach((l,i)=>{const oy=stag&&i%2==1?40:0;
+    g.fillStyle=l[1];g.font='500 16px sans-serif';g.fillText(l[0],cx(i),20+oy);
+    g.fillStyle=tp;g.font='14px sans-serif';g.fillText(l[2],cx(i),38+oy);
+    if(stag&&i%2==1){g.strokeStyle=bd;g.lineWidth=0.5;g.beginPath();g.moveTo(cx(i),44+oy);g.lineTo(cx(i),top-6);g.stroke()}});
+  g.strokeStyle=bs;g.lineWidth=0.8;g.beginPath();g.moveTo(split,top-6);g.lineTo(split,H1-botPad);g.stroke();
+  const s0=split+4,sg=(gx1-s0)/2,sxc=i=>s0+sg*(i+0.5),ys=f=>base-f*L0*SV;
+  g.strokeStyle=bd;g.lineWidth=0.5;for(let k=-3;k<=3;k++){const y=ys(k*0.1);g.beginPath();g.moveTo(s0,y);g.lineTo(gx1,y);g.stroke()}
+  g.strokeStyle=tp;g.lineWidth=1.2;g.beginPath();g.moveTo(s0,base);g.lineTo(gx1,base);g.stroke();
+  const dT=th-1,dR=1/x**3-1;
+  bar(g,sxc(0),base,ys(Math.max(-0.3,Math.min(0.3,dT))),TCO,w,false);
+  bar(g,sxc(1),base,ys(Math.max(-0.3,Math.min(0.3,dR))),RHO,w,false);
+  const oy2=stag?40:0;g.font='500 16px sans-serif';g.fillStyle=TCO;g.fillText('T',sxc(0),20);g.fillStyle=RHO;g.fillText('ρ',sxc(1),20+oy2);
+  g.font='14px sans-serif';g.fillStyle=tp;g.fillText(pct(dT),sxc(0),38);g.fillText(pct(dR),sxc(1),38+oy2);
+  g.fillStyle=ts;g.font='11px sans-serif';g.fillText('±10%',s0+sg,ys(0.1)-3);
+  g.textAlign='left';g.fillStyle=ts;g.font='11px sans-serif';
+  g.fillText(mode=='core'?'peso/area ∝ 1/r⁴: massa sovrastante costante, cala la gravità e cresce l\'area':'peso costante: gli strati sopra la bolla non si spostano',gx0,H1-22);
+  g.fillText('pressioni: stessa scala (% del peso); P rad '+($('real').checked?'reale':'ingrandita al 25%')+'. T e ρ: scarti ×'+SV,gx0,H1-6);
+  if(narrow)return;
+  g.strokeStyle=bs;g.lineWidth=0.5;g.beginPath();g.moveTo(VW+6,12);g.lineTo(VW+6,H1-12);g.stroke();
+  const BW=W1-VW-12,bx=VW+12+BW/2,by=H1/2+8,f=Math.max(2-FMAX,Math.min(FMAX,1+(x-1)*AMP()));
+  let B0,Bx;
+  if(mode=='core'){
+    B0=Math.min(BW,H1-60)/2/FMAX/1.2;Bx=B0*f;
+    const Ro=Bx*1.45,Ro0=B0*1.45;
+    g.fillStyle='#EF9F27';g.globalAlpha=0.16;g.beginPath();g.arc(bx,by,Ro,0,TAU);g.moveTo(bx+Bx,by);g.arc(bx,by,Bx,TAU,0,true);g.fill('evenodd');g.globalAlpha=1;
+    g.setLineDash([3,3]);g.strokeStyle=ts;g.lineWidth=0.8;g.beginPath();g.arc(bx,by,Ro0,0,TAU);g.stroke();g.setLineDash([]);
+    g.strokeStyle=AMB;g.lineWidth=1;g.beginPath();g.arc(bx,by,Ro,0,TAU);g.stroke();
+    g.fillStyle=ts;g.font='11px sans-serif';g.textAlign='center';g.fillText('strati sovrastanti (si spostano con il nucleo)',bx,H1-10);g.textAlign='left';
+  }else{
+    B0=Math.min(BW,H1-60)/2/FMAX;Bx=B0*f;
+    g.fillStyle='#D85A30';g.globalAlpha=0.12;g.fillRect(VW+12,48,BW,H1-80);g.globalAlpha=1;
+    g.fillStyle=ts;g.font='11px sans-serif';g.textAlign='center';g.fillText('plasma circostante (fermo: T e peso costanti)',bx,H1-10);g.textAlign='left';
+  }
+  g.setLineDash([3,3]);g.strokeStyle=ts;g.lineWidth=0.8;g.beginPath();g.arc(bx,by,B0,0,TAU);g.stroke();g.setLineDash([]);
+  g.fillStyle=tcol();g.globalAlpha=0.35;g.beginPath();g.arc(bx,by,Bx,0,TAU);g.fill();g.globalAlpha=1;
+  const on=Math.abs(fl()-1)>0.02;g.strokeStyle=on?(fl()>1?RED:BLU):tp;g.lineWidth=on?3+pulse.n*1.5:2;g.beginPath();g.arc(bx,by,Bx,0,TAU);g.stroke();
+  const sp=0.004*th*(0.5+spd*0.5);
+  ions.forEach(p=>{if(run){p.x+=p.vx*sp;p.y+=p.vy*sp;const r=Math.hypot(p.x,p.y);if(r>0.95){const nx=p.x/r,ny=p.y/r,d=p.vx*nx+p.vy*ny;p.vx-=2*d*nx;p.vy-=2*d*ny;p.x=nx*0.95;p.y=ny*0.95}}
+    g.fillStyle=tp;g.beginPath();g.arc(bx+p.x*Bx,by+p.y*Bx,2.8,0,TAU);g.fill()});
+  if(run){const sc=0.12*(0.5+spd*0.5)*fl(),lp=rpp()/(1+CN),lc=CN*rcn()/(1+CN);
+    const add=c=>{const p=ions[Math.floor(Math.random()*N)];flashes.push({x:p.x,y:p.y,l:1,c})};
+    if(Math.random()<sc*Math.min(lp,6))add(GPP);if(Math.random()<sc*Math.min(lc*3,6))add(GCN);}
+  if(run)flashes=flashes.filter(q=>(q.l-=0.015)>0);
+  flashes.forEach(q=>{g.strokeStyle=q.c;g.globalAlpha=q.l;g.lineWidth=3;g.beginPath();g.arc(bx+q.x*Bx,by+q.y*Bx,4+16*(1-q.l),0,TAU);g.stroke()});g.globalAlpha=1;
+  g.font='13px sans-serif';g.fillStyle=tp;g.fillText((mode=='core'?'nucleo':'bolla')+' · raggio '+pct(x-1)+'  (disegno ×'+AMP()+')',VW+16,18);
+  g.fillStyle=ts;g.font='12px sans-serif';g.fillText('ε del plasma ×'+rtot().toFixed(2)+'   tratteggio = equilibrio',VW+16,36);
+  if(on){g.font='500 15px sans-serif';g.fillStyle=fl()>1?RED:BLU;g.fillText('impulso: efficienza ×'+fl().toFixed(2)+'  (gradino '+pulse.n+' di '+NMAX+')',VW+16,58)}
+  g.textAlign='right';g.font='13px sans-serif';g.fillStyle=GPP;g.fillText('○ pp',W1-60,18);g.fillStyle=GCN;g.fillText('○ CNO',W1-6,18);g.textAlign='left';
+}
+function bands(g,L,Tp,B,step){tl.forEach((p,i)=>{if(Math.abs(p[6]-1)>0.03){g.fillStyle=p[6]>1?RED:BLU;g.globalAlpha=Math.min(0.3,0.06+0.25*Math.abs(Math.log10(p[6])));g.fillRect(L+i*step,Tp,step+0.5,B-Tp)}});g.globalAlpha=1}
+function drawTrace(){
+  const g=tx,ts=C('--text-secondary'),bd=C('--border-strong');g.clearRect(0,0,W3,H3);
+  const L=40,Rt=W3-4,Tp=32,B=H3-8,mid=(Tp+B)/2,half=(B-Tp)/2,S=SLIN;
+  g.strokeStyle=bd;g.lineWidth=0.5;g.beginPath();g.moveTo(L,Tp);g.lineTo(L,B);g.stroke();
+  g.font='11px sans-serif';g.fillStyle=ts;
+  [-0.4,-0.3,-0.2,-0.1,0,0.1,0.2,0.3,0.4].forEach(k=>{const y=mid-k/S*half;g.globalAlpha=k==0?0.9:0.35;g.setLineDash(k==0?[3,3]:[]);g.beginPath();g.moveTo(L,y);g.lineTo(Rt,y);g.stroke();g.setLineDash([]);g.globalAlpha=1;g.fillText((k>0?'+':k<0?'−':'')+Math.abs(k*100)+'%',2,y+4)});
+  g.fillText('rispetto all\'equilibrio, nel tempo',L+4,11);
+  const step=(Rt-L)/600;bands(g,L,Tp,B,step);
+  [[2,RED,'peso/area',[6,3]],[5,AMB,'P rad',null],[0,BLU,'raggio',null],[1,TCO,'T',null]].forEach(([j,col,lab,dash],q)=>{
+    g.strokeStyle=col;g.lineWidth=j==1?2.6:2;if(dash)g.setLineDash(dash);g.beginPath();
+    tl.forEach((p,i)=>{const X=L+i*step,Y=mid-Math.max(-S,Math.min(S,p[j]))/S*half;i?g.lineTo(X,Y):g.moveTo(X,Y)});g.stroke();g.setLineDash([]);
+    g.fillStyle=col;g.fillRect(L+4+q*76,20,12,3);g.fillStyle=ts;g.fillText(lab,L+20+q*76,25)});
+}
+function drawPlot(){
+  const g=px,ts=C('--text-secondary'),bd=C('--border-strong');g.clearRect(0,0,W2,H2);
+  const S=0.6,L=40,Rt=W2-4,Tp=32,B=H2-8,Y=v=>B-(Math.max(-S,Math.min(S,Math.log10(Math.max(1e-6,v))))+S)/(2*S)*(B-Tp);
+  g.strokeStyle=bd;g.lineWidth=0.5;g.beginPath();g.moveTo(L,Tp);g.lineTo(L,B);g.stroke();
+  g.font='11px sans-serif';g.fillStyle=ts;
+  [[0.25,'×0.25'],[0.5,'×0.5'],[0.75,'×0.75'],[1,'×1'],[1.5,'×1.5'],[2,'×2'],[3,'×3'],[4,'×4']].forEach(([mm,lab])=>{const y=Y(mm);g.fillText(lab,0,y+4);g.globalAlpha=mm==1?0.9:0.35;g.beginPath();g.moveTo(L,y);g.lineTo(Rt,y);g.stroke();g.globalAlpha=1});
+  g.fillText('efficienza delle reazioni ε rispetto all\'equilibrio (pp + CNO)',L+4,11);
+  const step=(Rt-L)/600;bands(g,L,Tp,B,step);
+  g.strokeStyle=C('--text-primary');g.lineWidth=2.8;g.beginPath();
+  tl.forEach((p,i)=>{const X=L+i*step,y=Y(p[8]);i?g.lineTo(X,y):g.moveTo(X,y)});g.stroke();
+  g.fillStyle=C('--text-primary');g.fillRect(L+4,20,14,3);g.fillStyle=ts;g.fillText('ε totale (sale al comando, poi risponde il nucleo)',L+22,25);
+}
+function advance(){const tot=spd/60,ns=Math.ceil(tot/0.005);for(let i=0;i<ns;i++)step(tot/ns);
+  if(frame%4==0){tl.push([x-1,th-1,Pw()-1,rpp(),rcn(),th**4-1,fl(),pulse?pulse.n:0,fl()*rtot()]);if(tl.length>600)tl.shift()}}
+function render(){draw();drawTrace();drawPlot()}
+function loop(){frame++;if(run)advance();render();requestAnimationFrame(loop)}
+window.__sim={setF:(v)=>{F=v},setSpd:(v)=>{spd=v},press,setMode,reset,tick:(n)=>{for(let i=0;i<n;i++){frame++;advance()}render()},state:()=>({x,th,t,eps:rtot(),etot:fl()*rtot(),fl:fl(),pulse:pulse&&{...pulse}})};
+setMode('core');loop();
+</script>
+</body></html>

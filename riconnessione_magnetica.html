@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<!--
+  © 2026 Carlo Casoli — "Il Sole: Osservazione e Fisica"
+  Licenza CC BY-NC-ND 4.0: https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it
+  Vietati l'uso commerciale e la distribuzione di versioni modificate senza autorizzazione scritta dell'autore.
+-->
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Riconnessione magnetica 3D</title>
+<style>
+:root{--text-primary:#1f1e1d;--text-secondary:#73726c;--surface-0:#ffffff;--surface-1:#f5f4ee;--border-strong:#b4b2a9;--bg-accent:#E6F1FB;--border-accent:#378ADD;--text-accent:#0C447C;--radius:8px}
+@media (prefers-color-scheme: dark){:root{--text-primary:#f1efe8;--text-secondary:#b4b2a9;--surface-0:#1f1e1d;--surface-1:#2c2c2a;--border-strong:#5f5e5a;--bg-accent:#042C53;--border-accent:#378ADD;--text-accent:#B5D4F4}}
+html,body{margin:0;background:var(--surface-0);color:var(--text-primary);font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:16px}
+h1{font-size:20px;font-weight:500;margin:0 0 8px}
+#c{width:100%;height:540px;display:block;touch-action:none;cursor:grab}
+.bar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:8px 0;font-size:13px;color:var(--text-secondary)}
+.bar button{font-size:13px;padding:4px 10px;border:0.5px solid var(--border-strong);background:var(--surface-1);color:var(--text-primary);border-radius:var(--radius);cursor:pointer}
+.bar button.on{background:var(--bg-accent);border-color:var(--border-accent);color:var(--text-accent)}
+#cap{font-size:14px;line-height:1.5;color:var(--text-primary);margin:6px 0 0;min-height:68px}
+#cap b{font-weight:500}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>Riconnessione magnetica solare in 3D: sequenza temporale</h1>
+<canvas id="c"></canvas>
+<input type="range" id="sl" min="0" max="6" step="0.01" value="0" style="width:100%">
+<div class="bar" id="ph"></div>
+<div class="bar">
+<button id="play">Riproduci</button>
+<span>Vista:</span>
+<button onclick="setView(-0.6,0.3)">3D</button>
+<button onclick="setView(0,0)">Fronte (XY)</button>
+<button onclick="setView(0,1.5708)">Dall'alto (XZ)</button>
+<button onclick="setView(1.5708,0.1)">Laterale (YZ)</button>
+<span>Trascina per ruotare</span>
+<button id="dl" style="margin-left:auto">Scarica HTML</button>
+</div>
+<div class="bar"><span>Simboli: ⊙ = punta verso di te · ⊗ = si allontana da te</span></div>
+<div id="cap"></div>
+</div>
+<script>
+const cv=document.getElementById('c'),ctx=cv.getContext('2d'),sl=document.getElementById('sl');
+let W=600,H=540,yaw=-0.6,pitch=0.3,ty=yaw,tp=pitch,U=0,playing=false,tw=null;
+const MAXU=6;
+const NAMES=['1 · Inizio','2 · Avvicinamento','3 · Compressione','4 · Innesco','5 · Espulsione','6 · Impatto ed eruzione','7 · Post-flare'];
+const CAPS=[
+'<b>Inizio.</b> Due tubi di flusso con polarità opposta (B_y > 0 viola, B_y < 0 corallo), lontani, con linee dritte. Sopra la flux rope (verde) è ancorata alla cromosfera con le sue due radici ed è trattenuta dal campo sovrastante (archi grigi).',
+'<b>Avvicinamento.</b> I tubi si muovono rigidi lungo X, spinti dall\'afflusso di plasma (frecce verdi). Nessuna deformazione e nessun foglio di corrente: il campo cambia segno su una distanza ancora grande, quindi J è piccola.',
+'<b>Compressione.</b> Lo spazio tra i tubi si riduce a pochi spessori: il salto di B_y è ora ripido e J_z ≈ (1/μ₀)·∂B_y/∂x cresce. Solo adesso si forma il current sheet (piano ambra).',
+'<b>Innesco.</b> Solo nel centro del foglio (zona di diffusione) le linee più interne si pizzicano a X; il resto resta dritto. Compaiono la linea X ed E_z, che accelera gli elettroni lungo Z.',
+'<b>Espulsione.</b> Le linee riconnesse a U e a Λ vengono espulse dalla tensione J×B (getti ±Y). La riconnessione sotto la corda recide le linee che la ancoravano e indebolisce il campo sovrastante, che si apre e si dissolve. La flux rope inizia a salire.',
+'<b>Impatto ed eruzione.</b> I fasci di elettroni colpiscono la cromosfera (raggi X duri ai footpoint), il plasma evapora verso l\'alto. Senza più il campo che la trattiene, la flux rope accelera verso lo spazio, ancora ancorata alle radici: CME. Il current sheet si allunga seguendo la corda e si attenua.',
+'<b>Post-flare.</b> L\'afflusso di flusso si esaurisce e il current sheet si dissolve: la riconnessione è finita, i getti e i fasci si spengono. Restano l\'arcata dei loop post-flare, ancorata alla cromosfera e piena di plasma caldo (raggi X molli ed EUV), e la flux rope ormai lontana come CME.'];
+function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
+function cssv(n,f){const v=getComputedStyle(document.documentElement).getPropertyValue(n).trim();return v||f}
+function SC(){return Math.min(W,H)/3.1}
+function resize(){const r=cv.getBoundingClientRect(),d=window.devicePixelRatio||1;W=r.width;H=r.height;cv.width=W*d;cv.height=H*d;ctx.setTransform(d,0,0,d,0,0);draw()}
+function rot(p){const cy=Math.cos(yaw),sy=Math.sin(yaw),cp=Math.cos(pitch),sp=Math.sin(pitch);const x1=p[0]*cy+p[2]*sy,z1=-p[0]*sy+p[2]*cy;return [x1,p[1]*cp-z1*sp,p[1]*sp+z1*cp]}
+function P(p){const S=SC(),r=rot(p);return {x:W/2+r[0]*S,y:H/2-(r[1]-0.2)*S,d:r[2]}}
+function bz(a,b,c,d,n){const o=[];for(let i=0;i<=n;i++){const t=i/n,q=1-t;o.push([0,1,2].map(k=>q*q*q*a[k]+3*q*q*t*b[k]+3*q*t*t*c[k]+t*t*t*d[k]))}return o}
+function ring(x,y,z,r,plane){const o=[];for(let i=0;i<=24;i++){const a=i/24*6.2832,c=r*Math.cos(a),s=r*Math.sin(a);o.push(plane==='xz'?[x+c,y,z+s]:[x+c,y+s,z])}return o}
+function xcOf(u){return u<=1?0.70-0.20*u:(u<=2?0.50-0.36*(u-1):0.14)}
+function scene(){
+const out=[],u=U;
+const sec=cssv('--text-secondary','#73726c'),A='#BA7517',T='#1D9E75',PUR='#7F77DD',COR='#D85A30';
+const xc=xcOf(u),th=0.32,s=clamp((0.4-xc)/0.26,0,1);
+const fadeP=clamp(u-5,0,1),att=1-0.5*clamp(u-4,0,1)-0.5*clamp(u-5,0,1),yTop=0.6+0.5*clamp((u-3.6)/1.4,0,1);
+const L=(pts,col,w,o)=>out.push(Object.assign({t:'l',pts,col,w},o||{}));
+const Q=(pts,fill,col,o)=>out.push(Object.assign({t:'q',pts,fill,col},o||{}));
+const X=(pp,str,col,dx,dy,al)=>out.push({t:'t',p:pp,s:str,col,dx,dy,al:al||'left'});
+Q([[-1.15,-1,-1.15],[1.15,-1,-1.15],[1.15,-1,1.15],[-1.15,-1,1.15]],'rgba(136,135,128,0.22)',sec);
+X([1.15,-1,1.15],'Cromosfera',sec,6,14);
+const ai=u<2?0.13:0.05,ao=u<2?0.07:0.03;
+[-1,1].forEach(sd=>{
+const rgb=sd<0?'127,119,221':'216,90,48',col=sd<0?PUR:COR;
+Q([[sd*xc,-0.98,-0.85],[sd*xc,0.95,-0.85],[sd*xc,0.95,0.85],[sd*xc,-0.98,0.85]],'rgba('+rgb+','+ai+')',col);
+const xo=xc+th;
+Q([[sd*xo,-0.98,-0.85],[sd*xo,0.95,-0.85],[sd*xo,0.95,0.85],[sd*xo,-0.98,0.85]],'rgba('+rgb+','+ao+')',col);
+if(u<2.2)X([sd*(xc+th/2),0.95,0.85],sd<0?'Tubo B_y > 0':'Tubo B_y < 0',col,0,-8,'center');
+});
+if(s*att>0.02){Q([[0,-0.6*s,-0.9],[0,yTop*s,-0.9],[0,yTop*s,0.9],[0,-0.6*s,0.9]],'rgba(239,159,39,'+(0.26*s)+')',A,{alpha:att});
+if(s>0.8&&att>0.4)X([0,yTop,0.9],'Current sheet',A,6,-6)}
+if(u<4.9)[-1,1].forEach(sd=>[-0.5,0.5].forEach(z=>L([[sd*(xc+th+0.34),0,z],[sd*(xc+th+0.08),0,z]],T,2.2,{arrow:1})));
+if(u<1.7)X([0,0,0.5],'Afflusso →←',T,0,-10,'center');
+const fl=1-fadeP;
+for(let k=0;k<3;k++){
+const Lk=xc+0.16*k,pk=clamp(u-(2+0.8*k),0,1),rk=clamp((u-(3+0.8*k))/1.2,0,1),eu=0.5*rk,el=-0.1*rk;
+[-0.6,-0.2,0.2,0.6].forEach(z=>{
+[-1,1].forEach(sd=>{
+const col=sd<0?PUR:COR,x0=sd*Lk,ex=x0*(1-pk);
+const pu=Math.min(0.85,eu+0.3),pl=el-0.3;
+const up=[[x0,0.95,z],[x0,pu,z]].concat(bz([x0,pu,z],[x0,eu+0.1,z],[ex+sd*0.1*pk,eu,z],[ex,eu,z],12));
+const lo=[[x0,-0.98,z],[x0,pl,z]].concat(bz([x0,pl,z],[x0,el-0.1,z],[ex+sd*0.1*pk,el,z],[ex,el,z],12));
+if(fl>0.02){
+L(up,col,1.7,{alpha:fl});L(lo,col,1.7,{alpha:fl});
+if(Math.abs(z)>0.5){L([[x0,0.9,z],[x0,sd<0?0.94:0.86,z]],col,1.7,{arrow:1,alpha:fl});L([[x0,-0.75,z],[x0,sd<0?-0.71:-0.79,z]],col,1.7,{arrow:1,alpha:fl})}}
+});
+});
+}
+if(fadeP>0.02){
+[-0.6,-0.2,0.2,0.6].forEach(z=>[0,1,2].forEach(j=>{const w=0.22+0.17*j,ap=0.3+0.16*j,hh=ap/0.75;L(bz([-w,-0.98,z],[-w,-0.98+hh,z],[w,-0.98+hh,z],[w,-0.98,z],20),A,2.6,{alpha:fadeP})}));
+if(fadeP>0.6)X([0,-0.36,0.6],'Loop post-flare',A,0,-8,'center')}
+if(s>0.5&&att>0.05){const j=clamp((s-0.5)/0.5,0,1);[-0.25,0.25].forEach(y=>L([[0,y,-0.7*j],[0,y,0.7*j]],A,2,{arrow:1,alpha:att}))}
+if(u>=2.5&&att>0.05){L([[0,0,-0.9],[0,0,0.9]],A,3,{alpha:att});if(att>0.4){X([0,0,0.9],'Punto X',A,8,4);X([0,-0.25,0.7],'J, E_z (lungo Z)',A,8,14)}}
+const fr=clamp((u-3.6)/1.4,0,1),yr=0.78+0.62*fr*fr+0.12*fadeP,rr=0.12+0.07*fr;
+const al=1-clamp((u-3.6)/1.0,0,1),Ap=1.12+0.5*clamp((u-3.4)/1.4,0,1),ya=(Ap-0.1625)/0.75;
+if(al>0.02){[-0.3,0.3].forEach(z=>L(bz([-1.1,-1,z],[-1.0,ya,z],[1.0,ya,z],[1.1,-1,z],24),sec,1.6,{alpha:al}));
+if(u<3.3)X([0,Ap,0.3],'Campo sovrastante',sec,0,-6,'center')}
+[-0.75,-0.375,0,0.375,0.75].forEach(z=>L(ring(0,yr,z,rr,'xy'),T,1.6));
+for(let i=0;i<8;i++){const g=i/8*6.2832,px=rr*Math.cos(g),py=yr+rr*Math.sin(g);L([[px,py,-0.75],[px,py,0.75]],T,1)}
+[-1,1].forEach(sd=>L(bz([0,yr,sd*0.75],[0,yr,sd*0.95],[0,-0.6,sd*1.05],[0,-1,sd*1.05],20),T,2.4));
+X([0,-1,1.05],'Radice della corda',T,8,14);
+X([rr,yr,0],u>=4.5?'Flux rope → CME':'Flux rope (filamento)',T,10,4,'left');
+if(u>2.9&&fl>0.02){const j=clamp((u-2.9)/0.8,0,1),eu0=0.5*clamp((u-3)/1.2,0,1),el0=-0.1*clamp((u-3)/1.2,0,1);
+L([[0,eu0+0.04,0],[0,eu0+0.04+0.2*j,0]],T,3,{arrow:1,alpha:fl});
+L([[0,el0-0.04,0],[0,el0-0.04-0.22*j,0]],T,3,{arrow:1,alpha:fl});
+if(u>=3.8&&fl>0.5){X([0,eu0+0.14,0],'Getto +Y',T,8,0);X([0,el0-0.16,0],'Getto −Y',T,8,0)}}
+if(u>3.4&&fl>0.02){const b=clamp((u-3.4)/1.2,0,1);
+[-1,1].forEach(sd=>[-0.4,0.4].forEach(z=>L([[sd*0.22,-0.5,z],[sd*0.22,-0.5-0.46*b,z]],A,2.4,{arrow:1,dash:1,alpha:fl})));
+if(u>=4&&fl>0.5)X([0.22,-0.7,0.4],'Fasci e⁻',A,8,0)}
+if(u>4.3&&fl>0.02){const f=clamp((u-4.3)/0.7,0,1);
+[-1,1].forEach(sd=>[-0.4,0.4].forEach(z=>Q(ring(sd*0.22,-1,z,0.04+0.1*f,'xz'),'rgba(239,159,39,'+(0.55*f)+')',A,{alpha:fl})));
+if(fl>0.5)X([0.22,-1,0.4],'HXR',A,10,16)}
+if(u>4.5){const e=clamp((u-4.5)/0.5,0,1);
+[-0.4,0.4].forEach(z=>L([[0,-1,z],[0,-1+0.3*e,z]],T,2,{arrow:1}));
+X([0,-0.8,0.4],'Evaporazione',T,8,0)}
+return out}
+function draw(){
+ctx.clearRect(0,0,W,H);
+const prims=scene(),S=SC();
+prims.forEach(o=>{if(o.t==='t'){o.q=P(o.p);o.dep=1e9}else{o.q=o.pts.map(P);o.dep=o.q.reduce((s,a)=>s+a.d,0)/o.q.length}});
+prims.sort((a,b)=>a.dep-b.dep);
+ctx.font='12px sans-serif';
+prims.forEach(o=>{
+ctx.globalAlpha=o.alpha!==undefined?o.alpha:1;
+if(o.t==='q'){ctx.beginPath();o.q.forEach((a,i)=>i?ctx.lineTo(a.x,a.y):ctx.moveTo(a.x,a.y));ctx.closePath();ctx.fillStyle=o.fill;ctx.fill();ctx.strokeStyle=o.col;ctx.lineWidth=0.7;ctx.stroke()}
+else if(o.t==='l'){ctx.beginPath();o.q.forEach((a,i)=>i?ctx.lineTo(a.x,a.y):ctx.moveTo(a.x,a.y));ctx.strokeStyle=o.col;ctx.lineWidth=o.w;ctx.setLineDash(o.dash?[5,4]:[]);ctx.stroke();ctx.setLineDash([]);
+if(o.arrow){const n=o.pts.length,e=o.q[n-1],s=o.q[n-2],p1=o.pts[n-2],p0=o.pts[n-1];
+const len3=Math.hypot(p0[0]-p1[0],p0[1]-p1[1],p0[2]-p1[2])*S,len2=Math.hypot(e.x-s.x,e.y-s.y);
+ctx.strokeStyle=o.col;ctx.fillStyle=o.col;ctx.lineWidth=1.6;
+if(len3>0&&len2<0.3*len3){const r=6;ctx.beginPath();ctx.arc(e.x,e.y,r,0,6.2832);ctx.stroke();
+if(e.d>s.d){ctx.beginPath();ctx.arc(e.x,e.y,2.2,0,6.2832);ctx.fill()}
+else{const c=r*0.6;ctx.beginPath();ctx.moveTo(e.x-c,e.y-c);ctx.lineTo(e.x+c,e.y+c);ctx.moveTo(e.x-c,e.y+c);ctx.lineTo(e.x+c,e.y-c);ctx.stroke()}}
+else{const a=Math.atan2(e.y-s.y,e.x-s.x),h=8;ctx.beginPath();ctx.moveTo(e.x-h*Math.cos(a-0.45),e.y-h*Math.sin(a-0.45));ctx.lineTo(e.x,e.y);ctx.lineTo(e.x-h*Math.cos(a+0.45),e.y-h*Math.sin(a+0.45));ctx.stroke()}}}
+else{ctx.fillStyle=o.col;ctx.textAlign=o.al;ctx.fillText(o.s,o.q.x+o.dx,o.q.y+o.dy)}});
+ctx.globalAlpha=1;
+const gx=44,gy=H-44,k=28,col=cssv('--text-primary','#222');
+ctx.lineWidth=1.5;ctx.strokeStyle=col;ctx.fillStyle=col;ctx.textAlign='center';
+[['X',[1,0,0]],['Y',[0,1,0]],['Z',[0,0,1]]].forEach(a=>{const r=rot(a[1]);ctx.beginPath();ctx.moveTo(gx,gy);ctx.lineTo(gx+r[0]*k,gy-r[1]*k);ctx.stroke();ctx.fillText(a[0],gx+r[0]*(k+10),gy-r[1]*(k+10)+4)});
+const i=clamp(Math.round(U),0,MAXU);
+document.getElementById('cap').innerHTML=CAPS[i];
+document.querySelectorAll('#ph button').forEach((b,j)=>b.classList.toggle('on',j===i));
+sl.value=U}
+const ph=document.getElementById('ph');
+NAMES.forEach((n,i)=>{const b=document.createElement('button');b.textContent=n;b.onclick=()=>goTo(i);ph.appendChild(b)});
+function goTo(t){playing=false;document.getElementById('play').textContent='Riproduci';cancelAnimationFrame(tw);(function f(){U+=(t-U)*0.12;if(Math.abs(t-U)<0.01)U=t;draw();if(U!==t)tw=requestAnimationFrame(f)})()}
+sl.oninput=()=>{playing=false;document.getElementById('play').textContent='Riproduci';cancelAnimationFrame(tw);U=parseFloat(sl.value);draw()};
+document.getElementById('play').onclick=function(){
+if(playing){playing=false;this.textContent='Riproduci';return}
+if(U>=MAXU-0.01)U=0;playing=true;this.textContent='Pausa';cancelAnimationFrame(tw);
+(function f(){if(!playing)return;U=Math.min(MAXU,U+0.008);draw();if(U>=MAXU){playing=false;document.getElementById('play').textContent='Riproduci';return}tw=requestAnimationFrame(f)})()};
+document.getElementById('dl').onclick=function(){
+const html='<!DOCTYPE html>\n'+document.documentElement.outerHTML;
+const b=new Blob([html],{type:'text/html'}),a=document.createElement('a');
+a.href=URL.createObjectURL(b);a.download='riconnessione_magnetica_3d.html';document.body.appendChild(a);a.click();a.remove()};
+let drag=null;
+cv.addEventListener('pointerdown',e=>{drag=[e.clientX,e.clientY,yaw,pitch];cv.setPointerCapture(e.pointerId);cv.style.cursor='grabbing'});
+cv.addEventListener('pointermove',e=>{if(!drag)return;yaw=ty=drag[2]+(e.clientX-drag[0])*0.01;pitch=tp=clamp(drag[3]+(e.clientY-drag[1])*0.01,-1.5708,1.5708);draw()});
+cv.addEventListener('pointerup',()=>{drag=null;cv.style.cursor='grab'});
+function setView(y,p){ty=y;tp=p;(function f(){yaw+=(ty-yaw)*0.2;pitch+=(tp-pitch)*0.2;if(Math.abs(ty-yaw)<0.005&&Math.abs(tp-pitch)<0.005){yaw=ty;pitch=tp;draw();return}draw();requestAnimationFrame(f)})()}
+window.addEventListener('resize',resize);resize();
+</script>
+</body>
+</html>

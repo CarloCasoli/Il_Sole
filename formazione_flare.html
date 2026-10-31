@@ -1,0 +1,210 @@
+<!doctype html>
+<!--
+  © 2026 Carlo Casoli — "Il Sole: Osservazione e Fisica"
+  Licenza CC BY-NC-ND 4.0: https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it
+  Vietati l'uso commerciale e la distribuzione di versioni modificate senza autorizzazione scritta dell'autore.
+-->
+<html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!DOCTYPE html>
+<html lang="it"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Due omega che scorrono, si inclinano e producono un flare</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html,body{height:100%;margin:0;background:#0b0d14;color:#eee;font-family:system-ui,Arial,sans-serif;overflow:hidden}
+#c{position:absolute;inset:0;width:100%;height:100%;touch-action:none}
+.ui{position:absolute;left:12px;right:12px;bottom:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;background:#0009;padding:8px 12px;border-radius:10px}
+button{background:#e2703a;border:0;color:#fff;padding:6px 12px;border-radius:6px;font-size:14px}
+#ph{position:absolute;top:12px;left:12px;right:12px;font-size:15px}
+.lb{position:absolute;font-size:13px;pointer-events:none;text-shadow:0 0 4px #000}
+</style></head><body>
+<canvas id="c"></canvas><div id="ph"></div>
+<div class="lb" id="l1" style="color:#f5d76e">Fotosfera</div>
+<div class="lb" id="lf" style="color:#fff3b0;font-weight:700;font-size:16px">FLARE</div>
+<div class="ui"><button id="b">Riavvia</button><button id="pz">Pausa</button><button id="v1">Obliqua</button><button id="v2">Dall’alto</button><button id="v3">Di taglio</button><label>Velocità <input id="s" type="range" min="0.3" max="2" step="0.1" value="1"></label></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const cv=document.getElementById('c'),R=new THREE.WebGLRenderer({canvas:cv,antialias:true});
+R.setPixelRatio(Math.min(devicePixelRatio,2));
+const S=new THREE.Scene(),cam=new THREE.PerspectiveCamera(45,1,.1,100),G=new THREE.Group();S.add(G);
+function rs(){R.setSize(innerWidth,innerHeight);cam.aspect=innerWidth/innerHeight;cam.position.set(0,4.5,innerWidth<innerHeight?34:23);cam.lookAt(0,2.6,0);cam.updateProjectionMatrix()}
+addEventListener('resize',rs);rs();
+const t=document.createElement('canvas');t.width=t.height=1024;const x=t.getContext('2d');
+x.fillStyle='#8a5a12';x.fillRect(0,0,1024,1024);
+for(let i=0;i<9000;i++){x.fillStyle=`hsl(${38+Math.random()*10},90%,${45+Math.random()*20}%)`;x.beginPath();x.arc(Math.random()*1024,Math.random()*1024,2.5+Math.random()*3.5,0,7);x.fill()}
+const ptex=new THREE.CanvasTexture(t);ptex.wrapS=ptex.wrapT=THREE.RepeatWrapping;ptex.repeat.set(1.6,1.2);
+const plane=new THREE.Mesh(new THREE.PlaneGeometry(22,9),new THREE.MeshBasicMaterial({map:ptex,transparent:true,opacity:.6,side:2,depthWrite:false}));
+plane.rotation.x=-Math.PI/2;G.add(plane);
+const NP=151,X0=-6.5,X1=6.5,D=-2.4,TOP=5.2,HMAX=7.6,HV=2.9,NS=20;
+const c1=new THREE.Color(0x7a1a10),c2=new THREE.Color(0xff8a7a),c3=new THREE.Color(0xffe6a0),wh=new THREE.Color(1,.95,.75),tc=new THREE.Color();
+const cl=v=>Math.min(1,Math.max(0,v)),sm=v=>{v=cl(v);return v*v*(3-2*v)};
+const AX=new Float32Array(NP),AY=new Float32Array(NP),UP=new THREE.Vector3(0,1,0),dv=new THREE.Vector3();
+function omega(h,w,om){
+ const lw=w*(.6+.55*om),nx=w*(1.1-.45*om),bx=Math.min(w*1.8,4.9),xo=Math.min(bx+1.4,5.9);
+ const Rp=[[X1,0],[xo,0],[bx,.08*h],[nx,.32*h],[lw,.72*h],[.7*lw,.92*h]],L=Rp.map(p=>[-p[0],p[1]]);
+ return new THREE.CatmullRomCurve3(L.concat([[0,h]],Rp.slice().reverse()).map(p=>new THREE.Vector3(p[0],D+p[1],0)),false,'centripetal').getSpacedPoints(NP-1)}
+function crossOf(X,Y){if(Y[75]<=0)return 0;let i=75;while(i<NP-1&&Y[i]>0)i++;return X[i-1]+(X[i]-X[i-1])*Y[i-1]/(Y[i-1]-Y[i])}
+// zs: −1 tubo dietro, +1 davanti; sx: lato di partenza in x; dirs: verso del campo; pl: polarità della macchia sinistra
+function mkTube(zs,sx,dirs,pl){
+ const t={zs,sx,dirs,strands:[],arrows:[],spots:[],cross:0,cx:0};
+ for(let k=0;k<NS;k++){
+  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(new Float32Array(NP*3),3));g.setAttribute('color',new THREE.BufferAttribute(new Float32Array(NP*3),3));
+  const ln=new THREE.Line(g,new THREE.LineBasicMaterial({vertexColors:true,transparent:true,opacity:.85}));G.add(ln);
+  t.strands.push({ln,ph:k/NS*6.283,rr:.25+.75*Math.sqrt(Math.random()),off:Math.random()});
+  const m=new THREE.Mesh(new THREE.ConeGeometry(.038,.21,8),new THREE.MeshBasicMaterial({color:0x4fc3ff}));m.visible=k%3===0;G.add(m);t.arrows.push(m)}
+ [pl,-pl].forEach(p=>{
+  const m=new THREE.Mesh(new THREE.CircleGeometry(1,40),new THREE.MeshBasicMaterial({color:0x1a0d05,transparent:true,opacity:.9}));
+  m.add(new THREE.Mesh(new THREE.RingGeometry(1,1.14,48),new THREE.MeshBasicMaterial({color:p>0?0xff5a4a:0x4aa3ff,side:2})));
+  m.rotation.x=-Math.PI/2;m.position.y=.01;G.add(m);
+  const lb=document.createElement('div');lb.className='lb';lb.style.color=p>0?'#ff8f80':'#7fbcff';lb.style.fontWeight='600';lb.textContent=p>0?'N (+)':'S (−)';document.body.appendChild(lb);
+  t.spots.push({m,lb})});
+ return t}
+const A=mkTube(-1,-1,-1,-1),B=mkTube(1,1,1,1);
+let XM=0;
+// zo: semidistanza dei piedi in z; lean: inclinazione delle cime verso l'altro tubo; beta: torsione dell'asse
+function updT(t,time,h,w,pr,rf,cx,zo,lean,beta,fl){
+ const r0=(.4+.35*pr)*rf,tw=1.5,k=cl((h+D)/TOP),sf=cl(h-HV),pa=.3*cl((h+D)/1.2),zb=t.zs*zo,sb=Math.sin(beta);
+ const P=omega(h,w,Math.pow(k,1.5));for(let i=0;i<NP;i++){AX[i]=P[i].x;AY[i]=P[i].y}
+ const cross=crossOf(AX,AY),sv=cross>0&&sf>.03,scl=Math.max(.03,Math.min(.8,.15+.65*k)*sf);
+ t.cross=cross;t.cx=cx;
+ t.spots.forEach((s,i)=>{const xr=(i?1:-1)*cross;s.m.visible=sv;s.m.position.set(cx+xr,.01,zb-t.zs*xr*sb);s.m.scale.setScalar(scl)});
+ t.strands.forEach((s,n)=>{
+  const p=s.ln.geometry.attributes.position.array,c=s.ln.geometry.attributes.color.array;
+  for(let i=0;i<NP;i++){
+   const q=X0+(X1-X0)*i/(NP-1),th=s.ph+tw*q+time*.4,ax=Math.abs(AX[i]);
+   const ra=r0*s.rr*(1-pa*Math.exp(-Math.pow(ax-cross,2)/.6));
+   const y=AY[i]+ra*Math.cos(th),xw=cx+AX[i],z=zb-t.zs*(lean*sm(y/4.2)+AX[i]*sb)+ra*Math.sin(th);
+   p[i*3]=xw;p[i*3+1]=y;p[i*3+2]=z;
+   const f=cl((y+.5)/3);tc.copy(c1).lerp(c2,Math.min(1,f*1.6)).lerp(c3,Math.max(0,f-.5)*.9);
+   if(fl>.01)tc.lerp(wh,cl(1.3*fl*Math.exp(-Math.pow(xw-XM,2)/4-z*z/.6)*cl((y-2)/1.5)));
+   c[i*3]=tc.r;c[i*3+1]=tc.g;c[i*3+2]=tc.b}
+  s.ln.geometry.attributes.position.needsUpdate=s.ln.geometry.attributes.color.needsUpdate=true;
+  let u=(time*.12+s.off)%1;if(t.dirs<0)u=1-u;
+  const j=Math.min(NP-2,Math.max(1,Math.floor(u*(NP-1)))),a=(j+1)*3,b=(j-1)*3,m=t.arrows[n];
+  m.position.set(p[j*3],p[j*3+1],p[j*3+2]);
+  dv.set(p[a]-p[b],p[a+1]-p[b+1],p[a+2]-p[b+2]).multiplyScalar(t.dirs).normalize();m.quaternion.setFromUnitVectors(UP,dv)})}
+// Effetti del flare
+const gc=document.createElement('canvas');gc.width=gc.height=128;const gx=gc.getContext('2d'),gr=gx.createRadialGradient(64,64,0,64,64,64);
+gr.addColorStop(0,'rgba(255,255,240,1)');gr.addColorStop(.25,'rgba(255,220,120,.7)');gr.addColorStop(1,'rgba(255,120,30,0)');gx.fillStyle=gr;gx.fillRect(0,0,128,128);
+const gtex=new THREE.CanvasTexture(gc);
+const flashes=[0,1,2,3,4].map(()=>{const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:gtex,blending:THREE.AdditiveBlending,transparent:true,depthWrite:false}));sp.visible=false;G.add(sp);return sp});
+let fOn=false;
+const rings=[];[A,B].forEach(t=>t.spots.forEach(sp=>{for(let ty=0;ty<2;ty++){const m=new THREE.Mesh(new THREE.RingGeometry(.9,1,48),new THREE.MeshBasicMaterial({color:ty?0xffd070:0xfff0c0,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false,side:2}));m.rotation.x=-Math.PI/2;m.visible=false;G.add(m);rings.push({m,sp,ty})}}));
+function flareFx(fl,ex,ytop,T){
+ fOn=A.spots[0].m.visible&&B.spots[0].m.visible;
+ const f0=flashes[0];f0.visible=fOn&&fl>.02;if(f0.visible){f0.position.set(XM,ytop,0);f0.scale.setScalar(2+4*fl);f0.material.opacity=.6*fl}
+ [A,B].forEach((t,a)=>t.spots.forEach((sp,i)=>{const f=flashes[1+a*2+i];f.visible=fOn&&ex>.02;if(f.visible){f.position.copy(sp.m.position);f.position.y=.3;f.scale.setScalar(1.6+4*ex);f.material.opacity=ex}}));
+ rings.forEach(r=>{const u=(T-TF-.9-(r.ty?1.3:0))/(r.ty?2:2.4);r.m.visible=fOn&&u>0&&u<1;if(r.m.visible){r.m.position.set(r.sp.m.position.x,.07,r.sp.m.position.z);r.m.scale.setScalar(.5+(r.ty?2.5:4.5)*u);r.m.material.opacity=(r.ty?.5:.85)*(1-u)}});
+ plane.material.color.setRGB(1+.7*ex,1+.6*ex,1+.3*ex)}
+// Cronologia
+const TB=5,DUR=14,TS0=19,TS1=31,TL0=23,TL1=32,TF=32,TD=40,DEC=22,XS=3.4,ZO=1.7,LMAX=1.1,BETA=8*Math.PI/180;
+let T=0,clk=0,last=performance.now(),paused=false;
+// Riconnessione: ogni coppia di linee (A_k,B_k) viene tagliata a quota YC0 sulle due gambe e ricucita in modo incrociato:
+// due anse basse (A−/B+ e A+/B−) che si accorciano, e un anello chiuso (plasmoide) fatto dalle due parti alte, che sale e si espande
+const YC0=3.6;
+function mkL(n){const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(new Float32Array(n*3),3));g.setAttribute('color',new THREE.BufferAttribute(new Float32Array(n*3),3));
+ const l=new THREE.Line(g,new THREE.LineBasicMaterial({vertexColors:true,transparent:true,opacity:.9,blending:THREE.AdditiveBlending,depthWrite:false}));l.visible=false;l.frustumCulled=false;G.add(l);return l}
+const perm=[...Array(NS).keys()].sort(()=>Math.random()-.5);
+const pairs=perm.map((r,k)=>({lowL:mkL(170),lowR:mkL(170),ring:mkL(345),snap:null,tk:TF+.2+3*r/NS}));
+function mkSeg(){const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(new Float32Array(NS*24),3));g.setAttribute('color',new THREE.BufferAttribute(new Float32Array(NS*24),3));
+ const l=new THREE.LineSegments(g,new THREE.LineBasicMaterial({vertexColors:true,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false}));l.frustumCulled=false;G.add(l);return l}
+const jetD=mkSeg(),jetU=mkSeg();
+function lp(arr,f){const i=Math.max(0,Math.min(NP-2,Math.floor(f))),t=f-i;return[arr[i*3]+(arr[i*3+3]-arr[i*3])*t,arr[i*3+1]+(arr[i*3+4]-arr[i*3+1])*t,arr[i*3+2]+(arr[i*3+5]-arr[i*3+2])*t]}
+function segW(l,ix,arr,f0,f1,k,r,g,b){const P=l.geometry.attributes.position.array,C=l.geometry.attributes.color.array,a=lp(arr,f0),c=lp(arr,f1);P.set([a[0],a[1],a[2],c[0],c[1],c[2]],ix*6);C.set([r*k,g*k,b*k,r*k,g*k,b*k],ix*6)}
+function clrSeg(k){for(let j=k*4;j<k*4+4;j++){jetD.geometry.attributes.color.array.fill(0,j*6,j*6+6);jetU.geometry.attributes.color.array.fill(0,j*6,j*6+6)}}
+function dirv(arr,i,j){const x=arr[j*3]-arr[i*3],y=arr[j*3+1]-arr[i*3+1],z=arr[j*3+2]-arr[i*3+2],n=Math.hypot(x,y,z);return n<1e-4?[0,1,0]:[x/n,y/n,z/n]}
+const pt=(arr,i)=>[arr[i*3],arr[i*3+1],arr[i*3+2]];
+// raccordo liscio (Bézier cubica) tra due estremi, con tangenti d0 (in uscita da a) e d3 (in ingresso in b)
+function bez(emit,a,d0,b,d3){const L=.55*Math.hypot(b[0]-a[0],b[1]-a[1],b[2]-a[2])+.01,
+ p1=[a[0]+d0[0]*L,a[1]+d0[1]*L,a[2]+d0[2]*L],p2=[b[0]-d3[0]*L,b[1]-d3[1]*L,b[2]-d3[2]*L];
+ for(let j=1;j<=10;j++){const u=j/11,v=1-u,w0=v*v*v,w1=3*v*v*u,w2=3*v*u*u,w3=u*u*u;
+  emit(w0*a[0]+w1*p1[0]+w2*p2[0]+w3*b[0],w0*a[1]+w1*p1[1]+w2*p2[1]+w3*b[1],w0*a[2]+w1*p1[2]+w2*p2[2]+w3*b[2])}}
+function lowLine(l,pa,pb,i0,i1,right,hot){
+ const P=l.geometry.attributes.position.array,C=l.geometry.attributes.color.array;let n=0;
+ const emit=(x,y,z)=>{P[n*3]=x;P[n*3+1]=y;P[n*3+2]=z;tc.copy(wh).lerp(c3,hot).multiplyScalar(cl(1+y/1.2));C[n*3]=tc.r;C[n*3+1]=tc.g;C[n*3+2]=tc.b;n++};
+ const put=(arr,i)=>emit(arr[i*3],arr[i*3+1],arr[i*3+2]);
+ if(!right){const j=Math.max(i0,i1-2);for(let i=i0;i<=i1;i++)put(pa,i);bez(emit,pt(pa,i1),dirv(pa,j,i1),pt(pb,i1),dirv(pb,i1,j));for(let i=i1;i>=i0;i--)put(pb,i)}
+ else{const j=Math.min(i0,i1+2);for(let i=i0;i>=i1;i--)put(pa,i);bez(emit,pt(pa,i1),dirv(pa,j,i1),pt(pb,i1),dirv(pb,i1,j));for(let i=i1;i<=i0;i++)put(pb,i)}
+ l.geometry.setDrawRange(0,n);l.geometry.attributes.position.needsUpdate=l.geometry.attributes.color.needsUpdate=true;l.visible=n>3}
+// Anello superiore (flux rope): stesse linee ricucite di prima, ma ruotato di 90° attorno alla verticale:
+// ribaltato in una U con concavità verso l'alto; la sua curvatura giace nel piano y–z (lo stesso delle anse basse) e il tubo si estende lungo x
+function snapRing(pa,pb){
+ let iL=0;while(iL<74&&pa[iL*3+1]<YC0)iL++;let iR=NP-1;while(iR>76&&pa[iR*3+1]<YC0)iR--;
+ const v=[],emit=(x,y,z)=>v.push(x,y,z),jR=Math.max(iL,iR-2),jL=Math.min(iR,iL+2);
+ for(let i=iL;i<=iR;i++)emit(pa[i*3],pa[i*3+1],pa[i*3+2]);
+ bez(emit,pt(pa,iR),dirv(pa,jR,iR),pt(pb,iR),dirv(pb,iR,jR));
+ for(let i=iR;i>=iL;i--)emit(pb[i*3],pb[i*3+1],pb[i*3+2]);
+ bez(emit,pt(pb,iL),dirv(pb,jL,iL),pt(pa,iL),dirv(pa,iL,jL));
+ emit(pa[iL*3],pa[iL*3+1],pa[iL*3+2]);
+ const n=v.length/3;let cx=0,cy=0,cz=0;for(let i=0;i<n;i++){cx+=v[i*3];cy+=v[i*3+1];cz+=v[i*3+2]}cx/=n;cy/=n;cz/=n;
+ let mn=1e9,mx=-1e9;for(let i=0;i<n;i++){mn=Math.min(mn,v[i*3+1]);mx=Math.max(mx,v[i*3+1])}
+ const o=new Float32Array(v.length);
+ // ribaltamento verticale: l'arco ∩ diventa una U con la concavità verso l'alto (fondo a quota mn)
+ for(let i=0;i<n;i++){const dx=v[i*3]-cx,dz=v[i*3+2]-cz;o[i*3]=cx+dz*1.6;o[i*3+1]=mn+(mx-v[i*3+1]);o[i*3+2]=cz+dx*.7}
+ return{v:o,c:[cx,mn,cz]}}
+function reconnect(k,q,rk,fin,hm){
+ const sa=A.strands[k],sb=B.strands[k],pa=sa.ln.geometry.attributes.position.array,pb=sb.ln.geometry.attributes.position.array;
+ sa.ln.visible=sb.ln.visible=fin>.02;sa.ln.material.opacity=sb.ln.material.opacity=.85*fin;
+ A.arrows[k].visible=B.arrows[k].visible=(k%3===0)&&fin>.4;
+ let ycur=YC0-(YC0-.4)*Math.pow(sm(rk/4.5),2);if(rk>4.5){const xx=rk-4.5;ycur+=.9*Math.exp(-xx*.8)*Math.abs(Math.sin(3.5*xx))}
+ const hot=cl(rk/3),op=.95*cl(hm-HV);
+ let ia=0;while(ia<74&&pa[ia*3+1]<-1.2)ia++;let ic=ia;while(ic<74&&pa[ic*3+1]<ycur)ic++;
+ let ib=NP-1;while(ib>76&&pa[ib*3+1]<-1.2)ib--;let id=ib;while(id>76&&pa[id*3+1]<ycur)id--;
+ lowLine(q.lowL,pa,pb,ia,ic,false,hot);lowLine(q.lowR,pa,pb,ib,id,true,hot);
+ q.lowL.material.opacity=q.lowR.material.opacity=op;
+ // getti velocissimi verso il basso lungo le gambe, poi rimbalzo verso l'alto
+ let ic0=ia;while(ic0<74&&pa[ic0*3+1]<YC0)ic0++;let id0=ib;while(id0>76&&pa[id0*3+1]<YC0)id0--;
+ const u1=rk/.35,u2=(rk-.35)/.9;
+ [pa,pb].forEach((arr,ti)=>[0,1].forEach(sd=>{
+  const foot=sd?ib:ia,cut=sd?id0:ic0,ix=k*4+ti*2+sd,ku=Math.min(1,u1);
+  segW(jetD,ix,arr,cut+(foot-cut)*Math.max(0,ku-.35),cut+(foot-cut)*ku,u1>0&&u1<1.2?1-cl((u1-1)/.2):0,.8,.95,1);
+  segW(jetU,ix,arr,foot+(cut-foot)*.5*Math.max(0,u2-.4),foot+(cut-foot)*.5*cl(u2),u2>0&&u2<1?(1-u2)*.8:0,1,.7,.3)}));
+ if(!q.snap)q.snap=snapRing(pa,pb);
+ const s=cl((rk-.3)/8),e=1+1.8*s,lift=13*s*s,v=q.snap.v,c=q.snap.c,n=v.length/3,P=q.ring.geometry.attributes.position.array,C=q.ring.geometry.attributes.color.array;
+ tc.copy(wh).lerp(c3,sm(s*2)).lerp(c2,sm((s-.4)*2));
+ for(let i=0;i<n;i++){P[i*3]=c[0]+(v[i*3]-c[0])*e;P[i*3+1]=c[1]+(v[i*3+1]-c[1])*e+lift;P[i*3+2]=c[2]+(v[i*3+2]-c[2])*e;C[i*3]=tc.r;C[i*3+1]=tc.g;C[i*3+2]=tc.b}
+ q.ring.geometry.setDrawRange(0,n);q.ring.geometry.attributes.position.needsUpdate=q.ring.geometry.attributes.color.needsUpdate=true;
+ q.ring.material.opacity=.95*(1-sm((s-.55)/.45));q.ring.visible=s<1}
+const flf=v=>v<0?0:Math.min(1,1.4*(1-Math.exp(-4*v))*Math.exp(-v/2.8));
+function st(t0,dd){const e=sm((T-t0)/DUR);if(dd<=0)return{h:HMAX*e,w:1.5+.7*e,pr:e,rf:.8+.2*sm((T-t0)/6)};const s1=sm(dd);return{h:HMAX*(1-s1),w:2.2,pr:1,rf:1-.2*s1}}
+const ph=document.getElementById('ph'),l1=document.getElementById('l1'),lf=document.getElementById('lf');
+function proj(v,el,dx,dy){const q=v.clone();G.localToWorld(q);q.project(cam);el.style.left=(q.x*.5+.5)*innerWidth+dx+'px';el.style.top=(-q.y*.5+.5)*innerHeight+dy+'px'}
+function loop(now){
+ requestAnimationFrame(loop);
+ const dt=Math.min(.1,(now-last)/1000);last=now;
+ if(!paused){const sp=+document.getElementById('s').value;T+=dt*sp;clk+=dt*sp}
+ if(T>TD+DEC+4)T=0;
+ const dd=Math.max(0,(T-TD)/DEC);
+ const slide=dd>0?1-sm((dd-.3)/.7):sm((T-TS0)/(TS1-TS0));      // scorrimento delle basi in x
+ const def=dd>0?1-sm(dd/.5):sm((T-TL0)/(TL1-TL0));             // inclinazione cime + torsione
+ const fl=flf(T-TF),flR=flf(T-TF-.7);
+ const a=st(0,dd),b=st(TB,dd);
+ XM=0;
+ updT(A,clk,a.h,a.w,a.pr,a.rf,A.sx*XS*(1-slide),ZO,LMAX*def,BETA*def,fl);
+ updT(B,clk,b.h,b.w,b.pr,b.rf,B.sx*XS*(1-slide),ZO,LMAX*def,BETA*def,fl);
+ let ex=0,exr=0;pairs.forEach(q=>{const x=T-q.tk-.4;if(x>0){ex+=(1-Math.exp(-10*x))*Math.exp(-x/1.3);const y=x-1.1;if(y>0)exr+=.55*(1-Math.exp(-10*y))*Math.exp(-y/1.1)}});
+ flareFx(fl,Math.min(1,(ex+exr)/NS*3.2),D+a.h-.5,T);
+ const fin=sm((T-(TD+DEC-1))/4);
+ pairs.forEach((q,k)=>{const rk=T-q.tk;
+  if(rk<0){q.snap=null;q.lowL.visible=q.lowR.visible=q.ring.visible=false;clrSeg(k);A.strands[k].ln.visible=B.strands[k].ln.visible=true;A.strands[k].ln.material.opacity=B.strands[k].ln.material.opacity=.85;A.arrows[k].visible=B.arrows[k].visible=(k%3===0)}
+  else reconnect(k,q,rk,fin,a.h)});
+ jetD.geometry.attributes.position.needsUpdate=jetD.geometry.attributes.color.needsUpdate=jetU.geometry.attributes.position.needsUpdate=jetU.geometry.attributes.color.needsUpdate=true;
+ ph.textContent=T>=TF?(dd>.6?'10 · Macchie sparite: il campo originale si riforma in profondità':dd>0?'9 · Le anse basse sprofondano; le macchie si riducono e spariscono':T-TF<1?'6 · RICONNESSIONE: getti velocissimi verso il basso lungo le gambe':T-TF<4?'7 · Impatto sulla fotosfera: esplosione e rimbalzo':'8 · Sopra il punto di taglio il plasmoide (flux rope) sale e si espande; sotto le anse si accorciano, nello stesso piano'):T<TB+4?'1 · Un primo tubo di flusso (A) risale e buca la fotosfera':T<TS0?'2 · Poco dopo emerge il tubo B, spostato lateralmente rispetto ad A':T<TL0?'3 · Le basi scorrono in direzioni opposte (A verso destra, B verso sinistra): le macchie non si avvicinano frontalmente':'4 · Torsione della base: le cime degli omega si inclinano l’una verso l’altra, fino al contatto';
+ G.rotation.y+=(G.userData.ry-G.rotation.y)*.1;G.rotation.x+=(G.userData.rx-G.rotation.x)*.1;
+ [A,B].forEach(t=>t.spots.forEach(s=>{s.lb.style.display=s.m.visible?'block':'none';if(s.m.visible)proj(s.m.position.clone().add(new THREE.Vector3(0,.15,s.m.scale.x*1.2)),s.lb,-14,0)}));
+ lf.style.display=fOn&&fl>.15?'block':'none';if(fOn)proj(flashes[0].position,lf,-30,-40);
+ proj(new THREE.Vector3(10.5,0,4.2),l1,-95,-4);
+ R.render(S,cam)}
+G.userData={ry:-.2,rx:.5};G.rotation.set(.5,-.2,0);
+const view=(rx,ry)=>{G.userData.rx=rx;G.userData.ry=ry};
+document.getElementById('v1').onclick=()=>view(.5,-.2);document.getElementById('v2').onclick=()=>view(1.45,0);document.getElementById('v3').onclick=()=>view(.05,1.5708);
+let dn=false,px=0,py=0;
+cv.onpointerdown=e=>{dn=true;px=e.clientX;py=e.clientY};
+addEventListener('pointerup',()=>dn=false);
+addEventListener('pointermove',e=>{if(!dn)return;G.userData.ry+=(e.clientX-px)*.008;G.userData.rx=Math.max(-.2,Math.min(1.5,G.userData.rx+(e.clientY-py)*.006));px=e.clientX;py=e.clientY});
+document.getElementById('b').onclick=()=>{T=0};
+const pz=document.getElementById('pz');pz.onclick=()=>{paused=!paused;pz.textContent=paused?'Riprendi':'Pausa'};
+requestAnimationFrame(loop);
+</script></body></html>
+
+</body></html>

@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<!--
+  © 2026 Carlo Casoli — "Il Sole: Osservazione e Fisica"
+  Licenza CC BY-NC-ND 4.0: https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it
+  Vietati l'uso commerciale e la distribuzione di versioni modificate senza autorizzazione scritta dell'autore.
+-->
+<html lang="it"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Effetto Ω: come la rotazione avvolge il campo magnetico</title>
+<style>
+:root{--bg:#fbf8f2;--fg:#231f1a;--mut:#6b6358;--card:#fff;--line:#ddd3c2;--acc:#d9531e;box-sizing:border-box}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15130f;--fg:#efe8dc;--mut:#a39a8b;--card:#211e18;--line:#3a352b;--acc:#ff8a4c}}
+:root[data-theme="dark"]{--bg:#15130f;--fg:#efe8dc;--mut:#a39a8b;--card:#211e18;--line:#3a352b;--acc:#ff8a4c}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.4 Georgia,'Times New Roman',serif}
+main{height:100%;height:100dvh;box-sizing:border-box;display:flex;flex-direction:column;gap:6px;padding:calc(6px + env(safe-area-inset-top,0px)) 8px calc(6px + env(safe-area-inset-bottom,0px))}
+.grid{flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pane{min-width:0;min-height:0;display:flex}
+.pane svg{flex:1;min-width:0;min-height:0;width:100%;height:100%;display:block}
+@media(max-width:640px){.grid{grid-template-columns:1fr;grid-template-rows:1fr 1fr}}
+.ctl{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px 12px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:0}.row+.row{margin-top:6px}
+button{font:inherit;font-size:.85rem;border:1px solid var(--line);background:var(--bg);color:var(--fg);border-radius:20px;padding:5px 12px;cursor:pointer}
+input[type=range]{flex:1;min-width:150px;accent-color:var(--acc)}
+.bar{height:10px;background:var(--line);border-radius:6px;overflow:hidden;flex:1;min-width:150px}.bar i{display:block;height:100%;width:0;background:var(--acc)}
+label{font-size:.85rem;color:var(--mut)}
+</style></head><body><main>
+<div class="grid"><div class="pane"><svg viewBox="0 0 600 600" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Linee di campo avvolte dalla rotazione differenziale">
+<defs>
+<linearGradient id="tubeR" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff9d78"/><stop offset=".42" stop-color="#e2572b"/><stop offset="1" stop-color="#8a2c11"/></linearGradient>
+<linearGradient id="tubeB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8fc3f2"/><stop offset=".42" stop-color="#2f78c4"/><stop offset="1" stop-color="#123a63"/></linearGradient>
+</defs>
+<circle cx="300" cy="300" r="250" fill="#ffd93a" opacity=".6" stroke="#e0b400" stroke-width="2"/>
+<circle cx="300" cy="300" r="175" fill="#f0a020" fill-opacity=".35" stroke="#b0641a" stroke-dasharray="4 4"/>
+<clipPath id="ic"><circle cx="300" cy="300" r="175"/></clipPath>
+<rect x="125" y="275.6" width="350" height="48.8" fill="#fff" fill-opacity=".35" clip-path="url(#ic)"/>
+<line x1="50" y1="300" x2="550" y2="300" stroke="#fff" stroke-width="2.5" stroke-dasharray="8 6"/>
+<g id="fl"></g>
+
+<text x="300" y="44" text-anchor="middle" font-size="12" fill="var(--fg)" opacity=".85">superficie</text>
+<text x="300" y="146" text-anchor="middle" font-size="12" fill="var(--fg)" opacity=".85">base zona convettiva (0,7 R)</text>
+<g stroke="var(--fg)" stroke-width="2.5" fill="var(--fg)" opacity=".75">
+<line x1="14" y1="300" x2="86" y2="300"/><path d="M86,300 l-8,-5 v10z"/>
+<line x1="24" y1="190" x2="68" y2="190"/><path d="M68,190 l-8,-5 v10z"/>
+<line x1="34" y1="100" x2="56" y2="100"/><path d="M56,100 l-8,-5 v10z"/></g>
+<text x="14" y="322" font-size="11" fill="var(--fg)">equatore: 25 giorni</text>
+<text x="14" y="128" font-size="11" fill="var(--fg)">poli: ~35 giorni</text>
+</svg></div><div class="pane"><svg viewBox="0 0 600 600" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Sezione interna: campo poloidale e campo toroidale">
+<circle cx="300" cy="300" r="250" fill="#ffd93a" opacity=".6" stroke="#e0b400" stroke-width="2"/>
+<circle cx="300" cy="300" r="175" fill="none" stroke="#b0641a" stroke-dasharray="4 4"/>
+<line x1="300" y1="50" x2="300" y2="550" stroke="var(--mut)" stroke-dasharray="3 5" opacity=".6"/>
+<line x1="50" y1="300" x2="550" y2="300" stroke="#fff" stroke-width="2" stroke-dasharray="8 6"/>
+<g id="caps" fill="none" stroke-linecap="round"></g><g id="po"></g><g id="to"></g><g id="cv"></g>
+<text x="300" y="20" text-anchor="middle" fill="var(--mut)" font-size="13">Polo nord</text>
+<text x="300" y="592" text-anchor="middle" fill="var(--mut)" font-size="13">Polo sud</text>
+</svg></div></div>
+<div class="ctl">
+<div class="row"><button id="pp">Pausa</button><button id="dl" hidden>Scarica pagina (.html)</button><label style="flex:1;min-width:200px">Ciclo solare, 0-22 anni (due cicli) <input id="cy" type="range" min="0" max="2200" value="0" style="width:100%"></label>
+<span id="tm" style="font-size:.85rem;color:var(--mut);min-width:110px;text-align:right"></span></div>
+<div class="row"><label style="flex:1;min-width:200px">Avvolgimento del campo, in giorni (primi ~1,9 anni) <input id="sl" type="range" min="0" max="700" value="0" style="width:100%"></label>
+<label style="flex:1;min-width:200px;display:flex;gap:8px;align-items:center">Campo orizzontale (toroidale)<span class="bar"><i id="gi"></i></span></label></div>
+</div>
+<div id="t" hidden></div><div id="d" hidden></div>
+
+<script data-own="1">
+const POS='#e2572b',NEG='#2f78c4',cx=300,cy=300,R=250,MAXD=700,rad=x=>x*Math.PI/180,$=id=>document.getElementById(id);
+const dOm0=la=>{const s=Math.sin(rad(45*Math.tanh(Math.abs(la)/45)));return 1*s*s},DOM_MAX=dOm0(90),dOm=la=>DOM_MAX-dOm0(la); // velocità relativa al polo (fermo): 0 al polo, massima all'equatore, gradi/giorno
+const RT=175; // raggio della tachoclina (0,7 R)
+const pt=(l0,la,t)=>{const lon=l0+dOm(la)*t;return{x:cx+RT*Math.cos(rad(la))*Math.sin(rad(lon)),y:cy-RT*Math.sin(rad(la)),v:Math.cos(rad(lon))>0}};
+function arrow(p,q,c,sz,op){const a=Math.atan2(q.y-p.y,q.x-p.x),co=Math.cos(a),si=Math.sin(a),x=p.x,y=p.y;
+ return `<path d="M${(x+co*sz).toFixed(1)},${(y+si*sz).toFixed(1)} L${(x-co*.7*sz-si*.6*sz).toFixed(1)},${(y-si*.7*sz+co*.6*sz).toFixed(1)} L${(x-co*.7*sz+si*.6*sz).toFixed(1)},${(y-si*.7*sz-co*.6*sz).toFixed(1)}Z" fill="${c}" fill-opacity="${op}"/>`}
+// scomparsa del toroidale (dalle alte alle basse latitudini) e ritorno del poloidale invertito
+const LA_=[90,35,29,23,17,11,5,0],TE_=[2.7,2.8,4.4,6.0,7.6,9.2,10.8,10.8]; // = emersione della macchia corrispondente + 0.8 anni
+function tE(la){la=Math.abs(la);for(let i=0;i<LA_.length-1;i++)if(la<=LA_[i]&&la>=LA_[i+1]){const u=(LA_[i]-la)/(LA_[i]-LA_[i+1]);return TE_[i]+(TE_[i+1]-TE_[i])*u}return 10.6}
+const tOn=la=>{la=Math.abs(la);return la>=35?7+(90-la)/55*2.4:9.4+(35-la)/35*.8};
+const oOld=(la,Y)=>1-ease((Y-(tE(la)-.8))/1.6),oNew=(la,Y)=>ease((Y-tOn(la))/.8);
+function chunks(l0,t){const ch=[];let cur=null,last=null;
+ for(let la=-89.5;la<=89.5;la+=.5){const q=pt(l0,la,t),k=Math.floor((la+90)/4);if(!q.v){cur=null;last=null;continue}
+  if(!cur||cur.k!==k){cur={k,la,pts:[]};if(last)cur.pts.push(last);ch.push(cur)}
+  cur.pts.push(q);last=q}return ch}
+const pth=(c,col,w,op)=>`<path d="M${c.pts.map(q=>q.x.toFixed(1)+','+q.y.toFixed(1)).join(' L')}" fill="none" stroke="${col}" stroke-width="${w}" stroke-opacity="${op}" stroke-linecap="round"/>`;
+const PAL=[{l:'#7a2e12',h:NEG},{l:'#1f6f4a',h:POS}],AL=[-82,-70,-58,-46,-36,-28,-20,-13,13,20,28,36,46,58,70,82];
+const AL8=[-72,-54,-38,-22,22,38,54,72];
+const sst=x=>{x=Math.max(0,Math.min(1,x));return x*x*(3-2*x)};
+// quanto una linea è avvolta dipende dallo sfasamento accumulato (w = gradi di longitudine per grado di latitudine), non dalla proiezione istantanea
+const dOmD=la=>Math.abs(dOm(la+.5)-dOm(la-.5));
+// 1 = linea ancora inclinata (>10 gradi), 0 = quasi orizzontale (<5 gradi); vicino all'equatore si usa la latitudine 15 come riferimento così l'arco a S sparisce insieme ai tratti orizzontali
+function lineMul(la,t){const ref=Math.max(Math.abs(la),15),w=dOmD(ref)*t,phi=Math.atan2(1,Math.max(w,1e-6))*180/Math.PI;return sst((phi-5)/5)}
+function cyc(l0,t,Y,cc,mul){const T=Math.min(1,t/MAXD),pa=PAL[cc],hi=l0===0,col=hi?pa.h:pa.l,cN=PAL[(cc+1)%2].h,cS=pa.h;let o='',ar='';
+ chunks(l0,t).forEach(h=>{const op=oOld(h.la,Y)*(mul?mul(h.la):1)*lineMul(h.la,t);if(op>.02)o+=pth(h,col,hi?3.5:1.4+1.6*T,(hi?1:.8)*op)});
+ // frecce sulle linee che si avvolgono (meridiano centrale): verso decrescente di latitudine nel ciclo pari, crescente nel dispari
+ if(l0%90===0)AL8.forEach(la=>{const a=pt(l0,la,t),b=pt(l0,la+.5,t),op=oOld(la,Y)*(mul?mul(la):1)*lineMul(la,t);
+  if(op>.02&&a.v&&b.v)ar+=cc?arrow(a,b,la>0?cN:cS,8,op):arrow(b,a,la>0?cN:cS,8,op)});
+ return[o,ar]}
+// tubi toroidali: 6 per emisfero, nascono man mano che le linee diventano orizzontali e svaniscono lentamente dal più vicino ai poli
+const TLAT=[36,26,17,9],TOUT=[3.2,5.0,6.8,8.6],TDUR=2.2;
+function tubeP(k,t,Yl){return(1-lineMul(TLAT[k],t))*(1-sst((Yl-TOUT[k])/TDUR))}
+function tubes(t,Yl,c){let o='';
+ for(let k=0;k<4;k++){const p=tubeP(k,t,Yl);if(p<.02)continue;const la=TLAT[k],hw=RT*Math.cos(rad(la)),dy=RT*Math.sin(rad(la)),om=60+250*dOm(la)/DOM_MAX;
+  [1,-1].forEach(hm=>{const y=cy-hm*dy,isR=(hm>0)!==(c===1),grad=isR?'url(#tubeR)':'url(#tubeB)',dir=((hm>0)!==(c===1))?1:-1,x1=(cx-hw).toFixed(1),x2=(cx+hw).toFixed(1),H=9;
+   o+=`<g opacity="${(p).toFixed(2)}"><rect x="${x1}" y="${(y-H).toFixed(1)}" width="${(hw*2).toFixed(1)}" height="${H*2}" rx="${H}" fill="${grad}"/></g>`;
+   for(let j=0;j<3;j++){const ph=rad(120*j+dir*om*Yl),cs=Math.cos(ph);if(cs<=.05)continue;const x=cx+hw*Math.sin(ph);o+=arrow({x,y},{x:x+dir*10,y},'#fff',8,p*Math.min(1,cs*2.5)*.85)}})}
+ return o}
+// il poloidale del ciclo nuovo ricompare per latitudine: prima alle alte latitudini (nord), poi verso l'equatore
+const newF=(la,Y)=>sst((Y-(9.4-(Math.abs(la)-5)/85*5.4))/1.5);
+function front(t,Y,c){let o='',ar='';const early=Y<2,Yl=Y;
+ for(let i=0;i<12;i++){const l0=-180+30*i,hi=l0===0,pn=PAL[(c+1)%2],cB=hi?pn.h:pn.l;
+  let r=cyc(l0,t,Y,c,null);o+=r[0];ar+=r[1];
+  if(early){const fade=1-ease(Y/1.4);r=cyc(l0,9.5*365,9.5,(c+1)%2,()=>fade);o+=r[0];ar+=r[1]}
+  if(Y>3.5){chunks(l0,0).forEach(h=>{const opN=newF(h.la,Y);if(opN>.02)o+=pth(h,cB,hi?3.5:2.2,(hi?1:.85)*opN)});
+   if(l0%90===0)AL8.forEach(la=>{const a=pt(l0,la,0),b=pt(l0,la+.5,0),opN=newF(la,Y);if(opN>.02&&a.v&&b.v)ar+=c?arrow(b,a,cB,8,opN):arrow(a,b,cB,8,opN)})}}
+ $('fl').innerHTML=o+tubes(t,Yl,c)+ar}
+// sezione: poloidale che sbiadisce + sequenza di tubi toroidali a latitudine decrescente
+const TB=[[0,1.5,2.0],[2.0,3.2,3.6],[3.6,4.8,5.2],[5.2,6.4,6.8],[6.8,8.0,8.4],[8.4,9.6,10.0]],LT=[35,29,23,17,11,5]; // [nascita, fine crescita, emersione] in anni
+const cl=x=>Math.max(0,Math.min(1,x)),ease=x=>{x=cl(x);return x*x*(3-2*x)};
+const PL=(la,rr,side,hm)=>[cx+side*rr*Math.cos(rad(la)),cy-hm*rr*Math.sin(rad(la))];
+function tube(x,y,r,cross,op){const c=cross?NEG:POS;
+ return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r.toFixed(1)}" fill="${c}" fill-opacity="${.7*op}" stroke="${c}" stroke-width="2" stroke-opacity="${op}"/>`+
+ (cross?`<path d="M${x-r*.6},${y-r*.6}L${x+r*.6},${y+r*.6}M${x-r*.6},${y+r*.6}L${x+r*.6},${y-r*.6}" stroke="#fff" stroke-width="2" stroke-opacity="${op}"/>`:`<circle cx="${x}" cy="${y}" r="${Math.max(1.5,r*.25)}" fill="#fff" fill-opacity="${op}"/>`)}
+function spot(x,y,r,c,op){return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r.toFixed(1)}" fill="${c}" fill-opacity="${op}" stroke="#1a1612" stroke-width="1.5" stroke-opacity="${op}"/><text x="${x.toFixed(1)}" y="${(y+4).toFixed(1)}" font-size="${Math.max(9,r*1.2).toFixed(0)}" font-weight="bold" font-family="Arial,sans-serif" text-anchor="middle" fill="#fff" fill-opacity="${op}">${c===POS?'+':'−'}</text>`}
+function omega(a,b,op,h){const n=q=>{const d=Math.hypot(q[0]-cx,q[1]-cy);return[(q[0]-cx)/d,(q[1]-cy)/d]},na=n(a),nb=n(b),dx=a[0]-b[0],dy=a[1]-b[1],f=z=>z.toFixed(1);
+ return `<path d="M${f(a[0])},${f(a[1])} C${f(a[0]+na[0]*h+dx*.5)},${f(a[1]+na[1]*h+dy*.5)} ${f(b[0]+nb[0]*h-dx*.5)},${f(b[1]+nb[1]*h-dy*.5)} ${f(b[0])},${f(b[1])}" fill="none" stroke="#d81b1b" stroke-width="3.5" stroke-linecap="round" stroke-opacity="${op}"/>`}
+function section(Ya,c,Yl){$('po').innerHTML='';
+ const v=(c?-1:1)*(1-2*ease((Yl-3)/7.5)),rc=256,cc=Math.cos(rad(60))*rc,hc=Math.sin(rad(60))*rc,col=z=>z>0?POS:NEG;
+ $('caps').innerHTML=`<path d="M${cx+cc},${cy-hc} A${rc},${rc} 0 0 0 ${cx-cc},${cy-hc}" stroke="${col(v)}" stroke-opacity="${Math.abs(v)*.9}" stroke-width="12"/><path d="M${cx-cc},${cy+hc} A${rc},${rc} 0 0 0 ${cx+cc},${cy+hc}" stroke="${col(-v)}" stroke-opacity="${Math.abs(v)*.9}" stroke-width="12"/>`;
+ let o='';
+ function one(k,yl,par,fade){const [ta,tg,tr]=TB[k],la=LT[k],rmax=6+2.4*k;if(yl<ta)return;
+  [1,-1].forEach(hm=>{const sw=(hm>0)!==par;
+   if(yl<tr){const u=ease((yl-tg)/(tr-tg)),r0=3+(rmax-3)*ease((yl-ta)/(tg-ta)),r=r0*(1-.3*u)*fade;
+    const [x,y]=PL(la+4*u,175+63*u,-1,hm);o+=tube(x,y,r,!sw,fade);
+    if(u<1){const [x2,y2]=PL(la,175,1,hm);o+=tube(x2,y2,r0*fade,sw,.45*(1-u)*fade)}
+   }else{const age=yl-tr;if(age<2.4){const ls=la+4,a1=ease(age/1.4),a2=ease(age/2.4),sp=2.2+3.3*ease(age/0.6),c0=sw?POS:NEG,c1=sw?NEG:POS;
+    const pa=PL(ls-sp-2.5*a1,238,-1,hm),pb=PL(ls+sp+(72-ls-sp)*a2,238,-1,hm),om=(1-ease(age/(0.8+0.12*k)))*fade;
+    if(om>.02)o+=omega(pa,pb,om,34+8*k);
+    if(a1<.98)o+=spot(pa[0],pa[1],6+1.5*k,c0,(1-a1)*fade);
+    o+=spot(pb[0],pb[1],(6+1.5*k)*.85,c1,.9*(1-.8*a2)*fade)}}
+  })}
+ for(let k=0;k<6;k++)one(k,Yl,c===1,1); // ciclo in corso
+ const [,,trLast]=TB[5],tailAge=Yl+(11-trLast); // coda del tubo più basso del ciclo precedente (l'ultimo a emergere)
+ if(tailAge<2.4)one(5,trLast+tailAge,c===0,1);
+ $('to').innerHTML=o}
+// nastro trasportatore (lato destro): superficie verso i poli, ritorno profondo verso l'equatore
+const CV=[1,-1].map(sg=>{const p=[];for(let i=0;i<=40;i++){const a=Math.PI/2*i/40;p.push([cx+228*Math.cos(a),cy-sg*228*Math.sin(a)])}
+ for(let i=1;i<=8;i++)p.push([cx,cy-sg*(228-70*i/8)]);
+ for(let i=1;i<=40;i++){const a=Math.PI/2*(1-i/40);p.push([cx+158*Math.cos(a),cy-sg*158*Math.sin(a)])}
+ for(let i=1;i<=8;i++)p.push([cx+158+70*i/8,cy]);return p});
+const CVL=CV.map(p=>{const c=[0];for(let i=1;i<p.length;i++)c.push(c[i-1]+Math.hypot(p[i][0]-p[i-1][0],p[i][1]-p[i-1][1]));return c});
+const CVB=[0,40,48,88,96],CVC=[0,.2,.26,.92,1],CVS=[.2,.06,.66,.08],CV_LOOPS=3;let curYl=0;
+function cvPhase(Yl){const v=Yl/2-(11/(4*Math.PI))*Math.sin(2*Math.PI*Yl/11);return (v/5.5*CV_LOOPS)%1}
+function cvPos(k,ph){let j=0;while(j<3&&ph>=CVC[j+1])j++;const f=(ph-CVC[j])/CVS[j],L=CVL[k],p=CV[k],d=L[CVB[j]]+(L[CVB[j+1]]-L[CVB[j]])*f;
+ let i=CVB[j];while(i<CVB[j+1]-1&&L[i+1]<d)i++;const u=(d-L[i])/((L[i+1]-L[i])||1);return[p[i][0]+(p[i+1][0]-p[i][0])*u,p[i][1]+(p[i+1][1]-p[i][1])*u,j]}
+function wseg(pts,w0,w1){let o='';const n=pts.length-1;
+ for(let i=0;i<n;i++){const w=w0+(w1-w0)*i/(n-1||1);o+=`<path d="M${pts[i][0].toFixed(1)},${pts[i][1].toFixed(1)} L${pts[i+1][0].toFixed(1)},${pts[i+1][1].toFixed(1)}" fill="none" stroke="var(--fg)" stroke-opacity=".22" stroke-width="${w.toFixed(1)}" stroke-linecap="round"/>`}
+ return o}
+function conv(){let o='';CV.forEach((p,k)=>{
+  o+=wseg(p.slice(0,41),2.5,2.5);   // superficie: canale sottile
+  o+=wseg(p.slice(40,49),2.5,24);   // discesa ai poli: si allarga
+  o+=wseg(p.slice(48,89),24,24);    // ritorno profondo: canale molto più spesso
+  o+=wseg(p.slice(88,97),24,2.5);   // risalita all'equatore: si restringe
+  for(let i=0;i<10;i++){const [x,y,j]=cvPos(k,(i/10+cvPhase(curYl))%1);o+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${j===0?8:j===2?6:4}" fill="${j===0?'#ff3b30':j===2?'#3fa9ff':'#6b6358'}" stroke="#fff" stroke-width="1.4"/>`}});
+ $('cv').innerHTML=o}
+function text0(T){if(T<.12)return['Punto di partenza: campo verticale','Le linee di campo corrono lungo i meridiani, da un polo all\'altro. Il gas del Sole le trascina con sé (le "congela" al suo interno), quindi seguirle equivale a seguire il gas.'];
+ if(T<.35)return['Le linee si inclinano','L\'equatore ruota in 25 giorni, i poli in circa 35. Il gas alle basse latitudini corre avanti e trascina la parte centrale di ogni linea, che si inclina e si allunga.'];
+ if(T<.7)return['Le linee si avvolgono attorno al Sole','Ogni giro di differenza aggiunge un avvolgimento. Le linee si allungano e si affollano: il campo orizzontale (toroidale) cresce, all\'incirca in modo lineare con il tempo.'];
+ return['Campo toroidale intenso','Ora le linee ai lati sono quasi parallele all\'equatore: il campo è toroidale, con frecce a sinistra nell\'emisfero nord (contro il verso di rotazione) e a destra in quello sud (nel verso di rotazione). All\'equatore resta una fascia neutra: il campo cambia segno tra i due emisferi e deve annullarsi. Il campo è molto più intenso di quello iniziale ed è massimo a medie latitudini, dove nascono le prime macchie del ciclo.']}
+function text(T,Y){if(Y<1.9)return text0(T);
+ if(Y>=9.5)return['Fine del ciclo: il campo dei poli è invertito','Il campo polare ha ormai il segno opposto a quello iniziale e il nuovo campo poloidale sta per essere riavvolto. A bassa latitudine emergono ancora le ultime coppie di questo ciclo, mentre a 35° iniziano quelle del successivo.'];
+ let kp=-1;for(let i=0;i<6;i++)if(Y>=TB[i][2])kp=i;
+ if(kp>=0&&Y-TB[kp][2]<1.4){if(kp===5)return['Fine del ciclo','Le ultime macchie emergono a circa 5° dall\'equatore. Il campo dei poli è stato ricostruito con segno invertito e il ciclo successivo ricomincia a latitudini medie.'];
+  return['Emerge una coppia, ne nasce una nuova più vicina all\'equatore','Il tubo buca la fotosfera e si sdoppia: le linee di campo disegnano per poco un Ω rosso tra le due macchie, che poi si allontanano. La leading (verso l\'equatore) si annulla con quella dell\'altro emisfero, la trailing si sfuma e sale verso il polo. Il campo dei poli cambia segno gradualmente, per la somma di tutte le trailing di questo tipo. Intanto alla base si forma un nuovo tubo, più grande e a latitudine minore ('+LT[kp+1]+'°).']}
+ let k=0;for(let i=0;i<6;i++)if(Y>=TB[i][0])k=i;const [ta,tg,tr]=TB[k];
+ if(Y<tg)return['Un tubo toroidale cresce a '+LT[k]+'°','Alla base della zona convettiva il campo avvolto si concentra in un tubo di flusso, che cresce di diametro. Il campo poloidale è ormai in gran parte convertito.'];
+ return['Il tubo sale verso la superficie','Più leggero del gas intorno, il tubo risale la zona convettiva. Per la forza di Coriolis viene deviato verso il polo, quindi emerge a qualche grado in più di latitudine.']}
+function draw(Y){const c=Y>=11?1:0,Yl=Y-11*c;curYl=Yl;const D=Yl*365,T=Math.min(1,D/MAXD);front(D,Yl,c);section(Y,c,Yl);
+ let av=0,av2=0,nn=0;for(let la=10;la<=85;la+=5){av+=oOld(la,Yl);av2+=oOld(la,Yl+11);nn++}$('gi').style.width=(Math.min(1,T*av/nn+(Yl<5?av2/nn:0))*100)+'%';
+ $('tm').textContent='anno '+Y.toFixed(1)+' · ciclo '+(c+1);
+ const [a,b]=text(T,Yl);$('t').textContent=(c?'2° ciclo, polarità invertite: ':'')+a;$('d').textContent=b+(Yl>=1.9&&Yl<2?' Intanto, a bassa latitudine, emergono ancora le ultime coppie del ciclo precedente: è la sovrapposizione tra due cicli.':'')}
+let Y=0,playing=true,last=performance.now(),hold=0;
+function setY(y){Y=y;$('cy').value=Math.round(y*100);$('sl').value=Math.round(Math.min(MAXD,(y-(y>=11?11:0))*365));draw(y)}
+$('sl').oninput=()=>{playing=false;$('pp').textContent='Riprendi';setY((Y>=11?11:0)+ +$('sl').value/365)};
+$('cy').oninput=()=>{playing=false;$('pp').textContent='Riprendi';setY($('cy').value/100)};
+$('pp').onclick=()=>{playing=!playing;$('pp').textContent=playing?'Pausa':'Riprendi'};
+function tick(n){const dt=(n-last)/1000;last=n;conv();
+ if(playing){if(Y>=22){hold+=dt;if(hold>2.5){hold=0;setY(0)}}else setY(Math.min(22,Y+dt*((Y%11)<1.9?0.135:0.23)))}
+ requestAnimationFrame(tick)}
+function snapshot(){const c=document.documentElement.cloneNode(true);c.querySelectorAll('script:not([data-own])').forEach(n=>n.remove());
+ ['fl','to','po','caps'].forEach(id=>{const e=c.querySelector('#'+id);if(e)e.innerHTML=''});const b=c.querySelector('#dl');if(b)b.hidden=true;return '<!DOCTYPE html>\n'+c.outerHTML}
+(async()=>{if(!(window.claude&&claude.use))return;const b=$('dl');let dl=null;try{dl=await claude.use('downloads')}catch(e){}
+ b.hidden=false;
+ b.onclick=async()=>{const t0=b.textContent;
+  if(!dl){b.textContent='Non disponibile in questa vista: scarica il file dalla chat';setTimeout(()=>b.textContent=t0,4000);return}
+  try{await dl.save({filename:'effetto_omega_rotazione_differenziale.html',data:snapshot()});b.textContent='Salvato'}catch(e){b.textContent=(e&&e.code==='declined')?t0:'Salvataggio non riuscito'}
+  setTimeout(()=>b.textContent=t0,2500)}})();
+setY(0);requestAnimationFrame(tick);
+</script></main></body></html>

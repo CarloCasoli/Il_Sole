@@ -1,0 +1,388 @@
+<!doctype html>
+<!--
+  © 2026 Carlo Casoli — "Il Sole: Osservazione e Fisica"
+  Licenza CC BY-NC-ND 4.0: https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it
+  Vietati l'uso commerciale e la distribuzione di versioni modificate senza autorizzazione scritta dell'autore.
+-->
+<html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Risalita del tubo di flusso</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,500&display=swap">
+<style>
+/* Layout: scena 3D a sinistra, pannello strumenti a destra (in colonna su telefono) */
+:root{
+  --bg:#eef1f4; --panel:#ffffff; --ink:#18212c; --muted:#5b6878; --line:#d5dbe3;
+  --sun:#e0892f; --tube:#6b5bd2; --trail:#d0482f; --ref:#7d8896; --scene:#e4e9ef;
+  --f-display:"Newsreader", Georgia, serif; --f-body:"IBM Plex Sans", system-ui, sans-serif; --f-data:"IBM Plex Mono", ui-monospace, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e131a; --panel:#151c26; --ink:#e5e9ef; --muted:#8e9aab; --line:#283241;
+  --sun:#f0a04b; --tube:#9d90ff; --trail:#ff7356; --ref:#8794a6; --scene:#0a0f15; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e131a; --panel:#151c26; --ink:#e5e9ef; --muted:#8e9aab; --line:#283241;
+  --sun:#f0a04b; --tube:#9d90ff; --trail:#ff7356; --ref:#8794a6; --scene:#0a0f15; color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:14px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px 32px}
+header{max-width:1240px;margin:0 auto 12px;display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 16px}
+h1{font-family:var(--f-display);font-weight:500;font-size:28px;margin:0;text-wrap:balance}
+header p{margin:0;color:var(--muted);max-width:70ch}
+main{max-width:1240px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:16px}
+@media (max-width:860px){main{grid-template-columns:minmax(0,1fr)}}
+#stage{position:relative;background:var(--scene);border:1px solid var(--line);border-radius:10px;overflow:hidden;min-height:420px;aspect-ratio:4/3;max-width:100%}
+#stage canvas{display:block;width:100%;height:100%}
+.lbl{position:absolute;transform:translate(-50%,-50%);font:500 12px var(--f-data);color:var(--muted);pointer-events:none;white-space:nowrap}
+#hud{position:absolute;left:12px;top:10px;font:12px var(--f-data);color:var(--muted);pointer-events:none}
+#hud b{color:var(--ink);font-weight:500}
+#state{position:absolute;left:12px;bottom:10px;right:12px;font-size:13px;color:var(--ink);pointer-events:none}
+aside{display:flex;flex-direction:column;gap:12px;min-width:0}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+.card h2{margin:0;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+button{font:500 13px var(--f-body);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:6px 10px;cursor:pointer}
+button:hover{border-color:var(--muted)}
+button.on{background:var(--ink);color:var(--panel);border-color:var(--ink)}
+button:focus-visible,input:focus-visible{outline:2px solid var(--sun);outline-offset:2px}
+label.sl{display:flex;flex-direction:column;gap:2px;font-size:13px}
+label.sl span{display:flex;justify-content:space-between}
+label.sl output{font-family:var(--f-data);color:var(--muted)}
+input[type=range]{width:100%;accent-color:var(--sun)}
+label.ck{display:flex;gap:8px;align-items:center;font-size:13px;cursor:pointer}
+input[type=checkbox]{accent-color:var(--sun);width:16px;height:16px}
+dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:13px}
+dt{color:var(--muted)} dd{margin:0;text-align:right;font-family:var(--f-data);font-variant-numeric:tabular-nums}
+#mer{width:100%;max-width:300px;aspect-ratio:1;display:block;margin:0 auto}
+.legend{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:12px;color:var(--muted)}
+.legend i{display:inline-block;width:14px;height:3px;vertical-align:middle;margin-right:4px;border-radius:2px}
+section.notes{max-width:1240px;margin:20px auto 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+section.notes div{min-width:0}
+section.notes h3{font-family:var(--f-display);font-weight:500;font-size:18px;margin:0 0 4px}
+section.notes p,section.notes li{color:var(--muted);margin:0 0 6px;max-width:65ch}
+section.notes ul{padding-left:18px;margin:0}
+</style>
+
+<header>
+  <h1>Risalita del tubo di flusso</h1>
+  <p>Un tratto del tubo toroidale si stacca dalla base della zona convettiva e sale verso la fotosfera, mentre il Sole ruota.</p>
+</header>
+
+<main>
+  <div id="stage">
+    <div id="hud"></div>
+    <div id="state"></div>
+  </div>
+  <aside>
+    <div class="card">
+      <div class="row">
+        <button id="play">Avvia</button>
+        <button id="reset">Ricomincia</button>
+      </div>
+      <label class="sl"><span>Intensità del campo nel tubo <output id="Bv"></output></span>
+        <input type="range" id="B" min="2" max="15" step="0.5" value="10"></label>
+      <label class="sl"><span>Latitudine di partenza <output id="Lv"></output></span>
+        <input type="range" id="L" min="10" max="35" step="1" value="20"></label>
+      <label class="sl"><span>Velocità <output id="Sv"></output></span>
+        <input type="range" id="S" min="0" max="4" step="1" value="1"></label>
+      <label class="ck"><input type="checkbox" id="cor" checked> Forza di Coriolis</label>
+      <label class="ck"><input type="checkbox" id="dif" checked> Rotazione differenziale sul tubo</label>
+      <label class="ck"><input type="checkbox" id="trl" checked> Scia della cima dell'arco</label>
+      <label class="ck"><input type="checkbox" id="frg" checked> Disgregazione per convezione</label>
+    </div>
+    <div class="card">
+      <h2>Punto di vista</h2>
+      <div class="row">
+        <button id="fRot" class="on">Chi ruota col Sole</button>
+        <button id="fIn">Dallo spazio</button>
+      </div>
+      <div class="row">
+        <button id="cOb">Obliqua</button>
+        <button id="cPo">Dal polo Nord</button>
+        <button id="cFr">Di fronte</button>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Cima dell'arco</h2>
+      <dl>
+        <dt>Giorni trascorsi</dt><dd id="oT">0</dd>
+        <dt>Stato del tubo</dt><dd id="oS">compatto</dd>
+        <dt>Profondità</dt><dd id="oD">–</dd>
+        <dt>Latitudine</dt><dd id="oL">–</dd>
+        <dt>Spostamento verso Ovest</dt><dd id="oW">–</dd>
+        <dt>&nbsp;· per Coriolis</dt><dd id="oWc">–</dd>
+        <dt>&nbsp;· per rotazione differenziale</dt><dd id="oWd">–</dd>
+      </dl>
+    </div>
+    <div class="card">
+      <h2>Taglio lungo il meridiano</h2>
+      <canvas id="mer" width="600" height="600" aria-label="Sezione meridiana con percorso radiale, percorso parallelo all'asse e percorso reale della cima dell'arco"></canvas>
+      <div class="legend">
+        <span><i style="background:var(--ref)"></i>salita radiale</span>
+        <span><i style="background:var(--muted);opacity:.5"></i>parallela all'asse</span>
+        <span><i style="background:var(--trail)"></i>percorso reale</span>
+      </div>
+    </div>
+  </aside>
+</main>
+
+<section class="notes">
+  <div>
+    <h3>Cosa guardare</h3>
+    <ul>
+      <li>Con <b>Coriolis spenta</b> la cima sale dritta: latitudine costante, nessuno spostamento.</li>
+      <li>Con <b>Coriolis accesa</b> la cima resta indietro verso Ovest (la ballerina che allarga le braccia) e piega verso il polo.</li>
+      <li>Con un <b>campo debole</b> la salita è lenta: Coriolis ha più tempo e il tubo sale quasi parallelo all'asse, verso latitudini alte. Nel Sole questo non si osserva: le macchie compaiono solo entro circa 35°–40°. È proprio l'argomento con cui si deduce che i tubi devono essere forti; un tubo debole verrebbe sfilacciato dalla convezione prima di arrivare in superficie. Con <b>Disgregazione per convezione</b> attiva l'animazione lo mostra; spegnendola si vede il percorso ipotetico che il tubo seguirebbe se restasse intero.</li>
+      <li>Con un <b>campo forte</b> la salita è rapida e quasi radiale: emerge vicino alla latitudine di partenza.</li>
+      <li>Solo quando la latitudine cambia entra in gioco la <b>rotazione differenziale</b>: con la salita radiale il suo contributo resta zero.</li>
+      <li>Il cerchio tratteggiato sulla superficie è la <b>latitudine di partenza</b>. In vista obliqua un punto che sale lungo il raggio sembra salire anche verso Nord: è un effetto della prospettiva. Fanno fede il cerchio, il numero della latitudine e il taglio lungo il meridiano.</li>
+    </ul>
+  </div>
+  <div>
+    <h3>Dallo spazio o da chi ruota col Sole</h3>
+    <p>Dallo spazio tutto gira e il piccolo ritardo del tubo si perde nella rotazione d'insieme. Ruotando insieme al Sole, alla velocità della latitudine di partenza, resta visibile solo ciò che cambia: il ritardo della cima e lo scorrimento delle file di punti sulla superficie, che segnano la rotazione differenziale.</p>
+  </div>
+  <div>
+    <h3>Limiti del modello</h3>
+    <p>È uno schema qualitativo, non una simulazione magnetoidrodinamica. I percorsi riproducono l'andamento dei modelli a tubo sottile (Choudhuri e Gilman, 1987; Fan, 2009): tubi da circa 10⁵ gauss risalgono in poche settimane quasi radialmente, tubi più deboli vengono deviati verso il polo. Tempi, angoli e spessori sono semplificati; la tensione del tubo è rappresentata riducendo l'effetto della rotazione differenziale sulla cima. La disgregazione avviene quando il campo del tubo, che si indebolisce salendo, scende sotto quello dei moti convettivi intorno (campo di equipartizione); la soglia è scelta in modo che i tubi da circa 6×10⁴ gauss in su arrivino interi in superficie.</p>
+  </div>
+</section>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+(function(){
+const D=Math.PI/180, R0=0.7, W=36*D, NSEG=240;
+const $=id=>document.getElementById(id);
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+function Om(lat){const s=Math.sin(lat)**2;return 14.71-2.39*s-1.78*s*s;} // gradi/giorno
+
+const st={B:10,lat0:20*D,cor:true,dif:true,trail:true,frame:'rot',speed:3,t:0,phiD:0,running:false,done:false,emLat:null,trailPts:[]};
+const speeds=[1,3,6,12,24];
+
+// ---------- modello cinematico della cima ----------
+function wDev(){return st.cor?1/(1+Math.pow(st.B/4,3)):0;}
+function Trise(){return 300/st.B;}
+function qRatio(uu){return st.B/2.7*(1-0.55*uu);} // campo del tubo / campo dei moti convettivi
+function frac(){return st.fragU===null?0:Math.min(1,(u()-st.fragU)/0.15);}
+const STR=[...Array(7)].map((_,i)=>{const ang=i/6*2*Math.PI,rr=i?0.011:0;return {x:rr*Math.cos(ang),y:rr*Math.sin(ang),a:0.6+Math.random(),b:0.6+Math.random(),w:0.5+Math.random(),p:Math.random()*6.3,q:Math.random()*6.3};});
+function apex(u){
+  const r=R0+0.35*u, s0=R0*Math.cos(st.lat0), w=wDev();
+  const latPar=Math.acos(Math.min(1,s0/r));
+  const lat=st.lat0+w*(latPar-st.lat0);
+  const phiC=st.cor?-(3+35*w)*Math.pow(u,1.5)*D:0;
+  return {r,lat,phiC};
+}
+
+// ---------- scena ----------
+const stage=$('stage');
+const renderer=new THREE.WebGLRenderer({antialias:true,alpha:false});
+renderer.setPixelRatio(Math.min(2,window.devicePixelRatio||1));
+stage.appendChild(renderer.domElement);
+const scene=new THREE.Scene();
+const camera=new THREE.PerspectiveCamera(38,1,0.01,50);
+const controls=new THREE.OrbitControls(camera,renderer.domElement);
+controls.enableDamping=true;controls.minDistance=1.6;controls.maxDistance=8;controls.enablePan=false;
+scene.add(new THREE.AmbientLight(0xffffff,0.75));
+const dl=new THREE.DirectionalLight(0xffffff,0.6);dl.position.set(3,4,5);scene.add(dl);
+
+const P=(r,lat,phi)=>new THREE.Vector3(r*Math.cos(lat)*Math.cos(phi), r*Math.sin(lat), -r*Math.cos(lat)*Math.sin(phi));
+
+const world=new THREE.Group(); scene.add(world);      // gira con Ω0 nella vista "dallo spazio"
+const mats={};
+function mkMats(){
+  const c=k=>new THREE.Color(css(k));
+  mats.sun=new THREE.MeshLambertMaterial({color:c('--sun'),transparent:true,opacity:0.13,depthWrite:false,side:THREE.DoubleSide});
+  mats.tach=new THREE.MeshLambertMaterial({color:c('--sun'),transparent:true,opacity:0.22,depthWrite:false});
+  mats.tube=new THREE.MeshLambertMaterial({color:c('--tube')});
+  mats.strand=new THREE.MeshLambertMaterial({color:c('--tube'),transparent:true,opacity:1,depthWrite:false});
+  mats.trail=new THREE.MeshBasicMaterial({color:c('--trail')});
+  mats.ref=new THREE.LineDashedMaterial({color:c('--ref'),dashSize:0.03,gapSize:0.02});
+  mats.grid=new THREE.LineBasicMaterial({color:c('--ref'),transparent:true,opacity:0.35});
+  mats.dot=new THREE.MeshBasicMaterial({color:c('--sun')});
+  mats.spot=new THREE.MeshBasicMaterial({color:new THREE.Color(css('--ink'))});
+  renderer.setClearColor(c('--scene'));
+}
+mkMats();
+
+const sunMesh=new THREE.Mesh(new THREE.SphereGeometry(1,64,48),mats.sun); scene.add(sunMesh);
+const tachMesh=new THREE.Mesh(new THREE.SphereGeometry(R0,48,36),mats.tach); scene.add(tachMesh);
+const gridG=new THREE.Group(); scene.add(gridG);
+function circle(r,lat){const pts=[];for(let i=0;i<=128;i++)pts.push(P(r,lat,i/128*2*Math.PI));return new THREE.BufferGeometry().setFromPoints(pts);}
+[-60,-30,0,30,60].forEach(l=>gridG.add(new THREE.Line(circle(1.001,l*D),mats.grid)));
+gridG.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0,-1.35,0),new THREE.Vector3(0,1.35,0)]),mats.grid));
+
+// file di punti sulla superficie (mostrano la rotazione differenziale)
+const tracerLats=[-75,-60,-45,-30,-15,0,15,30,45,60,75].map(x=>x*D), tracerLons=[0,60,120,180,240,300].map(x=>x*D);
+const tracers=[]; const dotGeo=new THREE.SphereGeometry(0.014,10,8);
+tracerLons.forEach(lo=>tracerLats.forEach(la=>{const m=new THREE.Mesh(dotGeo,mats.dot);scene.add(m);tracers.push({lo,la,m});}));
+
+let tubeMesh=null, trailLine=null, refLine=null, latCircle=null; const spotGeo=new THREE.SphereGeometry(0.032,16,12);const spots=[new THREE.Mesh(spotGeo,mats.spot),new THREE.Mesh(spotGeo,mats.spot)];
+spots.forEach(s=>{s.visible=false;world.add(s);});
+
+function buildRef(){
+  if(refLine){world.remove(refLine);refLine.geometry.dispose();}
+  const g=new THREE.BufferGeometry().setFromPoints([P(R0,st.lat0,0),P(1.08,st.lat0,0)]);
+  refLine=new THREE.Line(g,mats.ref);refLine.computeLineDistances();world.add(refLine);
+  if(latCircle){scene.remove(latCircle);latCircle.geometry.dispose();}
+  latCircle=new THREE.Line(circle(1.002,st.lat0),mats.ref);latCircle.computeLineDistances();scene.add(latCircle);
+}
+
+function loopPoint(delta,a,u){
+  const f=Math.abs(delta)<W?Math.cos(Math.PI*delta/(2*W))**2:0;
+  const J=st.cor?(4+10*wDev())*u*D:0;
+  const r=R0+(a.r-R0)*f;
+  const lat=st.lat0+(a.lat-st.lat0)*f - J*Math.sin(Math.PI*Math.max(-1,Math.min(1,delta/W)))*f;
+  const phi=delta+(a.phiC+st.phiD)*f;
+  return {r,lat,phi};
+}
+function buildTube(u){
+  const a=apex(u); const pts=[]; const raw=[];
+  for(let i=0;i<NSEG;i++){const delta=-Math.PI+i/NSEG*2*Math.PI;const q=loopPoint(delta,a,u);raw.push(q);pts.push(P(q.r,q.lat,q.phi));}
+  if(tubeMesh){world.remove(tubeMesh);tubeMesh.traverse(o=>{if(o.geometry)o.geometry.dispose();});}
+  const fr=frac();
+  if(fr<=0){
+    tubeMesh=new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts,true),NSEG*2,0.016,8,true),mats.tube);
+  } else {
+    tubeMesh=new THREE.Group(); mats.strand.opacity=Math.max(0,1-fr);
+    const tt=st.t*0.4;
+    STR.forEach(sd=>{
+      const sp=raw.map((q,i)=>{
+        const delta=-Math.PI+i/NSEG*2*Math.PI, f=Math.abs(delta)<W?Math.cos(Math.PI*delta/(2*W))**2:0;
+        const er=P(1,q.lat,q.phi), en=new THREE.Vector3(-Math.sin(q.lat)*Math.cos(q.phi),Math.cos(q.lat),Math.sin(q.lat)*Math.sin(q.phi));
+        const k=fr*f*0.12;
+        const dx=sd.x+k*(Math.sin(3*delta*sd.a+tt*sd.w+sd.p)+0.6*Math.sin(8*delta*sd.b+tt*sd.w*1.7+sd.q));
+        const dy=sd.y+k*(Math.cos(4*delta*sd.b+tt*sd.w+sd.q)+0.6*Math.sin(9*delta*sd.a-tt*sd.w+sd.p));
+        return P(q.r,q.lat,q.phi).add(er.multiplyScalar(dx)).add(en.multiplyScalar(dy));
+      });
+      tubeMesh.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(sp,true),NSEG*2,0.0055,5,true),mats.strand));
+    });
+  }
+  world.add(tubeMesh);
+  // macchie dove l'arco attraversa la fotosfera
+  const cross=[];for(let i=0;i<NSEG;i++){const p=raw[i],q=raw[(i+1)%NSEG];if((p.r-1)*(q.r-1)<0){const k=(1-p.r)/(q.r-p.r);cross.push({lat:p.lat+k*(q.lat-p.lat),phi:p.phi+k*(q.phi-p.phi)});}}
+  spots.forEach((s,i)=>{const c=cross[i];s.visible=!!c&&cross.length>=2&&frac()<0.4;if(c){s.position.copy(P(1.0,c.lat,c.phi));}});
+  return a;
+}
+function buildTrail(){
+  if(trailLine){world.remove(trailLine);trailLine.geometry.dispose();}
+  if(!st.trail||st.trailPts.length<2){trailLine=null;return;}
+  const cv=new THREE.CatmullRomCurve3(st.trailPts.map(q=>P(q.r,q.lat,q.phi)));trailLine=new THREE.Mesh(new THREE.TubeGeometry(cv,Math.max(8,st.trailPts.length*2),0.007,6,false),mats.trail);world.add(trailLine);
+}
+
+// etichette HTML
+const labels=[['N',new THREE.Vector3(0,1.45,0)],['S',new THREE.Vector3(0,-1.45,0)]].map(([t,v])=>{const d=document.createElement('div');d.className='lbl';d.textContent=t;stage.appendChild(d);return {d,v};});
+const rotLbl=document.createElement('div');rotLbl.className='lbl';rotLbl.textContent='verso di rotazione (Est)';stage.appendChild(rotLbl);
+const rotArrow=new THREE.ArrowHelper(new THREE.Vector3(0,0,-1),new THREE.Vector3(1.18,0,0.25),0.4,0x888888,0.07,0.05);scene.add(rotArrow);
+
+// ---------- camera ----------
+function camTo(v){camera.position.copy(v);controls.target.set(0,0,0);controls.update();}
+function camOblique(){camTo(new THREE.Vector3(2.6,1.7,2.4));}
+function camPole(){camTo(new THREE.Vector3(0.001,4.0,0.001));}
+function camFront(){const ang=world.rotation.y;const v=P(4.0,st.lat0,-0.15+0);v.applyAxisAngle(new THREE.Vector3(0,1,0),ang);camTo(v);}
+camOblique();
+
+function resize(){const w=stage.clientWidth,h=stage.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();}
+new ResizeObserver(resize).observe(stage);resize();
+
+// ---------- sezione meridiana 2D ----------
+const mc=$('mer'), mx=mc.getContext('2d');
+function drawMer(a){
+  const W2=mc.width,H2=mc.height,pad=60,sc=(W2-pad*1.6);
+  const X=s=>pad+s*sc, Y=z=>H2-pad-z*sc;
+  mx.clearRect(0,0,W2,H2);
+  const ink=css('--ink'),muted=css('--muted'),ref=css('--ref'),trail=css('--trail'),sun=css('--sun'),tube=css('--tube');
+  mx.lineWidth=2;
+  mx.fillStyle=sun;mx.globalAlpha=0.12;mx.beginPath();mx.moveTo(X(0),Y(0));mx.arc(X(0),Y(0),sc,-Math.PI/2,0);mx.closePath();mx.fill();
+  mx.globalAlpha=0.22;mx.beginPath();mx.moveTo(X(0),Y(0));mx.arc(X(0),Y(0),R0*sc,-Math.PI/2,0);mx.closePath();mx.fill();mx.globalAlpha=1;
+  mx.strokeStyle=muted;mx.beginPath();mx.arc(X(0),Y(0),sc,-Math.PI/2,0);mx.stroke();
+  mx.beginPath();mx.moveTo(X(0),Y(-0.02));mx.lineTo(X(0),Y(1.08));mx.moveTo(X(0),Y(0));mx.lineTo(X(1.05),Y(0));mx.stroke();
+  mx.fillStyle=muted;mx.font='26px "IBM Plex Mono", monospace';
+  mx.fillText('asse',X(0)+10,Y(1.0)+6);mx.fillText('equatore',X(0.62),Y(0)+34);
+  mx.fillText('zona',X(0.04),Y(0.3));mx.fillText('radiativa',X(0.04),Y(0.24));
+  const s0=R0*Math.cos(st.lat0), c0=Math.cos(st.lat0), s1=Math.sin(st.lat0);
+  mx.setLineDash([12,9]);mx.strokeStyle=ref;mx.beginPath();mx.moveTo(X(R0*c0),Y(R0*s1));mx.lineTo(X(1.05*c0),Y(1.05*s1));mx.stroke();
+  mx.globalAlpha=0.5;mx.strokeStyle=muted;mx.setLineDash([3,7]);mx.beginPath();mx.moveTo(X(s0),Y(R0*s1));mx.lineTo(X(s0),Y(Math.sqrt(1.05**2-s0*s0)));mx.stroke();mx.globalAlpha=1;mx.setLineDash([]);
+  mx.fillStyle=tube;mx.beginPath();mx.arc(X(s0),Y(R0*s1),8,0,2*Math.PI);mx.fill();
+  if(st.trailPts.length>1){mx.strokeStyle=trail;mx.lineWidth=4;mx.beginPath();st.trailPts.forEach((q,i)=>{const s=q.r*Math.cos(q.lat),z=q.r*Math.sin(q.lat);i?mx.lineTo(X(s),Y(z)):mx.moveTo(X(s),Y(z));});mx.stroke();}
+  if(a){mx.fillStyle=trail;mx.beginPath();mx.arc(X(a.r*Math.cos(a.lat)),Y(a.r*Math.sin(a.lat)),9,0,2*Math.PI);mx.fill();}
+}
+
+// ---------- ciclo ----------
+let last=performance.now(), curApex=null;
+function u(){return Math.min(1,st.t/Trise());}
+function fmtDeg(x){return (x/D).toFixed(1).replace('.',',')+'°';}
+function update(dtDays,force){
+  if(!(dtDays>0&&!st.done)&&!force) return;
+  if(dtDays>0&&!st.done){
+    const sub=Math.max(1,Math.ceil(dtDays/0.25));const h=dtDays/sub;
+    for(let i=0;i<sub;i++){
+      st.t+=h;const a=apex(u());
+      if(st.frg&&st.fragU===null&&u()>0.02&&a.r<0.995&&qRatio(u())<1){st.fragU=u();st.fragDepth=(1-a.r)*696000;}
+      if(st.dif) st.phiD+=0.25*(Om(a.lat)-Om(st.lat0))*h*D;
+      if(st.trailPts.length===0||st.t-(st.trailPts._t||0)>Trise()/120){st.trailPts.push({r:a.r,lat:a.lat,phi:a.phiC+st.phiD});st.trailPts._t=st.t;}
+      if(a.r>=1&&st.emLat===null&&frac()<0.4) st.emLat=a.lat;
+      if(u()>=1||frac()>=1){st.done=true;st.running=false;break;}
+    }
+  }
+  curApex=buildTube(u());buildTrail();drawMer(curApex);readouts();
+}
+function readouts(){
+  const a=curApex, uu=u();
+  $('oT').textContent=Math.round(st.t);
+  $('oS').textContent=st.fragU===null?'compatto':frac()>=1?'disgregato':'si sfilaccia';
+  $('oD').textContent=a.r<1?Math.round((1-a.r)*696000/1000)*1000+' km':'in superficie';
+  $('oL').textContent=fmtDeg(a.lat);
+  const wc=-a.phiC, wd=-st.phiD;
+  $('oW').textContent=fmtDeg(wc+wd);$('oWc').textContent=fmtDeg(wc);$('oWd').textContent=fmtDeg(wd);
+  $('hud').innerHTML='giorno <b>'+Math.round(st.t)+'</b> · campo <b>'+st.B.toString().replace('.',',')+'×10⁴ G</b>';
+  let msg;
+  if(st.t===0) msg='Il tubo toroidale giace alla base della zona convettiva. Premi Avvia.';
+  else if(st.fragU!==null) msg=frac()>=1?'Il tubo si è disgregato a circa '+(Math.round(st.fragDepth/1000)*1000).toLocaleString('it-IT')+' km di profondità: il suo campo era più debole dei moti convettivi, che lo hanno fatto a pezzi. Nessuna macchia emerge.':'Il campo del tubo è ormai più debole dei moti convettivi intorno: i fili si separano e il tubo si sfilaccia.';
+  else if(st.emLat!==null&&st.cor&&st.B<6&&!st.frg) msg='Caso ipotetico: l\'arco arriverebbe a '+fmtDeg(st.emLat)+' (partenza: '+fmtDeg(st.lat0)+'), dove le macchie non si osservano mai. Nel Sole un tubo così debole verrebbe sfilacciato dalla convezione prima di emergere: per questo si deduce che i tubi alla base sono di circa 10⁵ gauss.';
+  else if(st.emLat!==null) msg='L\'arco è emerso a '+fmtDeg(st.emLat)+' di latitudine (partenza: '+fmtDeg(st.lat0)+'). Le due macchie segnano i punti in cui buca la fotosfera.';
+  else msg='Il tratto centrale del tubo sale per galleggiamento magnetico; i piedi restano ancorati alla base.';
+  $('state').textContent=msg;
+  $('play').textContent=st.done?'Ripeti':st.running?'Pausa':(st.t>0?'Riprendi':'Avvia');
+}
+function placeTracers(){
+  tracers.forEach(o=>{const dphi=(st.frame==='rot'?(Om(o.la)-Om(st.lat0)):Om(o.la))*st.t*D;o.m.position.copy(P(1.004,o.la,o.lo+dphi));});
+  world.rotation.y=st.frame==='in'?Om(st.lat0)*st.t*D:0;
+}
+function placeLabels(){
+  const w=stage.clientWidth,h=stage.clientHeight;
+  const put=(d,v)=>{const p=v.clone().project(camera);d.style.left=((p.x+1)/2*w)+'px';d.style.top=((1-p.y)/2*h)+'px';d.hidden=p.z>1;};
+  labels.forEach(l=>put(l.d,l.v));put(rotLbl,new THREE.Vector3(1.35,-0.12,-0.05));
+}
+function loop(now){
+  const dt=Math.min(0.1,(now-last)/1000);last=now;
+  update(st.running?dt*st.speed:0);placeTracers();controls.update();renderer.render(scene,camera);placeLabels();
+  requestAnimationFrame(loop);
+}
+
+function reset(){st.t=0;st.phiD=0;st.fragU=null;st.fragDepth=null;st.done=false;st.running=false;st.emLat=null;st.trailPts=[];st.trailPts._t=0;buildRef();update(0,true);}
+function syncOut(){
+  $('Bv').textContent=st.B.toString().replace('.',',')+'×10⁴ G';
+  $('Lv').textContent=Math.round(st.lat0/D)+'°';
+  $('Sv').textContent=st.speed+' giorni/s';
+}
+$('play').onclick=()=>{if(st.done)reset();st.running=!st.running;readouts();};
+$('reset').onclick=reset;
+$('B').oninput=e=>{st.B=+e.target.value;syncOut();reset();};
+$('L').oninput=e=>{st.lat0=+e.target.value*D;syncOut();reset();};
+$('S').oninput=e=>{st.speed=speeds[+e.target.value];syncOut();};
+$('cor').onchange=e=>{st.cor=e.target.checked;reset();};
+$('dif').onchange=e=>{st.dif=e.target.checked;reset();};
+$('frg').onchange=e=>{st.frg=e.target.checked;reset();};
+$('trl').onchange=e=>{st.trail=e.target.checked;update(0,true);};
+function setFrame(f){st.frame=f;$('fRot').classList.toggle('on',f==='rot');$('fIn').classList.toggle('on',f==='in');}
+$('fRot').onclick=()=>setFrame('rot');$('fIn').onclick=()=>setFrame('in');
+$('cOb').onclick=camOblique;$('cPo').onclick=camPole;$('cFr').onclick=camFront;
+
+function retheme(){const old=[tubeMesh&&tubeMesh.material];mkMats();sunMesh.material=mats.sun;tachMesh.material=mats.tach;tracers.forEach(o=>o.m.material=mats.dot);spots.forEach(s=>s.material=mats.spot);gridG.children.forEach(c=>c.material=mats.grid);buildRef();update(0,true);}
+try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',retheme);}catch(e){}
+new MutationObserver(retheme).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+
+st.frg=true;st.speed=speeds[1];syncOut();reset();requestAnimationFrame(loop);
+})();
+</script>
+
+</body></html>

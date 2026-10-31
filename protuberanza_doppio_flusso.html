@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<!--
+  © 2026 Carlo Casoli — "Il Sole: Osservazione e Fisica"
+  Licenza CC BY-NC-ND 4.0: https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it
+  Vietati l'uso commerciale e la distribuzione di versioni modificate senza autorizzazione scritta dell'autore.
+-->
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Protuberanza — Modello 3D dei tubi di flusso elicoidali</title>
+<style>
+  :root{
+    --bg: #05070d;
+    --panel-bg: rgba(10,14,24,0.72);
+    --text: #eef2f7;
+    --text-dim: #9aa6b8;
+    --amber: #ff6a3d;
+    --amber-dim: #ff6a3d99;
+    --cyan: #39c9ff;
+    --cyan-dim: #39c9ff99;
+    --red-strong: #ff3b3b;
+    --blue-strong: #3b82ff;
+    --red-weak: #ffb199;
+    --blue-weak: #a8d8ff;
+    --arrow-white: #ffffff;
+    --arrow-green: #39ff6a;
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  html,body{margin:0;padding:0;background:var(--bg);overflow:hidden;height:100%;width:100%;font-family:var(--sans);}
+  #scene{position:fixed;inset:0;cursor:grab;}
+  #scene.dragging{cursor:grabbing;}
+
+  #panel{
+    position:fixed; top:18px; left:18px; max-width:340px;
+    background:var(--panel-bg); backdrop-filter: blur(10px);
+    border:1px solid rgba(255,255,255,0.08); border-radius:10px;
+    padding:16px 18px; color:var(--text); z-index:10;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+  }
+  #panel h1{
+    font-size:14px; letter-spacing:0.04em; margin:0 0 4px 0; font-weight:600;
+    text-transform:uppercase; color:var(--amber);
+  }
+  #panel p.sub{margin:0 0 12px 0; font-size:11.5px; color:var(--text-dim); line-height:1.5;}
+  .legend-row{display:flex; align-items:flex-start; gap:8px; margin:6px 0; font-size:11.5px; color:var(--text-dim); font-family:var(--mono);}
+  .legend-row.small{font-size:9.5px;}
+  .swatch{width:11px; height:11px; border-radius:3px; margin-top:2px; flex:0 0 auto;}
+  .legend-row b{color:var(--text); font-family:var(--sans); font-weight:600;}
+
+  #controls{
+    position:fixed; bottom:18px; left:18px; z-index:10;
+    background:var(--panel-bg); backdrop-filter: blur(10px);
+    border:1px solid rgba(255,255,255,0.08); border-radius:10px;
+    padding:10px 14px; display:flex; align-items:center; gap:14px;
+    font-family:var(--mono); font-size:11.5px; color:var(--text-dim);
+  }
+  #playBtn{
+    background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.15);
+    color:var(--text); border-radius:6px; padding:6px 12px; cursor:pointer;
+    font-family:var(--mono); font-size:11.5px; letter-spacing:0.03em;
+  }
+  #playBtn:hover{background:rgba(255,255,255,0.14);}
+  #speed{width:90px; accent-color: var(--amber);}
+  #resetBtn{
+    background:transparent; border:1px solid rgba(255,255,255,0.15);
+    color:var(--text-dim); border-radius:6px; padding:6px 12px; cursor:pointer;
+    font-family:var(--mono); font-size:11px;
+  }
+  #resetBtn:hover{color:var(--text); border-color:rgba(255,255,255,0.35);}
+
+  #hint{
+    position:fixed; bottom:18px; right:18px; z-index:10;
+    font-family:var(--mono); font-size:10.5px; color:var(--text-dim);
+    text-align:right; opacity:0.75; line-height:1.6;
+  }
+
+  #loading{
+    position:fixed; inset:0; display:flex; align-items:center; justify-content:center;
+    background:var(--bg); color:var(--text-dim); font-family:var(--mono); font-size:12px;
+    z-index:100; letter-spacing:0.05em;
+  }
+</style>
+</head>
+<body>
+
+<div id="loading">CARICAMENTO MODELLO…</div>
+
+<div id="controls">
+  <button id="playBtn">⏸ Pausa</button>
+  <span>Velocità plasma</span>
+  <input type="range" id="speed" min="0.1" max="3" step="0.1" value="1">
+</div>
+
+<button id="resetBtn" style="position:fixed; top:18px; right:18px; z-index:10;">⟲ Reset vista</button>
+
+<div id="hint">trascina per ruotare in qualsiasi direzione<br>rotellina per lo zoom</div>
+
+<div id="scene"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function(){
+"use strict";
+
+// ---------------------------------------------------------------------
+// 1. SCENE / CAMERA / RENDERER
+// ---------------------------------------------------------------------
+const container = document.getElementById('scene');
+const scene = new THREE.Scene();
+
+const camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.1, 500);
+camera.position.set(0, -22, 10);
+camera.up.set(0,0,1);
+camera.lookAt(0,0,3);
+
+const renderer = new THREE.WebGLRenderer({antialias:true, alpha:false});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setClearColor(0x05070d, 1);
+container.appendChild(renderer.domElement);
+
+window.addEventListener('resize', ()=>{
+  camera.aspect = window.innerWidth/window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+const rig = new THREE.Group();
+scene.add(rig);
+
+// ---------------------------------------------------------------------
+// 2. LIGHTING
+// ---------------------------------------------------------------------
+scene.add(new THREE.AmbientLight(0x404868, 1.3));
+
+const key = new THREE.DirectionalLight(0xfff2e0, 0.9);
+key.position.set(10, -15, 18);
+scene.add(key);
+
+const glow = new THREE.PointLight(0xff8a4c, 2.2, 40, 2);
+glow.position.set(0, 0, 0.5);
+rig.add(glow);
+
+const fill = new THREE.DirectionalLight(0x6fb7ff, 0.35);
+fill.position.set(-12, 10, -6);
+scene.add(fill);
+
+// ---------------------------------------------------------------------
+// 3. STARFIELD
+// ---------------------------------------------------------------------
+(function starfield(){
+  const N = 900;
+  const positions = new Float32Array(N*3);
+  for(let i=0;i<N;i++){
+    const r = 90 + Math.random()*140;
+    const theta = Math.random()*Math.PI*2;
+    const phi = Math.acos(2*Math.random()-1);
+    positions[i*3]   = r*Math.sin(phi)*Math.cos(theta);
+    positions[i*3+1] = r*Math.sin(phi)*Math.sin(theta);
+    positions[i*3+2] = r*Math.cos(phi);
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.BufferAttribute(positions,3));
+  const mat = new THREE.PointsMaterial({color:0xaabbdd, size:0.55, sizeAttenuation:true, transparent:true, opacity:0.75});
+  scene.add(new THREE.Points(geo, mat));
+})();
+
+// ---------------------------------------------------------------------
+// 4. GEOMETRY MATH (TRATTO CENTRALE PIATTO + DISCESA RIPIIDA AI PIEDI)
+// ---------------------------------------------------------------------
+function archPoint(t, L, H, xShift){
+  const x = -L + 2*L*t + xShift;
+  let z = 0;
+  const ramp = 0.13; // raccordo ripido e localizzato agli estremi
+  if(t < ramp){
+    const u = t / ramp;
+    z = H * (0.5 - 0.5 * Math.cos(u * Math.PI));
+  } else if(t > 1 - ramp){
+    const u = (1 - t) / ramp;
+    z = H * (0.5 - 0.5 * Math.cos(u * Math.PI));
+  } else {
+    z = H; // tratto centrale orizzontale e rettilineo
+  }
+  return new THREE.Vector3(x, 0, z);
+}
+
+class ParamCurve extends THREE.Curve{
+  constructor(fn){ super(); this.fn = fn; }
+  getPoint(t){ return this.fn(t); }
+}
+function makeArchFn(L,H,xShift){ return (t)=> archPoint(t,L,H,xShift); }
+
+function smootherstep(x){
+  x = THREE.MathUtils.clamp(x,0,1);
+  return x*x*x*(x*(x*6-15)+10);
+}
+function blendFactor(t, edge){
+  if(t <= edge) return smootherstep(1 - t/edge);
+  if(t >= 1-edge) return smootherstep((t-(1-edge))/edge);
+  return 0;
+}
+function makeSplayFn(fnInner, fnOuter, edge){
+  return function(t){
+    const s = blendFactor(t, edge);
+    if(s <= 0) return fnInner(t);
+    return fnInner(t).clone().lerp(fnOuter(t), s);
+  };
+}
+
+function frameAt(pointFn, t){
+  const dt = 1e-4;
+  const t1 = Math.max(0, t-dt), t2 = Math.min(1, t+dt);
+  const p1 = pointFn(t1), p2 = pointFn(t2);
+  const T = p2.clone().sub(p1).normalize();
+  const up = new THREE.Vector3(0,0,1);
+  let N = up.clone().sub(T.clone().multiplyScalar(up.dot(T)));
+  if(N.lengthSq() < 1e-8) N.set(0,1,0);
+  N.normalize();
+  const B = new THREE.Vector3().crossVectors(T,N).normalize();
+  return {T,N,B};
+}
+
+// ---------------------------------------------------------------------
+// 4b. ROTATION MINIMIZING FRAME (metodo della doppia riflessione)
+// Il semplice frame "up-vector" (frameAt) diventa instabile e può
+// ribaltarsi bruscamente quando la tangente della curva si avvicina
+// alla verticale (i tratti ripidi vicino ai piedi): questo causava
+// l'effetto di frecce che sembrano "scontrarsi" e deviare per un istante.
+// Qui costruiamo un frame continuo e stabile lungo l'intera curva, una
+// sola volta, e lo interpoliamo durante l'animazione.
+// ---------------------------------------------------------------------
+function computeFrameTable(pointFn, n){
+  const dt = 1e-4;
+  const ts = new Array(n), pts = new Array(n), tans = new Array(n);
+  const norms = new Array(n), binorms = new Array(n);
+
+  for(let i=0;i<n;i++){
+    const t = i/(n-1);
+    ts[i] = t;
+    pts[i] = pointFn(t);
+  }
+  for(let i=0;i<n;i++){
+    const t = ts[i];
+    const t1 = Math.max(0, t-dt), t2 = Math.min(1, t+dt);
+    tans[i] = pointFn(t2).clone().sub(pointFn(t1)).normalize();
+  }
+
+  const upRef = new THREE.Vector3(0,0,1);
+  const altRef = new THREE.Vector3(1,0,0);
+  const t0 = tans[0];
+  const ref0 = Math.abs(t0.dot(upRef)) < 0.9 ? upRef : altRef;
+  const n0 = ref0.clone().sub(t0.clone().multiplyScalar(t0.dot(ref0))).normalize();
+  norms[0] = n0;
+  binorms[0] = new THREE.Vector3().crossVectors(tans[0], norms[0]).normalize();
+
+  for(let i=0;i<n-1;i++){
+    const p_i = pts[i], p_ip1 = pts[i+1];
+    const t_i = tans[i], t_ip1 = tans[i+1];
+    const r_i = norms[i];
+
+    const v1 = p_ip1.clone().sub(p_i);
+    const c1 = v1.dot(v1);
+    let r_iL, t_iL;
+    if(c1 < 1e-12){ r_iL = r_i.clone(); t_iL = t_i.clone(); }
+    else {
+      r_iL = r_i.clone().sub(v1.clone().multiplyScalar((2/c1) * v1.dot(r_i)));
+      t_iL = t_i.clone().sub(v1.clone().multiplyScalar((2/c1) * v1.dot(t_i)));
+    }
+    const v2 = t_ip1.clone().sub(t_iL);
+    const c2 = v2.dot(v2);
+    let r_ip1 = (c2 < 1e-12) ? r_iL.clone() : r_iL.clone().sub(v2.clone().multiplyScalar((2/c2) * v2.dot(r_iL)));
+
+    r_ip1.sub(t_ip1.clone().multiplyScalar(t_ip1.dot(r_ip1)));
+    if(r_ip1.lengthSq() < 1e-10) r_ip1.copy(r_i);
+    r_ip1.normalize();
+    norms[i+1] = r_ip1;
+    binorms[i+1] = new THREE.Vector3().crossVectors(t_ip1, r_ip1).normalize();
+  }
+
+  return {ts, pts, tans, norms, binorms, n};
+}
+
+function lookupFrame(table, t){
+  const tt = THREE.MathUtils.clamp(t, 0, 1);
+  const n = table.n;
+  const idxF = tt * (n-1);
+  const i0 = Math.floor(idxF);
+  const i1 = Math.min(n-1, i0+1);
+  const f = idxF - i0;
+  const T = table.tans[i0].clone().lerp(table.tans[i1], f).normalize();
+  let N = table.norms[i0].clone().lerp(table.norms[i1], f);
+  N.sub(T.clone().multiplyScalar(T.dot(N)));
+  if(N.lengthSq() < 1e-10) N.copy(table.norms[i0]); else N.normalize();
+  const B = new THREE.Vector3().crossVectors(T, N).normalize();
+  return {T, N, B};
+}
+
+function helixSample(t, pointFn, frameTable, helixR, turns, phase, axialBias = 1.0){
+  const {T,N,B} = lookupFrame(frameTable, t);
+  const base = pointFn(t);
+  const rNow = (typeof helixR === 'function') ? helixR(t) : helixR;
+  const theta = 2*Math.PI*turns*t + phase;
+  const offset = N.clone().multiplyScalar(Math.cos(theta)*rNow)
+                  .add(B.clone().multiplyScalar(Math.sin(theta)*rNow));
+  const pos = base.clone().add(offset);
+
+  const dt = 1e-4;
+  const t2 = Math.min(0.999, t+dt);
+  const {T:T2, N:N2, B:B2} = lookupFrame(frameTable, t2);
+  const base2 = pointFn(t2);
+  const rNext = (typeof helixR === 'function') ? helixR(t2) : helixR;
+  const theta2 = 2*Math.PI*turns*t2 + phase;
+  const offset2 = N2.clone().multiplyScalar(Math.cos(theta2)*rNext)
+                   .add(B2.clone().multiplyScalar(Math.sin(theta2)*rNext));
+  const pos2 = base2.clone().add(offset2);
+  
+  let dir = pos2.clone().sub(pos).normalize();
+  if(axialBias > 1.0){
+    // Mescola la direzione elicoidale con il vettore tangente T dell'asse per renderla più assiale
+    dir.lerp(T, (axialBias - 1.0) / axialBias).normalize();
+  }
+  return {pos, dir};
+}
+
+function buildVariableRadiusTube(pointFn, tubularSegments, radialSegments, radiusFn){
+  const positions = [];
+  const normals = [];
+  const uvs = [];
+  const indices = [];
+
+  for(let i=0;i<=tubularSegments;i++){
+    const t = i/tubularSegments;
+    const tSafe = Math.min(Math.max(t, 0.0008), 0.9992); // evita instabilita' del frame ai bordi esatti
+    const {N,B} = frameAt(pointFn, tSafe);
+    const center = pointFn(t);
+    const r = radiusFn(t);
+    for(let j=0;j<=radialSegments;j++){
+      const v = (j/radialSegments) * Math.PI*2;
+      const cos = Math.cos(v), sin = Math.sin(v);
+      const nx = N.x*cos + B.x*sin;
+      const ny = N.y*cos + B.y*sin;
+      const nz = N.z*cos + B.z*sin;
+      normals.push(nx, ny, nz);
+      positions.push(center.x + r*nx, center.y + r*ny, center.z + r*nz);
+      uvs.push(t, j/radialSegments);
+    }
+  }
+
+  const ring = radialSegments + 1;
+  for(let i=0;i<tubularSegments;i++){
+    for(let j=0;j<radialSegments;j++){
+      const a = i*ring + j;
+      const b = a + ring;
+      const c = a + 1;
+      const d = b + 1;
+      indices.push(a, b, d);
+      indices.push(a, d, c);
+    }
+  }
+
+  const geo = new THREE.BufferGeometry();
+  geo.setIndex(indices);
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  geo.setAttribute('normal', new THREE.Float32BufferAttribute(normals, 3));
+  geo.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+  return geo;
+}
+
+// ---------------------------------------------------------------------
+// 5+6. PARAMETRI DEI TUBI
+// ---------------------------------------------------------------------
+const archA = {L:6.2, H:4.2, xShift:0.0};
+const archB_target = {L:8.6, H:6.4, xShift:0.0};  
+const EDGE = 0.15;
+
+const fnA = makeArchFn(archA.L, archA.H, archA.xShift);
+const fnB_target = makeArchFn(archB_target.L, archB_target.H, archB_target.xShift);
+const fnB = makeSplayFn(fnA, fnB_target, EDGE);
+
+const curveA = new ParamCurve(fnA);
+const curveB = new ParamCurve(fnB);
+
+const tubeA_radius = 0.95;   
+const tubeB_radius = 1.40;   
+const tubeB_endRadius = 0.55; // raggio ridotto dei due estremi del Tubo B, dove non è più concentrico col Tubo A
+
+// Il raggio del Tubo B resta invariato (tubeB_radius) per tutto il tratto condiviso con il Tubo A
+// (blendFactor = 0), e si restringe verso tubeB_endRadius solo dove le due curve si separano
+// (blendFactor > 0), cioè in prossimità dei due piedi.
+function tubeB_radiusFn(t){
+  const s = blendFactor(t, EDGE);
+  return THREE.MathUtils.lerp(tubeB_radius, tubeB_endRadius, s);
+}
+
+// --- Tubo A ---
+const geoA = new THREE.TubeGeometry(curveA, 220, tubeA_radius, 28, false);
+const matA = new THREE.MeshPhysicalMaterial({
+  color:0xff6a3d, transparent:true, opacity:0.26, roughness:0.35, metalness:0.0,
+  transmission:0.15, side:THREE.DoubleSide, depthWrite:false, emissive:0x351405, emissiveIntensity:0.6
+});
+const meshA = new THREE.Mesh(geoA, matA);
+rig.add(meshA);
+
+const coreGeoA = new THREE.TubeGeometry(curveA, 220, 0.05, 8, false);
+const coreMatA = new THREE.MeshBasicMaterial({color:0xffb08a, transparent:true, opacity:0.5});
+rig.add(new THREE.Mesh(coreGeoA, coreMatA));
+
+// --- Tubo B (raggio variabile: pieno nel tratto condiviso, rastremato ai due piedi) ---
+const geoB = buildVariableRadiusTube(fnB, 260, 24, tubeB_radiusFn);
+const matB = new THREE.MeshPhysicalMaterial({
+  color:0x39c9ff, transparent:true, opacity:0.15, roughness:0.3, metalness:0.0,
+  transmission:0.3, side:THREE.DoubleSide, depthWrite:false, emissive:0x062233, emissiveIntensity:0.5
+});
+const meshB = new THREE.Mesh(geoB, matB);
+rig.add(meshB);
+
+const coreGeoB = new THREE.TubeGeometry(curveB, 220, 0.03, 8, false);
+const coreMatB = new THREE.MeshBasicMaterial({color:0xbfeeff, transparent:true, opacity:0.35});
+rig.add(new THREE.Mesh(coreGeoB, coreMatB));
+
+// ---------------------------------------------------------------------
+// 7. PHOTOSPHERE
+// ---------------------------------------------------------------------
+function makePhotosphereTexture(){
+  const size = 512;
+  const c = document.createElement('canvas'); c.width=c.height=size;
+  const ctx = c.getContext('2d');
+  const grad = ctx.createRadialGradient(size/2,size/2,0, size/2,size/2,size/2);
+  grad.addColorStop(0.0,'rgba(255,150,70,0.55)');
+  grad.addColorStop(0.35,'rgba(200,70,30,0.30)');
+  grad.addColorStop(0.75,'rgba(90,20,15,0.10)');
+  grad.addColorStop(1.0,'rgba(90,20,15,0.0)');
+  ctx.fillStyle = grad; ctx.fillRect(0,0,size,size);
+  ctx.strokeStyle = 'rgba(255,200,160,0.18)'; ctx.lineWidth=1;
+  for(let r=size*0.1;r<size*0.5;r+=size*0.1){
+    ctx.beginPath(); ctx.arc(size/2,size/2,r,0,Math.PI*2); ctx.stroke();
+  }
+  for(let a=0;a<Math.PI*2;a+=Math.PI/8){
+    ctx.beginPath();
+    ctx.moveTo(size/2,size/2);
+    ctx.lineTo(size/2+Math.cos(a)*size*0.5, size/2+Math.sin(a)*size*0.5);
+    ctx.stroke();
+  }
+  return new THREE.CanvasTexture(c);
+}
+const photoGeo = new THREE.CircleGeometry(15, 64);
+const photoMat = new THREE.MeshBasicMaterial({map:makePhotosphereTexture(), transparent:true, depthWrite:false});
+const photoMesh = new THREE.Mesh(photoGeo, photoMat);
+photoMesh.position.z = -0.05;
+rig.add(photoMesh);
+
+// ---------------------------------------------------------------------
+// 8. FOOTPOINTS
+// ---------------------------------------------------------------------
+function makePoleLabelSprite(letter, size){
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = 128;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#000000';
+  ctx.beginPath();
+  ctx.arc(64,64,52,0,Math.PI*2);
+  ctx.fill();
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 66px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(letter, 64, 70);
+  const texture = new THREE.CanvasTexture(canvas);
+  const mat = new THREE.SpriteMaterial({map:texture, transparent:true, depthWrite:false, depthTest:false});
+  const sprite = new THREE.Sprite(mat);
+  sprite.scale.set(size, size, 1);
+  sprite.renderOrder = 999;
+  return sprite;
+}
+
+function footpoint(x, color, radius, label){
+  const g = new THREE.SphereGeometry(radius, 24, 24);
+  const m = new THREE.MeshBasicMaterial({color});
+  const s = new THREE.Mesh(g,m);
+  s.position.set(x, 0, 0.02);
+  rig.add(s);
+  const haloGeo = new THREE.SphereGeometry(radius*2.2, 16, 16);
+  const haloMat = new THREE.MeshBasicMaterial({color, transparent:true, opacity:0.18});
+  const halo = new THREE.Mesh(haloGeo, haloMat);
+  halo.position.copy(s.position);
+  rig.add(halo);
+  if(label){
+    const sprite = makePoleLabelSprite(label, radius*1.3);
+    sprite.position.set(x, 0, 0.02);
+    rig.add(sprite);
+  }
+  return s;
+}
+
+footpoint(-archA.L, 0xff3b3b, 0.55, 'N');
+footpoint( archA.L, 0x3b82ff, 0.55, 'S');
+
+footpoint(-archB_target.L, 0x7db8ff, 0.32, 'S');
+footpoint( archB_target.L, 0xff8a70, 0.32, 'N');
+
+// ---------------------------------------------------------------------
+// 9. PLASMA FLOW VECTORS
+// ---------------------------------------------------------------------
+const N_ARROWS = 16;
+const arrowsA = [], arrowsB = [];
+const tPhaseA = []; 
+const tPhaseB = [];
+
+for(let i=0;i<N_ARROWS;i++){
+  const arrow = new THREE.ArrowHelper(
+    new THREE.Vector3(1,0,0), new THREE.Vector3(0,0,0),
+    0.9, 0xffffff, 0.32, 0.16
+  );
+  arrow.line.material.transparent = true;
+  arrow.cone.material.transparent = true;
+  arrow.line.material.depthWrite = false;
+  arrow.cone.material.depthWrite = false;
+  arrow.renderOrder = 1;
+  rig.add(arrow);
+  arrowsA.push(arrow);
+  tPhaseA.push(i / N_ARROWS);
+}
+for(let i=0;i<N_ARROWS;i++){
+  const arrow = new THREE.ArrowHelper(
+    new THREE.Vector3(1,0,0), new THREE.Vector3(0,0,0),
+    0.9, 0x39ff6a, 0.28, 0.14
+  );
+  arrow.line.material.transparent = true;
+  arrow.cone.material.transparent = true;
+  arrow.line.material.depthWrite = false;
+  arrow.cone.material.depthWrite = false;
+  arrow.renderOrder = 2;
+  rig.add(arrow);
+  arrowsB.push(arrow);
+  tPhaseB.push(i / N_ARROWS);
+}
+
+const HELIX_R_A = tubeA_radius*0.6;
+const HELIX_TURNS_A = 3.5;
+const HELIX_R_B_BASE = (tubeA_radius + tubeB_radius)/2;
+const HELIX_R_B_SCALE = HELIX_R_B_BASE / tubeB_radius; // stesso rapporto rispetto al raggio del tubo, mantenuto lungo tutta la curva
+const HELIX_R_B = (t) => tubeB_radiusFn(t) * HELIX_R_B_SCALE;
+const HELIX_TURNS_B = 2.0; // Ridotto a 2.0 per spire più larghe e allungate (più assiali)
+
+// Frame stabili precalcolati una sola volta: eliminano i "salti" di orientamento
+// del frame N,B nei tratti ripidi, che causavano l'effetto di frecce che sembrano
+// scontrarsi e deviare per un istante quando i due flussi si incrociano.
+const frameTableA = computeFrameTable(fnA, 500);
+const frameTableB = computeFrameTable(fnB, 500);
+
+const T_MIN = 0.005, T_MAX = 0.995; 
+
+function updateArrows(arrows, phases, pointFn, frameTable, helixR, turns, dirSign, speed, dt, phaseOffset, axialBias){
+  for(let i=0;i<arrows.length;i++){
+    phases[i] += dirSign * speed * dt * 0.06;
+    let tt = phases[i] % 1; if(tt<0) tt += 1;
+    const tMapped = T_MIN + tt*(T_MAX - T_MIN);
+    const {pos, dir} = helixSample(tMapped, pointFn, frameTable, helixR, turns, phaseOffset, axialBias);
+    const flowDir = dir.clone().multiplyScalar(dirSign);
+    arrows[i].position.copy(pos);
+    arrows[i].setDirection(flowDir.normalize());
+
+    const edge = Math.min(tt, 1-tt);
+    const fade = Math.min(1, edge/0.05);
+    arrows[i].line.material.opacity = 0.95*fade;
+    arrows[i].cone.material.opacity = 1.0*fade;
+  }
+}
+
+// ---------------------------------------------------------------------
+// 10. ARCBALL ROTATION
+// ---------------------------------------------------------------------
+const dom = renderer.domElement;
+let dragging = false;
+let lastVec = null;
+
+function pointerToSphere(clientX, clientY){
+  const rect = dom.getBoundingClientRect();
+  let x = (clientX - rect.left)/rect.width*2 - 1;
+  let y = -((clientY - rect.top)/rect.height*2 - 1);
+  const r2 = x*x + y*y;
+  let z;
+  if(r2 <= 1){ z = Math.sqrt(1-r2); } else { const s=1/Math.sqrt(r2); x*=s; y*=s; z=0; }
+  return new THREE.Vector3(x,y,z);
+}
+function onDown(e){
+  dragging = true; container.classList.add('dragging');
+  const p = (e.touches ? e.touches[0] : e);
+  lastVec = pointerToSphere(p.clientX, p.clientY);
+}
+function onMove(e){
+  if(!dragging) return;
+  const p = (e.touches ? e.touches[0] : e);
+  const cur = pointerToSphere(p.clientX, p.clientY);
+  const axis = new THREE.Vector3().crossVectors(lastVec, cur);
+  const dot = THREE.MathUtils.clamp(lastVec.dot(cur), -1, 1);
+  const angle = Math.acos(dot) * 1.7; 
+  if(axis.lengthSq() > 1e-10 && angle > 1e-6){
+    axis.normalize();
+    const worldAxis = axis.clone().applyQuaternion(camera.quaternion);
+    const q = new THREE.Quaternion().setFromAxisAngle(worldAxis, angle);
+    rig.quaternion.premultiply(q);
+  }
+  lastVec = cur;
+  e.preventDefault();
+}
+function onUp(){ dragging = false; container.classList.remove('dragging'); lastVec = null; }
+
+dom.addEventListener('mousedown', onDown);
+window.addEventListener('mousemove', onMove);
+window.addEventListener('mouseup', onUp);
+dom.addEventListener('touchstart', onDown, {passive:true});
+window.addEventListener('touchmove', onMove, {passive:false});
+window.addEventListener('touchend', onUp);
+
+dom.addEventListener('wheel', (e)=>{
+  e.preventDefault();
+  const dist = camera.position.length();
+  const newDist = THREE.MathUtils.clamp(dist * (1 + e.deltaY*0.001), 8, 90);
+  camera.position.setLength(newDist);
+}, {passive:false});
+
+document.getElementById('resetBtn').addEventListener('click', ()=>{
+  rig.quaternion.identity();
+  camera.position.set(0,-22,10);
+  camera.lookAt(0,0,3);
+});
+
+// ---------------------------------------------------------------------
+// 11. PLAY / PAUSE + SPEED
+// ---------------------------------------------------------------------
+let playing = true;
+let speed = 1.0;
+document.getElementById('playBtn').addEventListener('click', (e)=>{
+  playing = !playing;
+  e.target.textContent = playing ? '⏸ Pausa' : '▶ Play';
+});
+document.getElementById('speed').addEventListener('input', (e)=>{
+  speed = parseFloat(e.target.value);
+});
+
+// ---------------------------------------------------------------------
+// 12. RENDER LOOP
+// ---------------------------------------------------------------------
+const clock = new THREE.Clock();
+document.getElementById('loading').style.display = 'none';
+
+function animate(){
+  requestAnimationFrame(animate);
+  const dt = Math.min(clock.getDelta(), 0.05);
+
+  if(playing){
+    // Tubo A: bias assiale standard (1.0)
+    updateArrows(arrowsA, tPhaseA, fnA, frameTableA, HELIX_R_A, HELIX_TURNS_A, -1, speed, dt, 0.0, 1.0);
+    // Tubo B: velocità normale ma forte componente assiale (bias = 2.2) per orientare i vettori lungo il tubo
+    updateArrows(arrowsB, tPhaseB, fnB, frameTableB, HELIX_R_B, HELIX_TURNS_B, +1, speed * 1.2, dt, Math.PI/3, 2.2);
+  }
+
+  glow.intensity = 2.0 + Math.sin(clock.elapsedTime*1.3)*0.3;
+
+  renderer.render(scene, camera);
+}
+animate();
+
+})();
+</script>
+</body>
+</html>

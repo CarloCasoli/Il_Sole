@@ -1,0 +1,353 @@
+<!doctype html>
+<!--
+  © 2026 Carlo Casoli — "Il Sole: Osservazione e Fisica"
+  Licenza CC BY-NC-ND 4.0: https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it
+  Vietati l'uso commerciale e la distribuzione di versioni modificate senza autorizzazione scritta dell'autore.
+-->
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Galleggiamento del tubo di flusso</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: stesso impianto di "Equilibrio nel nucleo" — barre dei vettori a sinistra, disegno a destra, due grafici sotto */
+:root{--text-primary:#1f1e1d;--text-secondary:#5f5e5a;--border:rgba(0,0,0,.12);--border-strong:rgba(0,0,0,.25);--bg:#ffffff;--chip:#f4f3ef;--tube:rgba(239,159,39,.10);--plasma:216,90,48}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--text-primary:#f1efe8;--text-secondary:#b4b2a9;--border:rgba(255,255,255,.12);--border-strong:rgba(255,255,255,.28);--bg:#1f1f1e;--chip:#2a2a28;--tube:rgba(239,159,39,.12);--plasma:216,90,48;color-scheme:dark}}
+:root[data-theme="dark"]{--text-primary:#f1efe8;--text-secondary:#b4b2a9;--border:rgba(255,255,255,.12);--border-strong:rgba(255,255,255,.28);--bg:#1f1f1e;--chip:#2a2a28;--tube:rgba(239,159,39,.12);--plasma:216,90,48;color-scheme:dark}
+body{margin:0;padding-block:16px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));background:var(--bg);color:var(--text-primary);font-family:-apple-system,"Segoe UI",Roboto,sans-serif}
+button{background:transparent;color:var(--text-primary);border:1px solid var(--border-strong);border-radius:8px;cursor:pointer;font-family:inherit}
+button:hover{background:rgba(127,127,127,.12)}
+button:focus-visible,input:focus-visible{outline:2px solid #378ADD;outline-offset:2px}
+.bar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:0 0 6px;font-size:12px;color:var(--text-secondary)}
+.bar button{font-size:12px;padding:3px 8px}
+.bar input[type=range]{width:110px}
+.bar b{font-weight:500;color:var(--text-primary);min-width:30px;display:inline-block;font-variant-numeric:tabular-nums}
+.tab{font-size:13px!important;padding:6px 14px!important;transition:all .15s}
+.chain{display:flex;flex-wrap:wrap;gap:4px 6px;align-items:center;margin:10px 0 0;font-size:12.5px}
+.chain span.s{padding:3px 9px;border-radius:12px;background:var(--chip);color:var(--text-secondary);border:1px solid var(--border)}
+.chain span.s.on{color:var(--text-primary);border-color:var(--border-strong);font-weight:500}
+.chain span.a{color:var(--text-secondary)}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px;margin-top:8px}
+@media (max-width:640px){.grid2{grid-template-columns:minmax(0,1fr)}}
+.note{margin-top:10px;font-size:12px;color:var(--text-secondary);max-width:80ch;line-height:1.45}
+</style>
+</head><body>
+
+<div class="bar" style="gap:8px">
+  <span style="font-size:13px;color:var(--text-secondary)">Fase:</span>
+  <button class="tab" id="tEq">1 · Tubo in equilibrio</button>
+  <button class="tab" id="tRise">2 · Risalita</button>
+</div>
+<div style="margin:2px 0 8px">
+  <div id="mTitle" style="font-size:18px;font-weight:500">–</div>
+  <div id="mSub" style="font-size:13px;color:var(--text-secondary);max-width:95ch;line-height:1.45;margin-top:2px">–</div>
+</div>
+<div class="bar">
+  <label for="kB">Campo B</label><input type="range" id="kB" min="0" max="10" step="1" value="7"><b id="kBo">–</b>
+  <button id="bGo" hidden>▶ Avvia risalita</button>
+  <button id="bP" aria-label="Pausa" style="min-width:34px">❚❚</button>
+  <button id="bR" aria-label="Ricomincia" style="min-width:34px">↺</button>
+  <label for="spd">Velocità</label><input type="range" id="spd" min="1" max="6" step="1" value="3" style="width:80px"><b id="spdO">×1</b>
+  <label><input type="checkbox" id="real"> valori reali (P<sub>m</sub> ≈ 1/150 000 di P<sub>e</sub>)</label>
+</div>
+<canvas id="main" style="width:100%;height:640px;display:block"></canvas>
+<div class="grid2">
+  <canvas id="pl1" style="width:100%;height:190px;display:block"></canvas>
+  <canvas id="pl2" style="width:100%;height:190px;display:block"></canvas>
+</div>
+<div class="chain" id="chain"></div>
+<div class="note">Modello qualitativo: tubo sottile in equilibrio termico con l'ambiente (T<sub>i</sub> = T<sub>e</sub>), zona convettiva descritta come politropo (P ∝ profondità<sup>2,5</sup>, ρ ∝ profondità<sup>1,5</sup>), massa e flusso del tubo conservati, gravità g ∝ 1/r² (alla fotosfera è circa metà che alla base). Senza «valori reali» la pressione magnetica è amplificata di circa 10<sup>4</sup>–10<sup>5</sup> volte per renderla visibile; i tempi sono accelerati. Valori reali alla base della zona convettiva: P<sub>e</sub> ≈ 6·10<sup>12</sup> Pa, B ≈ 10 T (10<sup>5</sup> G).</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const C=n=>(getComputedStyle(document.documentElement).getPropertyValue(n).trim()||'#888');
+const TAU=Math.PI*2;
+const RED='#E24B4A',BLU='#378ADD',LBL='#85B7EB',PUR='#22B84A',AMB='#BA7517',GRN='#1D9E75';
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const cv=$('main'),c1=$('pl1'),c2=$('pl2');const gx=cv.getContext('2d'),g1=c1.getContext('2d'),g2=c2.getContext('2d');
+function fit(c,g){const r=c.getBoundingClientRect(),d=devicePixelRatio||1;c.width=Math.round(r.width*d);c.height=Math.round(r.height*d);g.setTransform(d,0,0,d,0,0);return[r.width,r.height]}
+let W,H,W1,H1,W2,H2;function rs(){[W,H]=fit(cv,gx);[W1,H1]=fit(c1,g1);[W2,H2]=fit(c2,g2);seedDots()}
+
+/* ---------- fisica ---------- */
+const PE0=6e12, B_REAL=10, BREAL0=6.6e-6;           // Pa, tesla, P_m/P_e reale per 10 T alla base
+let k=7, real=false, phase='eq', run=true, spd=1;
+const bOf=kk=>real?BREAL0*(kk/7)**2:0.5*(kk/10)**2;  // b = P_m/P_e (= 1/β)
+const BteslaOf=kk=>B_REAL*kk/7;
+const DMAX=200, DOFF=2;                                // profondità in Mm (migliaia di km)
+const Dn=d=>(d+DOFF)/(DMAX+DOFF);
+function state(d,b0){                                   // tubo a profondità d, partito da b0 alla base
+  if(b0<=0)return{b:0,BB:1,AA:1};
+  const K0=(1-b0)/Math.sqrt(b0),D=Dn(d),q=K0*D**-0.25,s=(-q+Math.sqrt(q*q+4))/2,b=s*s;
+  const BB=D**1.25*Math.sqrt(b/b0);return{b,BB,AA:1/BB,D};
+}
+const net=b=>b/(1-b), spinta=b=>1/(1-b);
+const RSUN=696, gR=dd=>((RSUN-DMAX)/(RSUN-dd))**2;   // g/g alla base: g ∝ 1/r² (massa interna ≈ costante)
+let d=DMAX,v=0,arrived=false,trail=[],tAcc=0,riseGeo=null;
+function resetRise(){d=DMAX;v=0;arrived=false;trail=[];tAcc=0}
+const netRef=()=>net(real?BREAL0:0.245);
+function stepRise(dt){
+  if(arrived)return;const b0=bOf(k);if(b0<=0){return}
+  const st=state(d,b0),vt=12*Math.sqrt(gR(d)*net(st.b)/netRef());
+  v+=(vt-v)*Math.min(1,dt/0.8);d-=v*dt;tAcc+=dt;
+  if(tAcc>0.9){tAcc=0;trail.push(d)}
+  if(d<=0){d=0;arrived=true;v=0}
+  if(riseGeo){const s2=state(d,b0);if(riseGeo.yOf(d)-riseGeo.rOf(s2.AA)<=riseGeo.yT+1){arrived=true;v=0}}
+}
+function fmt(x,dec){return x.toFixed(dec).replace('.',',')}
+function fr(x){ // frazione → testo nell'unità della modalità
+  return real?fmt(x*1e6,2)+' ppm':fmt(x*100,1)+'%'}
+function pctFull(x){return real?fmt(x*100,5)+'%':fmt(x*100,1)+'%'}
+
+/* ---------- puntini ---------- */
+let outDots=[],inDots=[],sunflower=[];
+function rnd(){return Math.random()}
+for(let i=0;i<150;i++){const r=Math.sqrt(rnd())*0.94,a=rnd()*TAU;inDots.push({x:r*Math.cos(a),y:r*Math.sin(a),vx:rnd()-.5,vy:rnd()-.5})}
+for(let i=0;i<14;i++){const r=Math.sqrt((i+0.5)/14)*0.78,a=i*2.39996;sunflower.push([r*Math.cos(a),r*Math.sin(a)])}
+const sun7=[];for(let i=0;i<7;i++){const r=Math.sqrt((i+0.5)/7)*0.62,a=i*2.39996+0.4;sun7.push([r*Math.cos(a),r*Math.sin(a)])}
+const gas18=[];for(let i=0;i<22;i++){const r=Math.sqrt((i+0.3)/22)*0.9,a=i*2.39996+1.3;gas18.push([r*Math.cos(a),r*Math.sin(a)])}
+let geo={};
+function layout(){
+  const narrow=W<700;
+  if(narrow)geo={narrow,bx:0,by:0,bw:W,bh:300,px:0,py:310,pw:W,ph:H-310};
+  else geo={narrow,bx:0,by:0,bw:W*0.52,bh:H,px:W*0.52+14,py:0,pw:W*0.48-14,ph:H};
+}
+function seedDots(){
+  layout();outDots=[];const R=secR(),cx=geo.px+geo.pw/2,cy=geo.py+geo.ph/2+6;
+  const sigma=150/(Math.PI*R*R),n=Math.round(sigma*geo.pw*(geo.ph-60)*0.95);
+  let guard=0;
+  while(outDots.length<n&&guard++<n*8){const x=geo.px+rnd()*geo.pw,y=geo.py+40+rnd()*(geo.ph-60);
+    const f=(y-geo.py)/geo.ph;if(rnd()>0.72+0.28*f)continue;           // un po' più denso in basso
+    if(Math.hypot(x-cx,y-cy)<R+4)continue;outDots.push({x,y,ox:x,oy:y,p:rnd()*TAU})}
+}
+function secR(){return Math.min(geo.pw*0.3,geo.ph*0.24)}
+
+/* ---------- disegno di base ---------- */
+function arrow(g,X,y0,y1,col,w,head){const len=y0-y1;if(Math.abs(len)<1.5)return;g.fillStyle=col;
+  const s=Math.sign(len),hh=head?Math.min(11,Math.abs(len)):0;
+  g.fillRect(X-w/2,Math.min(y0,y1+s*hh),w,Math.abs(len)-hh);
+  if(head){g.beginPath();g.moveTo(X,y1);g.lineTo(X-w/2-4,y1+s*hh);g.lineTo(X+w/2+4,y1+s*hh);g.closePath();g.fill()}}
+function line(g,x0,y0,x1,y1){g.beginPath();g.moveTo(x0,y0);g.lineTo(x1,y1);g.stroke()}
+function vArrow(g,x0,y0,x1,y1,col,w){const L=Math.hypot(x1-x0,y1-y0);if(L<2)return;const ux=(x1-x0)/L,uy=(y1-y0)/L,h=Math.min(8,L*0.6);
+  g.strokeStyle=col;g.lineWidth=w;line(g,x0,y0,x1-ux*h*0.8,y1-uy*h*0.8);g.fillStyle=col;g.beginPath();g.moveTo(x1,y1);
+  g.lineTo(x1-ux*h-uy*h*0.55,y1-uy*h+ux*h*0.55);g.lineTo(x1-ux*h+uy*h*0.55,y1-uy*h-ux*h*0.55);g.closePath();g.fill()}
+function odot(g,x,y,r,col){g.strokeStyle=col;g.lineWidth=1.4;g.beginPath();g.arc(x,y,r,0,TAU);g.stroke();g.fillStyle=col;g.beginPath();g.arc(x,y,r*0.32,0,TAU);g.fill()}
+
+/* ---------- barre (vettori) ---------- */
+function drawBars(b,gr){
+  const g=gx,tp=C('--text-primary'),ts=C('--text-secondary'),bd=C('--border'),bs=C('--border-strong');
+  const {bx,by,bw,bh,narrow}=geo,fs=narrow?11:13,fsv=narrow?10:13;
+  const gA0=bx+34,gA1=bx+bw*0.54,gB0=bx+bw*0.6+26,gB1=bx+bw-6;
+  const top=by+(narrow?62:78),bot=by+bh-(narrow?30:46);
+  // gruppo A: pressioni
+  g.font='500 '+(narrow?12:13)+'px sans-serif';g.fillStyle=tp;g.textAlign='left';
+  g.fillText('Pressioni al bordo del tubo',gA0-30,by+14);g.fillText('Forze sul tubo',gB0-24,by+14);
+  g.font='11px sans-serif';g.fillStyle=ts;g.fillText('in % di Pₑ',gA0-30,by+28);g.fillText(phase=='eq'?'in % della spinta (fissa)':'in % del peso alla base',gB0-24,by+28);
+  const yA=f=>bot-f*(bot-top)/1.08;
+  g.textAlign='right';
+  [0,0.25,0.5,0.75,1].forEach(f=>{const y=yA(f);g.strokeStyle=f==0?tp:(f==1?bs:bd);g.lineWidth=f==0?1.2:0.6;line(g,gA0,y,gA1,y);g.fillStyle=ts;g.font='10px sans-serif';g.fillText(Math.round(f*100)+'%',gA0-3,y+3)});
+  const nA=4,gapA=(gA1-gA0)/nA,wA=Math.min(22,gapA*0.42),cA=i=>gA0+gapA*(i+0.5);
+  arrow(g,cA(0),yA(0),yA(1),BLU,wA,false);
+  arrow(g,cA(1),yA(0),yA(1-b),LBL,wA,false);
+  arrow(g,cA(2),yA(0),yA(b),PUR,wA,false);
+  arrow(g,cA(3),yA(0),yA(1-b),LBL,wA,false);arrow(g,cA(3),yA(1-b),yA(1),PUR,wA,false);
+  g.setLineDash([4,3]);g.strokeStyle=BLU;g.lineWidth=1.6;line(g,cA(3)-wA,yA(1),cA(3)+wA,yA(1));g.setLineDash([]);
+  const lA=[['Pₑ',BLU,'100%'],['Pᵢ',LBL,pctFull(1-b)],['Pₘ',PUR,pctFull(b)],['Pᵢ+Pₘ',tp,'= Pₑ']];
+  g.textAlign='center';
+  lA.forEach((l,i)=>{const oy=narrow&&i%2?0:0;g.fillStyle=l[1]==LBL?'#4f8fcf':l[1];g.font='500 '+(narrow?13:16)+'px sans-serif';g.fillText(l[0],cA(i),by+(narrow?44:50)+oy);
+    g.fillStyle=tp;g.font=fsv+'px sans-serif';g.fillText(l[2],cA(i),by+(narrow?58:68)+oy)});
+  // gruppo B: forze
+  const unit=(bot-top)/3.15,base=top+2.1*unit,yB=f=>base-f*unit;
+  g.textAlign='right';
+  [-1,0,1,2].forEach(f=>{const y=yB(f);g.strokeStyle=f==0?tp:bd;g.lineWidth=f==0?1.2:0.6;line(g,gB0,y,gB1,y);g.fillStyle=ts;g.font='10px sans-serif';g.fillText((f>0?'+':f<0?'−':'')+Math.abs(f*100)+'%',gB0-3,y+3)});
+  const gapB=(gB1-gB0)/3,wB=Math.min(22,gapB*0.42),cB=i=>gB0+gapB*(i+0.5);
+  const eq=phase=='eq',Wt=eq?1-b:gr,S=eq?1:gr*spinta(b),N=eq?b:gr*net(b);
+  arrow(g,cB(0),yB(0),yB(-Wt),RED,wB,true);
+  arrow(g,cB(1),yB(0),yB(S),BLU,wB,true);
+  g.setLineDash([4,3]);g.strokeStyle=RED;g.lineWidth=1.6;line(g,cB(1)-wB,yB(Wt),cB(1)+wB,yB(Wt));g.setLineDash([]);
+  if(N*unit<1.5){g.fillStyle=tp;g.beginPath();g.arc(cB(2),yB(0),4,0,TAU);g.fill()}else arrow(g,cB(2),yB(0),yB(N),tp,wB*0.7,true);
+  const lB=[['peso',RED,'−'+pctFull(Wt)],['spinta',BLU,'+'+pctFull(S)],['netta',tp,'+'+fr(N)]];
+  g.textAlign='center';
+  lB.forEach((l,i)=>{g.fillStyle=l[1];g.font='500 '+(narrow?12:16)+'px sans-serif';g.fillText(l[0],cB(i),by+(narrow?44:50));
+    g.fillStyle=tp;g.font=fsv+'px sans-serif';g.fillText(l[2],cB(i),by+(narrow?58:68))});
+  // didascalie
+  g.font='11px sans-serif';g.fillStyle=ts;g.textAlign='left';
+  if(!narrow){
+    g.fillText('ρᵢ·g·V  (verso il basso)',gB0-24,bot+18);g.fillText('ρₑ·g·V  (Archimede)   – – = peso',gB0-24,bot+32);
+    g.fillText('Pₑ = Pᵢ + B²/2μ₀ :  la colonna impilata',gA0-30,bot+18);g.fillText('arriva sempre al tratteggio di Pₑ',gA0-30,bot+32);
+  }
+  g.strokeStyle=bs;g.lineWidth=0.6;const xs=bx+bw*0.57;line(g,xs,by+6,xs,bot+8);
+}
+
+/* ---------- fase 1: sezione del tubo ---------- */
+function drawSection(b){
+  const g=gx,tp=C('--text-primary'),ts=C('--text-secondary'),{px,py,pw,ph}=geo;
+  const R=secR(),cx=px+pw/2,cy=py+ph/2+6;
+  // plasma esterno: sfumatura più densa in basso
+  const gr=g.createLinearGradient(0,py+30,0,py+ph-14),pl=C('--plasma');
+  gr.addColorStop(0,'rgba('+pl+',0.05)');gr.addColorStop(1,'rgba('+pl+',0.20)');g.fillStyle=gr;g.fillRect(px,py+30,pw,ph-44);
+  g.fillStyle=ts;g.font='11px sans-serif';g.textAlign='center';g.fillText('plasma della zona convettiva: più denso e più compresso verso il basso',cx,py+ph-2);
+  // puntini esterni
+  const t=performance.now()/1000;
+  g.fillStyle=tp;g.globalAlpha=0.7;
+  outDots.forEach(p=>{const x=p.ox+(RM?0:Math.sin(t*1.7+p.p)*1.6),y=p.oy+(RM?0:Math.cos(t*1.3+p.p*1.7)*1.6);g.beginPath();g.arc(x,y,2.1,0,TAU);g.fill()});
+  g.globalAlpha=1;
+  // tubo
+  g.fillStyle=C('--bg');g.beginPath();g.arc(cx,cy,R,0,TAU);g.fill();
+  g.fillStyle='rgba('+pl+','+(0.125*(1-b)).toFixed(4)+')';g.beginPath();g.arc(cx,cy,R,0,TAU);g.fill();
+  // linee di campo ⊙ (numero ∝ B)
+  const nB=Math.round(1.4*k);for(let i=0;i<nB;i++)odot(g,cx+sunflower[i][0]*R,cy+sunflower[i][1]*R,6.5,PUR);
+  // gas interno (densità ∝ 1−b)
+  const nIn=Math.round(150*(1-b));g.fillStyle=tp;g.globalAlpha=0.7;
+  for(let i=0;i<nIn;i++){const p=inDots[i];g.beginPath();g.arc(cx+p.x*R,cy+p.y*R,2.1,0,TAU);g.fill()}g.globalAlpha=1;
+  densGauge(g,px+8,py+ph-62,Math.min(220,pw*0.45),b);
+  g.strokeStyle=tp;g.lineWidth=2;g.beginPath();g.arc(cx,cy,R,0,TAU);g.stroke();
+  // frecce di pressione. Fuori: Pₑ cresce verso il basso in proporzione a ρₑ.
+  // Dentro: Pₘ uniforme + Pᵢ, che cresce verso il basso in proporzione a ρᵢ (più debole se B è grande).
+  const L0=Math.min(50,R*0.4),GAM=0.5,bv=real?0:b;
+  for(let j=0;j<12;j++){const a=j/12*TAU,ux=Math.cos(a),uy=Math.sin(a);
+    const Le=L0*(1+GAM*uy),Li=L0*(1+GAM*(1-bv)*uy),Lm=L0*bv;
+    vArrow(g,cx+ux*(R+6+Le),cy+uy*(R+6+Le),cx+ux*(R+4),cy+uy*(R+4),BLU,3.2);
+    const r0=R-4-Li,rm=r0+Lm;
+    if(Lm>1){g.strokeStyle=PUR;g.lineWidth=4.2;line(g,cx+ux*r0,cy+uy*r0,cx+ux*rm,cy+uy*rm)}
+    vArrow(g,cx+ux*rm,cy+uy*rm,cx+ux*(R-4),cy+uy*(R-4),LBL,3.6)}
+  if(bv>0.004){g.font='500 12px sans-serif';g.textAlign='left';
+    const lab=(t,x,y)=>{const w=g.measureText(t).width;g.fillStyle=C('--bg');g.globalAlpha=0.85;g.fillRect(x-3,y-12,w+6,16);g.globalAlpha=1;g.fillStyle=tp;g.fillText(t,x,y)};
+    lab('sopra: Pᵢ + Pₘ > Pₑ  → spinge su',cx+14,cy-R-L0*0.55);
+    lab('sotto: Pₑ > Pᵢ + Pₘ  → spinge su',cx+14,cy+R+L0*0.95)}
+  // forze verticali al centro: spinta fissa, peso che cala, netta che cresce
+  const Ls=R*0.62,xs0=cx-26;
+  const halo=(x0,y0,x1,y1,col)=>{const bgc=C('--bg');vArrow(g,x0,y0,x1,y1,bgc,9);vArrow(g,x0,y0,x1,y1,col,4.5)};
+  halo(xs0,cy,xs0,cy-Ls,BLU);
+  halo(xs0+26,cy,xs0+26,cy+Ls*(1-b),RED);
+  if(Ls*b>3)halo(xs0+52,cy,xs0+52,cy-Ls*b,tp);else{g.fillStyle=tp;g.beginPath();g.arc(xs0+52,cy,4,0,TAU);g.fill()}
+  g.font='500 12px sans-serif';g.textAlign='center';
+  const tl=(t,x,y,col)=>{const w=g.measureText(t).width;g.fillStyle=C('--bg');g.globalAlpha=0.85;g.fillRect(x-w/2-3,y-12,w+6,16);g.globalAlpha=1;g.fillStyle=col;g.fillText(t,x,y)};
+  tl('spinta',xs0,cy-Ls-8,BLU);tl('peso',xs0+26,cy+Ls*(1-b)+18,RED);tl('netta '+fr(b),xs0+60,cy-Math.max(Ls*b,4)-8,tp);
+  // legenda
+  g.font='12px sans-serif';g.textAlign='left';let lx=px+6,ly=py+16;
+  [[BLU,'Pₑ  e spinta'],[LBL,'Pᵢ  gas interno'],[PUR,'Pₘ = B²/2μ₀'],[RED,'peso'],[tp,'netta']].forEach(([c,s])=>{g.fillStyle=c;g.fillRect(lx,ly-4,14,4);g.fillStyle=tp;g.fillText(s,lx+19,ly);lx+=g.measureText(s).width+34});
+  g.fillStyle=ts;g.font='11px sans-serif';
+  g.fillText('sezione del tubo:  ⊙ = linee di campo uscenti dallo schermo,  • = particelle di gas,  Tᵢ = Tₑ',px+6,py+34);
+}
+
+function densGauge(g,x,y,w,b){const tp=C('--text-primary'),ts=C('--text-secondary'),pl=C('--plasma');
+  g.fillStyle=C('--bg');g.globalAlpha=0.85;g.fillRect(x-4,y-16,w+96,52);g.globalAlpha=1;
+  g.font='500 12px sans-serif';g.fillStyle=tp;g.textAlign='left';g.fillText('densità del gas',x,y-3);
+  [['ρₑ fuori',1],['ρᵢ dentro',1-b]].forEach(([l,f],i)=>{const yy=y+5+i*15;g.fillStyle=ts;g.font='11px sans-serif';g.fillText(l,x,yy+8);
+    g.strokeStyle=C('--border-strong');g.lineWidth=0.8;g.strokeRect(x+58,yy,w-58,10);g.fillStyle='rgba('+pl+',0.85)';g.fillRect(x+58,yy,(w-58)*f,10);
+    g.fillStyle=tp;g.fillText(real?fmt(f*100,5)+'%':fmt(f*100,1)+'%',x+w+6,yy+8)})}
+/* ---------- fase 2: risalita ---------- */
+function drawRise(){
+  const g=gx,tp=C('--text-primary'),ts=C('--text-secondary'),bd=C('--border'),{px,py,pw,ph,narrow}=geo;
+  const b0=bOf(k),st=state(d,b0);
+  const x0=px+(narrow?62:78),x1=px+pw-6,yT=py+(narrow?200:76),yB=py+ph-26,yOf=dd=>yT+dd/DMAX*(yB-yT);
+  const pl=C('--plasma'),gr=g.createLinearGradient(0,yT,0,yB);
+  gr.addColorStop(0,'rgba('+pl+',0.03)');gr.addColorStop(0.5,'rgba('+pl+',0.10)');gr.addColorStop(1,'rgba('+pl+',0.30)');g.fillStyle=gr;g.fillRect(x0,yT,x1-x0,yB-yT);
+  g.strokeStyle=AMB;g.lineWidth=3;line(g,x0,yT,x1,yT);
+  g.fillStyle=AMB;g.font='500 12px sans-serif';g.textAlign='left';g.fillText('fotosfera',x0+4,yT-6);
+  g.fillStyle=ts;g.font='11px sans-serif';g.textAlign='right';
+  for(let dd=0;dd<=200;dd+=50){const y=yOf(dd);g.strokeStyle=bd;g.lineWidth=0.5;line(g,x0-4,y,x1,y);g.fillText(dd==0?'0 km':(dd*1000).toLocaleString('it-IT')+' km',x0-6,y+4)}
+  g.textAlign='left';g.fillText('base della zona convettiva',x0+4,yB-6);
+  const cx=(x0+x1)/2+(narrow?-10:-60),r0=narrow?16:20,rOf=AA=>Math.min((x1-x0)*0.22,narrow?55:72,r0*AA**0.22);
+  riseGeo={yOf,rOf,yT};
+  // scia
+  g.setLineDash([3,4]);g.strokeStyle=ts;g.lineWidth=0.8;
+  trail.forEach(dd=>{const s=state(dd,b0);g.beginPath();g.arc(cx,yOf(dd),rOf(s.AA),0,TAU);g.stroke()});g.setLineDash([]);
+  if(b0<=0){g.fillStyle=tp;g.font='14px sans-serif';g.textAlign='center';g.fillText('B = 0: nessuna pressione magnetica, nessuna spinta. Il tubo resta fermo.',(x0+x1)/2,yOf(DMAX)-60)}
+  const y=yOf(d),r=rOf(st.AA);
+  const fy=d/DMAX,abg=fy<0.5?0.03+0.14*fy:0.10+0.40*(fy-0.5);
+  g.fillStyle=C('--bg');g.beginPath();g.arc(cx,y,r,0,TAU);g.fill();g.fillStyle='rgba('+pl+','+(abg*(1-st.b)).toFixed(4)+')';g.beginPath();g.arc(cx,y,r,0,TAU);g.fill();
+  sun7.forEach(p=>odot(g,cx+p[0]*r,y+p[1]*r,4,PUR));
+  g.fillStyle=tp;gas18.forEach(p=>{g.beginPath();g.arc(cx+p[0]*r,y+p[1]*r,1.6,0,TAU);g.fill()});
+  g.strokeStyle=tp;g.lineWidth=1.8;g.beginPath();g.arc(cx,y,r,0,TAU);g.stroke();
+  // forze sul tubo
+  const U=46,ax=cx+r+16;
+  if(b0>0){
+    const G=gR(d);vArrow(g,ax,y,ax,y+U*G,RED,3);vArrow(g,ax+13,y,ax+13,y-U*G*spinta(st.b),BLU,3);
+    const Ln=U*G*net(st.b);if(Ln>2)vArrow(g,ax+26,y,ax+26,y-Ln,tp,3.4);
+    g.font='11px sans-serif';g.textAlign='left';g.fillStyle=RED;g.fillText('peso',ax+4,y+U+12);
+    g.fillStyle=tp;g.fillText('netta '+fr(G*net(st.b)),ax+34,y-Math.max(Ln,6)+4);
+  }
+  // pannello valori
+  const rows=[['profondità',(d*1000).toLocaleString('it-IT',{maximumFractionDigits:0})+' km'],
+    ['B',real?fmt(BteslaOf(k)*st.BB,BteslaOf(k)*st.BB<0.1?4:2)+' T':'×'+fmt(st.BB,st.BB<0.1?4:3)+' rispetto alla base'],
+    ['area A','×'+fmt(st.AA,st.AA>100?0:2)],['Φ = B·A','×'+fmt(st.BB*st.AA,2)+'  (costante)'],
+    ['ρᵢ/ρₑ',real?fmt((1-st.b)*100,5)+'%':fmt((1-st.b)*100,1)+'%'],['g / g alla base','×'+fmt(gR(d),2)],['peso','×'+fmt(gR(d),2)+' (massa costante)'],['spinta netta',fr(gR(d)*net(st.b))+' del peso base']];
+  g.font='12px sans-serif';const bxw=narrow?Math.min(240,pw-12):196,bxx=x1-bxw,byy=narrow?py+44:yT+10;
+  g.fillStyle=C('--bg');g.globalAlpha=0.88;g.fillRect(bxx-6,byy,bxw+4,rows.length*17+10);g.globalAlpha=1;
+  rows.forEach((rw,i)=>{g.textAlign='left';g.fillStyle=ts;g.fillText(rw[0],bxx,byy+17+i*17);g.textAlign='right';g.fillStyle=tp;g.fillText(rw[1],x1-4,byy+17+i*17)});
+  g.textAlign='left';g.fillStyle=ts;g.font='11px sans-serif';
+  g.fillText(narrow?'⊙ e • sempre gli stessi. Raggio non in scala.':'⊙ e • sempre gli stessi: flusso e massa del tubo si conservano. Raggio non in scala.',px+6,py+16);
+  if(arrived){g.font='500 '+(narrow?12:14)+'px sans-serif';g.fillStyle=tp;g.fillText(narrow?'Il tubo tocca la fotosfera.':'Il tubo tocca la fotosfera: più largo, campo più debole, spinta ancora verso l\'alto.',px+6,py+38)}
+  else if(!running2&&d==DMAX&&b0>0){g.font='500 14px sans-serif';g.fillStyle=tp;g.fillText('Premi ▶ Avvia risalita',px+6,py+36)}
+}
+
+/* ---------- grafici ---------- */
+function axes(g,Wd,Hd,title){const ts=C('--text-secondary');g.clearRect(0,0,Wd,Hd);g.font='11px sans-serif';g.fillStyle=ts;g.textAlign='left';g.fillText(title,44,12)}
+function plotLines(g,Wd,Hd,xs,series,yMin,yMax,ticks,xlab,marker,logY){
+  const L=44,R=Wd-22,T=36,B=Hd-28,ts=C('--text-secondary'),bd=C('--border-strong');
+  const X=t=>L+(t-xs[0])/(xs[1]-xs[0])*(R-L),Y=val=>{const u=logY?Math.log10(Math.max(1e-9,val)):val;return B-(u-yMin)/(yMax-yMin)*(B-T)};
+  g.strokeStyle=bd;g.lineWidth=0.5;line(g,L,T,L,B);line(g,L,B,R,B);
+  g.font='10px sans-serif';g.fillStyle=ts;g.textAlign='right';
+  ticks.forEach(([vv,lab])=>{const y=logY?B-(vv-yMin)/(yMax-yMin)*(B-T):Y(vv);g.globalAlpha=0.35;line(g,L,y,R,y);g.globalAlpha=1;g.fillText(lab,L-4,y+3)});
+  g.textAlign='center';xlab.forEach(([t,lab])=>g.fillText(lab,X(t),B+12));
+  series.forEach(s=>{g.strokeStyle=s.col;g.lineWidth=s.w||2;if(s.dash)g.setLineDash(s.dash);g.beginPath();s.pts.forEach((p,i)=>{const xx=X(p[0]),yy=Y(p[1]);i?g.lineTo(xx,yy):g.moveTo(xx,yy)});g.stroke();g.setLineDash([])});
+  if(marker!=null){g.strokeStyle=C('--text-primary');g.lineWidth=1;g.setLineDash([2,2]);line(g,X(marker),T,X(marker),B);g.setLineDash([])}
+  let lx=L+4;series.forEach(s=>{if(!s.lab)return;g.fillStyle=s.col;g.fillRect(lx,T-6,12,3);g.fillStyle=ts;g.textAlign='left';g.fillText(s.lab,lx+16,T-2);lx+=g.measureText(s.lab).width+30});
+  return{X,Y}
+}
+function drawPlots(){
+  const tp=C('--text-primary');
+  if(phase=='eq'){
+    const ks=[...Array(41)].map((_,i)=>i/4),sc=real?1e6:100,u=real?' ppm':'%';
+    axes(g1,W1,H1,real?'pressione magnetica Pₘ (ppm di Pₑ) al crescere di B — Pᵢ = Pₑ − Pₘ ≈ 100%':'pressioni interne (% di Pₑ) al crescere di B');
+    const s1=[{col:PUR,lab:'Pₘ',pts:ks.map(kk=>[kk,bOf(kk)*sc])}];if(!real)s1.unshift({col:'#4f8fcf',lab:'Pᵢ',pts:ks.map(kk=>[kk,(1-bOf(kk))*100])});
+    const m1=real?bOf(10)*1e6*1.1:100;
+    const xl=[0,2,4,6,8,10].map(kk=>[kk,real?fmt(BteslaOf(kk),1)+' T':'B ×'+fmt(kk/7,2)]);
+    plotLines(g1,W1,H1,[0,10],s1,0,m1,[0,0.25,0.5,0.75,1].map(f=>[f*m1,fmt(f*m1,real?1:0)+u]),xl,k,false);
+    axes(g2,W2,H2,'spinta netta (% della spinta) al crescere di B — cresce come B², perché cala il peso');
+    const m2=bOf(10)*sc*1.1;
+    plotLines(g2,W2,H2,[0,10],[{col:tp,lab:'netta',pts:ks.map(kk=>[kk,bOf(kk)*sc])}],0,m2,[0,0.5,1].map(f=>[f*m2,fmt(f*m2,real?1:0)+u]),xl,k,false);
+  }else{
+    const b0=bOf(k),ds=[...Array(101)].map((_,i)=>DMAX*(1-i/100));
+    const sts=ds.map(dd=>state(dd,b0)),xd=dd=>DMAX-dd;
+    let lo=0,hi=0;sts.forEach(s=>{lo=Math.min(lo,Math.log10(s.BB));hi=Math.max(hi,Math.log10(s.AA))});lo=Math.floor(lo);hi=Math.ceil(hi);if(hi-lo<2){lo-=1;hi+=1}
+    axes(g1,W1,H1,'durante la risalita: B cala, l\'area A cresce, il flusso Φ = B·A resta costante (scala logaritmica)');
+    const tk=[];for(let e=lo;e<=hi;e++)tk.push([e,e==0?'×1':e>0?'×10'+(e>1?sup(e):''):'×10'+'⁻'+sup(-e)]);
+    const xl=[0,50,100,150,200].map(t=>[t,((DMAX-t)*1000).toLocaleString('it-IT')+(t==200?' km':'')]);
+    plotLines(g1,W1,H1,[0,DMAX],[{col:PUR,lab:'B',pts:ds.map((dd,i)=>[xd(dd),sts[i].BB])},{col:AMB,lab:'A',pts:ds.map((dd,i)=>[xd(dd),sts[i].AA])},{col:tp,lab:'Φ = B·A',dash:[5,4],w:1.6,pts:ds.map((dd,i)=>[xd(dd),1])}],lo,hi,tk,xl,xd(d),true);
+    const sc=real?1e6:100,u=real?' ppm':'%';let m=0;sts.forEach((s,i)=>m=Math.max(m,gR(ds[i])*net(s.b)*sc));if(!real)sts.forEach((s,i)=>m=Math.max(m,gR(ds[i])*spinta(s.b)*100*1.05));m=m*1.15||1;
+    axes(g2,W2,H2,real?'spinta netta (ppm del peso alla base): cala salendo ma resta positiva':'spinta, peso e netta = spinta − peso (% del peso alla base): calano salendo, la netta resta positiva');
+    plotLines(g2,W2,H2,[0,DMAX],[{col:tp,lab:'netta',pts:ds.map((dd,i)=>[xd(dd),gR(dd)*net(sts[i].b)*sc])}].concat(real?[]:[{col:BLU,lab:'spinta',pts:ds.map((dd,i)=>[xd(dd),gR(dd)*spinta(sts[i].b)*100])},{col:RED,lab:'peso',pts:ds.map(dd=>[xd(dd),gR(dd)*100])}]),0,m,[0,0.5,1].map(f=>[f*m,fmt(f*m,real?2:1)+u]),xl,xd(d),false);
+  }
+}
+function sup(n){return String(n).split('').map(c=>'⁰¹²³⁴⁵⁶⁷⁸⁹'[+c]).join('')}
+
+/* ---------- testi, comandi ---------- */
+const INFO={eq:['Equilibrio di pressione: perché il tubo è più leggero','Al bordo del tubo deve valere Pₑ = Pᵢ + B²/2μ₀. Più campo c\'è, meno gas serve dentro. A parità di temperatura, meno pressione vuol dire meno densità: il tubo pesa meno del plasma che sposta, e la spinta di Archimede supera il peso. Muovi il cursore del campo B.'],
+  rise:['Risalita: il tubo sale e si gonfia','Salendo la pressione esterna cala e il tubo si espande. Il flusso Φ = B·A resta costante, quindi B diminuisce. La spinta netta si indebolisce, ma finché c\'è campo resta verso l\'alto, fino alla fotosfera.']};
+const CH=['campo B intenso','pressione magnetica B²/2μ₀','Pᵢ più bassa','ρᵢ più bassa (Tᵢ = Tₑ)','spinta verso l\'alto','risalita ed espansione'];
+function setChain(){const on=phase=='eq'?[0,1,2,3,4]:[4,5];$('chain').innerHTML=CH.map((s,i)=>'<span class="s'+(on.includes(i)?' on':'')+'">'+s+'</span>'+(i<CH.length-1?'<span class="a">→</span>':'')).join('')}
+function styleTab(el,on){el.style.background=on?'#378ADD':'transparent';el.style.color=on?'#ffffff':'';el.style.borderColor=on?'#378ADD':'';el.style.fontWeight=on?'500':'400';el.setAttribute('aria-pressed',on)}
+let running2=false;
+function setPhase(p){phase=p;styleTab($('tEq'),p=='eq');styleTab($('tRise'),p=='rise');$('mTitle').textContent=INFO[p][0];$('mSub').textContent=INFO[p][1];$('bGo').hidden=p!='rise';resetRise();running2=false;setChain()}
+$('tEq').onclick=()=>setPhase('eq');$('tRise').onclick=()=>setPhase('rise');
+$('bGo').onclick=()=>{if(arrived||d<DMAX)resetRise();running2=true;run=true;$('bP').textContent='❚❚'};
+function kLabel(){$('kBo').textContent=real?fmt(BteslaOf(k),1)+' T':'×'+fmt(k/7,2)}
+$('kB').oninput=()=>{k=+$('kB').value;kLabel();resetRise();running2=false};
+$('real').onchange=()=>{real=$('real').checked;kLabel();resetRise();running2=false};
+const sMap=[0.33,0.5,1,1.5,2,3];$('spd').oninput=()=>{spd=sMap[$('spd').value-1];$('spdO').textContent='×'+fmt(spd,spd%1?2:0)};
+$('bP').onclick=()=>{run=!run;$('bP').textContent=run?'❚❚':'▶';$('bP').setAttribute('aria-label',run?'Pausa':'Riprendi')};
+$('bR').onclick=()=>{resetRise();running2=false};
+
+/* ---------- ciclo ---------- */
+let last=performance.now();
+function frame(now){const dt=Math.min(0.05,(now-last)/1000);last=now;
+  if(run){if(phase=='rise'&&running2)stepRise(dt*spd);
+    if(!RM&&phase=='eq')inDots.forEach(p=>{p.x+=p.vx*0.004*spd;p.y+=p.vy*0.004*spd;const r=Math.hypot(p.x,p.y);if(r>0.92){const nx=p.x/r,ny=p.y/r,q=p.vx*nx+p.vy*ny;p.vx-=2*q*nx;p.vy-=2*q*ny;p.x=nx*0.92;p.y=ny*0.92}})}
+  gx.clearRect(0,0,W,H);
+  const b=phase=='eq'?bOf(k):state(d,bOf(k)).b;
+  drawBars(b,phase=='eq'?1:gR(d));phase=='eq'?drawSection(b):drawRise();drawPlots();
+  requestAnimationFrame(frame)}
+addEventListener('resize',rs);rs();kLabel();setPhase('eq');requestAnimationFrame(frame);
+window.__sim={setPhase,start:()=>$('bGo').onclick(),state:()=>({d,v,arrived,k,real,phase})};
+</script>
+</body></html>

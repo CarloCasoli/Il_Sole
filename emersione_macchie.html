@@ -1,0 +1,881 @@
+<!doctype html>
+<!--
+  © 2026 Carlo Casoli — "Il Sole: Osservazione e Fisica"
+  Licenza CC BY-NC-ND 4.0: https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it
+  Vietati l'uso commerciale e la distribuzione di versioni modificate senza autorizzazione scritta dell'autore.
+-->
+<html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Emersione di un gruppo di macchie βγδ</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500&display=swap">
+<style>
+/* Layout: scena 3D a sinistra con barra comandi sotto; pannello di stato a destra; su telefono tutto in colonna. */
+:root {
+  --bg: #0c0a15;
+  --surface: #15121f;
+  --line: #2c2842;
+  --fg: #efe9dd;
+  --muted: #a8a1b8;
+  --sun: #ff9d3d;
+  --sun-ink: #1a0c02;
+  --pos: #ff6153;
+  --neg: #4ea9ff;
+  --font-display: 'Bricolage Grotesque', 'Segoe UI', system-ui, sans-serif;
+  --font-body: 'IBM Plex Sans', 'Segoe UI', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace;
+  color-scheme: dark;
+}
+html, body { background: var(--bg); }
+body {
+  color: var(--fg);
+  font: 15px/1.5 var(--font-body);
+  padding-block: 20px 36px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.shell { max-width: 1240px; margin: 0 auto; }
+h1 {
+  font: 700 clamp(26px, 4vw, 40px)/1.08 var(--font-display);
+  letter-spacing: -0.015em;
+  margin: 0;
+  text-wrap: balance;
+}
+.lede { color: var(--muted); max-width: 66ch; margin: 8px 0 0; }
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 350px;
+  gap: 20px;
+  margin-top: 18px;
+  align-items: start;
+}
+.main-col, .panel { min-width: 0; }
+@media (max-width: 960px) { .layout { grid-template-columns: minmax(0, 1fr); } }
+
+.view {
+  position: relative;
+  height: clamp(360px, 56vw, 620px);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+  background: #0b0a14;
+}
+.view canvas { display: block; width: 100%; height: 100%; touch-action: pan-y; cursor: grab; }
+.view canvas:active { cursor: grabbing; }
+.labels { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.tag {
+  position: absolute; left: 0; top: 0;
+  font: 500 12px/1 var(--font-mono);
+  white-space: nowrap;
+  text-shadow: 0 0 4px #000, 0 0 2px #000;
+  will-change: transform;
+}
+.tag.pos { color: var(--pos); font-size: 15px; }
+.tag.neg { color: var(--neg); font-size: 15px; }
+.tag.name { color: #fff4dc; font-size: 14px; }
+.tag.fsign { color: #fff; font-size: 15px; font-weight: 500; }
+.tag.env { color: #cdc3e4; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; }
+.hud {
+  position: absolute; left: 12px; top: 10px;
+  font: 500 13px/1 var(--font-mono);
+  color: #fff4dc;
+  text-shadow: 0 0 6px #000;
+  pointer-events: none;
+}
+.legend {
+  position: absolute; left: 12px; bottom: 10px; right: 12px;
+  display: flex; gap: 6px 14px; flex-wrap: wrap;
+  font: 400 12px/1.2 var(--font-mono);
+  color: #efe9dd;
+  text-shadow: 0 0 6px #000;
+  pointer-events: none;
+}
+.legend i { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 6px; vertical-align: -1px; }
+.noGL { position: absolute; inset: 0; display: grid; place-items: center; padding: 24px; text-align: center; color: var(--muted); }
+
+.controls { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; margin-top: 12px; }
+.btn {
+  font: 500 14px/1 var(--font-body);
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--fg);
+  cursor: pointer;
+}
+.btn:hover { border-color: #4a4568; }
+.btn.primary { background: var(--sun); color: var(--sun-ink); border-color: var(--sun); min-width: 9.5em; }
+.btn.primary:hover { filter: brightness(1.08); }
+.btn[aria-pressed="true"] { border-color: var(--sun); color: var(--sun); }
+.btn:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid var(--sun); outline-offset: 2px; }
+.timeline { flex: 1 1 240px; min-width: 0; display: flex; align-items: center; gap: 12px; }
+.timeline input[type=range] { flex: 1; min-width: 0; accent-color: var(--sun); }
+.readout { font: 500 13px/1 var(--font-mono); color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
+select {
+  font: 400 13px/1 var(--font-mono);
+  background: var(--surface); color: var(--fg);
+  border: 1px solid var(--line); border-radius: 8px; padding: 9px 8px;
+}
+.cap { font: 500 11px/1 var(--font-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-right: 4px; }
+.views { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 10px; }
+.views .btn { padding: 8px 12px; font-size: 13px; }
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 16px;
+  display: flex; flex-direction: column; gap: 18px;
+}
+.panel h2 { font: 500 11px/1 var(--font-mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin: 0 0 8px; }
+#status { margin: 0; min-height: 10.5em; }
+.cls { font: 700 30px/1 var(--font-display); letter-spacing: 0.02em; color: var(--sun); }
+.clsNote { margin: 6px 0 0; color: var(--muted); font-size: 13px; min-height: 2.7em; }
+.pairs { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.pair {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 10px; align-items: center;
+  padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px;
+}
+.pair label { display: flex; align-items: center; gap: 8px; min-width: 0; flex-wrap: wrap; }
+.pair b { font: 500 14px/1 var(--font-mono); }
+.pair .sw { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+.pair .note { color: var(--muted); font-size: 12px; }
+.chip { font: 500 11px/1 var(--font-mono); padding: 4px 8px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); justify-self: end; }
+.chip.rise { color: var(--neg); border-color: #2c4a6e; }
+.chip.emerge { color: var(--sun); border-color: #6e4a22; }
+.chip.done { color: #8fd694; border-color: #2f5a35; }
+.num { grid-column: 1 / -1; font: 400 12px/1.35 var(--font-mono); color: var(--muted); font-variant-numeric: tabular-nums; }
+.opts { display: grid; gap: 8px; }
+.opts label { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; justify-self: start; }
+.seg input { position: absolute; opacity: 0; pointer-events: none; }
+.seg label { padding: 8px 12px; font-size: 13px; color: var(--muted); cursor: pointer; }
+.seg input:checked + label { background: var(--sun); color: var(--sun-ink); }
+.seg input:focus-visible + label { outline: 2px solid var(--sun); outline-offset: -2px; }
+.fine { color: var(--muted); font-size: 12.5px; margin: 0; }
+</style>
+
+<div class="shell">
+  <h1>Emersione di un gruppo di macchie βγδ</h1>
+  <p class="lede">Sotto la fotosfera si trova un grande tronco di flusso magnetico, dalla cui parte alta si staccano cinque tubi. Emergono uno alla volta: il più grande, G, si solleva per primo come una bolla, gli altri lo seguono e, risalendo, si torcono fino a invertire o ruotare la polarità. Ne esce un gruppo βγδ. Trascina la scena per ruotarla, usa la rotellina per l'ingrandimento.</p>
+
+  <div class="layout">
+    <div class="main-col">
+      <div class="view" id="view">
+        <div class="labels" id="labels"></div>
+        <div class="hud" id="hud">schema dei piedi</div>
+        <div class="legend"><span><i style="background:var(--pos)"></i>polarità +</span><span><i style="background:var(--neg)"></i>polarità −</span><span>colore del tubo = coppia</span><span>1 unità ≈ 5 Mm</span></div>
+      </div>
+
+      <div class="controls">
+        <button class="btn primary" id="btnPlay" type="button">Avvia emersione</button>
+        <button class="btn" id="btnSchema" type="button">Schema 2D</button>
+        <div class="timeline">
+          <input type="range" id="tSlider" min="0" max="1450" value="0" aria-label="Tempo simulato">
+          <span class="readout" id="tOut">0,0 / 14,5 giorni</span>
+        </div>
+        <label class="cap" for="speed">Velocità</label>
+        <select id="speed">
+          <option value="0.5">0,5×</option>
+          <option value="1" selected>1×</option>
+          <option value="2">2×</option>
+          <option value="4">4×</option>
+        </select>
+      </div>
+      <div class="views">
+        <span class="cap">Vista</span>
+        <button class="btn" id="vTop" type="button" aria-pressed="true">Dall'alto</button>
+        <button class="btn" id="vObl" type="button" aria-pressed="false">Obliqua</button>
+        <button class="btn" id="vSide" type="button" aria-pressed="false">Di lato</button>
+      </div>
+      <div class="views" id="soloBar">
+        <span class="cap">Emersione</span>
+        <button class="btn" type="button" data-solo="all" aria-pressed="true">Tutte</button>
+        <button class="btn" type="button" data-solo="G" aria-pressed="false">G</button>
+        <button class="btn" type="button" data-solo="p1" aria-pressed="false">p1</button>
+        <button class="btn" type="button" data-solo="p2" aria-pressed="false">p2</button>
+        <button class="btn" type="button" data-solo="p3" aria-pressed="false">p3</button>
+        <button class="btn" type="button" data-solo="p4" aria-pressed="false">p4</button>
+      </div>
+    </div>
+
+    <aside class="panel">
+      <div>
+        <h2>Cosa succede</h2>
+        <p id="status"></p>
+      </div>
+      <div>
+        <h2>Classe magnetica (indicativa)</h2>
+        <div class="cls" id="cls">—</div>
+        <p class="clsNote" id="clsNote"></p>
+      </div>
+      <div>
+        <h2>Tubi</h2>
+        <ul class="pairs" id="pairs"></ul>
+      </div>
+      <div class="opts">
+        <h2>Visualizzazione</h2>
+        <div class="seg" role="radiogroup" aria-label="Modo di visualizzazione">
+          <input type="radio" name="mode" id="modeWhite" value="white" checked><label for="modeWhite">Luce bianca</label>
+          <input type="radio" name="mode" id="modeMag" value="mag"><label for="modeMag">Magnetogramma</label>
+        </div>
+        <label><input type="checkbox" id="chkAuto" checked> Regia automatica della camera</label>
+        <label><input type="checkbox" id="chkDir" checked> Verso del campo (impulsi)</label>
+        <label><input type="checkbox" id="chkSgn" checked> Segni di polarità</label>
+        <label><input type="checkbox" id="chkRec"> Siti di possibile riconnessione</label>
+        <label><input type="checkbox" id="chkSch" checked> Schema dei piedi</label>
+        <label><input type="checkbox" id="chkFld" checked> Linee di campo</label>
+        <label><input type="checkbox" id="chkSub" checked> Zona convettiva e tronco</label>
+      </div>
+      <p class="fine">Modello schematico: profondità, tempi, dimensioni e flussi sono indicativi e non vengono da una simulazione MHD. La classe magnetica è calcolata da una regola semplice sulle macchie visibili.</p>
+    </aside>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function () {
+  'use strict';
+  var T = THREE;
+  var clamp = function (x, a, b) { return Math.min(b, Math.max(a, x)); };
+  var ss = function (x) { x = clamp(x, 0, 1); return x * x * (3 - 2 * x); };
+  var T_END = 14.5, BOX_D = 14, UNIT_MM = 5, PW = 36, PH = 22, XMIN = -15, XMAX = 15, NS = 170, RAD = 8, LN = 5, PULSE_V = 2.4, PULSE_M = 12;
+  var POS = new T.Color(0xff6153), NEG = new T.Color(0x4ea9ff), WHITE = new T.Color(0xffffff);
+  var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var RAD2 = Math.PI / 180;
+
+  /* ---------- Coppie: schema finale dei piedi e parametri del sotto-tubo ---------- */
+  /* af = angolo del vettore dal piede + al piede − (0° = + a ovest). Oltre 90° la coppia è invertita. */
+  /* tc = giorno in cui l'apice attraversa la fotosfera; dur = durata dell'emersione del tubo (giorni);
+     Hmax = quota finale dell'apice (unità: 1 ≈ 5 Mm); zi = quota di partenza, nella parte alta del tronco;
+     tr = traslazione verso est durante la risalita (unità). */
+  var PAIRS = [
+    { id: 'G',  note: 'grande · 8°',       c: [0, 0],        af: 8,   sep: 13,  rf: 1.75, Hmax: 8.0, zi: -4.8, tc: 1.3,  dur: 3.0, tr: 0,   flux: 4.0e21, col: '#ffd34d', rx: 8.6, ry: 3.6 },
+    { id: 'p1', note: 'normale · 14°',     c: [-3.0, 1.8],   af: 14,  sep: 4.2, rf: 0.85, Hmax: 3.2, zi: -5.4, tc: 4.8,  dur: 2.8, tr: 0,   flux: 3.0e20, col: '#2fd3c0', rx: 3.3, ry: 1.35 },
+    { id: 'p2', note: 'invertita · 170°',  c: [0.8, -1.9],   af: 170, sep: 4.6, rf: 0.9,  Hmax: 3.4, zi: -6.0, tc: 7.3,  dur: 3.2, tr: 0,   flux: 3.5e20, col: '#b18cff', rx: 3.5, ry: 1.35 },
+    { id: 'p3', note: 'a 90°',             c: [6.9, 3.2],    af: 90,  sep: 3.8, rf: 0.8,  Hmax: 3.0, zi: -5.8, tc: 10.1, dur: 2.6, tr: 0,   flux: 2.5e20, col: '#8be04a', rx: 3.1, ry: 1.3 },
+    { id: 'p4', note: 'invertita · 190°',  c: [-4.3, -2.4],  af: 190, sep: 3.2, rf: 0.8,  Hmax: 3.0, zi: -5.2, tc: 12.9, dur: 2.8, tr: 2.8, flux: 2.2e20, col: '#ff77b8', rx: 2.7, ry: 1.3 }
+  ];
+  /* inversa della smoothstep: serve a far attraversare la fotosfera esattamente al giorno tc */
+  function invSS(y) { var lo = 0, hi = 1; for (var i = 0; i < 50; i++) { var m = (lo + hi) / 2; if (ss(m) < y) lo = m; else hi = m; } return (lo + hi) / 2; }
+  PAIRS.forEach(function (p, k) {
+    p.afR = p.af * RAD2;
+    p.s1 = p.sep / 2;
+    p.Af = p.Hmax - p.zi;
+    p.bf = -p.zi / p.Af;
+    p.w = p.s1 / Math.pow(-Math.log(p.bf), 1 / 3);
+    p.t0 = p.tc - p.dur * invSS(p.bf);
+    p.ph = 0.9 + k * 1.3;
+    p.enabled = true;
+    p.color = new T.Color(p.col);
+    p.tf = [
+      [p.c[0] - p.s1 * Math.cos(p.afR), p.c[1] - p.s1 * Math.sin(p.afR)],
+      [p.c[0] + p.s1 * Math.cos(p.afR), p.c[1] + p.s1 * Math.sin(p.afR)]
+    ];
+  });
+
+  /* ---------- Renderer e scena ---------- */
+  var viewEl = document.getElementById('view');
+  var renderer;
+  try { renderer = new T.WebGLRenderer({ antialias: true }); }
+  catch (e) {
+    var m = document.createElement('div'); m.className = 'noGL';
+    m.textContent = 'Il browser non riesce ad avviare WebGL, quindi la scena 3D non può essere mostrata.';
+    viewEl.appendChild(m); return;
+  }
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.setClearColor(0x0b0a14);
+  renderer.localClippingEnabled = true;
+  viewEl.insertBefore(renderer.domElement, viewEl.firstChild);
+
+  var scene = new T.Scene();
+  var camera = new T.PerspectiveCamera(35, 1, 0.1, 400);
+  camera.up.set(0, 0, 1);
+  scene.add(new T.AmbientLight(0xffffff, 0.8));
+  var sunL = new T.DirectionalLight(0xffffff, 0.6); sunL.position.set(5, -8, 12); scene.add(sunL);
+
+  /* ---------- Texture ---------- */
+  function makeGran(gray) {
+    var W = 1024, H = 640, cols = 60, rows = 37, cw = W / cols, ch = H / rows;
+    var px = [], py = [], tone = [];
+    for (var j = 0; j < rows; j++) for (var i = 0; i < cols; i++) {
+      px.push((i + 0.15 + Math.random() * 0.7) * cw);
+      py.push((j + 0.15 + Math.random() * 0.7) * ch);
+      tone.push(Math.random());
+    }
+    var cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+    var g = cv.getContext('2d'); var img = g.createImageData(W, H);
+    for (var y = 0; y < H; y++) {
+      var cj = Math.floor(y / ch);
+      for (var x = 0; x < W; x++) {
+        var ci = Math.floor(x / cw), d1 = 1e9, d2 = 1e9, k = 0;
+        for (var dj = -1; dj <= 1; dj++) {
+          var jj = cj + dj; if (jj < 0 || jj >= rows) continue;
+          for (var di = -1; di <= 1; di++) {
+            var ii = ci + di; if (ii < 0 || ii >= cols) continue;
+            var n = jj * cols + ii, dx = x - px[n], dy = y - py[n], d = Math.sqrt(dx * dx + dy * dy);
+            if (d < d1) { d2 = d1; d1 = d; k = n; } else if (d < d2) { d2 = d; }
+          }
+        }
+        var edge = ss((d2 - d1) / (cw * 0.28));
+        var v = (0.35 + 0.65 * edge) * (0.85 + 0.3 * tone[k]);
+        var o = (y * W + x) * 4;
+        if (gray) { var c = Math.min(255, 60 + v * 150); img.data[o] = c; img.data[o + 1] = c; img.data[o + 2] = c + 6; }
+        else { img.data[o] = Math.min(255, 150 + v * 105); img.data[o + 1] = Math.min(255, 60 + v * 130); img.data[o + 2] = Math.min(255, 12 + v * 60); }
+        img.data[o + 3] = 255;
+      }
+    }
+    g.putImageData(img, 0, 0);
+    var tex = new T.CanvasTexture(cv);
+    tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
+    return tex;
+  }
+  function makeSoftDisk() {
+    var c = document.createElement('canvas'); c.width = c.height = 128;
+    var g = c.getContext('2d'), gr = g.createRadialGradient(64, 64, 0, 64, 64, 64);
+    gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(0.62, 'rgba(255,255,255,0.96)'); gr.addColorStop(1, 'rgba(255,255,255,0)');
+    g.fillStyle = gr; g.fillRect(0, 0, 128, 128);
+    return new T.CanvasTexture(c);
+  }
+  function makePenumbra() {
+    var c = document.createElement('canvas'); c.width = c.height = 256;
+    var g = c.getContext('2d'); g.translate(128, 128);
+    var gr = g.createRadialGradient(0, 0, 0, 0, 0, 128);
+    gr.addColorStop(0, '#2a1208'); gr.addColorStop(0.45, '#3d1a0a'); gr.addColorStop(0.7, '#7a3a15'); gr.addColorStop(0.95, '#a85a22'); gr.addColorStop(1, 'rgba(168,90,34,0)');
+    g.fillStyle = gr; g.beginPath(); g.arc(0, 0, 128, 0, Math.PI * 2); g.fill();
+    for (var i = 0; i < 700; i++) {
+      var a = Math.random() * Math.PI * 2, r0 = 50 + Math.random() * 30, r1 = Math.min(124, r0 + 20 + Math.random() * 50);
+      g.strokeStyle = 'rgba(' + (150 + Math.random() * 80 | 0) + ',' + (70 + Math.random() * 60 | 0) + ',' + (25 + Math.random() * 30 | 0) + ',' + (0.25 + Math.random() * 0.4) + ')';
+      g.lineWidth = 1 + Math.random() * 1.2;
+      g.beginPath(); g.moveTo(Math.cos(a) * r0, Math.sin(a) * r0); g.lineTo(Math.cos(a) * r1, Math.sin(a) * r1); g.stroke();
+    }
+    g.globalCompositeOperation = 'destination-in';
+    var mk = g.createRadialGradient(0, 0, 0, 0, 0, 128);
+    mk.addColorStop(0, '#fff'); mk.addColorStop(0.88, '#fff'); mk.addColorStop(1, 'rgba(255,255,255,0)');
+    g.fillStyle = mk; g.fillRect(-128, -128, 256, 256);
+    return new T.CanvasTexture(c);
+  }
+  var granWhite = makeGran(false), granGray = makeGran(true);
+  var softTex = makeSoftDisk(), penTex = makePenumbra();
+
+  /* ---------- Fotosfera, zona convettiva, tronco ---------- */
+  var planeMat = new T.MeshBasicMaterial({ map: granWhite, transparent: true, opacity: 0.84, depthWrite: false });
+  var plane = new T.Mesh(new T.PlaneGeometry(PW, PH), planeMat); plane.renderOrder = 2; scene.add(plane);
+  var box = new T.Mesh(new T.BoxGeometry(PW, PH, BOX_D), new T.MeshBasicMaterial({ color: 0x3a160d, transparent: true, opacity: 0.6, side: T.BackSide, depthWrite: false }));
+  box.position.z = -BOX_D / 2; box.renderOrder = 0; scene.add(box);
+  var boxEdges = new T.LineSegments(new T.EdgesGeometry(new T.BoxGeometry(PW, PH, BOX_D)), new T.LineBasicMaterial({ color: 0x7a4a58, transparent: true, opacity: 0.45 }));
+  boxEdges.position.z = -BOX_D / 2; scene.add(boxEdges);
+
+  var ropeGroup = new T.Group(); scene.add(ropeGroup);
+  (function () {
+    var segs = 9, len = (XMAX - XMIN) / segs, ops = [0.03, 0.06, 0.1, 0.1, 0.1, 0.1, 0.1, 0.06, 0.03], R_ROPE = 4.0, Z_ROPE = -8.4;
+    for (var i = 0; i < segs; i++) {
+      var cyl = new T.Mesh(new T.CylinderGeometry(R_ROPE, R_ROPE, len, 28, 1, true), new T.MeshBasicMaterial({ color: 0x8a78c0, transparent: true, opacity: ops[i], side: T.DoubleSide, depthWrite: false }));
+      cyl.rotation.z = Math.PI / 2; cyl.position.set(XMIN + (i + 0.5) * len, 0, Z_ROPE); cyl.renderOrder = 1; ropeGroup.add(cyl);
+    }
+    [-9, -3, 3, 9].forEach(function (x) {
+      var pts = [], k;
+      for (k = 0; k < 48; k++) { var a = k / 48 * Math.PI * 2; pts.push(new T.Vector3(x, R_ROPE * Math.cos(a), Z_ROPE + R_ROPE * Math.sin(a))); }
+      var ring = new T.LineLoop(new T.BufferGeometry().setFromPoints(pts), new T.LineBasicMaterial({ color: 0xa896e0, transparent: true, opacity: 0.22, depthWrite: false }));
+      ring.renderOrder = 1; ropeGroup.add(ring);
+    });
+  })();
+
+  /* ---------- Sotto-tubi ---------- */
+  var clipUp = [new T.Plane(new T.Vector3(0, 0, 1), 0)];
+  var clipDn = [new T.Plane(new T.Vector3(0, 0, -1), 0)];
+  var idxArr = new Uint16Array((NS - 1) * RAD * 6);
+  (function () {
+    var q = 0;
+    for (var i = 0; i < NS - 1; i++) for (var j = 0; j < RAD; j++) {
+      var a0 = i * RAD + j, a1 = i * RAD + (j + 1) % RAD, b0 = (i + 1) * RAD + j, b1 = (i + 1) * RAD + (j + 1) % RAD;
+      idxArr[q++] = a0; idxArr[q++] = b0; idxArr[q++] = a1; idxArr[q++] = a1; idxArr[q++] = b0; idxArr[q++] = b1;
+    }
+  })();
+  var idxAttr = new T.BufferAttribute(idxArr, 1);
+
+  PAIRS.forEach(function (p) {
+    var lightCol = p.color.clone().lerp(WHITE, 0.45), pulseCol = p.color.clone().lerp(WHITE, 0.7);
+    p.tubeUp = new T.Mesh(new T.BufferGeometry(), new T.MeshPhongMaterial({ color: p.color, transparent: true, opacity: 0.6, depthWrite: false, clippingPlanes: clipUp, shininess: 40 }));
+    p.tubeDn = new T.Mesh(new T.BufferGeometry(), new T.MeshPhongMaterial({ color: p.color, transparent: true, opacity: 0.38, depthWrite: false, clippingPlanes: clipDn, shininess: 40 }));
+    p.lineUp = new T.LineSegments(new T.BufferGeometry(), new T.LineBasicMaterial({ color: lightCol, transparent: true, opacity: 0.9, depthWrite: false, clippingPlanes: clipUp }));
+    p.lineDn = new T.LineSegments(new T.BufferGeometry(), new T.LineBasicMaterial({ color: lightCol, transparent: true, opacity: 0.45, depthWrite: false, clippingPlanes: clipDn }));
+    p.tubeUp.renderOrder = 8; p.lineUp.renderOrder = 9; p.tubeDn.renderOrder = 1; p.lineDn.renderOrder = 1;
+    p.pulseGeo = new T.BufferGeometry();
+    p.pulsePos = new T.BufferAttribute(new Float32Array(PULSE_M * 3), 3);
+    p.pulseGeo.setAttribute('position', p.pulsePos);
+    p.pulseUp = new T.Points(p.pulseGeo, new T.PointsMaterial({ color: pulseCol, size: 0.7, map: softTex, transparent: true, depthWrite: false, sizeAttenuation: true, clippingPlanes: clipUp }));
+    p.pulseDn = new T.Points(p.pulseGeo, new T.PointsMaterial({ color: pulseCol, size: 0.7, map: softTex, transparent: true, opacity: 0.6, depthWrite: false, sizeAttenuation: true, clippingPlanes: clipDn }));
+    p.pulseUp.renderOrder = 9; p.pulseDn.renderOrder = 1;
+    [p.tubeUp, p.tubeDn, p.lineUp, p.lineDn, p.pulseUp, p.pulseDn].forEach(function (o) { o.frustumCulled = false; scene.add(o); });
+  });
+
+  /* Percorso del sotto-tubo: rigonfiamento verticale + rotazione del lobo attorno alla verticale. */
+  function buildPath(p, t) {
+    var pr = clamp((t - p.t0) / p.dur, 0, 1), e = ss(pr), A = p.Af * e;
+    var phi = p.afR * ss(clamp((pr - 0.05) / 0.95, 0, 1));
+    var cosm = Math.cos(phi) - 1, sinp = Math.sin(phi);
+    var crossAmp = 1.2 * ss((phi - 1.6) / 1.0);
+    var und = 0.7 * ss(t / 3);
+    var xc = p.c[0] - p.tr * (1 - e), yc = p.c[1], pts = new Float32Array(NS * 3), i;
+    for (i = 0; i < NS; i++) {
+      var x = XMIN + (XMAX - XMIN) * i / (NS - 1), u = x - xc, au = Math.abs(u);
+      var b = Math.exp(-Math.pow(au / p.w, 3)), W = Math.min(1, b / p.bf);
+      var far = ss((au - p.s1 - 2.5) / 3);
+      var bump = ss((au - p.s1) / 1.0) * (1 - ss((au - p.s1 - 3) / 3));
+      var sg = u > 0 ? 1 : (u < 0 ? -1 : 0);
+      pts[3 * i]     = xc + u + W * u * cosm;
+      pts[3 * i + 1] = yc + W * u * sinp + sg * crossAmp * bump + far * 0.6 * Math.sin(0.55 * x + p.ph);
+      pts[3 * i + 2] = p.zi + A * b + far * (0.45 * Math.sin(0.4 * x + 1.7 * p.ph) + und * 0.8 * Math.sin(2 * Math.PI * x / 16));
+    }
+    var feet = [null, null];
+    for (i = 0; i < NS - 1; i++) {
+      var z0 = pts[3 * i + 2], z1 = pts[3 * i + 5];
+      if (z0 < 0 && z1 >= 0 && !feet[0]) { var f = -z0 / (z1 - z0); feet[0] = { x: pts[3 * i] + (pts[3 * i + 3] - pts[3 * i]) * f, y: pts[3 * i + 1] + (pts[3 * i + 4] - pts[3 * i + 1]) * f }; }
+      else if (z0 >= 0 && z1 < 0 && !feet[1]) { var g2 = z0 / (z0 - z1); feet[1] = { x: pts[3 * i] + (pts[3 * i + 3] - pts[3 * i]) * g2, y: pts[3 * i + 1] + (pts[3 * i + 4] - pts[3 * i + 1]) * g2 }; }
+    }
+    var H = p.zi + A;
+    return { p: pr, e: e, A: A, H: H, F: ss(clamp(H / p.Hmax, 0, 1)), phi: phi, phiDeg: phi / RAD2, pts: pts, feet: feet };
+  }
+
+  /* Riferimenti locali (trasporto parallelo) e lunghezza d'arco. */
+  function frames(pts) {
+    var n = NS, Tt = new Float32Array(n * 3), Nn = new Float32Array(n * 3), Bb = new Float32Array(n * 3), cum = new Float32Array(n), i;
+    for (i = 0; i < n; i++) {
+      var i0 = Math.max(0, i - 1), i1 = Math.min(n - 1, i + 1);
+      var dx = pts[3 * i1] - pts[3 * i0], dy = pts[3 * i1 + 1] - pts[3 * i0 + 1], dz = pts[3 * i1 + 2] - pts[3 * i0 + 2], l = Math.sqrt(dx * dx + dy * dy + dz * dz) || 1;
+      Tt[3 * i] = dx / l; Tt[3 * i + 1] = dy / l; Tt[3 * i + 2] = dz / l;
+      if (i > 0) {
+        var ex = pts[3 * i] - pts[3 * i - 3], ey = pts[3 * i + 1] - pts[3 * i - 2], ez = pts[3 * i + 2] - pts[3 * i - 1];
+        cum[i] = cum[i - 1] + Math.sqrt(ex * ex + ey * ey + ez * ez);
+      }
+    }
+    var nx = Tt[1] * 1 - Tt[2] * 0, ny = Tt[2] * 0 - Tt[0] * 1, nz = 0, nl = Math.sqrt(nx * nx + ny * ny + nz * nz) || 1;
+    nx /= nl; ny /= nl; nz /= nl;
+    for (i = 0; i < n; i++) {
+      var tx = Tt[3 * i], ty = Tt[3 * i + 1], tz = Tt[3 * i + 2], d = nx * tx + ny * ty + nz * tz;
+      nx -= d * tx; ny -= d * ty; nz -= d * tz; nl = Math.sqrt(nx * nx + ny * ny + nz * nz) || 1; nx /= nl; ny /= nl; nz /= nl;
+      Nn[3 * i] = nx; Nn[3 * i + 1] = ny; Nn[3 * i + 2] = nz;
+      Bb[3 * i] = ty * nz - tz * ny; Bb[3 * i + 1] = tz * nx - tx * nz; Bb[3 * i + 2] = tx * ny - ty * nx;
+    }
+    return { N: Nn, B: Bb, cum: cum, total: cum[n - 1] };
+  }
+
+  function buildGeometry(p, st) {
+    var pts = st.pts, fr = frames(pts), n = NS, i, j;
+    var rl = p.rf * 0.7 * (0.55 + 0.45 * Math.sqrt(st.F));
+    var pos = new Float32Array(n * RAD * 3), rr = new Float32Array(n);
+    for (i = 0; i < n; i++) {
+      var z = pts[3 * i + 2], r = rl * (1 + 1.2 * ss(z / p.Hmax)); rr[i] = r;
+      for (j = 0; j < RAD; j++) {
+        var ph = 2 * Math.PI * j / RAD, c = Math.cos(ph) * r, s = Math.sin(ph) * r, o = (i * RAD + j) * 3;
+        pos[o] = pts[3 * i] + c * fr.N[3 * i] + s * fr.B[3 * i];
+        pos[o + 1] = pts[3 * i + 1] + c * fr.N[3 * i + 1] + s * fr.B[3 * i + 1];
+        pos[o + 2] = pts[3 * i + 2] + c * fr.N[3 * i + 2] + s * fr.B[3 * i + 2];
+      }
+    }
+    var tg = new T.BufferGeometry();
+    tg.setAttribute('position', new T.BufferAttribute(pos, 3)); tg.setIndex(idxAttr); tg.computeVertexNormals();
+    var lp = new Float32Array(LN * (n - 1) * 6), q = 0;
+    for (j = 0; j < LN; j++) {
+      var rho = j === 0 ? 0 : 0.6, phi0 = (j - 1) * Math.PI / 2, prev = null;
+      for (i = 0; i < n; i++) {
+        var a = phi0 + fr.cum[i] * 0.45, c2 = Math.cos(a) * rho * rr[i], s2 = Math.sin(a) * rho * rr[i];
+        var cur = [pts[3 * i] + c2 * fr.N[3 * i] + s2 * fr.B[3 * i], pts[3 * i + 1] + c2 * fr.N[3 * i + 1] + s2 * fr.B[3 * i + 1], pts[3 * i + 2] + c2 * fr.N[3 * i + 2] + s2 * fr.B[3 * i + 2]];
+        if (prev) { lp[q++] = prev[0]; lp[q++] = prev[1]; lp[q++] = prev[2]; lp[q++] = cur[0]; lp[q++] = cur[1]; lp[q++] = cur[2]; }
+        prev = cur;
+      }
+    }
+    var lg = new T.BufferGeometry(); lg.setAttribute('position', new T.BufferAttribute(lp, 3));
+    return { tube: tg, lines: lg, cum: fr.cum, total: fr.total };
+  }
+  function setGeo2(a, b, geo) { var old = a.geometry; a.geometry = geo; b.geometry = geo; old.dispose(); }
+
+  /* ---------- Macchie in superficie ---------- */
+  var spotGroup = new T.Group(); scene.add(spotGroup);
+  PAIRS.forEach(function (p) {
+    p.spots = [];
+    [0, 1].forEach(function (f) {
+      var pol = f === 0 ? 1 : -1, colr = pol > 0 ? POS : NEG, geo = new T.PlaneGeometry(1, 1);
+      var pen = new T.Mesh(geo, new T.MeshBasicMaterial({ map: penTex, transparent: true, depthWrite: false }));
+      var umb = new T.Mesh(geo, new T.MeshBasicMaterial({ map: softTex, color: 0x0a0402, transparent: true, depthWrite: false }));
+      var patch = new T.Mesh(geo, new T.MeshBasicMaterial({ map: softTex, color: colr, transparent: true, opacity: 0.9, depthWrite: false }));
+      pen.position.z = 0.03; umb.position.z = 0.05; patch.position.z = 0.04;
+      pen.renderOrder = 4; umb.renderOrder = 5; patch.renderOrder = 6;
+      spotGroup.add(pen, umb, patch);
+      p.spots.push({ pol: pol, pen: pen, umb: umb, patch: patch, on: false, x: 0, y: 0, rp: 0, F: 0 });
+    });
+  });
+
+  /* ---------- Schema 2D dei piedi (posizioni finali) ---------- */
+  var schemaGroup = new T.Group(); scene.add(schemaGroup);
+  var schemaMats = [];
+  function sMat(M, opts) { var m = new M(opts); m.transparent = true; m.depthTest = false; schemaMats.push(m); return m; }
+  PAIRS.forEach(function (p) {
+    var pts = [], k, ang = p.afR;
+    for (k = 0; k < 96; k++) {
+      var th = k / 96 * Math.PI * 2, x = p.rx * Math.cos(th), y = p.ry * Math.sin(th);
+      pts.push(new T.Vector3(p.c[0] + x * Math.cos(ang) - y * Math.sin(ang), p.c[1] + x * Math.sin(ang) + y * Math.cos(ang), 0.1));
+    }
+    var ell = new T.LineLoop(new T.BufferGeometry().setFromPoints(pts), sMat(T.LineDashedMaterial, { color: 0xfff2d8, dashSize: 0.35, gapSize: 0.25 }));
+    ell.computeLineDistances(); ell.renderOrder = 10; schemaGroup.add(ell);
+    var ax = new T.Line(new T.BufferGeometry().setFromPoints([new T.Vector3(p.tf[0][0], p.tf[0][1], 0.1), new T.Vector3(p.tf[1][0], p.tf[1][1], 0.1)]), sMat(T.LineDashedMaterial, { color: 0xfff2d8, dashSize: 0.18, gapSize: 0.18 }));
+    ax.computeLineDistances(); ax.renderOrder = 10; schemaGroup.add(ax);
+    p.schema = [ell, ax];
+    [0, 1].forEach(function (f) {
+      var dot = new T.Mesh(new T.CircleGeometry(0.26, 24), sMat(T.MeshBasicMaterial, { color: p.color }));
+      var ring = new T.Mesh(new T.RingGeometry(0.3, 0.42, 32), sMat(T.MeshBasicMaterial, { color: f === 0 ? POS : NEG, side: T.DoubleSide }));
+      dot.position.set(p.tf[f][0], p.tf[f][1], 0.1); ring.position.copy(dot.position); dot.renderOrder = 11; ring.renderOrder = 11;
+      schemaGroup.add(dot, ring); p.schema.push(dot, ring);
+    });
+  });
+
+  /* freccia della traslazione di p4 verso est */
+  PAIRS.forEach(function (p) {
+    if (!p.tr) return;
+    var x0 = p.c[0] - p.tr, x1 = p.c[0] - 0.55, y = p.c[1] - p.ry - 0.6;
+    var ln = new T.Line(new T.BufferGeometry().setFromPoints([new T.Vector3(x0, y, 0.1), new T.Vector3(x1, y, 0.1)]), sMat(T.LineDashedMaterial, { color: p.color, dashSize: 0.3, gapSize: 0.2 }));
+    ln.computeLineDistances(); ln.renderOrder = 11; schemaGroup.add(ln);
+    var hg = new T.BufferGeometry().setFromPoints([new T.Vector3(x1 + 0.55, y, 0.1), new T.Vector3(x1, y + 0.3, 0.1), new T.Vector3(x1, y - 0.3, 0.1)]);
+    var head = new T.Mesh(hg, sMat(T.MeshBasicMaterial, { color: p.color, side: T.DoubleSide })); head.renderOrder = 11; schemaGroup.add(head);
+    p.schema.push(ln, head);
+    p.trLabelPos = [(x0 + x1) / 2, y - 0.5, 0.1];
+  });
+
+  /* ---------- Siti di possibile riconnessione ---------- */
+  var REC_D = 11 / UNIT_MM, REC_N = 10, recSites = [], recMarks = [];
+  for (var ri = 0; ri < REC_N; ri++) {
+    var rm = new T.Mesh(new T.PlaneGeometry(1, 1), new T.MeshBasicMaterial({ map: softTex, color: 0xfff36b, transparent: true, depthTest: false, depthWrite: false }));
+    rm.renderOrder = 13; rm.visible = false; scene.add(rm); recMarks.push(rm);
+  }
+  /* gambe di un tubo sopra la fotosfera: [gamba del piede +, gamba del piede −] */
+  function legs(pts) {
+    var above = [], i, top = -1, zt = -1e9;
+    for (i = 0; i < NS; i++) if (pts[3 * i + 2] > 0.05) { above.push(i); if (pts[3 * i + 2] > zt) { zt = pts[3 * i + 2]; top = i; } }
+    var L = [[], []];
+    above.forEach(function (i) { if (i % 2) return; L[i <= top ? 0 : 1].push([pts[3 * i], pts[3 * i + 1], pts[3 * i + 2]]); });
+    return L;
+  }
+  function findRecSites(S) {
+    var out = [], i, j;
+    var Ls = S.map(function (st) { return on(st.pr) && st.F > 0.05 ? legs(st.pts) : null; });
+    for (i = 0; i < S.length; i++) for (j = 0; j < S.length; j++) {
+      if (i === j || !Ls[i] || !Ls[j]) continue;
+      var A = Ls[i][0], B = Ls[j][1], best = 1e9, bp = null;   // gamba + di i contro gamba − di j
+      for (var a = 0; a < A.length; a++) for (var b = 0; b < B.length; b++) {
+        var dx = A[a][0] - B[b][0], dy = A[a][1] - B[b][1], dz = A[a][2] - B[b][2], d = Math.sqrt(dx * dx + dy * dy + dz * dz);
+        if (d < best) { best = d; bp = [(A[a][0] + B[b][0]) / 2, (A[a][1] + B[b][1]) / 2, (A[a][2] + B[b][2]) / 2]; }
+      }
+      if (best < REC_D) out.push(bp);
+    }
+    return out.slice(0, REC_N);
+  }
+
+  /* ---------- Etichette HTML proiettate ---------- */
+  var labelsEl = document.getElementById('labels'), labels = [];
+  function addLabel(text, cls, world, ax, ay, kind, pair) {
+    var el = document.createElement('div'); el.className = 'tag ' + cls; el.textContent = text; labelsEl.appendChild(el);
+    var L = { el: el, w: new T.Vector3(world[0], world[1], world[2]), ax: ax, ay: ay, kind: kind, pair: pair, on: false };
+    labels.push(L); return L;
+  }
+  PAIRS.forEach(function (p) {
+    addLabel(p.id, 'name', [p.c[0] + (p.id === 'G' ? -0.4 : 0), p.c[1] + (p.id === 'G' ? 0.4 : 0), 0.1], -50, -50, 'name', p);
+    p.sLabels = [];
+    [0, 1].forEach(function (f) {
+      addLabel(f === 0 ? '+' : '−', f === 0 ? 'pos' : 'neg', [p.tf[f][0], p.tf[f][1] - 0.75, 0.1], -50, -50, 'sign', p);
+      p.sLabels.push(addLabel(f === 0 ? '+' : '−', 'fsign', [0, 0, 0.1], -50, -55, 'fsign', p));
+    });
+  });
+  PAIRS.forEach(function (p) { if (p.trLabelPos) addLabel('≈ ' + Math.round(p.tr * UNIT_MM) + ' Mm verso est', 'env', p.trLabelPos, -50, -50, 'trl', p); });
+  addLabel('fotosfera', 'env', [-12.5, -4.5, 0], 0, -120, 'env', null);
+  addLabel('tronco', 'env', [-12.8, -4.5, -8.4], 0, -50, 'env', null);
+  addLabel('zona convettiva', 'env', [-12.5, -4.5, -13], 0, -50, 'env', null);
+
+  /* ---------- Camera ---------- */
+  var VIEWS = {
+    top:  { th: -Math.PI / 2, ph: 0.03, ty: 0.8, tz: 0,    zoom: 1 },
+    obl:  { th: -1.18,        ph: 1.0,  ty: 0.4, tz: -2,   zoom: 1.12 },
+    side: { th: -Math.PI / 2, ph: 1.47, ty: 0.4, tz: -2.5, zoom: 1.25 }
+  };
+  var cam = { th: VIEWS.top.th, ph: VIEWS.top.ph, ty: VIEWS.top.ty, tz: 0, zoom: 1 }, goal = null, rBase = 28, W = 1, Hh = 1;
+  var auto = true, lastStage = '';
+  var VBTN = { top: 'vTop', obl: 'vObl', side: 'vSide' };
+  function setView(name, fromUser) {
+    if (fromUser) { auto = false; document.getElementById('chkAuto').checked = false; }
+    goal = Object.assign({}, VIEWS[name]);
+    Object.keys(VBTN).forEach(function (k) { document.getElementById(VBTN[k]).setAttribute('aria-pressed', String(k === name)); });
+  }
+  function clearViewPress() { Object.keys(VBTN).forEach(function (k) { document.getElementById(VBTN[k]).setAttribute('aria-pressed', 'false'); }); }
+  function resize() {
+    W = viewEl.clientWidth; Hh = viewEl.clientHeight;
+    renderer.setSize(W, Hh, false);
+    renderer.domElement.style.width = W + 'px'; renderer.domElement.style.height = Hh + 'px';
+    camera.aspect = W / Hh; camera.updateProjectionMatrix();
+    rBase = Math.max(28 / (2 * Math.tan(camera.fov * Math.PI / 360) * camera.aspect), 20);
+  }
+  if (window.ResizeObserver) new ResizeObserver(resize).observe(viewEl); else window.addEventListener('resize', resize);
+  resize();
+
+  var drag = null, dom = renderer.domElement;
+  dom.addEventListener('pointerdown', function (e) {
+    drag = { x: e.clientX, y: e.clientY }; goal = null; auto = false; document.getElementById('chkAuto').checked = false; clearViewPress();
+    try { dom.setPointerCapture(e.pointerId); } catch (_) {}
+  });
+  dom.addEventListener('pointermove', function (e) {
+    if (!drag) return;
+    cam.th -= (e.clientX - drag.x) * 0.006;
+    cam.ph = clamp(cam.ph - (e.clientY - drag.y) * 0.006, 0.03, 1.5);
+    drag.x = e.clientX; drag.y = e.clientY;
+  });
+  var endDrag = function () { drag = null; };
+  dom.addEventListener('pointerup', endDrag); dom.addEventListener('pointercancel', endDrag);
+  dom.addEventListener('wheel', function (e) { e.preventDefault(); goal = null; cam.zoom = clamp(cam.zoom * Math.exp(e.deltaY * 0.001), 0.35, 1.8); }, { passive: false });
+
+  var tgt = new T.Vector3();
+  function updateCamera() {
+    var r = rBase * cam.zoom;
+    tgt.set(0, cam.ty, cam.tz);
+    camera.position.set(tgt.x + r * Math.sin(cam.ph) * Math.cos(cam.th), tgt.y + r * Math.sin(cam.ph) * Math.sin(cam.th), tgt.z + r * Math.cos(cam.ph));
+    camera.lookAt(tgt);
+  }
+
+  /* ---------- Interfaccia ---------- */
+  var t = 0, playing = false, speed = 1, mode = 'white', dirty = true, schemaAmt = 1, clock = 0;
+  var showSchema = true, showFld = true, showSub = true, showDir = true, showSgn = true, showRec = false;
+  var solo = null;                                   /* null = sequenza completa, altrimenti il tubo scelto */
+  function on(p) { return p.enabled && (solo === null || solo === p); }
+  function tStart() { return solo ? Math.max(0, solo.t0) : 0; }
+  function tStop() { return solo ? Math.min(T_END, solo.t0 + solo.dur) : T_END; }
+  var $ = function (id) { return document.getElementById(id); };
+  var btnPlay = $('btnPlay'), slider = $('tSlider'), tOut = $('tOut'), hud = $('hud'), statusEl = $('status'), clsEl = $('cls'), clsNote = $('clsNote');
+  var fmt = function (x, d) { return x.toFixed(d).replace('.', ',').replace('-', '−'); };
+  var SUP = { '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹' };
+  function fmtFlux(v) {
+    if (v < 1e18) return '0 Mx';
+    var e = Math.floor(Math.log10(v)), m = v / Math.pow(10, e);
+    return fmt(m, 1) + '·10' + String(e).split('').map(function (c) { return SUP[c]; }).join('') + ' Mx';
+  }
+
+  var pairsEl = $('pairs');
+  PAIRS.forEach(function (p) {
+    var li = document.createElement('li'); li.className = 'pair';
+    li.innerHTML = '<label for="chk-' + p.id + '"><input type="checkbox" id="chk-' + p.id + '" checked' + (p.id === 'G' ? ' disabled' : '') + '><span class="sw" style="background:' + p.col + '"></span><b>' + p.id + '</b><span class="note">' + p.note + '</span></label><span class="chip">profondo</span><span class="num">—</span>';
+    pairsEl.appendChild(li);
+    p.chip = li.querySelector('.chip'); p.num = li.querySelector('.num');
+    li.querySelector('input').addEventListener('change', function (e) { p.enabled = e.target.checked; dirty = true; });
+  });
+
+  function updateButtons() {
+    btnPlay.textContent = playing ? 'Pausa' : (t >= tStop() - 0.001 ? 'Ripeti' : (t <= tStart() + 0.001 ? 'Avvia emersione' : 'Riprendi'));
+  }
+  btnPlay.addEventListener('click', function () {
+    if (playing) { playing = false; }
+    else { if (t >= tStop() - 0.001 || t < tStart()) t = tStart(); playing = true; }
+    dirty = true; updateButtons();
+  });
+  function setSolo(id) {
+    solo = id === 'all' ? null : PAIRS.filter(function (p) { return p.id === id; })[0];
+    if (solo && !solo.enabled) { solo.enabled = true; document.getElementById('chk-' + solo.id).checked = true; }
+    document.querySelectorAll('[data-solo]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.solo === id)); });
+  }
+  document.querySelectorAll('[data-solo]').forEach(function (b) {
+    b.addEventListener('click', function () { setSolo(b.dataset.solo); t = tStart(); slider.value = Math.round(t * 100); playing = true; lastStage = ''; dirty = true; updateButtons(); });
+  });
+  $('btnSchema').addEventListener('click', function () { setSolo('all'); playing = false; t = 0; slider.value = 0; setView('top', false); lastStage = 'top'; dirty = true; updateButtons(); });
+  slider.addEventListener('input', function () { t = slider.value / 100; playing = false; dirty = true; updateButtons(); });
+  $('speed').addEventListener('change', function (e) { speed = parseFloat(e.target.value); });
+  $('vTop').addEventListener('click', function () { setView('top', true); });
+  $('vObl').addEventListener('click', function () { setView('obl', true); });
+  $('vSide').addEventListener('click', function () { setView('side', true); });
+  document.querySelectorAll('input[name=mode]').forEach(function (r) {
+    r.addEventListener('change', function () { mode = r.value; planeMat.map = mode === 'mag' ? granGray : granWhite; planeMat.needsUpdate = true; dirty = true; });
+  });
+  $('chkAuto').addEventListener('change', function (e) { auto = e.target.checked; lastStage = ''; });
+  $('chkDir').addEventListener('change', function (e) { showDir = e.target.checked; });
+  $('chkSgn').addEventListener('change', function (e) { showSgn = e.target.checked; });
+  $('chkRec').addEventListener('change', function (e) { showRec = e.target.checked; dirty = true; });
+  $('chkSch').addEventListener('change', function (e) { showSchema = e.target.checked; });
+  $('chkFld').addEventListener('change', function (e) { showFld = e.target.checked; dirty = true; });
+  $('chkSub').addEventListener('change', function (e) { showSub = e.target.checked; dirty = true; });
+
+  var curS = null;
+  function directorTick() {
+    var st = 'top';
+    if (!(t <= 0.001 && !playing) && curS) {
+      var act = null;
+      curS.forEach(function (x) { if (on(x.pr) && t >= x.pr.t0 && x.p < 1) act = act || x; });
+      if (act) st = act.H <= 0 ? 'side' : (act.F < 0.97 ? 'obl' : 'top');
+    }
+    if (st !== lastStage) { lastStage = st; if (auto) setView(st, false); }
+  }
+
+  /* Classe magnetica indicativa (Mount Wilson): β, βγ, βγδ. */
+  function classify(S) {
+    var G = S[0];
+    if (!S.some(function (x) { return on(x.pr) && x.F > 0.15; })) return { c: '—', n: 'Nessuna macchia ancora in fotosfera.' };
+    if (!on(G.pr)) return { c: '—', n: 'Classe non indicata: si sta osservando un solo tubo.' };
+    var smallVis = S.some(function (x, i) { return i > 0 && on(x.pr) && x.F > 0.15; });
+    var spots = [];
+    S.forEach(function (x, i) { x.pr.spots.forEach(function (sp) { if (on(x.pr) && sp.on && sp.F > 0.3) spots.push({ k: i, s: sp }); }); });
+    var delta = false, a, b;
+    for (a = 0; a < spots.length; a++) for (b = a + 1; b < spots.length; b++) {
+      var A = spots[a], B = spots[b];
+      if (A.k !== B.k && A.s.pol !== B.s.pol) {
+        var d = Math.hypot(A.s.x - B.s.x, A.s.y - B.s.y);
+        if (d < 0.8 * (A.s.rp + B.s.rp)) delta = true;
+      }
+    }
+    if (delta) return { c: 'βγδ', n: 'Umbre di polarità opposta dentro la stessa penombra: configurazione δ, la più eruttiva.' };
+    if (smallVis) return { c: 'βγ', n: 'Distribuzione irregolare delle polarità, senza una linea neutra semplice che le separi.' };
+    return { c: 'β', n: 'Bipolare semplice: una linea neutra separa le due polarità.' };
+  }
+
+  function statusText(S) {
+    var G = S[0];
+    if (t <= 0.001 && !playing) {
+      return 'Schema in fotosfera. I punti sono i piedi dove ogni tubo attraverserà la superficie, col colore del proprio tubo e un anello rosso (+) o blu (−). Una coppia grande (G) e quattro piccole: p1 normale, p2 e p4 invertite, p3 a 90°. Le ellissi tratteggiate racchiudono ogni coppia; la freccia indica la traslazione di p4 verso est. Premi «Avvia emersione», oppure uno dei pulsanti Emersione per un solo tubo.';
+    }
+    if (solo) {
+      var x = S[PAIRS.indexOf(solo)], id = solo.id, kind = solo.af < 30 ? 'normale, con la stessa orientazione di G' : solo.af > 120 ? 'invertita: i poli arrivano scambiati rispetto a G' : 'a 90°: i poli si dispongono in direzione nord–sud';
+      if (t < solo.t0) return 'Il tubo ' + id + ' è ancora nella parte alta del tronco.';
+      if (x.H <= 0) return 'Il tubo ' + id + ' si stacca dal tronco e risale verso la fotosfera; la cima è a ' + fmt(-x.H * UNIT_MM, 0) + ' Mm di profondità.' + (solo.tr ? ' Intanto trasla verso est.' : '');
+      if (x.F < 0.12) return 'L\'apice di ' + id + ' attraversa la fotosfera: compaiono due pori di polarità opposta, quasi a contatto.';
+      if (x.p < 1) return 'I piedi di ' + id + ' si allontanano e il flusso in superficie cresce; salendo il lobo si torce: ' + fmt(x.phiDeg, 0) + '° su ' + solo.af + '°.' + (x.F > 0.3 ? ' Con i pori più grandi compare la penombra.' : '');
+      return 'Emersione di ' + id + ' completata: è una coppia ' + kind + '.' + (solo.tr ? ' Durante la risalita si è spostata di circa ' + Math.round(solo.tr * UNIT_MM) + ' Mm verso est.' : '');
+    }
+    if (S.every(function (x) { return !on(x.pr) || x.p >= 1; })) {
+      return 'Gruppo maturo. I tubi hanno finito di ruotare e i piedi sono nelle posizioni dello schema. Le coppie invertite e quella a 90° portano polarità opposte accanto alle macchie di G.';
+    }
+    var s;
+    if (G.H <= 0) s = 'Fase sotterranea. Nella parte alta del tronco i cinque tubi sono quasi orizzontali. G porta più flusso, quindi è più leggero e più galleggiante: si stacca per primo dalla cima del tronco e si inarca come una bolla.';
+    else if (G.F < 0.12) s = 'L\'apice di G attraversa la fotosfera: compaiono due pori di polarità opposta, quasi a contatto.';
+    else s = 'I piedi di G si allontanano e il flusso in superficie cresce; con i pori più grandi compare la penombra.';
+    var sw = S.filter(function (x, i) { return i > 0 && on(x.pr) && x.p > 0 && x.H <= 0; }).map(function (x) { return x.pr.id; });
+    if (sw.length) s += ' Sotto la superficie risale ' + sw.join(', ') + '.';
+    var em = S.filter(function (x, i) { return i > 0 && on(x.pr) && x.H > 0 && x.p < 1; }).map(function (x) { return x.pr.id; });
+    if (em.length) s += ' In superficie stanno emergendo ' + em.join(', ') + '.';
+    var rot = S.filter(function (x, i) { return i > 0 && on(x.pr) && x.p > 0 && x.p < 1 && x.phiDeg > 5; }).map(function (x) { return x.pr.id + ' di ' + fmt(x.phiDeg, 0) + '°'; });
+    if (rot.length) s += ' Salendo si torcono: ' + rot.join(', ') + '.';
+    return s;
+  }
+
+  var lastClass = '';
+  function rebuild() {
+    var S = PAIRS.map(function (p) { var st = buildPath(p, t); st.pr = p; return st; });
+    curS = S;
+    S.forEach(function (st) {
+      var p = st.pr;
+      var pon = on(p);
+      [p.tubeUp, p.tubeDn, p.lineUp, p.lineDn, p.pulseUp, p.pulseDn].forEach(function (o) { o.visible = pon; });
+      if (pon) {
+        var g = buildGeometry(p, st);
+        setGeo2(p.tubeUp, p.tubeDn, g.tube); setGeo2(p.lineUp, p.lineDn, g.lines);
+        p.path = { pts: st.pts, cum: g.cum, total: g.total };
+      }
+      p.tubeDn.visible = showSub && pon; p.lineDn.visible = showSub && showFld && pon; p.pulseDn.visible = showSub && showDir && pon;
+      p.lineUp.visible = showFld && pon; p.pulseUp.visible = showDir && pon;
+
+      var F = st.F, ru = 0.45 * p.rf * Math.sqrt(F), rfull = p.rf * Math.sqrt(F), pf = ss((F - 0.3) / 0.4), rp = ru + (rfull - ru) * pf;
+      p.spots.forEach(function (sp, f) {
+        var ft = st.feet[f], vis = pon && F > 0.002 && !!ft, white = mode === 'white';
+        sp.on = vis; sp.F = F; sp.rp = rp;
+        if (ft) { sp.x = ft.x; sp.y = ft.y; [sp.pen, sp.umb, sp.patch].forEach(function (m) { m.position.x = ft.x; m.position.y = ft.y; }); p.sLabels[f].w.set(ft.x, ft.y, 0.1); }
+        p.sLabels[f].on = vis;
+        sp.umb.visible = vis && white; sp.pen.visible = vis && white && pf > 0.01; sp.patch.visible = vis && !white;
+        var du = Math.max(2 * ru, 0.001), dp = Math.max(2 * rp, 0.001), dpa = Math.max(2.3 * rfull, 0.001);
+        sp.umb.scale.set(du, du, 1); sp.pen.scale.set(dp, dp, 1); sp.pen.material.opacity = pf; sp.patch.scale.set(dpa, dpa, 1);
+      });
+
+      var status = !p.enabled ? 'escluso' : !pon ? 'nascosto' : st.p === 0 ? 'profondo' : st.H <= 0 ? 'in risalita' : F < 0.97 ? 'emerge' : 'matura';
+      p.chip.textContent = status; p.chip.className = 'chip' + (status === 'in risalita' ? ' rise' : status === 'emerge' ? ' emerge' : status === 'matura' ? ' done' : '');
+      var sep = st.feet[0] && st.feet[1] ? Math.hypot(st.feet[0].x - st.feet[1].x, st.feet[0].y - st.feet[1].y) * UNIT_MM : 0;
+      p.num.textContent = pon ? ('apice ' + fmt(st.H * UNIT_MM, 0) + ' Mm · rot. ' + fmt(st.phiDeg, 0) + '° / ' + p.af + '° · d ' + fmt(sep, 0) + ' Mm · Φ ' + fmtFlux(p.flux * F)) : '—';
+    });
+    var txt = statusText(S);
+    if (statusEl.textContent !== txt) statusEl.textContent = txt;
+    recSites = showRec ? findRecSites(S) : [];
+    var cl = classify(S);
+    if (clsEl.textContent !== cl.c) clsEl.textContent = cl.c;
+    if (clsNote.textContent !== cl.n) clsNote.textContent = cl.n;
+    tOut.textContent = fmt(t, 1) + ' / ' + fmt(T_END, 1) + ' giorni';
+    hud.textContent = (t <= 0.001 ? 'schema dei piedi' : 'giorno ' + fmt(t, 1)) + (cl.c !== '—' ? '  ·  ' + cl.c : '');
+    box.visible = boxEdges.visible = ropeGroup.visible = showSub;
+    planeMat.opacity = showSub ? 0.84 : 1;
+  }
+
+  function updatePulses() {
+    PAIRS.forEach(function (p) {
+      if (!p.enabled || !p.path) return;
+      var L = p.path.total, arr = p.pulsePos.array, cum = p.path.cum, pts = p.path.pts, m;
+      if (L < 1e-3) return;
+      for (m = 0; m < PULSE_M; m++) {
+        var s = ((m / PULSE_M) * L + clock * PULSE_V) % L, lo = 0, hi = NS - 1;
+        while (hi - lo > 1) { var mid = (lo + hi) >> 1; if (cum[mid] <= s) lo = mid; else hi = mid; }
+        var f = (s - cum[lo]) / Math.max(1e-6, cum[hi] - cum[lo]);
+        arr[3 * m] = pts[3 * lo] + (pts[3 * hi] - pts[3 * lo]) * f;
+        arr[3 * m + 1] = pts[3 * lo + 1] + (pts[3 * hi + 1] - pts[3 * lo + 1]) * f;
+        arr[3 * m + 2] = pts[3 * lo + 2] + (pts[3 * hi + 2] - pts[3 * lo + 2]) * f;
+      }
+      p.pulsePos.needsUpdate = true;
+    });
+  }
+
+  var pv = new T.Vector3();
+  function updateLabels() {
+    labels.forEach(function (L) {
+      var show = true, op = 1;
+      if (L.kind === 'name') { show = showSchema && on(L.pair); op = schemaAmt; }
+      else if (L.kind === 'sign') { show = showSchema && on(L.pair); op = 0.45 + 0.55 * schemaAmt; }
+      else if (L.kind === 'fsign') { show = showSgn && on(L.pair) && L.on; }
+      else if (L.kind === 'env') { show = showSub && cam.ph > 0.5; }
+      else if (L.kind === 'trl') { show = showSchema && on(L.pair); op = schemaAmt; }
+      pv.copy(L.w).project(camera);
+      if (!show || pv.z > 1 || op < 0.02) { L.el.style.display = 'none'; return; }
+      L.el.style.display = '';
+      L.el.style.opacity = op;
+      L.el.style.transform = 'translate(' + ((pv.x * 0.5 + 0.5) * W).toFixed(1) + 'px,' + ((-pv.y * 0.5 + 0.5) * Hh).toFixed(1) + 'px) translate(' + L.ax + '%,' + L.ay + '%)';
+    });
+  }
+
+  var last = performance.now();
+  function frame(now) {
+    var dt = Math.min(0.05, (now - last) / 1000); last = now;
+    if (!reduceMotion) clock += dt;
+    if (playing) {
+      t += dt * 0.35 * speed;
+      if (t >= tStop()) { t = tStop(); playing = false; updateButtons(); }
+      slider.value = Math.round(t * 100); dirty = true;
+    }
+    directorTick();
+    var sTarget = (t < 0.005 && !playing) ? 1 : 0;
+    schemaAmt += (sTarget - schemaAmt) * (1 - Math.exp(-dt * (reduceMotion ? 30 : 4)));
+    if (goal) {
+      var k = 1 - Math.exp(-dt * (reduceMotion ? 30 : 2.8));
+      cam.th += (goal.th - cam.th) * k; cam.ph += (goal.ph - cam.ph) * k; cam.ty += (goal.ty - cam.ty) * k; cam.tz += (goal.tz - cam.tz) * k; cam.zoom += (goal.zoom - cam.zoom) * k;
+      if (Math.abs(goal.th - cam.th) + Math.abs(goal.ph - cam.ph) + Math.abs(goal.zoom - cam.zoom) < 0.002) goal = null;
+    }
+    if (dirty) { rebuild(); dirty = false; }
+    updatePulses();
+    var base = mode === 'mag' ? 0.62 : 1, dim = base * (1 - 0.5 * schemaAmt);
+    planeMat.color.setRGB(mode === 'mag' ? dim * 0.92 : dim, mode === 'mag' ? dim * 0.96 : dim, mode === 'mag' ? dim * 1.06 : dim);
+    schemaGroup.visible = showSchema;
+    var sop = 0.35 + 0.65 * schemaAmt;
+    schemaMats.forEach(function (m) { m.opacity = sop; });
+    PAIRS.forEach(function (p) { p.schema.forEach(function (o) { o.visible = on(p); }); });
+    recMarks.forEach(function (m, k) {
+      var site = recSites[k];
+      m.visible = !!site;
+      if (site) { var pu = 1.1 + 0.35 * Math.sin(clock * 5 + k); m.position.set(site[0], site[1], site[2]); m.scale.set(pu, pu, 1); m.quaternion.copy(camera.quaternion); m.material.opacity = 0.65 + 0.3 * Math.sin(clock * 5 + k); }
+    });
+    updateCamera();
+    renderer.render(scene, camera);
+    updateLabels();
+    requestAnimationFrame(frame);
+  }
+  updateButtons();
+  requestAnimationFrame(frame);
+})();
+</script>
+
+</body></html>

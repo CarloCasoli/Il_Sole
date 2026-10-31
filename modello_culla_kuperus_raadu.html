@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<!--
+  © 2026 Carlo Casoli — "Il Sole: Osservazione e Fisica"
+  Licenza CC BY-NC-ND 4.0: https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it
+  Vietati l'uso commerciale e la distribuzione di versioni modificate senza autorizzazione scritta dell'autore.
+-->
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Animazione 3D - Modello Kuperus-Raadu</title>
+    <style>
+        body {
+            margin: 0;
+            background-color: #050510;
+            color: white;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+        }
+        #info {
+            position: absolute;
+            top: 15px;
+            width: 100%;
+            text-align: center;
+            z-index: 100;
+            font-size: 16px;
+            pointer-events: none;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+        }
+        #info small { opacity: 0.8; }
+    </style>
+</head>
+<body>
+    <div id="info">Animazione 3D: Modello Kuperus-Raadu (arcata di 5 archi)<br>
+    <small>Rotazione dei piedi &rarr; torsione elicoidale lungo ogni arco &rarr; canale originario che svanisce &rarr; cilindro di plasma depositato sul fondo dell'elica</small></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+    <script>
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x050510);
+
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(13, 8, 16);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+        scene.add(ambientLight);
+        const dirLight = new THREE.DirectionalLight(0xffffff, 0.5);
+        dirLight.position.set(5, 10, 5);
+        scene.add(dirLight);
+
+        // ---------- Piano della fotosfera (arancione) ----------
+        const planeGeometry = new THREE.PlaneGeometry(26, 26, 1, 1);
+        const planeMaterial = new THREE.MeshBasicMaterial({
+            color: 0xff8800,
+            side: THREE.DoubleSide,
+            wireframe: true,
+            transparent: true,
+            opacity: 0.4
+        });
+        const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+        plane.rotation.x = Math.PI / 2;
+        scene.add(plane);
+
+        // ---------- Helper: sprite di testo ----------
+        function makeTextSprite(text, color = '#ffffff', size = 64) {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = 512;
+            canvas.height = 128;
+            ctx.font = `bold ${size}px Arial`;
+            ctx.fillStyle = color;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.shadowColor = 'rgba(0,0,0,0.9)';
+            ctx.shadowBlur = 8;
+            ctx.fillText(text, 256, 64);
+            const texture = new THREE.CanvasTexture(canvas);
+            const material = new THREE.SpriteMaterial({ map: texture, transparent: true });
+            const sprite = new THREE.Sprite(material);
+            sprite.scale.set(3.2, 0.8, 1);
+            return sprite;
+        }
+
+        // ---------- Linea di Inversione di Polarità (PIL) ----------
+        const pilGeometry = new THREE.BufferGeometry();
+        const pilPoints = [new THREE.Vector3(0, 0.02, -11), new THREE.Vector3(0, 0.02, 11)];
+        pilGeometry.setFromPoints(pilPoints);
+        const pilMaterial = new THREE.LineBasicMaterial({ color: 0xff3333, linewidth: 4 });
+        const pilLine = new THREE.Line(pilGeometry, pilMaterial);
+        scene.add(pilLine);
+
+        const pilLabel = makeTextSprite('Linea neutra (PIL)', '#ff5555', 46);
+        pilLabel.position.set(0, 0.4, 11.8);
+        scene.add(pilLabel);
+
+        // ---------- Poli / footpoints (ribbon lungo tutta l'arcata) ----------
+        const footX = 7.2;
+        const posMarker = new THREE.Mesh(new THREE.SphereGeometry(0.22, 16, 16), new THREE.MeshBasicMaterial({ color: 0xff4444 }));
+        posMarker.position.set(-footX, 0.1, 0);
+        scene.add(posMarker);
+        const negMarker = new THREE.Mesh(new THREE.SphereGeometry(0.22, 16, 16), new THREE.MeshBasicMaterial({ color: 0x4488ff }));
+        negMarker.position.set(footX, 0.1, 0);
+        scene.add(negMarker);
+
+        const posLabel = makeTextSprite('Polo Positivo (+)', '#ff6666', 46);
+        posLabel.position.set(-footX, -0.7, 0);
+        scene.add(posLabel);
+        const negLabel = makeTextSprite('Polo Negativo (-)', '#66aaff', 46);
+        negLabel.position.set(footX, -0.7, 0);
+        scene.add(negLabel);
+
+        // ---------- Frecce rotanti ai piedi (rotazione dei footpoints) ----------
+        function makeRotatingArrow(color, scale = 1) {
+            const group = new THREE.Group();
+            const curve = new THREE.EllipseCurve(0, 0, 0.9 * scale, 0.9 * scale, 0, Math.PI * 1.5, false, 0);
+            const pts = curve.getPoints(40).map(p => new THREE.Vector3(p.x, 0, p.y));
+            const arcCurve3D = new THREE.CatmullRomCurve3(pts);
+            const arcGeom = new THREE.TubeGeometry(arcCurve3D, 40, 0.05 * scale, 8, false);
+            const arcMat = new THREE.MeshStandardMaterial({ color: color, emissive: color, emissiveIntensity: 0.3 });
+            const arcMesh = new THREE.Mesh(arcGeom, arcMat);
+            group.add(arcMesh);
+
+            const tipPoint = pts[pts.length - 1];
+            const prevPoint = pts[pts.length - 6];
+            const dir = new THREE.Vector3().subVectors(tipPoint, prevPoint).normalize();
+            const coneGeom = new THREE.ConeGeometry(0.14 * scale, 0.36 * scale, 12);
+            const coneMesh = new THREE.Mesh(coneGeom, arcMat);
+            coneMesh.position.copy(tipPoint);
+            const quat = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir);
+            coneMesh.quaternion.copy(quat);
+            group.add(coneMesh);
+
+            return group;
+        }
+
+        // ---------- Geometria di un singolo arco ----------
+        const Lx = 14.4;
+        const halfL = Lx / 2;
+        const apex = 7;
+        const dipWidth = 8;
+
+        function archProfile(x) {
+            return Math.max(0.1, apex * (1 - Math.pow(x / halfL, 2)));
+        }
+
+        function buildGuideCurve(zOffset) {
+            const pts = [];
+            for (let i = 0; i <= 100; i++) {
+                const t = i / 100;
+                const x = (t - 0.5) * Lx;
+                pts.push(new THREE.Vector3(x, archProfile(x), zOffset));
+            }
+            return new THREE.CatmullRomCurve3(pts);
+        }
+
+        function strandPoint(x, zOffset, phaseOffset, amp, spinPhase, dipAmp) {
+            const theta = kTwist * x + spinPhase + phaseOffset;
+            const dip = dipAmp * Math.exp(-(x * x) / dipWidth);
+            const yBase = Math.max(0.08, archProfile(x) - dip);
+            const y = yBase + amp * Math.cos(theta);
+            const z = zOffset + amp * Math.sin(theta);
+            return new THREE.Vector3(x, Math.max(0.05, y), z);
+        }
+
+        const kTwist = (2 * Math.PI * 2.2) / Lx; // ~2.2 avvolgimenti lungo l'intera arcata
+        const numStrandsPerArc = 3;
+        const strandRadius0 = 0.045;
+
+        // ---------- Costruzione dei 5 archi affiancati ----------
+        const zPositions = [-6, -3, 0, 3, 6];
+        const arcs = [];
+
+        zPositions.forEach(z => {
+            const guideCurve = buildGuideCurve(z);
+
+            // linea guida grigia statica
+            const guideGeometry = new THREE.TubeGeometry(guideCurve, 100, 0.022, 6, false);
+            const guideMaterial = new THREE.MeshBasicMaterial({ color: 0x888888, transparent: true, opacity: 0.28 });
+            const guideTube = new THREE.Mesh(guideGeometry, guideMaterial);
+            scene.add(guideTube);
+
+            // canale azzurro originario (svanisce quando l'elica si forma)
+            const axisMaterial = new THREE.MeshStandardMaterial({
+                color: 0x66ccff, roughness: 0.3, metalness: 0.2, emissive: 0x113355,
+                transparent: true, opacity: 1.0
+            });
+            const axisTube = new THREE.Mesh(new THREE.TubeGeometry(guideCurve, 100, 0.08, 8, false), axisMaterial);
+            scene.add(axisTube);
+
+            // filamenti a elica
+            const strandMeshes = [];
+            for (let i = 0; i < numStrandsPerArc; i++) {
+                const geometry = new THREE.TubeGeometry(guideCurve, 120, strandRadius0, 6, false);
+                const material = new THREE.MeshStandardMaterial({
+                    color: 0xffcc55, roughness: 0.3, metalness: 0.3, emissive: 0x553300, emissiveIntensity: 0.4
+                });
+                const mesh = new THREE.Mesh(geometry, material);
+                scene.add(mesh);
+                strandMeshes.push({ mesh, phase: (i * 2 * Math.PI) / numStrandsPerArc });
+            }
+
+            // piccole frecce rotanti ai due piedi di questo arco
+            const isCentral = Math.abs(z) < 0.001;
+            const arrowScale = isCentral ? 1 : 0.6;
+            const pivotPos = new THREE.Group();
+            pivotPos.position.set(-footX, 1.0, z);
+            pivotPos.add(makeRotatingArrow(0xffaa33, arrowScale));
+            scene.add(pivotPos);
+
+            const pivotNeg = new THREE.Group();
+            pivotNeg.position.set(footX, 1.0, z);
+            pivotNeg.add(makeRotatingArrow(0xffaa33, arrowScale));
+            scene.add(pivotNeg);
+
+            arcs.push({ z, guideCurve, axisTube, axisMaterial, strandMeshes, pivotPos, pivotNeg });
+        });
+
+        // ---------- Cilindro di plasma arancione, depositato sul fondo dell'elica ----------
+        const plasmaCylRadius = 0.4;
+        const plasmaCylLength = (zPositions[zPositions.length - 1] - zPositions[0]) + 4; // copre tutta l'arcata
+        const plasmaCylGeometry = new THREE.CylinderGeometry(plasmaCylRadius, plasmaCylRadius, plasmaCylLength, 28);
+        const plasmaCylMaterial = new THREE.MeshStandardMaterial({
+            color: 0x993d00,
+            emissive: 0x662200,
+            emissiveIntensity: 0.5,
+            roughness: 0.3,
+            metalness: 0.15,
+            transparent: true,
+            opacity: 0.0
+        });
+        const plasmaCylinder = new THREE.Mesh(plasmaCylGeometry, plasmaCylMaterial);
+        plasmaCylinder.rotation.x = Math.PI / 2; // asse del cilindro lungo z
+        scene.add(plasmaCylinder);
+
+        const plasmaLabel = makeTextSprite('Plasma depositato', '#ffaa55', 42);
+        plasmaLabel.visible = false;
+        scene.add(plasmaLabel);
+
+        // ---------- Loop di animazione ----------
+        const maxStrandAmp = 0.3;   // raggio massimo dell'elica dei filamenti (ulteriormente ridotto)
+        const maxDipAmp = 1.5;      // profondità massima della culla centrale
+        const spinSpeed = 1.1;      // velocità di rotazione visibile della torsione
+
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+
+            const time = Date.now() * 0.001;
+            const cycle = (Math.sin(time * 0.6) + 1) / 2; // sviluppo e rilassamento della torsione
+            const strandAmp = cycle * maxStrandAmp;
+            const dipAmp = cycle * maxDipAmp;
+            const spinPhase = time * spinSpeed;
+            const axisFade = Math.max(0, 1 - cycle * 1.6);
+
+            arcs.forEach(arc => {
+                // 1. Canale azzurro originario: svanisce non appena l'elica inizia a formarsi
+                arc.axisMaterial.opacity = axisFade;
+                arc.axisTube.visible = axisFade > 0.01;
+                if (arc.axisTube.visible) {
+                    const pts = [];
+                    for (let i = 0; i <= 100; i++) {
+                        const t = i / 100;
+                        const x = (t - 0.5) * Lx;
+                        const dip = dipAmp * Math.exp(-(x * x) / dipWidth);
+                        const y = Math.max(0.08, archProfile(x) - dip);
+                        pts.push(new THREE.Vector3(x, y, arc.z));
+                    }
+                    const newAxisCurve = new THREE.CatmullRomCurve3(pts);
+                    arc.axisTube.geometry.dispose();
+                    arc.axisTube.geometry = new THREE.TubeGeometry(newAxisCurve, 100, 0.08, 8, false);
+                }
+
+                // 2. Filamenti a elica: torsione lungo tutto l'arco, in rotazione continua
+                arc.strandMeshes.forEach(s => {
+                    const pts = [];
+                    for (let i = 0; i <= 120; i++) {
+                        const t = i / 120;
+                        const x = (t - 0.5) * Lx;
+                        pts.push(strandPoint(x, arc.z, s.phase, strandAmp, spinPhase, dipAmp));
+                    }
+                    const curve = new THREE.CatmullRomCurve3(pts);
+                    const newGeometry = new THREE.TubeGeometry(curve, 120, strandRadius0, 6, false);
+                    s.mesh.geometry.dispose();
+                    s.mesh.geometry = newGeometry;
+                });
+
+                // 3. Rotazione dei piedi dell'arco
+                arc.pivotPos.rotation.y += 0.02 * (spinSpeed / 1.1);
+                arc.pivotNeg.rotation.y += 0.02 * (spinSpeed / 1.1);
+            });
+
+            // 4. Cilindro di plasma arancione: appare quando l'elica è ormai completamente formata,
+            //    depositato sul fondo della spirale (punto più basso raggiunto dai filamenti)
+            const cylinderLift = 0.6; // solleva un poco il cilindro rispetto al fondo esatto dell'elica
+            const yBottomOfHelix = Math.max(0.08, archProfile(0) - dipAmp - strandAmp + cylinderLift);
+            plasmaCylinder.position.set(0, yBottomOfHelix, 0);
+            plasmaLabel.position.set(0, yBottomOfHelix + 0.9, 0);
+
+            if (cycle > 0.75) {
+                const depositProgress = (cycle - 0.75) / 0.25;
+                plasmaCylMaterial.opacity = depositProgress * 0.95;
+                plasmaLabel.visible = depositProgress > 0.2;
+            } else {
+                plasmaCylMaterial.opacity = 0.0;
+                plasmaLabel.visible = false;
+            }
+
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>

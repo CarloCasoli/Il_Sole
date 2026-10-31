@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<!--
+  © 2026 Carlo Casoli — "Il Sole: Osservazione e Fisica"
+  Licenza CC BY-NC-ND 4.0: https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it
+  Vietati l'uso commerciale e la distribuzione di versioni modificate senza autorizzazione scritta dell'autore.
+-->
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Zona Convettiva – Settore Radiale</title>
+<style>
+ :root{--bg:#05070d;--text:#e8ecf5;--muted:#8b95ac;--panel:#0d1220;--panel2:#141b30;--line:#232c47;--accent:#ffb347;--accent2:#ff6b35;}
+ @media (prefers-color-scheme: light){ :root:not([data-theme="dark"]){--bg:#eef1f8;--text:#11141c;--muted:#5b6478;--panel:#ffffff;--panel2:#e6eaf4;--line:#cfd6e6;} }
+ :root[data-theme="dark"]{--bg:#05070d;--text:#e8ecf5;--muted:#8b95ac;--panel:#0d1220;--panel2:#141b30;--line:#232c47;}
+ :root[data-theme="light"]{--bg:#eef1f8;--text:#11141c;--muted:#5b6478;--panel:#ffffff;--panel2:#e6eaf4;--line:#cfd6e6;}
+ *{box-sizing:border-box;}
+ body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,Segoe UI,Roboto,sans-serif;padding:10px;min-height:100vh;}
+ #app{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;align-items:flex-start;width:100%;max-width:1300px;margin:0 auto;}
+ .left{flex:1 1 520px;min-width:0;display:flex;flex-direction:column;align-items:center;}
+ .stage{position:relative;width:min(100%,calc(94vh*1.2),900px);aspect-ratio:6/5;}
+ canvas{width:100%;height:100%;display:block;border-radius:14px;position:absolute;top:0;left:0;}
+ .legend{display:flex;flex-wrap:wrap;gap:8px 18px;justify-content:center;margin-top:14px;max-width:600px;font-size:.78rem;color:var(--muted);}
+ .legend span.item{display:inline-flex;align-items:center;gap:6px;}
+ .dot{width:10px;height:10px;border-radius:50%;display:inline-block;flex:none;}
+ #panel{width:290px;flex:none;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:14px;}
+ #panel h1{font-size:15px;margin:0;font-weight:600;}
+ #panel p.sub{margin:0;color:var(--muted);font-size:12px;line-height:1.5;}
+ .ctrl{display:flex;flex-direction:column;gap:4px;}
+ .ctrl label{font-size:12px;color:var(--muted);display:flex;justify-content:space-between;}
+ .ctrl label b{color:var(--text);font-weight:600;}
+ input[type=range]{width:100%;accent-color:var(--accent);}
+ .btns{display:flex;gap:8px;}
+ button{flex:1;border-radius:8px;padding:9px;font-size:13px;cursor:pointer;font-weight:600;}
+ #toggleBtn{background:var(--accent2);color:#1a0d05;border:none;}
+ #resetBtn{background:transparent;color:var(--muted);border:1px solid var(--line);font-weight:500;}
+ #resetBtn:hover{color:var(--text);}
+ .chk{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);}
+ .layer{background:var(--panel2);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:6px;}
+ .layer .name{font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px;}
+ hr{border:none;border-top:1px solid var(--line);margin:0;}
+ @media (max-width:640px){ #panel{width:100%;} }
+</style>
+</head>
+<body>
+<div id="app">
+ <div class="left">
+  <div class="stage"><canvas id="bgcv"></canvas><canvas id="c"></canvas></div>
+  <div class="legend" id="legend"></div>
+ </div>
+ <div id="panel">
+  <div>
+   <h1>☀ Celle convettive</h1>
+   <p class="sub">Settore di 90° dal centro alla superficie. Modifica il numero di strati e i parametri di ciascuno.</p>
+  </div>
+  <div class="btns">
+   <button id="toggleBtn">⏸ Pausa</button>
+   <button id="resetBtn">↺ Ripristina</button>
+  </div>
+  <hr>
+  <div class="ctrl">
+   <label>Numero di strati convettivi <b id="nVal"></b></label>
+   <input id="nLayers" type="range" min="1" max="4" step="1" value="4">
+  </div>
+  <div class="ctrl">
+   <label>Velocità globale <b id="gVal"></b></label>
+   <input id="gSpeed" type="range" min="0.1" max="3" step="0.1" value="1">
+  </div>
+  <label class="chk"><input type="checkbox" id="showTraj" checked> Mostra traiettorie delle celle</label>
+  <hr>
+  <div id="layerCtrls" style="display:flex;flex-direction:column;gap:10px;"></div>
+ </div>
+</div>
+<script>
+(function(){
+const canvas=document.getElementById('c');
+const ctx=canvas.getContext('2d');
+const bgc=document.getElementById('bgcv');
+const bctx=bgc.getContext('2d');
+let W,H,cx,cy,R,DPR=1;
+
+function resize(){
+ const rect=canvas.parentElement.getBoundingClientRect();
+ if(!rect.width) return;
+ DPR=Math.min(window.devicePixelRatio||1,2);
+ W=canvas.width=bgc.width=rect.width*DPR; H=canvas.height=bgc.height=rect.height*DPR;
+ canvas.style.width=bgc.style.width=rect.width+'px';
+ canvas.style.height=bgc.style.height=rect.height+'px';
+ const padL=105*DPR, padT=14*DPR, padB=14*DPR, padR=14*DPR;
+ cx=padL; cy=H-padB;
+ R=Math.min(W-padL-padR, H-padT-padB);
+ drawStatic();
+}
+
+const A0=-Math.PI/2, A1=0, SWEEP=Math.PI/2;
+const CONV_IN=0.65, CONV_OUT=0.985;
+
+/* Preset per numero di strati (dall'interno verso l'esterno) */
+const PRESETS={
+ 1:[{cells:12,speed:0.07,size:12}],
+ 2:[{cells:6, speed:0.05,size:16},{cells:12,speed:0.09,size:8}],
+ 3:[{cells:5, speed:0.05,size:20},{cells:10,speed:0.07,size:13},{cells:20,speed:0.09,size:8}],
+ 4:[{cells:4, speed:0.04,size:22},{cells:8, speed:0.06,size:15},{cells:16,speed:0.08,size:9},{cells:32,speed:0.10,size:5}]
+};
+const NAMES={
+ 1:['Zona convettiva'],
+ 2:['Strato interno','Strato esterno'],
+ 3:['Strato interno','Strato intermedio','Strato esterno'],
+ 4:['Celle giganti','Supergranulazione','Mesogranulazione','Granulazione']
+};
+const COLORS={
+ 1:['#ffa64d'],
+ 2:['#ffcf6b','#ff7a3d'],
+ 3:['#ffcf6b','#ffa64d','#ff7a3d'],
+ 4:['#ffd98a','#ffb454','#ff8a45','#ff5a2d']
+};
+
+/* Le celle si impostano solo sullo strato più profondo (indice 0):
+   ogni strato verso l'esterno ne ha RATIO volte quelle dello strato precedente. */
+const RATIO=2, MAX_OUTER_CELLS=80;
+let N=4;
+let params=PRESETS[4].map(p=>({...p}));
+let layerDivs=[];
+function maxCells0(){ return Math.max(1,Math.floor(MAX_OUTER_CELLS/Math.pow(RATIO,N-1))); }
+function applyCells(c0){
+ for(let i=0;i<N;i++) params[i].cells=c0*Math.pow(RATIO,i);
+}
+let zones=[];
+let phase=[0,0,0,0];
+let running=true;
+let gSpeed=1;
+let showTraj=true;
+
+function buildZones(){
+ const nucleo={key:'nucleo',rIn:0,rOut:0.10,label:'Nucleo',color:'#fff2c0'};
+ const rad={key:'rad',rIn:0.10,rOut:CONV_IN,label:'Zona radiativa',color:'#ffb454'};
+ zones=[nucleo,rad];
+ // spessori decrescenti verso la superficie (rapporto 0.75 tra strati successivi)
+ const w=[];for(let i=0;i<N;i++)w.push(Math.pow(0.75,i));
+ const tot=w.reduce((a,b)=>a+b,0);
+ let r=CONV_IN;
+ for(let i=0;i<N;i++){
+  const th=(CONV_OUT-CONV_IN)*w[i]/tot;
+  zones.push({key:'c'+i,rIn:r,rOut:r+th,cells:params[i].cells,speed:params[i].speed,size:params[i].size,
+              label:NAMES[N][i],color:COLORS[N][i]});
+  r+=th;
+ }
+}
+
+function polar(r,a){return {x:cx+r*R*Math.cos(a), y:cy+r*R*Math.sin(a)};}
+function cellPts(rIn,rOut,aC,aE){return [[rIn,aC],[rOut,aC],[rOut,aE],[rIn,aE]];}
+function lerpColor(a,b,t){
+ const ah=parseInt(a.slice(1),16),bh=parseInt(b.slice(1),16);
+ const ar=ah>>16,ag=(ah>>8)&255,ab=ah&255,br=bh>>16,bg=(bh>>8)&255,bb=bh&255;
+ const r=Math.round(ar+(br-ar)*t),g=Math.round(ag+(bg-ag)*t),bl=Math.round(ab+(bb-ab)*t);
+ return `rgb(${r},${g},${bl})`;
+}
+function drawLoopPath(g,pts){
+ const p1=polar(pts[1][0],pts[1][1]);
+ const p3=polar(pts[3][0],pts[3][1]);
+ g.beginPath();
+ g.moveTo(p1.x,p1.y);
+ g.arc(cx,cy,pts[1][0]*R,pts[1][1],pts[2][1],pts[2][1]<pts[1][1]);
+ g.lineTo(p3.x,p3.y);
+ g.arc(cx,cy,pts[3][0]*R,pts[3][1],pts[0][1],pts[0][1]>pts[3][1]);
+ g.stroke();
+}
+function drawFixedArc(g,x0,y0,radius,startAngle,sweep,color,lw,dashOffset,arrowAtStart){
+ const endAngle=startAngle+sweep;
+ g.save();
+ g.beginPath();
+ g.arc(x0,y0,radius,startAngle,endAngle,false);
+ g.strokeStyle=color; g.lineWidth=lw; g.lineCap='round';
+ g.setLineDash([lw*1.5, lw*1.2]);
+ g.lineDashOffset=dashOffset;
+ g.stroke();
+ g.restore();
+ const tipA = arrowAtStart?startAngle:endAngle;
+ const backA = arrowAtStart?startAngle+0.14:endAngle-0.14;
+ const p1x=x0+radius*Math.cos(backA), p1y=y0+radius*Math.sin(backA);
+ const p2x=x0+radius*Math.cos(tipA), p2y=y0+radius*Math.sin(tipA);
+ const ang=Math.atan2(p2y-p1y,p2x-p1x);
+ g.save(); g.translate(p2x,p2y); g.rotate(ang);
+ const ah=lw*1.7;
+ g.beginPath();
+ g.moveTo(ah*1.1,0);
+ g.lineTo(-ah*0.5, ah*0.8);
+ g.lineTo(-ah*0.5,-ah*0.8);
+ g.closePath(); g.fillStyle=color; g.fill();
+ g.restore();
+}
+
+function sectorClip(g){
+ g.beginPath();
+ g.moveTo(cx,cy);
+ g.arc(cx,cy,R*0.999,A0,A1,false);
+ g.closePath();
+ g.clip();
+}
+
+function drawStatic(){
+ if(!W) return;
+ bctx.clearRect(0,0,W,H);
+ bctx.save();
+ sectorClip(bctx);
+
+ zones.forEach(z=>{
+  bctx.beginPath();
+  if(z.rIn===0){
+   bctx.moveTo(cx,cy);
+   bctx.arc(cx,cy,z.rOut*R,A0,A1,false);
+   bctx.closePath();
+  } else {
+   bctx.arc(cx,cy,z.rOut*R,A0,A1,false);
+   bctx.arc(cx,cy,z.rIn*R,A1,A0,true);
+   bctx.closePath();
+  }
+  bctx.fillStyle=lerpColor('#0a0503', z.color, z.key==='nucleo'?0.55:z.key==='rad'?0.22:0.12);
+  bctx.fill();
+ });
+
+ const nuc=zones[0];
+ const nucGrad=bctx.createRadialGradient(cx,cy,0,cx,cy,nuc.rOut*R);
+ nucGrad.addColorStop(0,'#fffaf0'); nucGrad.addColorStop(1,'#ffcf6b');
+ bctx.save();
+ bctx.beginPath(); bctx.moveTo(cx,cy); bctx.arc(cx,cy,nuc.rOut*R,A0,A1,false); bctx.closePath();
+ bctx.fillStyle=nucGrad; bctx.fill();
+ bctx.restore();
+
+ if(showTraj){
+  bctx.setLineDash([4*DPR,4*DPR]);
+  bctx.strokeStyle='rgba(255,255,255,0.35)';
+  bctx.lineWidth=1*DPR;
+  zones.forEach(z=>{
+   if(!z.cells) return;
+   const step=SWEEP/z.cells;
+   for(let j=0;j<z.cells;j++){
+    const aL=A0+j*step, aR=A0+(j+1)*step, aC=aL+step/2;
+    drawLoopPath(bctx, cellPts(z.rIn,z.rOut,aC,aR));
+    drawLoopPath(bctx, cellPts(z.rIn,z.rOut,aC,aL));
+   }
+  });
+  bctx.setLineDash([]);
+ }
+ bctx.restore();
+
+ bctx.font=`${11*DPR}px -apple-system,Segoe UI,sans-serif`;
+ bctx.textBaseline='middle';
+ bctx.lineCap='butt';
+ zones.forEach(z=>{
+  bctx.beginPath(); bctx.arc(cx,cy,z.rOut*R,A0,A1,false);
+  bctx.strokeStyle='rgba(255,255,255,0.55)'; bctx.lineWidth=1.6*DPR; bctx.stroke();
+ });
+
+ function labelAt(rFrac,text){
+  const p=polar(rFrac, A0);
+  bctx.beginPath(); bctx.arc(p.x,p.y,2.2*DPR,0,7); bctx.fillStyle='#fff'; bctx.fill();
+  bctx.fillStyle='#f3ede2'; bctx.textAlign='right';
+  bctx.fillText(text, p.x-8*DPR, p.y);
+ }
+ labelAt((zones[0].rIn+zones[0].rOut)/2, zones[0].label);
+ labelAt((zones[1].rIn+zones[1].rOut)/2, zones[1].label);
+ labelAt((CONV_IN+CONV_OUT)/2, 'Zona convettiva');
+
+ bctx.textAlign='left';
+ bctx.lineCap='round';
+ const last=zones[zones.length-1].rOut;
+ bctx.beginPath();
+ bctx.moveTo(cx,cy); bctx.lineTo(polar(last,A0).x, polar(last,A0).y);
+ bctx.moveTo(cx,cy); bctx.lineTo(polar(last,A1).x, polar(last,A1).y);
+ bctx.strokeStyle='rgba(255,255,255,0.5)'; bctx.lineWidth=1.4*DPR; bctx.stroke();
+}
+
+let lastT=0;
+function frame(now){
+ if(!lastT) lastT=now;
+ const dt=Math.min(0.1,(now-lastT)/1000); lastT=now;
+ if(W){
+  ctx.clearRect(0,0,W,H);
+  ctx.save();
+  sectorClip(ctx);
+  zones.forEach((z,zi)=>{
+   if(!z.cells) return;
+   const li=zi-2;
+   if(running) phase[li]+=dt*z.speed*260*DPR*gSpeed;
+   const dashOff=-phase[li];
+   const step=SWEEP/z.cells;
+   const rMid=(z.rIn+z.rOut)/2;
+   const radius=z.size*1.05*DPR;
+   const lw=Math.max(z.size*0.26*DPR,2*DPR);
+   for(let j=0;j<z.cells;j++){
+    const aL=A0+j*step, aR=A0+(j+1)*step, aC=aL+step/2;
+    const aLeftSub=(aL+aC)/2, aRightSub=(aC+aR)/2;
+    const pL=polar(rMid,aLeftSub), pR=polar(rMid,aRightSub);
+    const delta=step/4;
+    const startR=aRightSub-delta;
+    const startL=aLeftSub-(Math.PI-delta)-Math.PI/2;
+    drawFixedArc(ctx,pR.x,pR.y,radius,startR,1.5*Math.PI,z.color,lw,dashOff,false);
+    drawFixedArc(ctx,pL.x,pL.y,radius,startL,1.5*Math.PI,z.color,lw,-dashOff,true);
+   }
+  });
+  ctx.restore();
+ }
+ requestAnimationFrame(frame);
+}
+
+/* ---------- Legenda ---------- */
+function buildLegend(){
+ const legend=document.getElementById('legend');
+ legend.innerHTML='';
+ zones.forEach(z=>{
+  const s=document.createElement('span'); s.className='item';
+  s.innerHTML=`<span class="dot" style="background:${z.color}"></span>${z.label}${z.cells?` (${z.cells} celle)`:''}`;
+  legend.appendChild(s);
+ });
+}
+
+/* ---------- Pannello strati ---------- */
+function buildLayerControls(){
+ const box=document.getElementById('layerCtrls');
+ box.innerHTML='';
+ layerDivs=[];
+ for(let i=0;i<N;i++){
+  const p=params[i];
+  const div=document.createElement('div'); div.className='layer';
+  const cellsCtrl = i===0
+   ? `<div class="ctrl"><label>Numero di celle (strato più profondo) <b data-v="cells">${p.cells}</b></label>
+    <input type="range" data-k="cells" min="1" max="${maxCells0()}" step="1" value="${p.cells}"></div>`
+   : `<div class="ctrl"><label>Numero di celle (derivato) <b data-v="cells">${p.cells}</b></label></div>`;
+  div.innerHTML=`
+   <div class="name"><span class="dot" style="background:${COLORS[N][i]}"></span>${i+1}. ${NAMES[N][i]}</div>
+   ${cellsCtrl}
+   <div class="ctrl"><label>Velocità del flusso <b data-v="speed">${p.speed.toFixed(2)}</b></label>
+    <input type="range" data-k="speed" min="0.01" max="0.3" step="0.01" value="${p.speed}"></div>
+   <div class="ctrl"><label>Dimensione dei vortici <b data-v="size">${p.size}</b></label>
+    <input type="range" data-k="size" min="2" max="30" step="1" value="${p.size}"></div>`;
+  div.querySelectorAll('input').forEach(inp=>{
+   inp.addEventListener('input',()=>{
+    const k=inp.dataset.k;
+    if(k==='cells'){
+     applyCells(+inp.value);
+     layerDivs.forEach((d,j)=>{ d.querySelector('[data-v="cells"]').textContent=params[j].cells; });
+    } else {
+     params[i][k]=+inp.value;
+     div.querySelector(`[data-v="${k}"]`).textContent = k==='speed'? (+inp.value).toFixed(2) : inp.value;
+    }
+    buildZones(); drawStatic(); buildLegend();
+   });
+  });
+  box.appendChild(div);
+  layerDivs.push(div);
+ }
+}
+
+function loadPreset(){
+ params=PRESETS[N].map(p=>({...p}));
+ applyCells(PRESETS[N][0].cells);
+ phase=[0,0,0,0];
+ buildZones(); buildLayerControls(); buildLegend(); drawStatic();
+ document.getElementById('nVal').textContent=N;
+}
+
+document.getElementById('nLayers').addEventListener('input',e=>{
+ N=+e.target.value; loadPreset();
+});
+document.getElementById('gSpeed').addEventListener('input',e=>{
+ gSpeed=+e.target.value; document.getElementById('gVal').textContent='×'+gSpeed.toFixed(1);
+});
+document.getElementById('showTraj').addEventListener('change',e=>{
+ showTraj=e.target.checked; drawStatic();
+});
+document.getElementById('toggleBtn').addEventListener('click',()=>{
+ running=!running;
+ document.getElementById('toggleBtn').textContent = running? '⏸ Pausa' : '▶ Avvia';
+});
+document.getElementById('resetBtn').addEventListener('click',()=>{
+ N=4; gSpeed=1; showTraj=true;
+ document.getElementById('nLayers').value=4;
+ document.getElementById('gSpeed').value=1;
+ document.getElementById('gVal').textContent='×1.0';
+ document.getElementById('showTraj').checked=true;
+ loadPreset();
+});
+
+document.getElementById('gVal').textContent='×1.0';
+buildZones(); buildLayerControls(); buildLegend();
+document.getElementById('nVal').textContent=N;
+if(window.ResizeObserver){ new ResizeObserver(resize).observe(canvas.parentElement); }
+window.addEventListener('resize',resize);
+resize();
+requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<!--
+  © 2026 Carlo Casoli — "Il Sole: Osservazione e Fisica"
+  Licenza CC BY-NC-ND 4.0: https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it
+  Vietati l'uso commerciale e la distribuzione di versioni modificate senza autorizzazione scritta dell'autore.
+-->
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Animazione Formazione Culla e Condensazione - Modello KS</title>
+    <style>
+        body { 
+            margin: 0; 
+            background-color: #050510; 
+            color: white; 
+            font-family: Arial, sans-serif; 
+            overflow: hidden; 
+        }
+        #info { 
+            position: absolute; 
+            top: 15px; 
+            width: 100%; 
+            text-align: center; 
+            z-index: 100; 
+            font-size: 16px; 
+            pointer-events: none;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+        }
+    </style>
+</head>
+<body>
+    <div id="info">Animazione 3D: Formazione della Culla e Condensazione del Filamento<br><small>Il campo si deforma; il plasma si condensa nella culla formata</small></div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    
+    <script>
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x050510);
+
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(10, 6, 12); 
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+        scene.add(ambientLight);
+
+        // Piano della fotosfera
+        const planeGeometry = new THREE.PlaneGeometry(24, 24, 1, 1);
+        const planeMaterial = new THREE.MeshBasicMaterial({ 
+            color: 0x112233, 
+            side: THREE.DoubleSide, 
+            wireframe: true,
+            transparent: true,
+            opacity: 0.4
+        });
+        const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+        plane.rotation.x = Math.PI / 2;
+        scene.add(plane);
+
+        // Linea di Inversione di Polarità (PIL) - Asse Z (Rosso)
+        const pilGeometry = new THREE.BufferGeometry();
+        const pilPoints = [new THREE.Vector3(0, 0.02, -10), new THREE.Vector3(0, 0.02, 10)];
+        pilGeometry.setFromPoints(pilPoints);
+        const pilMaterial = new THREE.LineBasicMaterial({ color: 0xff3333, linewidth: 4 });
+        const pilLine = new THREE.Line(pilGeometry, pilMaterial);
+        scene.add(pilLine);
+
+        // Numero di tubi di flusso
+        const tubeMeshes = [];
+        const zOffsets = [];
+        for (let z = -9; z <= 9; z += 1.5) {
+            zOffsets.push(z);
+        }
+
+        function updateTubeGeometry(tubeMesh, zOffset, dipFactor) {
+            const points = [];
+            for (let i = 0; i <= 100; i++) {
+                let t = i / 100;
+                let x = (t - 0.5) * 14; 
+                let yBase = 7 * (1 - Math.pow(x / 7, 2));
+                let dip = dipFactor * 2.0 * Math.exp(-Math.pow(x, 2) * 3);
+                let y = Math.max(0.1, yBase - dip);
+                points.push(new THREE.Vector3(x, y, zOffset));
+            }
+            const curve = new THREE.CatmullRomCurve3(points);
+            const newGeometry = new THREE.TubeGeometry(curve, 64, 0.06, 8, false);
+            tubeMesh.geometry.dispose();
+            tubeMesh.geometry = newGeometry;
+        }
+
+        zOffsets.forEach(z => {
+            const points = [];
+            for (let i = 0; i <= 100; i++) {
+                let t = i / 100;
+                let x = (t - 0.5) * 14;
+                let y = Math.max(0.1, 7 * (1 - Math.pow(x / 7, 2)));
+                points.push(new THREE.Vector3(x, y, z));
+            }
+            const curve = new THREE.CatmullRomCurve3(points);
+            const geometry = new THREE.TubeGeometry(curve, 64, 0.06, 8, false);
+            const material = new THREE.MeshStandardMaterial({ 
+                color: 0x3388ff, 
+                roughness: 0.3,
+                metalness: 0.2
+            });
+            const tube = new THREE.Mesh(geometry, material);
+            scene.add(tube);
+            tubeMeshes.push({ mesh: tube, z: z });
+        });
+
+        // Cilindro di plasma posizionato FISSO alla quota corretta (y = 5.8) nella culla
+        const cylinderRadius = 0.35;
+        const cylinderLength = 17.0;
+        const plasmaGeometry = new THREE.CylinderGeometry(cylinderRadius, cylinderRadius, cylinderLength, 32);
+        const plasmaMaterial = new THREE.MeshStandardMaterial({ 
+            color: 0xcceeff, 
+            emissive: 0x44aaff, 
+            roughness: 0.2,
+            metalness: 0.1,
+            transparent: true,
+            opacity: 0.0 // Parte completamente trasparente
+        });
+        const plasmaFilament = new THREE.Mesh(plasmaGeometry, plasmaMaterial);
+        plasmaFilament.rotation.x = Math.PI / 2;
+        plasmaFilament.position.set(0, 5.8, 0); // Già al suo posto definitivo, non si muove in verticale
+        scene.add(plasmaFilament);
+
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+
+            let time = Date.Now ? Date.now() * 0.001 : Date.now() * 0.001;
+            let cycle = (Math.sin(time * 1.0) + 1) / 2; // Ciclo tra 0 e 1
+
+            // 1. Il campo magnetico si deforma nel tempo
+            tubeMeshes.forEach(item => {
+                updateTubeGeometry(item.mesh, item.z, cycle);
+            });
+
+            // 2. Il plasma appare (condensazione) solo nella seconda metà del ciclo, 
+            // quando la culla è ormai formata (cycle > 0.6)
+            if (cycle > 0.6) {
+                let condensationProgress = (cycle - 0.6) / 0.4; // va da 0 a 1 nella fase finale
+                plasmaFilament.material.opacity = condensationProgress * 0.95;
+            } else {
+                plasmaFilament.material.opacity = 0.0;
+            }
+
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>

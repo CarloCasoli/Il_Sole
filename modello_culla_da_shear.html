@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<!--
+  © 2026 Carlo Casoli — "Il Sole: Osservazione e Fisica"
+  Licenza CC BY-NC-ND 4.0: https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it
+  Vietati l'uso commerciale e la distribuzione di versioni modificate senza autorizzazione scritta dell'autore.
+-->
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Animazione 3D - Shear, Riconnessione e Grande Elicoide</title>
+    <style>
+        body {
+            margin: 0;
+            background-color: #050510;
+            color: white;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+        }
+        #info {
+            position: absolute;
+            top: 15px;
+            width: 100%;
+            text-align: center;
+            z-index: 100;
+            font-size: 16px;
+            pointer-events: none;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+        }
+        #info small { opacity: 0.8; }
+    </style>
+</head>
+<body>
+    <div id="info">Animazione 3D: Shear, Riconnessione e Grande Elicoide Parallelo alla PIL<br>
+    <small>Archi a omega, fitti e cesoiati &rarr; toccandosi spariscono dal centro verso i lati &rarr; nasce il tubo elicoidale in alto, con plasma nella culla &rarr; restano piccoli archi in basso</small></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+    <script>
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x050510);
+
+        const camera = new THREE.PerspectiveCamera(62, window.innerWidth / window.innerHeight, 0.1, 2000);
+        camera.position.set(30, 22, 38);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+        scene.add(ambientLight);
+        const dirLight = new THREE.DirectionalLight(0xffffff, 0.55);
+        dirLight.position.set(10, 20, 10);
+        scene.add(dirLight);
+
+        // ---------- Piano della fotosfera/cromosfera (texture sfumata generata via canvas) ----------
+        function makeChromosphereTexture() {
+            const size = 1024;
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+
+            // sfondo di base: gradiente radiale dal centro (più chiaro/caldo) verso i bordi (più scuro/rossastro)
+            const grad = ctx.createRadialGradient(size / 2, size / 2, size * 0.05, size / 2, size / 2, size * 0.72);
+            grad.addColorStop(0, '#ffdd88');
+            grad.addColorStop(0.25, '#ffbb44');
+            grad.addColorStop(0.55, '#ff8800');
+            grad.addColorStop(0.8, '#cc4400');
+            grad.addColorStop(1, '#551100');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, size, size);
+
+            // granulazione: tante macchie morbide sovrapposte per dare l'effetto "cromosfera"
+            for (let i = 0; i < 900; i++) {
+                const x = Math.random() * size;
+                const y = Math.random() * size;
+                const r = 6 + Math.random() * 22;
+                const brightness = Math.random();
+                const g = ctx.createRadialGradient(x, y, 0, x, y, r);
+                if (brightness > 0.5) {
+                    g.addColorStop(0, 'rgba(255,220,140,0.35)');
+                    g.addColorStop(1, 'rgba(255,220,140,0)');
+                } else {
+                    g.addColorStop(0, 'rgba(120,20,0,0.30)');
+                    g.addColorStop(1, 'rgba(120,20,0,0)');
+                }
+                ctx.fillStyle = g;
+                ctx.beginPath();
+                ctx.arc(x, y, r, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.wrapS = THREE.RepeatWrapping;
+            texture.wrapT = THREE.RepeatWrapping;
+            return texture;
+        }
+
+        const chromosphereTexture = makeChromosphereTexture();
+        const planeGeometry = new THREE.PlaneGeometry(1600, 1600, 1, 1);
+        const planeMaterial = new THREE.MeshBasicMaterial({
+            map: chromosphereTexture, side: THREE.DoubleSide, transparent: true, opacity: 0.75
+        });
+        const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+        plane.rotation.x = Math.PI / 2;
+        scene.add(plane);
+
+        // ---------- Helper: sprite di testo ----------
+        function makeTextSprite(text, color = '#ffffff', size = 64) {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = 512;
+            canvas.height = 128;
+            ctx.font = `bold ${size}px Arial`;
+            ctx.fillStyle = color;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.shadowColor = 'rgba(0,0,0,0.9)';
+            ctx.shadowBlur = 8;
+            ctx.fillText(text, 256, 64);
+            const texture = new THREE.CanvasTexture(canvas);
+            const material = new THREE.SpriteMaterial({ map: texture, transparent: true });
+            const sprite = new THREE.Sprite(material);
+            sprite.scale.set(6, 1.5, 1);
+            return sprite;
+        }
+
+        // ---------- Parametri principali ----------
+        const footX = 2.5;             // piedi ancora più vicini alla PIL
+        const apexInitial = 22;       // omega molto più alta, per avvicinarsi alla quota dell'elicoide
+        const blueTubeRadius = 0.45;  // diametro dei tubi blu
+        const shearMax = 22;          // scorrimento ulteriormente aumentato
+        const shearPower = 2.4;       // concentra lo scorrimento vicino ai piedi -> base parallela alla PIL
+        const flareAmt = footX * 0.9; // ampiezza del rigonfiamento "a omega"
+        const dz = 7.5;                // spaziatura dimezzata di nuovo -> archi più fitti
+        const zPositions = [-4 * dz, -3 * dz, -2 * dz, -dz, 0, dz, 2 * dz, 3 * dz, 4 * dz]; // 9 archi, base dimezzata (-30..30)
+
+        // ---------- Linea di Inversione di Polarità (PIL) ----------
+        const pilGeometry = new THREE.BufferGeometry();
+        pilGeometry.setFromPoints([new THREE.Vector3(0, 0.02, -85), new THREE.Vector3(0, 0.02, 85)]);
+        const pilMaterial = new THREE.LineBasicMaterial({ color: 0xff3333, linewidth: 4 });
+        scene.add(new THREE.Line(pilGeometry, pilMaterial));
+
+        const pilLabel = makeTextSprite('Linea neutra (PIL)', '#ff5555', 46);
+        pilLabel.position.set(0, 0.4, 87);
+        scene.add(pilLabel);
+
+        // ---------- Etichette di polarità ----------
+        const posLabel = makeTextSprite('Polo Positivo (+)', '#ff6666', 46);
+        posLabel.position.set(-footX, -1.6, 0);
+        scene.add(posLabel);
+        const negLabel = makeTextSprite('Polo Negativo (-)', '#66aaff', 46);
+        negLabel.position.set(footX, -1.6, 0);
+        scene.add(negLabel);
+
+        // frecce statiche che indicano il verso dello scorrimento dei piedi
+        function makeDirArrow(color, pointsPositiveZ) {
+            const group = new THREE.Group();
+            const len = 2.4;
+            const dir = pointsPositiveZ ? 1 : -1;
+            const lineMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, len, 8), new THREE.MeshBasicMaterial({ color }));
+            lineMesh.rotation.x = Math.PI / 2;
+            lineMesh.position.z = dir * len / 2;
+            group.add(lineMesh);
+            const coneMesh = new THREE.Mesh(new THREE.ConeGeometry(0.22, 0.55, 12), new THREE.MeshBasicMaterial({ color }));
+            coneMesh.rotation.x = dir > 0 ? Math.PI / 2 : -Math.PI / 2;
+            coneMesh.position.z = dir * (len + 0.3);
+            group.add(coneMesh);
+            return group;
+        }
+        const posArrow = makeDirArrow(0xff6666, true);
+        posArrow.position.set(-footX, 0.4, 0);
+        scene.add(posArrow);
+        const negArrow = makeDirArrow(0x66aaff, false);
+        negArrow.position.set(footX, 0.4, 0);
+        scene.add(negArrow);
+
+        // ---------- Archi blu iniziali: forma a OMEGA, cesoiati progressivamente ----------
+        function buildInitialArcCurve(z, shear) {
+            const pts = [];
+            for (let i = 0; i <= 120; i++) {
+                const t = i / 120;
+                const phi = Math.PI * t;
+                const x = -footX * Math.cos(phi) - flareAmt * Math.sin(2 * phi); // rigonfiamento "a omega"
+                const y = Math.max(0.05, apexInitial * Math.sin(phi));
+                const s = 2 * t - 1; // -1 .. 1, per concentrare lo scorrimento vicino ai piedi
+                const shift = Math.sign(s) * Math.pow(Math.abs(s), shearPower) * shear;
+                pts.push(new THREE.Vector3(x, y, z - shift));
+            }
+            return new THREE.CatmullRomCurve3(pts);
+        }
+
+        const initialArcs = zPositions.map(z => {
+            const material = new THREE.MeshStandardMaterial({
+                color: 0x3388ff, roughness: 0.3, metalness: 0.2, emissive: 0x0a2a55,
+                transparent: true, opacity: 1.0
+            });
+            const mesh = new THREE.Mesh(new THREE.TubeGeometry(buildInitialArcCurve(z, 0), 120, blueTubeRadius, 10, false), material);
+            scene.add(mesh);
+
+            const posFoot = new THREE.Mesh(new THREE.SphereGeometry(0.4, 14, 14), new THREE.MeshBasicMaterial({ color: 0xff5555, transparent: true }));
+            const negFoot = new THREE.Mesh(new THREE.SphereGeometry(0.4, 14, 14), new THREE.MeshBasicMaterial({ color: 0x5599ff, transparent: true }));
+            scene.add(posFoot);
+            scene.add(negFoot);
+
+            const rank = Math.round(Math.abs(z) / dz); // 0 = centro (sparisce per primo)
+
+            return { z, rank, mesh, material, posFoot, negFoot };
+        });
+
+        // ---------- Piccoli archi sotto (a cavallo della PIL), stile identico ai blu, molto più piccoli ----------
+        const numSmall = zPositions.length - 1;
+        const smallArcs = [];
+        function buildSmallArcCurve(zTouch, apex) {
+            return new THREE.CatmullRomCurve3([
+                new THREE.Vector3(-footX, 0.05, zTouch),
+                new THREE.Vector3(0, apex, zTouch),
+                new THREE.Vector3(footX, 0.05, zTouch)
+            ]);
+        }
+        for (let i = 0; i < numSmall; i++) {
+            const zTouch = zPositions[i] + dz / 2;
+            const material = new THREE.MeshStandardMaterial({
+                color: 0x3388ff, roughness: 0.3, metalness: 0.2, emissive: 0x0a2a55,
+                transparent: true, opacity: 0.0
+            });
+            const mesh = new THREE.Mesh(new THREE.TubeGeometry(buildSmallArcCurve(zTouch, apexInitial / 2), 60, 0.22, 8, false), material);
+            scene.add(mesh);
+            smallArcs.push({ zTouch, mesh, material });
+        }
+
+        // ---------- Grande tubo 3D con l'elica dentro, asse parallelo alla PIL (z) ----------
+        const helixHeight = apexInitial;         // (abbassato) l'elica ora è alla stessa quota dell'apice degli archi, non più sopra
+        const envelopeRadius = 4.2;              // diametro del tubo esterno
+        const helixRadius = 2.3;                 // diametro dell'elica interna
+        // l'elica deve estendersi esattamente quanto i piccoli archi sottostanti (stessa lunghezza lungo la PIL)
+        const reconnZmin = zPositions[0] + dz / 2;
+        const reconnZmax = zPositions[zPositions.length - 2] + dz / 2;
+        const helixZmin = reconnZmin;
+        const helixZmax = reconnZmax;
+        const helixTurns = 9;
+        const helixK = (2 * Math.PI * helixTurns) / (helixZmax - helixZmin);
+
+        function helixXY(z) {
+            const theta = helixK * (z - helixZmin);
+            return { x: helixRadius * Math.cos(theta), y: helixHeight + helixRadius * Math.sin(theta) };
+        }
+
+        // --- tubo esterno (l'involucro del flux rope), in wireframe: si vede attraverso, niente trasparenze "impastate" ---
+        const envelopeCurve = new THREE.CatmullRomCurve3([
+            new THREE.Vector3(0, helixHeight, helixZmin), new THREE.Vector3(0, helixHeight, helixZmax)
+        ]);
+        const envelopeMaterial = new THREE.MeshBasicMaterial({
+            color: 0x3388ff, wireframe: true, transparent: true, opacity: 0.0
+        });
+        const envelopeMesh = new THREE.Mesh(new THREE.TubeGeometry(envelopeCurve, 60, envelopeRadius, 16, false), envelopeMaterial);
+        scene.add(envelopeMesh);
+
+        // --- elica interna (linea di campo twistata), ben visibile dentro il tubo ---
+        const helixPts = [];
+        for (let i = 0; i <= 400; i++) {
+            const z = helixZmin + (helixZmax - helixZmin) * (i / 400);
+            const p = helixXY(z);
+            helixPts.push(new THREE.Vector3(p.x, p.y, z));
+        }
+        const helixCurve = new THREE.CatmullRomCurve3(helixPts);
+        const helixMaterial = new THREE.MeshStandardMaterial({
+            color: 0x66ccff, roughness: 0.25, metalness: 0.25, emissive: 0x2277aa, emissiveIntensity: 0.6,
+            transparent: true, opacity: 0.0
+        });
+        const helixMesh = new THREE.Mesh(new THREE.TubeGeometry(helixCurve, 400, 0.4, 8, false), helixMaterial);
+        scene.add(helixMesh);
+
+        // linee (marcatori luminosi) che si muovono lungo l'elica
+        const numMarkers = 16;
+        const markers = [];
+        for (let i = 0; i < numMarkers; i++) {
+            const mat = new THREE.MeshStandardMaterial({
+                color: 0xbfe6ff, emissive: 0x66ccff, emissiveIntensity: 0.9, transparent: true, opacity: 0.0
+            });
+            const m = new THREE.Mesh(new THREE.SphereGeometry(0.6, 12, 12), mat);
+            scene.add(m);
+            markers.push(m);
+        }
+
+        // ---------- Cilindro di plasma arancione, appoggiato sul fondo della culla dell'elicoide ----------
+        const plasmaCylLength = helixZmax - helixZmin;
+        const plasmaCylMaterial = new THREE.MeshStandardMaterial({
+            color: 0xff8800, emissive: 0xcc5500, emissiveIntensity: 0.5,
+            roughness: 0.3, metalness: 0.15, transparent: true, opacity: 0.0
+        });
+        const plasmaCylinder = new THREE.Mesh(
+            new THREE.CylinderGeometry(0.7, 0.7, plasmaCylLength, 24), plasmaCylMaterial
+        );
+        plasmaCylinder.rotation.x = Math.PI / 2;
+        plasmaCylinder.position.set(0, helixHeight - helixRadius, (helixZmin + helixZmax) / 2);
+        scene.add(plasmaCylinder);
+
+        // ---------- Loop di animazione ----------
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+
+            const time = Date.now() * 0.001;
+            const cycle = (Math.sin(time * 0.16) + 1) / 2; // sviluppo e rilassamento del processo completo
+
+            // --- fase 1: scorrimento (shear) fino al massimo ---
+            const shearProgress = Math.min(cycle / 0.35, 1);
+            const shear = shearProgress * shearMax;
+            const shearComplete = cycle >= 0.35;
+
+            // --- fase 2: una volta al massimo, gli archi blu spariscono dal centro verso l'esterno ---
+            initialArcs.forEach(arc => {
+                const curve = buildInitialArcCurve(arc.z, shear);
+                arc.mesh.geometry.dispose();
+                arc.mesh.geometry = new THREE.TubeGeometry(curve, 120, blueTubeRadius, 10, false);
+
+                let opacity = 1;
+                if (shearComplete) {
+                    const fadeStart = 0.38 + arc.rank * 0.045;
+                    const fadeDur = 0.09;
+                    if (cycle >= fadeStart) {
+                        opacity = Math.max(0, 1 - (cycle - fadeStart) / fadeDur);
+                    }
+                }
+                arc.material.opacity = opacity;
+                arc.mesh.visible = opacity > 0.01;
+
+                const posZ = arc.z + shear;
+                const negZ = arc.z - shear;
+                arc.posFoot.position.set(-footX, 0.05, posZ);
+                arc.negFoot.position.set(footX, 0.05, negZ);
+                arc.posFoot.material.opacity = opacity;
+                arc.negFoot.material.opacity = opacity;
+                arc.posFoot.visible = opacity > 0.01;
+                arc.negFoot.visible = opacity > 0.01;
+            });
+            posArrow.visible = cycle < 0.5;
+            negArrow.visible = cycle < 0.5;
+            const arrowOpacity = Math.max(0, 1 - Math.max(0, (cycle - 0.35) / 0.15));
+            posArrow.children.forEach(c => c.material.opacity = arrowOpacity);
+            negArrow.children.forEach(c => c.material.opacity = arrowOpacity);
+
+            // --- fase 3: contemporaneamente, nasce il grande tubo con l'elica dentro ---
+            let helixOpacity = 0;
+            if (cycle >= 0.4) {
+                helixOpacity = Math.min(1, (cycle - 0.4) / 0.2);
+            }
+            envelopeMaterial.opacity = helixOpacity * 0.7;
+            envelopeMesh.visible = helixOpacity > 0.01;
+            helixMaterial.opacity = helixOpacity * 0.95;
+            helixMesh.visible = helixOpacity > 0.01;
+            plasmaCylMaterial.opacity = helixOpacity * 0.9;
+            plasmaCylinder.visible = helixOpacity > 0.01;
+
+            // linee che si muovono lungo l'elica
+            markers.forEach((m, i) => {
+                m.material.opacity = helixOpacity * 0.95;
+                m.visible = helixOpacity > 0.01;
+                if (m.visible) {
+                    const span = helixZmax - helixZmin;
+                    const zPos = helixZmin + ((time * 5 + i * (span / numMarkers)) % span);
+                    const p = helixXY(zPos);
+                    m.position.set(p.x, p.y, zPos);
+                }
+            });
+
+            // --- fase 4: contemporaneamente, nuovi archi piccoli sotto: prima a metà altezza, poi scendono ---
+            let smallOpacity = 0;
+            let smallApex = apexInitial / 2;
+            if (cycle >= 0.4) {
+                smallOpacity = Math.min(1, (cycle - 0.4) / 0.1);
+                const descendProgress = Math.max(0, Math.min(1, (cycle - 0.5) / 0.3));
+                smallApex = (apexInitial / 2) * (1 - descendProgress) + 1.6 * descendProgress;
+            }
+            smallArcs.forEach(arc => {
+                arc.material.opacity = smallOpacity * 0.95;
+                arc.mesh.visible = smallOpacity > 0.01;
+                if (arc.mesh.visible) {
+                    const curve = buildSmallArcCurve(arc.zTouch, smallApex);
+                    arc.mesh.geometry.dispose();
+                    arc.mesh.geometry = new THREE.TubeGeometry(curve, 60, 0.22, 8, false);
+                }
+            });
+
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1480 @@
+<!DOCTYPE html>
+<!--
+  © 2026 Carlo Casoli — "Il Sole: Osservazione e Fisica"
+  Licenza CC BY-NC-ND 4.0: https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it
+  Vietati l'uso commerciale e la distribuzione di versioni modificate senza autorizzazione scritta dell'autore.
+-->
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Tubi di flusso magnetico — vista 3D</title>
+<style>
+  html, body { margin:0; padding:0; background:#f2e4c9; font-family: -apple-system, "Segoe UI", Arial, sans-serif; overflow:hidden; }
+  #app { position:relative; width:100vw; height:100vh; }
+  #mount { width:100%; height:100%; }
+  .panel {
+    position:absolute; top:14px; left:14px; display:flex; gap:8px; flex-wrap:wrap;
+    background:rgba(255,255,255,0.85); backdrop-filter:blur(4px);
+    padding:8px; border-radius:10px; border:1px solid #e2d9c8;
+  }
+  button {
+    padding:7px 12px; font-size:13px; border-radius:7px; border:1px solid #d8cbb0;
+    background:#fff; color:#3d2b1a; cursor:pointer;
+  }
+  button:hover { background:#f3e9d6; }
+  button.active { background:#3d2b1a; color:#fff; border-color:#3d2b1a; }
+  .hint {
+    position:absolute; bottom:14px; left:14px; font-size:12px; color:#7a6a52;
+    background:rgba(255,255,255,0.8); padding:6px 10px; border-radius:8px;
+  }
+  #errbox {
+    display:none; position:absolute; inset:0; align-items:center; justify-content:center;
+    background:#faf6ee; color:#712B13; font-size:14px; text-align:center; padding:2rem;
+  }
+
+  /* Pannello esterno con i cursori per modificare in tempo reale i parametri
+     del cambio di colore delle fibrille (FIBRILLE_CONFIG) */
+  #fibrille-controls {
+    position:absolute; top:14px; right:14px; width:290px; max-height:calc(100vh - 28px);
+    overflow-y:auto; background:rgba(255,255,255,0.92); backdrop-filter:blur(4px);
+    border:1px solid #e2d9c8; border-radius:10px; padding:10px 12px;
+    font-size:12.5px; color:#3d2b1a;
+  }
+  #fibrille-controls h3 {
+    margin:2px 0 8px 0; font-size:13.5px; display:flex; align-items:center; justify-content:space-between;
+    cursor:pointer; user-select:none;
+  }
+  #fibrille-controls .fc-group-title {
+    font-size:11px; font-weight:600; letter-spacing:.02em; color:#8a7454; text-transform:uppercase;
+    margin:10px 0 4px 0;
+  }
+  #fibrille-controls .fc-row { margin-bottom:9px; }
+  #fibrille-controls .fc-row label {
+    display:flex; justify-content:space-between; gap:6px; margin-bottom:3px;
+  }
+  #fibrille-controls .fc-row .fc-val { color:#8a5a20; font-weight:600; white-space:nowrap; }
+  #fibrille-controls input[type=range] {
+    width:100%; accent-color:#c97a2b; cursor:pointer;
+  }
+  #fibrille-controls .fc-body.collapsed { display:none; }
+  #fibrille-controls .fc-toggle-icon { font-size:11px; color:#8a7454; }
+
+  /* Overlay di aiuto: appare sopra tutta la scena, ferma l'animazione mentre e' aperto */
+  #help-overlay {
+    display:none; position:absolute; inset:0; z-index:50;
+    align-items:center; justify-content:center;
+    background:rgba(35,24,12,0.55); padding:24px;
+  }
+  #help-panel {
+    position:relative; background:#fffaf0; width:100%; max-width:680px;
+    max-height:86vh; overflow-y:auto; border-radius:14px; padding:26px 28px;
+    box-shadow:0 12px 45px rgba(0,0,0,0.4); color:#3d2b1a; line-height:1.5;
+  }
+  #help-panel h2 { margin:0 0 6px 0; font-size:19px; color:#5a3a1a; }
+  #help-panel .help-intro { font-size:13.5px; color:#5a4a35; margin-bottom:16px; }
+  #help-panel h4 {
+    margin:16px 0 6px 0; font-size:13px; text-transform:uppercase; letter-spacing:.03em;
+    color:#8a5a20; border-bottom:1px solid #ecdfc4; padding-bottom:4px;
+  }
+  #help-panel dl { margin:0; }
+  #help-panel dt { font-weight:700; font-size:13.5px; color:#3d2b1a; margin-top:10px; }
+  #help-panel dd { margin:2px 0 0 0; font-size:13px; color:#5a4a35; }
+  #btn-help-close {
+    position:absolute; top:14px; right:14px; background:#3d2b1a; color:#fff;
+    border-color:#3d2b1a; padding:6px 14px;
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="mount"></div>
+  <div id="errbox">Impossibile caricare la libreria 3D (three.js) da rete in questo ambiente.<br>Prova ad aprire il file in un browser normale (Chrome, Safari, Firefox) invece che nel visualizzatore integrato.</div>
+  <div class="panel">
+    <button id="btn-top">Vista dall'alto</button>
+    <button id="btn-iso">Vista 3D</button>
+    <button id="btn-side">Vista laterale</button>
+    <button id="btn-granuli">Vista granuli</button>
+    <button id="btn-spin">Rotazione auto: off</button>
+    <button id="btn-help">? Aiuto</button>
+  </div>
+
+  <div id="fibrille-controls">
+    <h3 id="fc-toggle">Controlli fibrille <span class="fc-toggle-icon" id="fc-icon">▾</span></h3>
+    <div class="fc-body" id="fc-body">
+
+      <div class="fc-row" style="display:flex; gap:6px; margin-bottom:12px;">
+        <button id="btn-save-params" style="flex:1;">💾 Salva parametri</button>
+        <button id="btn-load-params" style="flex:1;">📂 Carica parametri</button>
+        <input type="file" id="file-load-params" accept="application/json,.json" style="display:none;">
+      </div>
+      <div id="params-io-status" style="font-size:11px; color:#8a5a20; margin:-6px 0 10px 0; min-height:14px;"></div>
+
+      <div class="fc-group-title">Frequenza eventi</div>
+      <div class="fc-row">
+        <label>Intervallo di controllo <span class="fc-val" id="val-CHECK_INTERVAL_MS">150 ms</span></label>
+        <input type="range" id="sl-CHECK_INTERVAL_MS" min="10" max="1000" step="10" value="150">
+      </div>
+      <div class="fc-row">
+        <label>Probabilità di innesco <span class="fc-val" id="val-TRIGGER_PROBABILITY">0.90</span></label>
+        <input type="range" id="sl-TRIGGER_PROBABILITY" min="0" max="1" step="0.01" value="0.9">
+      </div>
+
+      <div class="fc-group-title">Durata tratto scuro</div>
+      <div class="fc-row">
+        <label>Durata minima <span class="fc-val" id="val-HOLD_MS_MIN">5000 ms</span></label>
+        <input type="range" id="sl-HOLD_MS_MIN" min="500" max="15000" step="100" value="5000">
+      </div>
+      <div class="fc-row">
+        <label>Durata massima <span class="fc-val" id="val-HOLD_MS_MAX">11000 ms</span></label>
+        <input type="range" id="sl-HOLD_MS_MAX" min="1000" max="20000" step="100" value="11000">
+      </div>
+      <div class="fc-row">
+        <label>Scorrimento in avanti <span class="fc-val" id="val-DRIFT_DISTANCE">0.12</span></label>
+        <input type="range" id="sl-DRIFT_DISTANCE" min="0" max="0.4" step="0.01" value="0.12">
+      </div>
+
+      <div class="fc-group-title">Dissolvenza</div>
+      <div class="fc-row">
+        <label>Velocità fade chiaro/scuro <span class="fc-val" id="val-TRANSITION_MS">700 ms</span></label>
+        <input type="range" id="sl-TRANSITION_MS" min="100" max="3000" step="50" value="700">
+      </div>
+
+      <div class="fc-group-title">Estensione del tratto scuro</div>
+      <div class="fc-row">
+        <label>Lunghezza minima <span class="fc-val" id="val-SEGMENT_LEN_MIN">0.05</span></label>
+        <input type="range" id="sl-SEGMENT_LEN_MIN" min="0.02" max="1" step="0.01" value="0.05">
+      </div>
+      <div class="fc-row">
+        <label>Lunghezza massima <span class="fc-val" id="val-SEGMENT_LEN_MAX">0.15</span></label>
+        <input type="range" id="sl-SEGMENT_LEN_MAX" min="0.02" max="1" step="0.01" value="0.15">
+      </div>
+      <div class="fc-row">
+        <label>Sfumatura in avanti <span class="fc-val" id="val-SEGMENT_FEATHER">0.035</span></label>
+        <input type="range" id="sl-SEGMENT_FEATHER" min="0.005" max="0.5" step="0.005" value="0.035">
+      </div>
+      <div class="fc-row">
+        <label>Sfumatura all'indietro (frazione) <span class="fc-val" id="val-BACKWARD_FEATHER_RATIO">0.25</span></label>
+        <input type="range" id="sl-BACKWARD_FEATHER_RATIO" min="0.05" max="1" step="0.05" value="0.25">
+      </div>
+
+      <div class="fc-group-title">Zona utile del percorso</div>
+      <div class="fc-row">
+        <label>Inizio minimo (t) <span class="fc-val" id="val-MIN_START_T">0.10</span></label>
+        <input type="range" id="sl-MIN_START_T" min="0" max="0.5" step="0.01" value="0.10">
+      </div>
+      <div class="fc-row">
+        <label>Fine massima (t) <span class="fc-val" id="val-MAX_END_T">0.97</span></label>
+        <input type="range" id="sl-MAX_END_T" min="0.5" max="1" step="0.01" value="0.97">
+      </div>
+
+      <div class="fc-group-title">Granulo fotosferico</div>
+      <div class="fc-row">
+        <label>Velocità chiusura granulo <span class="fc-val" id="val-GRANULE_SHRINK_MS">2800 ms</span></label>
+        <input type="range" id="sl-GRANULE_SHRINK_MS" min="200" max="5000" step="50" value="2800">
+      </div>
+      <div class="fc-row">
+        <label>Dimensione granulo <span class="fc-val" id="val-GRANULE_RADIUS">24</span></label>
+        <input type="range" id="sl-GRANULE_RADIUS" min="2" max="34" step="0.5" value="24">
+      </div>
+      <div class="fc-row">
+        <label>Intensità chiusura <span class="fc-val" id="val-GRANULE_MIN_SCALE">0.12</span></label>
+        <input type="range" id="sl-GRANULE_MIN_SCALE" min="0.02" max="0.9" step="0.01" value="0.12">
+      </div>
+
+      <div class="fc-group-title">Onda a zigzag</div>
+      <div class="fc-row">
+        <label>Velocità salita (altezza massima) <span class="fc-val" id="val-WAVE_DURATION_FULL_MS">3500 ms</span></label>
+        <input type="range" id="sl-WAVE_DURATION_FULL_MS" min="500" max="7000" step="100" value="3500">
+      </div>
+      <div class="fc-row">
+        <label>Spessore tubo <span class="fc-val" id="val-WAVE_TUBE_RADIUS">2.2</span></label>
+        <input type="range" id="sl-WAVE_TUBE_RADIUS" min="0.5" max="5" step="0.1" value="2.2">
+      </div>
+      <div class="fc-row">
+        <label>Zigzag alla base <span class="fc-val" id="val-WAVE_JITTER_AMP_BASE">1.5</span></label>
+        <input type="range" id="sl-WAVE_JITTER_AMP_BASE" min="0" max="5" step="0.1" value="1.5">
+      </div>
+      <div class="fc-row">
+        <label>Zigzag in cima <span class="fc-val" id="val-WAVE_JITTER_AMP_GROWTH">6</span></label>
+        <input type="range" id="sl-WAVE_JITTER_AMP_GROWTH" min="0" max="16" step="0.5" value="6">
+      </div>
+
+      <div class="fc-group-title">Velocità generali</div>
+      <div class="fc-row">
+        <label>Velocità frecce di flusso <span class="fc-val" id="val-FLOW_SPEED">0.00006</span></label>
+        <input type="range" id="sl-FLOW_SPEED" min="0.00001" max="0.0002" step="0.00001" value="0.00006">
+      </div>
+
+    </div>
+  </div>
+
+  <div id="help-overlay">
+    <div id="help-panel">
+      <button id="btn-help-close">Chiudi ✕</button>
+      <h2>Come funziona il modello e cosa fa ogni parametro</h2>
+      <p class="help-intro">
+        Ogni fibrilla (tubo di flusso) nasce <strong>chiara</strong> dalla regione attiva
+        circolare, con la stessa densita' di plasma di tutte le altre. Lungo il suo
+        percorso puo' essere investita, in un punto casuale, da un'onda magnetoacustica
+        che ne addensa il plasma per un tratto: quel tratto diventa piu' opaco/scuro
+        finche' l'onda non si esaurisce, poi torna chiaro. L'animazione e' ora ferma:
+        i valori mostrati sono quelli attivi in questo momento nel pannello "Controlli
+        fibrille"; puoi chiudere questo aiuto e regolarli mentre l'animazione riparte.
+      </p>
+
+      <h4>Frequenza eventi</h4>
+      <dl>
+        <dt>Intervallo di controllo (CHECK_INTERVAL_MS)</dt>
+        <dd>Ogni quanti millisecondi viene rivalutata la possibilita' di far partire un
+        nuovo tratto scuro su una fibrilla ancora libera. Valore piu' basso = controlli
+        piu' frequenti = eventi piu' ravvicinati nel tempo. Valore piu' alto = eventi
+        piu' radi.</dd>
+
+        <dt>Probabilita' di innesco (TRIGGER_PROBABILITY)</dt>
+        <dd>Probabilita' (0-1) che un nuovo evento parta ad ogni controllo, su una
+        fibrilla libera. Piu' alta = piu' fibrille si attivano contemporaneamente; piu'
+        bassa = eventi piu' rari. In media un nuovo evento parte ogni
+        (intervallo di controllo / probabilita') millisecondi.</dd>
+      </dl>
+
+      <h4>Durata del tratto scuro</h4>
+      <dl>
+        <dt>Durata minima e massima (HOLD_MS_MIN / HOLD_MS_MAX)</dt>
+        <dd>Ad ogni evento la durata di permanenza scura viene scelta a caso fra questi
+        due estremi (in millisecondi), prima che il tratto inizi a tornare chiaro.
+        Valori piu' alti = fibrille scure piu' a lungo = disegno complessivamente piu'
+        scuro. Valori piu' bassi = il colore scuro sparisce piu' in fretta = disegno
+        piu' chiaro.</dd>
+
+        <dt>Scorrimento in avanti (DRIFT_DISTANCE)</dt>
+        <dd>Una volta formato, il blocco scuro non resta fermo: scorre in avanti nello
+        stesso verso delle frecce di flusso, trasportato dal plasma, mantenendo
+        SEMPRE la stessa lunghezza fissa (non si allunga mai, si sposta soltanto).
+        Questo valore (in frazione 0-1 della lunghezza del tubo) indica di quanto
+        avanza durante l'intera sua vita da scuro. Valore 0 = resta fermo; valore
+        piu' alto = scorre di piu'.</dd>
+      </dl>
+
+      <h4>Dissolvenza</h4>
+      <dl>
+        <dt>Velocita' fade chiaro/scuro (TRANSITION_MS)</dt>
+        <dd>Durata in millisecondi della transizione graduale di colore, sia in entrata
+        (schiarito → scuro) sia in uscita (scuro → schiarito). Valore piu' basso =
+        cambio piu' scattante/veloce; valore piu' alto = dissolvenza piu' lenta e
+        morbida.</dd>
+      </dl>
+
+      <h4>Estensione del tratto scuro</h4>
+      <dl>
+        <dt>Lunghezza minima e massima (SEGMENT_LEN_MIN / SEGMENT_LEN_MAX)</dt>
+        <dd>Lunghezza del tratto che si scurisce ad ogni evento, espressa come frazione
+        (0-1) della lunghezza totale del tubo. Deve restare un pacchetto contenuto e
+        localizzato, come una vera onda di addensamento — non coprire la maggior
+        parte del tubo. Una volta formato, si sposta rigidamente in avanti (vedi
+        "Scorrimento in avanti" qui sotto) restando sempre della stessa lunghezza,
+        invece di allungarsi.</dd>
+
+        <dt>Sfumatura in avanti (SEGMENT_FEATHER)</dt>
+        <dd>Ampiezza (in frazione della lunghezza) della sfumatura sul bordo in avanti
+        del tratto scuro (nel verso del flusso), per evitare un taglio netto di
+        colore. Valore piu' basso = bordo piu' netto e deciso; valore piu' alto =
+        bordo molto sfumato e graduale.</dd>
+
+        <dt>Sfumatura all'indietro (BACKWARD_FEATHER_RATIO)</dt>
+        <dd>Il plasma scorre in avanti, quindi l'addensamento si propaga soprattutto
+        in quel verso: la sfumatura prima del punto di innesco (contro il verso del
+        flusso) usa solo questa piccola FRAZIONE della sfumatura in avanti — non un
+        valore assoluto. Ad esempio 0.25 significa che va indietro solo un quarto di
+        quanto va in avanti. Non puo' comunque mai sconfinare oltre l'origine del
+        tubo, qualunque valore venga impostato.</dd>
+      </dl>
+
+      <h4>Zona utile del percorso</h4>
+      <dl>
+        <dt>Inizio minimo - t (MIN_START_T)</dt>
+        <dd>Punto piu' vicino alla regione attiva (t=0) in cui puo' comparire il
+        granulo e iniziare un tratto scuro: garantisce che la fibrilla esca sempre
+        chiara dalla macchia, come richiesto dal modello fisico.</dd>
+
+        <dt>Fine massima - t (MAX_END_T)</dt>
+        <dd>Punto piu' lontano (verso t=1, l'estremo di atterraggio) in cui puo'
+        comparire il granulo. Il punto di innesco e' scelto in modo UNIFORME su
+        tutto l'intervallo fra MIN_START_T e MAX_END_T, con la stessa probabilita'
+        vicino alla base, a meta' tubo o vicino alla fine — se il tratto scuro
+        scelto e' troppo lungo per stare per intero prima di MAX_END_T, viene
+        semplicemente troncato li'. Restringere l'intervallo concentra i granuli
+        verso il centro del percorso; allargarlo li fa comparire quasi ovunque
+        lungo il tubo.</dd>
+      </dl>
+
+      <h4>Granulo fotosferico e onda a zigzag</h4>
+      <p class="help-intro" style="margin-bottom:8px;">
+        Ad ogni evento, PRIMA che una fibrilla scurisca, sulla fotosfera compare un
+        granulo: un cerchio giallo con bordo nero, posizionato ESATTAMENTE sotto il
+        punto del tubo in cui il colore comincera' a cambiare (stessa X,Z, ma in
+        basso, a livello del suolo). Per questo i granuli appaiono sparsi su tutto lo
+        spazio in basso, non ammassati in un unico punto. Il granulo si restringe (i
+        due raggi si riducono insieme); quando arriva quasi a scomparire, sparisce del
+        tutto e al suo posto compare un sottile tubo a zigzag (l'onda vera e propria),
+        che risale in verticale allargando la propria oscillazione man mano che sale,
+        fino a toccare il tubo: solo li' parte lo scurimento del plasma (fasi "active"
+        → "in").
+      </p>
+      <dl>
+        <dt>Velocita' chiusura granulo (GRANULE_SHRINK_MS)</dt>
+        <dd>Tempo (ms) impiegato dal granulo per chiudersi (restringersi) prima di
+        sparire e far comparire l'onda. Valore piu' basso = chiusura piu' rapida e
+        scattante; valore piu' alto = chiusura piu' lenta e visibile.</dd>
+
+        <dt>Dimensione granulo (GRANULE_RADIUS)</dt>
+        <dd>Dimensione del granulo quando compare sulla fotosfera, prima di iniziare
+        a chiudersi. Valore piu' alto = granulo piu' grande e visibile.</dd>
+
+        <dt>Intensita' chiusura (GRANULE_MIN_SCALE)</dt>
+        <dd>Dimensione minima raggiunta dal granulo durante la chiusura, come frazione
+        (0-1) della sua dimensione iniziale. Valore piu' basso (vicino a 0) = il
+        granulo si chiude quasi del tutto prima di sparire; valore piu' alto =
+        rimane visibile una porzione maggiore fino alla scomparsa.</dd>
+
+        <dt>Velocita' salita - altezza massima (WAVE_DURATION_FULL_MS)</dt>
+        <dd>Tempo (ms) che l'onda impiegherebbe a salire dell'altezza massima
+        raggiungibile dal tubo. Il tempo reale di salita e' proporzionale all'altezza
+        reale da percorrere, quindi i punti piu' alti sul tubo si accendono piu' tardi.
+        Valore piu' basso = salita piu' veloce; valore piu' alto = salita piu' lenta e
+        visibile.</dd>
+
+        <dt>Spessore tubo (WAVE_TUBE_RADIUS)</dt>
+        <dd>Quanto e' spesso il sottile tubo a zigzag che rappresenta l'onda.</dd>
+
+        <dt>Zigzag alla base / in cima (WAVE_JITTER_AMP_BASE / WAVE_JITTER_AMP_GROWTH)</dt>
+        <dd>Ampiezza dell'oscillazione a zigzag vicino al suolo, e di quanto cresce
+        salendo verso il tubo. Valori piu' alti rendono l'onda piu' "nervosa" e
+        visibile, soprattutto in prossimita' del tubo.</dd>
+      </dl>
+
+      <h4>Velocità generali</h4>
+      <dl>
+        <dt>Velocita' frecce di flusso (FLOW_SPEED)</dt>
+        <dd>Velocita' con cui le frecce che rappresentano il flusso di plasma scorrono
+        lungo i tubi, dalla base verso l'atterraggio. Valore piu' basso = frecce piu'
+        lente; valore piu' alto = frecce piu' veloci.</dd>
+      </dl>
+    </div>
+  </div>
+
+  <div class="hint">Trascina per ruotare · rotellina per zoom · tasto destro per pan</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+// =====================================================================================
+// BLOCCO DATI DI CONTROLLO — CAMBIO DI COLORE DELLE FIBRILLE
+// (addensamento/rarefazione del plasma lungo il tubo di flusso)
+// -------------------------------------------------------------------------------------
+// Modello fisico rappresentato: ogni fibrilla nasce CHIARA dalla regione attiva (bassa
+// densita' di plasma). Lungo il suo percorso puo' essere investita da un'onda
+// magnetoacustica che ne addensa il plasma per un TRATTO del percorso: quel tratto
+// diventa piu' opaco/scuro finche' l'onda non si esaurisce, poi torna chiaro.
+//
+// Tutti i valori che seguono sono raggruppati per effetto visivo e sono pensati per
+// essere modificati liberamente, senza toccare il resto dello script. Per ogni
+// parametro sono indicati: cosa controlla, cosa succede aumentandolo/diminuendolo, e
+// un paio di valori di esempio.
+// =====================================================================================
+var FIBRILLE_CONFIG = {
+
+  // --- FREQUENZA DEGLI EVENTI ------------------------------------------------------
+  // Ogni quanti ms viene rivalutata la possibilita' di far partire un nuovo tratto
+  // scuro su una fibrilla libera, e con quale probabilita'.
+  // Un evento nuovo parte, in media, ogni (CHECK_INTERVAL_MS / TRIGGER_PROBABILITY) ms,
+  // su una fibrilla che non ha gia' un tratto scuro attivo.
+  //   - CHECK_INTERVAL_MS piu' BASSO  -> controlli piu' frequenti -> eventi piu' frequenti
+  //   - CHECK_INTERVAL_MS piu' ALTO   -> controlli piu' radi      -> eventi piu' radi
+  //     Esempi: 10 (frequentissimo, minimo) ... 150 (attuale) ... 800 (raro)
+  CHECK_INTERVAL_MS:   150,
+
+  //   - TRIGGER_PROBABILITY piu' ALTA (max 1.0)  -> piu' probabile che un evento parta
+  //     ad ogni controllo -> piu' fibrille scure contemporaneamente
+  //   - TRIGGER_PROBABILITY piu' BASSA -> eventi piu' rari
+  //     Esempi: 0.25 (raro) ... 0.55 (attuale) ... 0.85 (quasi certo ad ogni controllo)
+  TRIGGER_PROBABILITY: 0.9,
+
+  // --- DURATA DEL TRATTO SCURO (quanto resta scuro prima di tornare chiaro) --------
+  // Ad ogni evento la durata di permanenza scura viene scelta a caso fra questi due
+  // estremi (in millisecondi). Valori piu' alti = fibrille scure piu' a lungo = disegno
+  // piu' scuro nel complesso. Valori piu' bassi = il colore scuro sparisce piu' in
+  // fretta = disegno piu' chiaro nel complesso.
+  //     Esempi HOLD_MS_MIN: 1500 (breve) ... 5000 (attuale) ... 8000 (lungo)
+  //     Esempi HOLD_MS_MAX: 3000 (breve) ... 11000 (attuale) ... 18000 (molto lungo)
+  HOLD_MS_MIN:         5000,
+  HOLD_MS_MAX:         11000,
+
+  // --- SCORRIMENTO DEL BLOCCO SCURO NEL VERSO DEL FLUSSO ----------------------------
+  // Una volta formato, il blocco scuro non resta fermo: scorre in avanti (nello
+  // stesso verso delle frecce di flusso), trasportato dal plasma, mantenendo SEMPRE
+  // la stessa lunghezza fissa (non si allunga mai, si sposta soltanto). Si ferma da
+  // solo se raggiunge l'estremo di atterraggio del tubo.
+  //   - DRIFT_DISTANCE: di quanto avanza il blocco (in frazione 0..1 della lunghezza
+  //     del tubo) durante l'intera sua vita "scura" (dalla fine dello scurimento
+  //     fino alla fine dello sfumare). Valore piu' alto = scorre di piu'/piu' in
+  //     fretta; valore 0 = resta fermo come prima.
+  //     Esempi: 0.02 (scorrimento appena percettibile) ... 0.12 (attuale) ... 0.4 (scorrimento ampio)
+  DRIFT_DISTANCE:      0.12,
+
+  // --- VELOCITA' DELLA DISSOLVENZA (fade chiaro<->scuro) ----------------------------
+  // Durata in ms della transizione graduale di colore, sia in entrata (schiarimento->
+  // scurimento) che in uscita (scurimento->schiarimento).
+  //   - Valore piu' BASSO -> transizione piu' scattante/veloce
+  //   - Valore piu' ALTO  -> dissolvenza piu' lenta e morbida
+  //     Esempi: 300 (scattante) ... 700 (attuale) ... 1500 (molto morbida)
+  TRANSITION_MS:       700,
+
+  // --- ESTENSIONE DEL TRATTO SCURO LUNGO IL PERCORSO --------------------------------
+  // Lunghezza del tratto che si scurisce, espressa come FRAZIONE (0..1) della
+  // lunghezza totale del tubo. Deve restare un pacchetto CONTENUTO e localizzato
+  // (come una vera onda di addensamento), non coprire la maggior parte del tubo:
+  // una volta formato, si sposta rigidamente in avanti (vedi DRIFT_DISTANCE) restando
+  // sempre della stessa lunghezza. Il punto di innesco (dove compare il granulo)
+  // resta uniforme su tutta la zona utile: se il tratto e' troppo lungo per stare
+  // per intero prima di MAX_END_T, viene semplicemente troncato li'.
+  //     Esempi SEGMENT_LEN_MIN: 0.02 (macchia molto corta) ... 0.05 (attuale) ... 0.12
+  //     Esempi SEGMENT_LEN_MAX: 0.08 (macchia corta) ... 0.15 (attuale) ... 0.30 (estesa)
+  SEGMENT_LEN_MIN:     0.05,
+  SEGMENT_LEN_MAX:     0.15,
+
+  // Ampiezza (in frazione 0..1 della lunghezza) della sfumatura ai due bordi del
+  // tratto scuro, per evitare un taglio netto di colore. Questo valore vale per la
+  // sfumatura IN AVANTI (nel verso del flusso, dopo il tratto scuro); la sfumatura
+  // ALL'INDIETRO (prima del punto di innesco) ne usa solo una piccola frazione,
+  // vedi BACKWARD_FEATHER_RATIO qui sotto.
+  //   - Valore piu' BASSO -> bordo piu' netto/deciso
+  //   - Valore piu' ALTO  -> bordo piu' sfumato/graduale
+  //     Esempi: 0.015 (bordo netto) ... 0.035 (attuale) ... 0.5 (sfumatura estesa a meta' tubo)
+  SEGMENT_FEATHER:     0.035,
+  //   - BACKWARD_FEATHER_RATIO: quanto e' ampia la sfumatura all'indietro (prima del
+  //     punto di innesco, contro il verso del flusso) rispetto a quella in avanti.
+  //     Il plasma scorre in avanti, quindi l'addensamento si propaga soprattutto in
+  //     quel verso: solo una piccola parte deve andare all'indietro.
+  //     Esempi: 0.05 (quasi solo in avanti) ... 0.25 (attuale) ... 1.0 (simmetrica)
+  BACKWARD_FEATHER_RATIO: 0.25,
+
+  // --- ZONA DEL PERCORSO IN CUI PUO' INNESCARSI IL TRATTO SCURO ---------------------
+  // Limiti (in frazione 0..1 del percorso) entro cui puo' comparire il granulo e
+  // iniziare il tratto scuro. MIN_START_T > 0 garantisce che la fibrilla esca sempre
+  // chiara dalla regione attiva (t=0); MAX_END_T < 1 evita che il granulo compaia
+  // troppo vicino all'estremo di atterraggio. Il punto di innesco (startT) e'
+  // scelto in modo UNIFORME su tutto questo intervallo, con la STESSA probabilita'
+  // in ogni punto (vicino alla base, a meta' tubo, o vicino alla fine) — non e'
+  // influenzato dalla lunghezza del tratto scuro.
+  //   - Restringere l'intervallo (MIN_START_T piu' alto / MAX_END_T piu' basso)
+  //     riduce la zona utile e rende i granuli piu' concentrati al centro
+  //   - Allargare l'intervallo (MIN_START_T piu' basso / MAX_END_T piu' alto)
+  //     permette ai granuli di comparire quasi ovunque lungo il tubo
+  //     Esempi MIN_START_T: 0.02 (quasi da subito) ... 0.10 (attuale) ... 0.25
+  //     Esempi MAX_END_T:   0.99 (quasi fino in fondo) ... 0.97 (attuale) ... 0.80
+  MIN_START_T:         0.10,
+  MAX_END_T:           0.97,
+
+  // --- GRANULO FOTOSFERICO --------------------------------------------------------
+  // Ad ogni evento, PRIMA che il tratto inizi a scurirsi, sulla fotosfera (alla base
+  // del tubo) compare un piccolo granulo: un cerchio giallo con bordo nero. Il
+  // granulo si restringe (i due raggi si riducono insieme); quando arriva quasi a
+  // scomparire, al suo posto compare il cono con l'onda interna (vedi sotto).
+  //   - GRANULE_SHRINK_MS piu' BASSO -> il granulo si chiude piu' velocemente
+  //     Esempi: 800 (scattante) ... 2800 (attuale) ... 5000 (molto lento e ben visibile)
+  GRANULE_SHRINK_MS:   2800,
+  //   - GRANULE_RADIUS: dimensione del granulo quando compare, prima di iniziare a
+  //     restringersi. Piu' alto -> granulo piu' grande e visibile.
+  //     Esempi: 6 (piccolo) ... 24 (attuale) ... 34 (enorme)
+  GRANULE_RADIUS:      24,
+  //   - GRANULE_MIN_SCALE piu' BASSO (vicino a 0) -> chiusura piu' marcata/completa
+  //     Esempi: 0.02 (scompare quasi del tutto) ... 0.12 (attuale) ... 0.5 (chiusura lieve)
+  GRANULE_MIN_SCALE:   0.12,
+
+  // --- CONO E ONDA INTERNA -----------------------------------------------------------
+  // Quando il granulo arriva al minimo, sparisce e al suo posto compare un sottile
+  // tubo a zigzag che rappresenta l'onda vera e propria, e risale fino a toccare il
+  // tubo: solo li', dove tocca, parte lo scurimento del plasma.
+  //   - WAVE_DURATION_FULL_MS: tempo (ms) che l'onda impiegherebbe a salire
+  //     dell'altezza massima raggiungibile dal tubo; il tempo reale e' proporzionale
+  //     all'altezza reale da percorrere, quindi i punti piu' alti si accendono piu' tardi.
+  //     Piu' basso -> salita piu' veloce; piu' alto -> salita piu' lenta e visibile.
+  //     Esempi: 800 (rapida) ... 3500 (attuale) ... 6000 (molto lenta)
+  WAVE_DURATION_FULL_MS: 3500,
+  //   - WAVE_TUBE_RADIUS: spessore del sottile tubo a zigzag che rappresenta l'onda.
+  //     Esempi: 0.8 (filiforme) ... 2.2 (attuale) ... 4.5 (spesso)
+  WAVE_TUBE_RADIUS:    2.2,
+  //   - WAVE_JITTER_AMP_BASE: ampiezza dello zigzag alla base (vicino al suolo).
+  //     Esempi: 0.5 (quasi dritto) ... 1.5 (attuale) ... 4
+  WAVE_JITTER_AMP_BASE: 1.5,
+  //   - WAVE_JITTER_AMP_GROWTH: quanto cresce l'ampiezza dello zigzag salendo verso
+  //     il tubo (cresce in modo quadratico con l'altezza).
+  //     Esempi: 2 (zigzag quasi costante) ... 6 (attuale) ... 14 (zigzag molto ampio in cima)
+  WAVE_JITTER_AMP_GROWTH: 6,
+
+  // --- VELOCITA' DELLE FRECCE DI FLUSSO ---------------------------------------------
+  // Velocita' con cui le frecce che scorrono lungo i tubi (flusso di plasma) si
+  // muovono dalla base verso l'atterraggio. Rallentata per accompagnare meglio il
+  // ritmo, ora piu' lento, degli eventi di granulo/onda/scurimento.
+  //   - FLOW_SPEED piu' BASSO -> frecce piu' lente
+  //     Esempi: 0.00002 (lentissime) ... 0.00006 (attuale) ... 0.00016 (veloci, valore originale)
+  FLOW_SPEED:          0.00006
+};
+// =====================================================================================
+
+window.addEventListener('load', function(){
+  if (typeof THREE === 'undefined' || typeof THREE.OrbitControls === 'undefined'){
+    document.getElementById('errbox').style.display = 'flex';
+    return;
+  }
+  try { init(); } catch(e){
+    document.getElementById('errbox').style.display = 'flex';
+    document.getElementById('errbox').innerHTML = 'Errore nella scena 3D: ' + e.message;
+    console.error(e);
+  }
+});
+
+function init(){
+  var mount = document.getElementById('mount');
+  var width = mount.clientWidth;
+  var height = mount.clientHeight;
+
+  var scene = new THREE.Scene();
+  scene.background = null;
+  // nebbia rimossa su richiesta: copriva le parti piu' lontane della scena
+
+  var camera = new THREE.PerspectiveCamera(42, width/height, 1, 5000);
+
+  var renderer = new THREE.WebGLRenderer({ antialias:true, alpha:true });
+  renderer.setSize(width, height);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  mount.appendChild(renderer.domElement);
+
+  var controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.target.set(0, 0, -60);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.08;
+  controls.minDistance = 80;
+  controls.maxDistance = 1200;
+
+  scene.add(new THREE.AmbientLight(0xffffff, 0.7));
+  var dl = new THREE.DirectionalLight(0xffffff, 0.85);
+  dl.position.set(250, 500, 300);
+  scene.add(dl);
+  var dl2 = new THREE.DirectionalLight(0xffe8c0, 0.3);
+  dl2.position.set(-200, 200, -200);
+  scene.add(dl2);
+
+  var groundGeo = new THREE.PlaneGeometry(20000, 20000);
+  var groundTexData = 'data:image/jpeg;base64,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';
+  var groundTex = new THREE.TextureLoader().load(groundTexData);
+  groundTex.wrapS = THREE.MirroredRepeatWrapping;
+  groundTex.wrapT = THREE.MirroredRepeatWrapping;
+  groundTex.repeat.set(35, 35);
+  var groundMat = new THREE.MeshStandardMaterial({ map: groundTex, color: 0xffffff, roughness:0.95, metalness:0 });
+  var ground = new THREE.Mesh(groundGeo, groundMat);
+  ground.rotation.x = -Math.PI/2;
+  ground.position.y = -1.2;
+  scene.add(ground);
+
+  // Curva "spina dorsale" nel piano orizzontale (vista dall'alto), a forma di S,
+  // simile all'andamento del filamento osservato nell'immagine H-alpha.
+  var spineCtrl = [
+    {x:-40,z:20},
+    {x:-10,z:-40},
+    {x:20,z:-110},
+    {x:90,z:-150},
+    {x:190,z:-150},
+    {x:280,z:-120},
+    {x:380,z:-85},
+    {x:480,z:-60}
+  ];
+
+  function catmullRom2D(ctrl, nSamples){
+    var pts = [ctrl[0]].concat(ctrl).concat([ctrl[ctrl.length-1]]);
+    var result = [];
+    for (var i=1;i<pts.length-2;i++){
+      var p0=pts[i-1],p1=pts[i],p2=pts[i+1],p3=pts[i+2];
+      var segN = Math.max(2, Math.floor(nSamples/(pts.length-3)));
+      for (var s=0;s<segN;s++){
+        var t = s/segN;
+        var t2=t*t,t3=t2*t;
+        var x = 0.5*((2*p1.x)+(-p0.x+p2.x)*t+(2*p0.x-5*p1.x+4*p2.x-p3.x)*t2+(-p0.x+3*p1.x-3*p2.x+p3.x)*t3);
+        var z = 0.5*((2*p1.z)+(-p0.z+p2.z)*t+(2*p0.z-5*p1.z+4*p2.z-p3.z)*t2+(-p0.z+3*p1.z-3*p2.z+p3.z)*t3);
+        result.push({x:x,z:z});
+      }
+    }
+    result.push(ctrl[ctrl.length-1]);
+    return result;
+  }
+
+  var spineSamples = catmullRom2D(spineCtrl, 240);
+  var cum = [0];
+  for (var si=1;si<spineSamples.length;si++){
+    var dxs=spineSamples[si].x-spineSamples[si-1].x, dzs=spineSamples[si].z-spineSamples[si-1].z;
+    cum.push(cum[si-1]+Math.sqrt(dxs*dxs+dzs*dzs));
+  }
+  var totalLen = cum[cum.length-1];
+
+  function spineAt(t){
+    var target = t*totalLen;
+    var idx = 0;
+    for (var i=0;i<cum.length-1;i++){
+      idx = i;
+      if (cum[i]<=target && cum[i+1]>=target) break;
+    }
+    var segLen = cum[idx+1]-cum[idx] || 1e-6;
+    var localT = (target-cum[idx])/segLen;
+    var p0=spineSamples[idx], p1=spineSamples[Math.min(idx+1,spineSamples.length-1)];
+    return { x: p0.x+(p1.x-p0.x)*localT, z: p0.z+(p1.z-p0.z)*localT };
+  }
+
+  function spineTangent(t){
+    var eps=0.01;
+    var t0=Math.max(0,t-eps), t1=Math.min(1,t+eps);
+    var a=spineAt(t0), b=spineAt(t1);
+    var dx=b.x-a.x, dz=b.z-a.z;
+    var len=Math.sqrt(dx*dx+dz*dz)||1e-6;
+    return {x:dx/len, z:dz/len};
+  }
+
+  function spineNormal(t){
+    var tan = spineTangent(t);
+    return { x: -tan.z, z: tan.x };
+  }
+
+  var N = 13;
+  var spacing = 9;
+  var cruiseJoinT = 0.10;
+  var cruiseEndT = 0.82;
+  var fanSpreadDeg = 92;
+  var fanSpreadRad = THREE.MathUtils.degToRad(fanSpreadDeg);
+  var landingRadiusExtra = 195;
+  var riseH = 55;
+  var plateauH = 95;
+
+  var tubeGroup = new THREE.Group();
+
+  // === COLORI DELLE FIBRILLE ===
+  // Le fibrille "scure" (colore storico) si alternano a fibrille piu' chiare,
+  // giallo-arancione, secondo la teoria di formazione rivista.
+  var tubeColorDark  = 0x6b3a20; // fibrilla scura (colore originale)
+  var tubeColorLight = 0xffb347; // fibrilla chiara, giallo-arancione
+  // ==============================
+
+  var glowMat = new THREE.MeshBasicMaterial({ color:0xffcc33 });
+  var tubeMeshesData = []; // un riferimento per ciascuna fibrilla, usato piu' sotto per gestire l'inversione di colore
+
+  // ===================================================================================
+  // GRANULO FOTOSFERICO E ONDA DI PRESSIONE
+  // Ad ogni evento di addensamento, PRIMA che il colore cambi, sulla fotosfera (alla
+  // base del tubo interessato) compare un piccolo granulo: un cerchio giallo con bordo
+  // nero. Il granulo si restringe (i due raggi, bordo e riempimento, si riducono
+  // insieme); quando arriva quasi a scomparire, dal granulo parte un'onda che risale
+  // lungo il tubo, allargandosi man mano che sale. Solo quando l'onda tocca il punto
+  // random del percorso in cui deve iniziare l'addensamento, li' parte lo scurimento
+  // del plasma - e a quel punto il granulo (gia' scomparso quando l'onda e' partita)
+  // lascia il posto a un tubo a zigzag che sale fino a toccarlo.
+  // ===================================================================================
+  var granuleBorderGeo = new THREE.CircleGeometry(1, 28);
+  var granuleFillGeo   = new THREE.CircleGeometry(1, 28);
+  var WAVE_SEGMENTS = 16; // suddivisioni del tubo a zigzag che rappresenta l'onda
+
+  function smoothstep01(x){
+    x = Math.max(0, Math.min(1, x));
+    return x*x*(3 - 2*x);
+  }
+
+  // crea il granulo (bordo nero + riempimento giallo) piatto, adagiato sulla fotosfera
+  function createGranule(point){
+    var border = new THREE.Mesh(granuleBorderGeo, new THREE.MeshBasicMaterial({
+      color:0x1a1208, depthTest:false, depthWrite:false
+    }));
+    var fill = new THREE.Mesh(granuleFillGeo, new THREE.MeshBasicMaterial({
+      color:0xffd83d, depthTest:false, depthWrite:false
+    }));
+    border.renderOrder = 995;
+    fill.renderOrder = 996;
+    border.rotation.x = -Math.PI/2;
+    fill.rotation.x = -Math.PI/2;
+    border.position.set(point.x, 1.85, point.z);
+    fill.position.set(point.x, 1.9, point.z);
+    border.scale.setScalar(FIBRILLE_CONFIG.GRANULE_RADIUS);
+    fill.scale.setScalar(FIBRILLE_CONFIG.GRANULE_RADIUS*0.72);
+    tubeGroup.add(border); tubeGroup.add(fill);
+    return { border:border, fill:fill };
+  }
+
+  function removeGranule(g){
+    if (!g) return;
+    tubeGroup.remove(g.border); tubeGroup.remove(g.fill);
+    g.border.material.dispose(); g.fill.material.dispose();
+  }
+
+  // aggiorna i due raggi del granulo durante la chiusura (1 -> GRANULE_MIN_SCALE),
+  // mantenendo costante il rapporto fra bordo nero e riempimento giallo
+  function updateGranuleShrink(g, progress){
+    var s = FIBRILLE_CONFIG.GRANULE_RADIUS * (1 - (1-FIBRILLE_CONFIG.GRANULE_MIN_SCALE)*smoothstep01(progress));
+    g.border.scale.setScalar(s);
+    g.fill.scale.setScalar(s*0.72);
+  }
+
+  // ---- ONDA A ZIGZAG (stessa tecnica di buildWaveGeometry, senza cono attorno) -----
+  // Solo un sottile tubo a zigzag (i punti oscillano a destra/sinistra con ampiezza
+  // crescente), ricostruito ogni frame man mano che sale, esattamente come nello
+  // script di riferimento fornito. Niente cono intorno (ingombrava troppo e faceva
+  // sembrare che l'evento coinvolgesse anche i tubi vicini) e nessun lampo finale.
+
+  function createConeWave(groundPoint, targetPoint){
+    // fattori di oscillazione fissati una volta per evento, cosi' lo zigzag ha un
+    // aspetto coerente (non "tremolante" in modo casuale) durante tutta la salita
+    var jitter = [];
+    for (var j=0; j<=WAVE_SEGMENTS; j++){ jitter.push(0.75 + Math.random()*0.5); }
+
+    var waveMat = new THREE.MeshBasicMaterial({ color:0xb5651d, transparent:true, opacity:0.95 });
+
+    return { groundPoint:groundPoint.clone(), targetPoint:targetPoint.clone(), jitter:jitter, waveMat:waveMat, waveMesh:null };
+  }
+
+  // ricostruisce il tubo a zigzag in base all'avanzamento (0 = appena partito dal
+  // granulo, 1 = ha raggiunto il tubo): l'ampiezza dello zigzag cresce
+  // quadraticamente con l'altezza, come nello script di riferimento
+  function updateConeWave(cw, progress){
+    if (cw.waveMesh){
+      tubeGroup.remove(cw.waveMesh);
+      cw.waveMesh.geometry.dispose();
+      cw.waveMesh = null;
+    }
+    var g = cw.groundPoint, t = cw.targetPoint;
+    var frontY = g.y + progress*(t.y - g.y);
+    var pts = [];
+    for (var s=0; s<=WAVE_SEGMENTS; s++){
+      var yFrac = s/WAVE_SEGMENTS;
+      var y = g.y + yFrac*(frontY-g.y);
+      var amp = FIBRILLE_CONFIG.WAVE_JITTER_AMP_BASE + FIBRILLE_CONFIG.WAVE_JITTER_AMP_GROWTH*yFrac*yFrac;
+      var sign = (s % 2 === 0) ? 1 : -1;
+      var jitter = cw.jitter[s] || 1;
+      var x = g.x + sign*amp*jitter;
+      var z = g.z + sign*amp*jitter*0.6;
+      pts.push(new THREE.Vector3(x, y, z));
+    }
+    var curve = new THREE.CatmullRomCurve3(pts);
+    var geo = new THREE.TubeGeometry(curve, Math.max(8, WAVE_SEGMENTS), FIBRILLE_CONFIG.WAVE_TUBE_RADIUS, 6, false);
+    cw.waveMesh = new THREE.Mesh(geo, cw.waveMat);
+    tubeGroup.add(cw.waveMesh);
+  }
+
+  function removeConeWave(cw){
+    if (!cw) return;
+    if (cw.waveMesh){
+      tubeGroup.remove(cw.waveMesh);
+      cw.waveMesh.geometry.dispose();
+    }
+    cw.waveMat.dispose();
+  }
+  // ===================================================================================
+
+  function buildVariableTube(curve, tubularSegments, radialSegments, radiusFn){
+    var frames = curve.computeFrenetFrames(tubularSegments, false);
+    var positions = [];
+    var normals = [];
+    var indices = [];
+
+    for (var i = 0; i <= tubularSegments; i++){
+      var t = i / tubularSegments;
+      var point = curve.getPointAt(t);
+      var N_ = frames.normals[i];
+      var B_ = frames.binormals[i];
+      var radius = radiusFn(t);
+
+      for (var j = 0; j <= radialSegments; j++){
+        var theta = (j / radialSegments) * Math.PI * 2;
+        var sin = Math.sin(theta), cos = -Math.cos(theta);
+        var nx = cos*N_.x + sin*B_.x;
+        var ny = cos*N_.y + sin*B_.y;
+        var nz = cos*N_.z + sin*B_.z;
+        positions.push(point.x + radius*nx, point.y + radius*ny, point.z + radius*nz);
+        normals.push(nx, ny, nz);
+      }
+    }
+
+    for (var i2 = 0; i2 < tubularSegments; i2++){
+      for (var j2 = 0; j2 < radialSegments; j2++){
+        var a = (radialSegments+1)*i2 + j2;
+        var b = (radialSegments+1)*(i2+1) + j2;
+        var c = (radialSegments+1)*(i2+1) + j2+1;
+        var d = (radialSegments+1)*i2 + j2+1;
+        indices.push(a,b,d, b,c,d);
+      }
+    }
+
+    // attributo colore per-vertice: inizializzato qui a bianco, viene poi impostato
+    // al colore chiaro subito dopo la creazione del tubo (vedi ciclo piu' sotto).
+    // Serve a poter scurire solo UN TRATTO del percorso, non l'intero tubo.
+    var vertCount = (tubularSegments+1)*(radialSegments+1);
+    var colors = new Float32Array(vertCount*3);
+
+    var geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+    geo.setAttribute('normal', new THREE.Float32BufferAttribute(normals, 3));
+    geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+    geo.setIndex(indices);
+    return geo;
+  }
+
+  function radiusProfile(t){
+    var rMin = 2.0, rMax = 8.0;
+    var thresh = 0.28;
+    if (t < thresh) return rMin;
+    var u = (t-thresh)/(1-thresh);
+    var smooth = u*u*u*(u*(u*6-15)+10); // smoothstep quintico: transizione molto graduale
+    return rMin + (rMax-rMin) * smooth;
+  }
+
+  var baseCenterForMarker = spineAt(0.045);
+  var landingPoints = [];
+  var flowCurves = [];
+
+  for (var i=0;i<N;i++){
+    var tN = i/(N-1);
+    var dLane = (i-(N-1)/2)*spacing;
+    var fanAngle = (tN-0.5)*fanSpreadRad;
+
+    // punto di partenza: casuale dentro l'area del cerchio nero (macchia),
+    // non piu' allineato - distribuzione uniforme sull'area (sqrt del raggio)
+    var baseCircleR = 26;
+    var rAngle = Math.random()*Math.PI*2;
+    var rRad = Math.sqrt(Math.random())*baseCircleR;
+    var baseX = baseCenterForMarker.x + Math.cos(rAngle)*rRad;
+    var baseZ = (baseCenterForMarker.z-10) + Math.sin(rAngle)*rRad;
+
+    // tratto di crociera: parallelo agli altri tubi nella prima parte (offset dLane,
+    // costante, tubi ancora sottili), poi l'offset cresce progressivamente verso la
+    // fine del tratto - proprio dove i tubi iniziano a ingrossarsi - cosi' che la
+    // distanza tra un tubo e l'altro aumenti insieme al diametro ed evitino di toccarsi
+    var cJoin = spineAt(cruiseJoinT), nJoin = spineNormal(cruiseJoinT);
+    var cMid  = spineAt((cruiseJoinT+cruiseEndT)/2), nMid = spineNormal((cruiseJoinT+cruiseEndT)/2);
+    var preEndT = cruiseJoinT + (cruiseEndT-cruiseJoinT)*0.78;
+    var cPre = spineAt(preEndT), nPre = spineNormal(preEndT);
+    var cEnd  = spineAt(cruiseEndT), nEnd = spineNormal(cruiseEndT);
+
+    var joinPt = { x: cJoin.x + nJoin.x*dLane, z: cJoin.z + nJoin.z*dLane };
+    var midPt  = { x: cMid.x  + nMid.x*dLane,  z: cMid.z  + nMid.z*dLane  };
+    var prePt  = { x: cPre.x  + nPre.x*dLane*1.7,  z: cPre.z  + nPre.z*dLane*1.7  };
+    var endPt  = { x: cEnd.x  + nEnd.x*dLane*2.6,  z: cEnd.z  + nEnd.z*dLane*2.6  };
+
+    // solo ora, verso la fine, i tubi divergono su un arco piu' ampio -
+    // proiettando IN AVANTI rispetto alla direzione locale del tratto di crociera,
+    // cosi' da evitare il ripiegamento all'indietro sopra il tratto precedente
+    var forwardDist = 200;
+    var lateralSpread = landingRadiusExtra;
+
+    var landX = endPt.x + nEnd.x*lateralSpread*Math.sin(fanAngle) + (endPt.x-midPt.x)*0 + spineTangent(cruiseEndT).x*forwardDist*Math.cos(fanAngle);
+    var landZ = endPt.z + nEnd.z*lateralSpread*Math.sin(fanAngle) + spineTangent(cruiseEndT).z*forwardDist*Math.cos(fanAngle);
+
+    var fanMidX = endPt.x + nEnd.x*lateralSpread*0.5*Math.sin(fanAngle) + spineTangent(cruiseEndT).x*forwardDist*0.5;
+    var fanMidZ = endPt.z + nEnd.z*lateralSpread*0.5*Math.sin(fanAngle) + spineTangent(cruiseEndT).z*forwardDist*0.5;
+
+    var pts = [
+      new THREE.Vector3(baseX, 0, baseZ),
+      new THREE.Vector3(baseX, riseH*0.6, baseZ + (joinPt.z-baseZ)*0.15),
+      new THREE.Vector3(joinPt.x, plateauH, joinPt.z),
+      new THREE.Vector3(midPt.x, plateauH, midPt.z),
+      new THREE.Vector3(prePt.x, plateauH, prePt.z),
+      new THREE.Vector3(endPt.x, plateauH, endPt.z),
+      new THREE.Vector3(fanMidX, plateauH*0.6, fanMidZ),
+      new THREE.Vector3(landX, riseH*0.3, landZ*0.97),
+      new THREE.Vector3(landX, 0, landZ)
+    ];
+    var curve = new THREE.CatmullRomCurve3(pts);
+    flowCurves.push(curve);
+    var tubeGeo = buildVariableTube(curve, 100, 10, radiusProfile);
+
+    // Tutte le fibrille nascono con la STESSA densita' (colore chiaro) dalla regione
+    // attiva: l'eventuale addensamento/scurimento avviene solo piu' avanti, in un
+    // tratto random del percorso (vedi blocco "ADDENSAMENTO LOCALIZZATO" piu' sotto).
+    // Il materiale usa vertexColors cosi' da poter colorare un tratto locale del
+    // tubo senza dover scurire l'intera fibrilla.
+    var initLight = new THREE.Color(tubeColorLight);
+    var colorAttr = tubeGeo.getAttribute('color');
+    for (var vc=0; vc<colorAttr.count; vc++){
+      colorAttr.setXYZ(vc, initLight.r, initLight.g, initLight.b);
+    }
+    colorAttr.needsUpdate = true;
+
+    var tubeMatInstance = new THREE.MeshStandardMaterial({
+      color: 0xffffff, vertexColors: true,
+      roughness:0.55, metalness:0.05
+    });
+
+    var mesh = new THREE.Mesh(tubeGeo, tubeMatInstance);
+    tubeGroup.add(mesh);
+
+    tubeMeshesData.push({
+      mesh:mesh, material:tubeMatInstance, colorAttr:colorAttr,
+      tubularSegments:100, radialSegments:10,
+      curve:curve,
+      segment:null,  // nessun tratto scuro attivo all'inizio
+      granule:null,  // granulo transitorio (cerchio giallo/bordo nero), attivo a inizio fase 'active'
+      wave:null      // onda transitoria che risale verso il punto di innesco, attiva durante la fase 'active'
+    });
+
+    landingPoints.push({x:landX, z:landZ});
+
+    var glow = new THREE.Mesh(new THREE.SphereGeometry(6.0,16,16), glowMat);
+    glow.position.set(landX, 2, landZ);
+    tubeGroup.add(glow);
+    var center = new THREE.Mesh(new THREE.SphereGeometry(3.0,14,14), new THREE.MeshBasicMaterial({ color:0xfff4b0 }));
+    center.position.set(landX, 3.5, landZ);
+    tubeGroup.add(center);
+    var halo = new THREE.Mesh(new THREE.SphereGeometry(12,16,16), new THREE.MeshBasicMaterial({ color:0xffcc33, transparent:true, opacity:0.22 }));
+    halo.position.copy(glow.position);
+    tubeGroup.add(halo);
+    var pl = new THREE.PointLight(0xffcc33, 0.5, 70);
+    pl.position.copy(glow.position);
+    tubeGroup.add(pl);
+  }
+
+  // base comune, di giallo meno intenso, sotto tutti i punti di atterraggio delle facole:
+  // una "salsiccia" curva (tubo sottile lungo l'arco di atterraggio) con due semisfere alle estremita'
+  var baseMatSausage = new THREE.MeshStandardMaterial({ color:0xf5da8a, roughness:0.9, transparent:true, opacity:0.75 });
+  var sausageRadius = 14;
+  if (landingPoints.length > 1){
+    var sausagePts = [];
+    for (var lp3=0; lp3<landingPoints.length; lp3++){
+      sausagePts.push(new THREE.Vector3(landingPoints[lp3].x, -0.6, landingPoints[lp3].z));
+    }
+    var sausageCurve = new THREE.CatmullRomCurve3(sausagePts);
+    var sausageGeo = new THREE.TubeGeometry(sausageCurve, 60, sausageRadius, 12, false);
+    var sausageMesh = new THREE.Mesh(sausageGeo, baseMatSausage);
+    tubeGroup.add(sausageMesh);
+
+    var capStart = new THREE.Mesh(new THREE.SphereGeometry(sausageRadius,16,16), baseMatSausage);
+    capStart.position.copy(sausagePts[0]);
+    tubeGroup.add(capStart);
+    var capEnd = new THREE.Mesh(new THREE.SphereGeometry(sausageRadius,16,16), baseMatSausage);
+    capEnd.position.copy(sausagePts[sausagePts.length-1]);
+    tubeGroup.add(capEnd);
+  }
+
+  var baseMesh = new THREE.Mesh(
+    new THREE.CylinderGeometry(34, 40, 6, 28),
+    new THREE.MeshStandardMaterial({ color:0x1c1310, roughness:0.85 })
+  );
+  baseMesh.position.set(baseCenterForMarker.x, -1.5, baseCenterForMarker.z-10);
+  tubeGroup.add(baseMesh);
+  var baseRing = new THREE.Mesh(
+    new THREE.RingGeometry(40, 58, 32),
+    new THREE.MeshStandardMaterial({ color:0xe08a55, roughness:0.9, side:THREE.DoubleSide })
+  );
+  baseRing.rotation.x = -Math.PI/2;
+  baseRing.position.set(baseCenterForMarker.x, -1, baseCenterForMarker.z-10);
+  tubeGroup.add(baseRing);
+
+  // particelle di flusso: piccole frecce che percorrono ciascun tubo
+  // dal polo nero (base) verso le facole (atterraggio), in loop continuo.
+  // depthTest disattivato cosi' restano visibili anche quando il tubo,
+  // ingrossandosi, le circonderebbe rendendole altrimenti nascoste.
+  var flowMat = new THREE.MeshBasicMaterial({
+    color:0xfff2a0, transparent:true, opacity:0.98,
+    blending:THREE.AdditiveBlending, depthTest:false, depthWrite:false
+  });
+  var arrowGeo = new THREE.ConeGeometry(2.6, 9, 8);
+  var particlesPerTube = 3;
+  var flowParticles = [];
+  for (var fc=0; fc<flowCurves.length; fc++){
+    for (var pp=0; pp<particlesPerTube; pp++){
+      var particle = new THREE.Mesh(arrowGeo, flowMat);
+      particle.renderOrder = 999;
+      particle.userData.curve = flowCurves[fc];
+      particle.userData.phase = Math.random();
+      particle.userData.speedMul = 0.8 + Math.random()*0.4;
+      tubeGroup.add(particle);
+      flowParticles.push(particle);
+    }
+  }
+
+  // ===================================================================================
+  // ADDENSAMENTO LOCALIZZATO DEL PLASMA (granulo -> onda -> colore chiaro -> scuro -> chiaro)
+  // A intervalli random, un granulo fotosferico alla base di una fibrilla libera (senza
+  // gia' un tratto scuro attivo) si restringe e lancia un'onda di pressione che risale
+  // lungo il tubo. Solo quando l'onda raggiunge un PUNTO RANDOM del percorso (mai
+  // proprio all'origine, sulla regione attiva) il plasma li' si addensa: il tratto
+  // scurisce gradualmente, resta scuro per una durata random, poi torna chiaro
+  // gradualmente, esattamente come richiesto dal modello fisico. Tutti i parametri di
+  // frequenza/durata sono raccolti in FIBRILLE_CONFIG, in cima allo script.
+  //
+  // Fasi dell'evento, in ordine: 'active' (granulo e onda partono insieme nello
+  // stesso istante: il granulo si contrae e sparisce mentre l'onda sale lungo il
+  // tubo fino al punto di innesco) -> 'in' (il tratto scurisce) ->
+  // 'hold' (resta scuro) -> 'out' (torna chiaro) -> null (fibrilla di nuovo libera).
+  // ===================================================================================
+  var lastFlipCheckTime = performance.now();
+  var colDark  = new THREE.Color(tubeColorDark);
+  var colLight = new THREE.Color(tubeColorLight);
+  var tmpColor = new THREE.Color();
+
+  // fattore spaziale (0..1) di quanto il punto a parametro t lungo il tubo
+  // appartiene al tratto scuro 'seg', con bordi sfumati di ampiezza seg.feather
+  function segmentLocalFactor(t, seg){
+    if (t >= seg.startT && t <= seg.endT) return 1;
+    if (t < seg.startT){
+      // sfumatura "all'indietro" (prima del punto di innesco, contro il verso del
+      // flusso): deve restare MOLTO piu' piccola di quella in avanti, dato che il
+      // plasma scorre in avanti e l'addensamento si propaga soprattutto in quel
+      // verso. Non deve MAI sconfinare oltre t=0 (il tubo esce sempre chiaro dalla
+      // regione attiva), qualunque sia il valore impostato.
+      var featherBefore = Math.max(0.0001, Math.min(
+        seg.feather * FIBRILLE_CONFIG.BACKWARD_FEATHER_RATIO, seg.startT
+      ));
+      var d = seg.startT - t;
+      if (d > featherBefore) return 0;
+      return smoothstep01(1 - d/featherBefore);
+    } else {
+      // sfumatura in avanti (nel verso del flusso): usa il valore pieno impostato,
+      // senza sconfinare oltre l'estremo di atterraggio (t=1)
+      var featherAfter = Math.max(0.0001, Math.min(seg.feather, 1 - seg.endT));
+      var d2 = t - seg.endT;
+      if (d2 > featherAfter) return 0;
+      return smoothstep01(1 - d2/featherAfter);
+    }
+  }
+
+  // fa scorrere in avanti il blocco scuro (nel verso del flusso), mantenendo SEMPRE
+  // la stessa lunghezza fissa (seg.baseLen, decisa una volta sola quando il tratto
+  // ha finito di scurirsi): non si allunga mai, si sposta soltanto. Si ferma da solo
+  // quando raggiunge l'estremo di atterraggio del tubo (t=1).
+  function applyDrift(seg, now){
+    var rate = FIBRILLE_CONFIG.DRIFT_DISTANCE / Math.max(1, seg.holdMs); // frazione di t al ms
+    var elapsed = now - seg.driftOriginTime;
+    var newStartT = seg.driftOriginT + rate*elapsed;
+    var maxStartT = Math.max(0, 1 - seg.baseLen);
+    if (newStartT > maxStartT) newStartT = maxStartT;
+    if (newStartT < 0) newStartT = 0;
+    seg.startT = newStartT;
+    seg.endT = Math.min(1, newStartT + seg.baseLen);
+  }
+
+  // riscrive l'attributo colore del tubo in base al tratto attivo e all'intensita'
+  // globale corrente (0 = tutto chiaro, 1 = tratto scuro a piena opacita')
+  function paintTubeSegment(td, intensity){
+    var seg = td.segment;
+    var rows = td.tubularSegments + 1;
+    var vertsPerRow = td.radialSegments + 1;
+    var attr = td.colorAttr;
+    for (var r=0; r<rows; r++){
+      var t = r/(rows-1);
+      var factor = seg ? segmentLocalFactor(t, seg) * intensity : 0;
+      tmpColor.copy(colLight).lerp(colDark, factor);
+      var base = r*vertsPerRow;
+      for (var vpr=0; vpr<vertsPerRow; vpr++){
+        attr.setXYZ(base+vpr, tmpColor.r, tmpColor.g, tmpColor.b);
+      }
+    }
+    attr.needsUpdate = true;
+  }
+
+  function updateColorFlips(now){
+    // 1) verifica periodica (ogni CHECK_INTERVAL_MS) se innescare un nuovo addensamento
+    if (now - lastFlipCheckTime >= FIBRILLE_CONFIG.CHECK_INTERVAL_MS){
+      lastFlipCheckTime = now;
+      if (Math.random() < FIBRILLE_CONFIG.TRIGGER_PROBABILITY){
+        // sceglie una fibrilla senza gia' un tratto scuro attivo
+        var candidates = tubeMeshesData.filter(function(td){ return !td.segment; });
+        if (candidates.length > 0){
+          var chosen = candidates[Math.floor(Math.random()*candidates.length)];
+          var len = FIBRILLE_CONFIG.SEGMENT_LEN_MIN +
+                    Math.random()*(FIBRILLE_CONFIG.SEGMENT_LEN_MAX - FIBRILLE_CONFIG.SEGMENT_LEN_MIN);
+          // startT e' uniforme su TUTTO l'intervallo [MIN_START_T, MAX_END_T], cosi' i
+          // granuli si formano con la stessa probabilita' lungo l'intera lunghezza del
+          // tubo. Se il tratto scuro (lungo "len") non ci sta per intero prima di
+          // MAX_END_T, viene semplicemente troncato li' (endT), invece di restringere
+          // artificialmente dove puo' iniziare startT.
+          var startT = FIBRILLE_CONFIG.MIN_START_T +
+                       Math.random()*(FIBRILLE_CONFIG.MAX_END_T - FIBRILLE_CONFIG.MIN_START_T);
+          var endT = Math.min(startT + len, FIBRILLE_CONFIG.MAX_END_T);
+          chosen.segment = {
+            startT: startT,
+            endT: endT,
+            feather: FIBRILLE_CONFIG.SEGMENT_FEATHER,
+            phase: 'active',   // granulo e onda avanzano insieme, nello stesso istante
+            phaseStart: now,
+            holdMs: FIBRILLE_CONFIG.HOLD_MS_MIN +
+                    Math.random()*(FIBRILLE_CONFIG.HOLD_MS_MAX - FIBRILLE_CONFIG.HOLD_MS_MIN)
+          };
+          // il punto sul tubo dove il colore comincera' a scurirsi
+          var targetPoint = chosen.curve.getPointAt(startT);
+          // il granulo compare sulla fotosfera, ESATTAMENTE sotto quel punto (stessa X,Z,
+          // ma in basso, a livello del suolo): per questo i granuli appaiono sparsi su
+          // tutto lo spazio in basso, non ammassati dentro la macchia
+          var groundPoint = new THREE.Vector3(targetPoint.x, 0.6, targetPoint.z);
+          chosen.segment.targetPoint = targetPoint;
+          chosen.segment.groundPoint = groundPoint;
+          // il granulo comincia subito a contrarsi E, nello stesso istante, l'onda
+          // comincia gia' a salire: nessuna sfasatura fra i due eventi
+          chosen.granule = createGranule(groundPoint);
+          chosen.wave = createConeWave(groundPoint, targetPoint);
+        }
+      }
+    }
+    // 2) avanza granulo, onda e tratti scuri attualmente attivi
+    for (var ti=0; ti<tubeMeshesData.length; ti++){
+      var td = tubeMeshesData[ti];
+      var seg = td.segment;
+      if (!seg) continue;
+
+      if (seg.phase === 'active'){
+        // il granulo si contrae e sparisce, in parallelo all'onda che sale: partono
+        // insieme, nello stesso istante (seg.phaseStart)
+        if (td.granule){
+          var progShrink = (now - seg.phaseStart) / FIBRILLE_CONFIG.GRANULE_SHRINK_MS;
+          if (progShrink >= 1){
+            removeGranule(td.granule);
+            td.granule = null;
+          } else {
+            updateGranuleShrink(td.granule, progShrink);
+          }
+        }
+
+        // l'onda sale in verticale dal suolo fino al punto sul tubo; il tempo di
+        // salita e' proporzionale all'altezza da percorrere, cosi' i punti piu' alti
+        // sul tubo si accendono piu' tardi
+        var maxHeightRef = riseH + plateauH;
+        var heightFrac = Math.max(0.05, Math.min(1, (seg.targetPoint.y - seg.groundPoint.y) / maxHeightRef));
+        var waveTravelMs = Math.max(60, FIBRILLE_CONFIG.WAVE_DURATION_FULL_MS * heightFrac);
+        var waveProgress = (now - seg.phaseStart) / waveTravelMs;
+        if (waveProgress >= 1){
+          // l'onda tocca il tubo: qui, e solo qui, comincia lo scurimento del plasma
+          removeConeWave(td.wave);
+          td.wave = null;
+          if (td.granule){ removeGranule(td.granule); td.granule = null; } // rete di sicurezza
+          seg.phase = 'in';
+          seg.phaseStart = now;
+        } else {
+          updateConeWave(td.wave, waveProgress);
+        }
+      } else if (seg.phase === 'in'){
+        var progIn = (now - seg.phaseStart) / FIBRILLE_CONFIG.TRANSITION_MS;
+        if (progIn >= 1){
+          progIn = 1;
+          seg.phase = 'hold';
+          seg.phaseStart = now;
+          // memorizza la lunghezza originale (fissa) e il punto/istante di partenza
+          // dello scorrimento: da qui in poi il blocco avanza SENZA mai allungarsi
+          seg.baseLen = seg.endT - seg.startT;
+          seg.driftOriginT = seg.startT;
+          seg.driftOriginTime = now;
+        }
+        paintTubeSegment(td, progIn);
+      } else if (seg.phase === 'hold'){
+        applyDrift(seg, now);
+        paintTubeSegment(td, 1);
+        if (now - seg.phaseStart >= seg.holdMs){
+          seg.phase = 'out';
+          seg.phaseStart = now;
+        }
+      } else if (seg.phase === 'out'){
+        // il blocco continua a scorrere in avanti anche mentre sfuma, mantenendo
+        // sempre la stessa lunghezza fissa
+        applyDrift(seg, now);
+        var progOut = (now - seg.phaseStart) / FIBRILLE_CONFIG.TRANSITION_MS;
+        if (progOut >= 1){
+          // tratto completamente tornato chiaro: libera la fibrilla per un futuro evento
+          paintTubeSegment(td, 0);
+          td.segment = null;
+          continue;
+        }
+        paintTubeSegment(td, 1 - progOut);
+      }
+    }
+  }
+
+  scene.add(tubeGroup);
+
+  var views = {
+    top:  { pos:[320, 850, -110],  target:[320,0,-110] },
+    iso:  { pos:[720, 380, -640], target:[320,0,-120] },
+    side: { pos:[1080, 150, -110], target:[320,50,-110] },
+    granuli: {
+      pos:[baseCenterForMarker.x + 120, 70, baseCenterForMarker.z-10 + 120],
+      target:[baseCenterForMarker.x, 10, baseCenterForMarker.z-10]
+    }
+  };
+
+  function setView(name){
+    var v = views[name];
+    camera.position.set(v.pos[0], v.pos[1], v.pos[2]);
+    controls.target.set(v.target[0], v.target[1], v.target[2]);
+    controls.update();
+    var btns = document.querySelectorAll('.panel button');
+    for (var k=0;k<btns.length;k++) btns[k].classList.remove('active');
+    var b = document.getElementById('btn-'+name);
+    if (b) b.classList.add('active');
+  }
+  setView('iso');
+
+  document.getElementById('btn-top').addEventListener('click', function(){ setView('top'); });
+  document.getElementById('btn-iso').addEventListener('click', function(){ setView('iso'); });
+  document.getElementById('btn-side').addEventListener('click', function(){ setView('side'); });
+  document.getElementById('btn-granuli').addEventListener('click', function(){ setView('granuli'); });
+
+  var autoSpin = false;
+  var spinBtn = document.getElementById('btn-spin');
+  spinBtn.addEventListener('click', function(){
+    autoSpin = !autoSpin;
+    spinBtn.textContent = 'Rotazione auto: ' + (autoSpin ? 'on' : 'off');
+    spinBtn.classList.toggle('active', autoSpin);
+  });
+
+  // --- Pausa/ripresa dell'animazione (usata dal pannello di aiuto) -------------------
+  // isPaused: quando true, il ciclo smette di far avanzare colori/particelle/rotazione,
+  // ma continua comunque a renderizzare la scena (cosi' resta visibile e interagibile).
+  // pauseOffsetTotal accumula il tempo reale trascorso in pausa e viene sottratto da
+  // performance.now(): in questo modo, alla ripresa, l'animazione riparte esattamente
+  // da dove era rimasta, senza "salti" nei timer dei cambi di colore o nelle particelle.
+  var isPaused = false;
+  var pauseOffsetTotal = 0;
+  var lastRealTime = performance.now();
+
+  function animate(){
+    requestAnimationFrame(animate);
+    try {
+      var realNow = performance.now();
+      var dt = realNow - lastRealTime;
+      lastRealTime = realNow;
+      if (isPaused) pauseOffsetTotal += dt;
+      var now = realNow - pauseOffsetTotal; // tempo "di simulazione", congelato in pausa
+
+      if (!isPaused){
+        if (autoSpin){
+          var tt = now*0.0002;
+          var radius = camera.position.distanceTo(controls.target);
+          camera.position.x = controls.target.x + radius*Math.sin(tt);
+          camera.position.z = controls.target.z + radius*Math.cos(tt);
+        }
+        updateColorFlips(now);
+        for (var fp=0; fp<flowParticles.length; fp++){
+          try {
+            var part = flowParticles[fp];
+            var t = (now*FIBRILLE_CONFIG.FLOW_SPEED*part.userData.speedMul + part.userData.phase) % 1;
+            var pos = part.userData.curve.getPointAt(t);
+            if (pos && isFinite(pos.x) && isFinite(pos.y) && isFinite(pos.z)){
+              part.position.set(pos.x, pos.y, pos.z);
+              var tang = part.userData.curve.getTangentAt(Math.min(t, 0.999));
+              if (tang && isFinite(tang.x) && isFinite(tang.y) && isFinite(tang.z)){
+                part.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0), tang);
+              }
+            }
+          } catch(errParticle){ /* ignora la singola particella problematica */ }
+        }
+      }
+      controls.update();
+      renderer.render(scene, camera);
+    } catch(errFrame){ /* non bloccare mai il ciclo di animazione */ }
+  }
+  animate();
+
+  // --- Pulsante di aiuto: ferma l'animazione e mostra il pannello con la spiegazione
+  // di tutti i parametri; il pulsante di chiusura nel pannello fa ripartire l'animazione.
+  var helpOverlay = document.getElementById('help-overlay');
+  var helpBtn = document.getElementById('btn-help');
+  var helpCloseBtn = document.getElementById('btn-help-close');
+  helpBtn.addEventListener('click', function(){
+    isPaused = true;
+    helpOverlay.style.display = 'flex';
+  });
+  helpCloseBtn.addEventListener('click', function(){
+    helpOverlay.style.display = 'none';
+    isPaused = false;
+  });
+
+  window.addEventListener('resize', function(){
+    width = mount.clientWidth;
+    height = mount.clientHeight;
+    camera.aspect = width/height;
+    camera.updateProjectionMatrix();
+    renderer.setSize(width, height);
+  });
+}
+</script>
+
+<script>
+// =====================================================================================
+// COLLEGAMENTO CURSORI <-> FIBRILLE_CONFIG
+// Ogni cursore scrive direttamente nell'oggetto FIBRILLE_CONFIG (dichiarato in cima
+// allo script principale): siccome il ciclo di animazione legge quell'oggetto ad ogni
+// frame, la modifica ha effetto immediato, senza bisogno di ricaricare la pagina.
+// =====================================================================================
+(function(){
+  // { chiave in FIBRILLE_CONFIG : numero di decimali da mostrare nel valore, suffisso }
+  var sliderDefs = [
+    { key:'CHECK_INTERVAL_MS',   decimals:0, suffix:' ms' },
+    { key:'TRIGGER_PROBABILITY', decimals:2, suffix:''    },
+    { key:'HOLD_MS_MIN',         decimals:0, suffix:' ms' },
+    { key:'HOLD_MS_MAX',         decimals:0, suffix:' ms' },
+    { key:'DRIFT_DISTANCE',      decimals:2, suffix:''    },
+    { key:'TRANSITION_MS',       decimals:0, suffix:' ms' },
+    { key:'SEGMENT_LEN_MIN',     decimals:2, suffix:''    },
+    { key:'SEGMENT_LEN_MAX',     decimals:2, suffix:''    },
+    { key:'SEGMENT_FEATHER',     decimals:3, suffix:''    },
+    { key:'BACKWARD_FEATHER_RATIO', decimals:2, suffix:'' },
+    { key:'MIN_START_T',         decimals:2, suffix:''    },
+    { key:'MAX_END_T',           decimals:2, suffix:''    },
+    { key:'GRANULE_SHRINK_MS',     decimals:0, suffix:' ms' },
+    { key:'GRANULE_RADIUS',        decimals:1, suffix:''    },
+    { key:'GRANULE_MIN_SCALE',     decimals:2, suffix:''    },
+    { key:'WAVE_DURATION_FULL_MS', decimals:0, suffix:' ms' },
+    { key:'WAVE_TUBE_RADIUS',      decimals:1, suffix:''    },
+    { key:'WAVE_JITTER_AMP_BASE',  decimals:1, suffix:''    },
+    { key:'WAVE_JITTER_AMP_GROWTH', decimals:1, suffix:''   },
+    { key:'FLOW_SPEED',            decimals:5, suffix:''    }
+  ];
+
+  sliderDefs.forEach(function(def){
+    var slider = document.getElementById('sl-' + def.key);
+    var valueEl = document.getElementById('val-' + def.key);
+    if (!slider || !valueEl) return;
+
+    slider.addEventListener('input', function(){
+      var v = parseFloat(slider.value);
+      FIBRILLE_CONFIG[def.key] = v;
+      valueEl.textContent = v.toFixed(def.decimals) + def.suffix;
+    });
+  });
+
+  // riallinea TUTTI i cursori (posizione + testo del valore) ai valori attuali
+  // presenti in FIBRILLE_CONFIG - usato dopo il caricamento di un file salvato
+  function syncSlidersFromConfig(){
+    sliderDefs.forEach(function(def){
+      var slider = document.getElementById('sl-' + def.key);
+      var valueEl = document.getElementById('val-' + def.key);
+      if (!slider || !valueEl) return;
+      var v = FIBRILLE_CONFIG[def.key];
+      if (typeof v !== 'number' || !isFinite(v)) return;
+      slider.value = v;
+      valueEl.textContent = v.toFixed(def.decimals) + def.suffix;
+    });
+  }
+
+  // --- SALVA / CARICA PARAMETRI SU FILE ESTERNO -------------------------------------
+  // "Salva parametri" scrive un file .json con tutti i valori attuali di
+  // FIBRILLE_CONFIG. "Carica parametri" rilegge un file salvato in precedenza e
+  // riallinea sia FIBRILLE_CONFIG sia tutti i cursori del pannello.
+  //
+  // Dove disponibile (File System Access API: Chrome/Edge, anche su Mac) si usano le
+  // VERE finestre di sistema "Salva con nome..." / "Apri..." navigabili, con scelta
+  // della cartella. Su browser che non la supportano (Safari, Firefox) si torna in
+  // automatico al metodo precedente: download nella cartella Download, e selezione
+  // file tramite l'input standard del browser.
+  var ioStatus = document.getElementById('params-io-status');
+  var hasFSAccess = ('showSaveFilePicker' in window) && ('showOpenFilePicker' in window);
+
+  function showIoStatus(msg, isError){
+    ioStatus.textContent = msg;
+    ioStatus.style.color = isError ? '#a33' : '#8a5a20';
+    clearTimeout(showIoStatus._t);
+    showIoStatus._t = setTimeout(function(){ ioStatus.textContent = ''; }, 4000);
+  }
+
+  function downloadFallbackSave(data, filename){
+    var blob = new Blob([data], { type:'application/json' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  document.getElementById('btn-save-params').addEventListener('click', function(){
+    var data = JSON.stringify(FIBRILLE_CONFIG, null, 2);
+    var stamp = new Date().toISOString().slice(0,19).replace(/[:T]/g,'-');
+    var filename = 'fibrille_parametri_' + stamp + '.json';
+
+    if (hasFSAccess){
+      window.showSaveFilePicker({
+        suggestedName: filename,
+        types: [{ description:'JSON', accept:{ 'application/json':['.json'] } }]
+      }).then(function(handle){
+        return handle.createWritable().then(function(writable){
+          return writable.write(data).then(function(){ return writable.close(); });
+        });
+      }).then(function(){
+        showIoStatus('Parametri salvati.', false);
+      }).catch(function(err){
+        if (err && err.name === 'AbortError') return; // utente ha annullato la finestra
+        // fallback silenzioso se la finestra di sistema non e' utilizzabile
+        try { downloadFallbackSave(data, filename); showIoStatus('Parametri salvati (download).', false); }
+        catch(e){ showIoStatus('Errore nel salvataggio.', true); }
+      });
+    } else {
+      try { downloadFallbackSave(data, filename); showIoStatus('Parametri salvati.', false); }
+      catch(e){ showIoStatus('Errore nel salvataggio.', true); }
+    }
+  });
+
+  function applyLoadedParams(text){
+    try {
+      var parsed = JSON.parse(text);
+      var applied = 0;
+      for (var key in parsed){
+        if (Object.prototype.hasOwnProperty.call(FIBRILLE_CONFIG, key) &&
+            typeof parsed[key] === 'number' && isFinite(parsed[key])){
+          FIBRILLE_CONFIG[key] = parsed[key];
+          applied++;
+        }
+      }
+      syncSlidersFromConfig();
+      showIoStatus('Caricati ' + applied + ' parametri.', false);
+    } catch (err) {
+      showIoStatus('File non valido.', true);
+    }
+  }
+
+  var fileInput = document.getElementById('file-load-params');
+  document.getElementById('btn-load-params').addEventListener('click', function(){
+    if (hasFSAccess){
+      window.showOpenFilePicker({
+        types: [{ description:'JSON', accept:{ 'application/json':['.json'] } }],
+        multiple:false
+      }).then(function(handles){
+        return handles[0].getFile();
+      }).then(function(file){
+        return file.text();
+      }).then(function(text){
+        applyLoadedParams(text);
+      }).catch(function(err){
+        if (err && err.name === 'AbortError') return; // utente ha annullato la finestra
+        // fallback silenzioso: apre l'input file standard
+        fileInput.value = '';
+        fileInput.click();
+      });
+    } else {
+      fileInput.value = ''; // permette di ricaricare anche lo stesso file una seconda volta
+      fileInput.click();
+    }
+  });
+  fileInput.addEventListener('change', function(){
+    var file = fileInput.files && fileInput.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(){ applyLoadedParams(reader.result); };
+    reader.onerror = function(){ showIoStatus('Errore nella lettura del file.', true); };
+    reader.readAsText(file);
+  });
+
+  // pannello richiudibile, per non occupare spazio quando non serve regolare i valori
+  var toggle = document.getElementById('fc-toggle');
+  var body = document.getElementById('fc-body');
+  var icon = document.getElementById('fc-icon');
+  toggle.addEventListener('click', function(){
+    var collapsed = body.classList.toggle('collapsed');
+    icon.textContent = collapsed ? '▸' : '▾';
+  });
+})();
+</script>
+</body>
+</html>

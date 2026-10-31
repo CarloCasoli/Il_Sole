@@ -1,0 +1,584 @@
+<!doctype html>
+<!--
+  © 2026 Carlo Casoli — "Il Sole: Osservazione e Fisica"
+  Licenza CC BY-NC-ND 4.0: https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it
+  Vietati l'uso commerciale e la distribuzione di versioni modificate senza autorizzazione scritta dell'autore.
+-->
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Reazioni termonucleari nel Sole</title>
+<style>
+:root{--nu-text:#8C7600;--text-primary:#1f1e1d;--text-secondary:#5f5e5a;--border:rgba(0,0,0,.12);--border-strong:rgba(0,0,0,.25);--bg:#ffffff;--panel:rgba(0,0,0,.03)}
+@media (prefers-color-scheme:dark){:root{--nu-text:#F0DC55;--text-primary:#f1efe8;--text-secondary:#b4b2a9;--border:rgba(255,255,255,.12);--border-strong:rgba(255,255,255,.28);--bg:#1f1f1e;--panel:rgba(255,255,255,.04)}}
+*{box-sizing:border-box}
+body{margin:0;padding:16px;background:var(--bg);color:var(--text-primary);font-family:-apple-system,"Segoe UI",Roboto,sans-serif;max-width:1280px;margin:0 auto}
+a{color:#378ADD}
+button{background:transparent;color:var(--text-primary);border:1px solid var(--border-strong);border-radius:8px;cursor:pointer;font-family:inherit}
+button:hover{background:rgba(127,127,127,.12)}
+.top{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 14px;margin-bottom:8px}
+.top h1{font-size:19px;font-weight:600;margin:0}
+.top a{font-size:13px;text-decoration:none}
+.bar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:0 0 8px;font-size:12px;color:var(--text-secondary)}
+.bar button{font-size:12px;padding:4px 9px}
+.bar input[type=range]{width:110px}
+.bar b{font-weight:500;color:var(--text-primary);min-width:34px;display:inline-block}
+.tab{font-size:13px!important;padding:6px 13px!important;transition:background .15s}
+.tab[aria-selected=true]{background:#378ADD;color:#fff;border-color:#378ADD;font-weight:500}
+.sel[aria-pressed=true]{background:#378ADD;color:#fff;border-color:#378ADD}
+.ttl{font-size:17px;font-weight:500;margin:4px 0 2px}
+.sub{font-size:13px;color:var(--text-secondary);margin:0 0 8px;max-width:900px;line-height:1.45}
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
+.cv{width:100%;display:block;border:1px solid var(--border);border-radius:10px;background:var(--panel)}
+.card{border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:13px;line-height:1.5;background:var(--panel)}
+.eq{font-size:16px;font-weight:500;margin-bottom:4px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:6px 14px;font-size:12.5px;margin-top:8px}
+.grid div span{display:block;color:var(--text-secondary);font-size:11.5px}
+.grid div b{font-weight:500;font-size:14px}
+.note{margin-top:12px;font-size:12px;color:var(--text-secondary);line-height:1.45}
+.legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12px;color:var(--text-secondary);margin:6px 0}
+.legend i{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+section{display:none}section.on{display:block}
+#flow{cursor:pointer}
+@media (max-width:760px){.two{grid-template-columns:minmax(0,1fr)}body{padding:12px}.top h1{font-size:17px}}
+</style></head><body>
+
+<div class="top">
+  <h1>Le reazioni termonucleari nel nucleo del Sole</h1>
+  <a href="index.html">← Indice delle animazioni</a>
+</div>
+
+<div class="bar" role="tablist" aria-label="Sezioni">
+  <button class="tab" role="tab" data-t="0">1 · Barriera e tunnel</button>
+  <button class="tab" role="tab" data-t="1">2 · Ciclo P-P</button>
+  <button class="tab" role="tab" data-t="2">3 · Ciclo CNO</button>
+  <button class="tab" role="tab" data-t="3">4 · Bilancio energetico</button>
+</div>
+
+<div class="bar">
+  <button id="bP" aria-label="Pausa" style="min-width:36px">❚❚</button>
+  <button id="bR" aria-label="Ricomincia" style="min-width:36px">↺</button>
+  <label for="spd">Velocità</label><input type="range" id="spd" min="0.25" max="3" step="0.25" value="1"><b id="spdO">×1</b>
+</div>
+
+<!-- ============ 1. BARRIERA ============ -->
+<section id="s0">
+  <div class="ttl">Barriera coulombiana ed effetto tunnel</div>
+  <p class="sub">Due nuclei positivi si respingono. Alla temperatura del nucleo solare la loro energia tipica è centinaia di volte più piccola della barriera: in fisica classica la fusione sarebbe impossibile. La meccanica quantistica permette di attraversare la barriera "di taglio". Il prodotto tra la coda della distribuzione di Maxwell-Boltzmann e la probabilità di tunneling è il <b>picco di Gamow</b> (Approfondimento 4.2). Il grafico usa una scala fissa: alzando la temperatura il picco non si sposta soltanto, ma cresce, perché aumenta il numero di reazioni (il tratteggio grigio è il picco al centro del Sole).</p>
+  <div class="bar">
+    <span>Coppia:</span>
+    <button class="sel" data-r="pp">p + p</button>
+    <button class="sel" data-r="pc">p + ¹²C</button>
+    <button class="sel" data-r="pn">p + ¹⁴N (passo lento del CNO)</button>
+    <span style="margin-left:8px"><label for="tT">Temperatura</label></span>
+    <input type="range" id="tT" min="8" max="35" step="0.1" value="15.7" style="width:160px"><b id="tTO"></b>
+    <button id="tSun">Centro del Sole</button>
+  </div>
+  <canvas class="cv" id="cGam" style="height:380px" aria-label="Picco di Gamow"></canvas>
+  <div class="legend">
+    <span><i style="background:#378ADD"></i>distribuzione di Maxwell-Boltzmann, e<sup>−E/kT</sup></span>
+    <span><i style="background:#E24B4A"></i>probabilità di tunnel, e<sup>−√(E<sub>G</sub>/E)</sup></span>
+    <span><i style="background:#EF9F27"></i>prodotto: il picco di Gamow, la sua area misura il numero di reazioni</span>
+    <span><i style="background:#888"></i>picco di Gamow al centro del Sole (15,7 MK), per confronto</span>
+  </div>
+  <div class="card" style="margin-top:10px">
+    <div class="grid" id="gRead" style="margin-top:0"></div>
+  </div>
+</section>
+
+<!-- ============ 2. CATENA PP ============ -->
+<section id="s1">
+  <div class="ttl">Il ciclo P-P (protone-protone)</div>
+  <p class="sub">Le reazioni una alla volta, con i tempi di attesa reali nel nucleo solare: le barre in basso compaiono man mano che si procede. Clicca un riquadro dello schema per vedere quella reazione (Approfondimento 4.1). I passi 1–3 avvengono due volte, perché servono due nuclei di ³He.</p>
+  <div class="bar">
+    <button id="pPrev">◀ Reazione precedente</button>
+    <button id="pNext">Reazione successiva ▶</button>
+    <label style="margin-left:8px"><input type="checkbox" id="pBr"> Mostra i rami ppII e ppIII (approfondimento)</label>
+    <span style="margin-left:8px">Scala dei tempi:</span>
+    <button class="sel" data-s="lin">lineare</button>
+    <button class="sel" data-s="log">logaritmica</button>
+  </div>
+  <div class="two">
+    <canvas class="cv" id="cStage" style="height:330px" aria-label="Animazione della reazione"></canvas>
+    <canvas class="cv" id="flow" style="height:330px" aria-label="Schema della catena"></canvas>
+  </div>
+  <div class="legend">
+    <span><i style="background:#E24B4A"></i>protone</span><span><i style="background:#8C939E"></i>neutrone</span>
+    <span><i style="background:#D4537E"></i>positrone e⁺</span><span><i style="background:#378ADD"></i>elettrone e⁻</span>
+    <span><i style="background:#EF9F27"></i>fotone γ</span><span><i style="background:#E4CF2A"></i>neutrino νₑ</span>
+  </div>
+  <div class="two">
+    <div class="card"><div class="eq" id="pEq"></div><div id="pTxt"></div><div class="grid" id="pCons"></div></div>
+    <canvas class="cv" id="cTime" style="height:240px" aria-label="Tempi di attesa delle reazioni"></canvas>
+  </div>
+</section>
+
+<!-- ============ 3. CNO ============ -->
+<section id="s2">
+  <div class="ttl">Il ciclo CNO e il confronto con il ciclo P-P</div>
+  <p class="sub">Carbonio, azoto e ossigeno fanno da catalizzatori: il ¹²C che entra nel ciclo ne esce intatto, e intanto quattro protoni diventano un nucleo di elio. Poiché la barriera è più alta (Z = 6–7), il ciclo dipende dalla temperatura in modo molto più ripido del ciclo P-P (Approfondimento 6.1). Le curve valgono per le condizioni del centro, dove il CNO pesa di più: integrato su tutto il nucleo, nel Sole il ciclo CNO fornisce circa l'1% dell'energia, come confermato dai neutrini CNO misurati da Borexino nel 2020.</p>
+  <div class="bar">
+    <label for="cT">Temperatura</label><input type="range" id="cT" min="8" max="30" step="0.1" value="15.7" style="width:160px"><b id="cTO"></b>
+    <button id="cSun">Centro del Sole</button>
+    <button id="cPrev" style="margin-left:8px">◀ Reazione precedente</button>
+    <button id="cNext">Reazione successiva ▶</button>
+    <span style="margin-left:8px">Scala dei tempi:</span>
+    <button class="sel" data-s="lin">lineare</button>
+    <button class="sel" data-s="log">logaritmica</button>
+  </div>
+  <div class="two">
+    <canvas class="cv" id="cWheel" style="height:390px" aria-label="Ciclo CNO"></canvas>
+    <canvas class="cv" id="cEps" style="height:390px" aria-label="Produzione di energia in funzione della temperatura"></canvas>
+  </div>
+  <div class="two" style="margin-top:10px">
+    <div class="card"><div class="eq" id="cEq"></div><div class="grid" id="cRead"></div></div>
+    <canvas class="cv" id="cTimeC" style="height:240px" aria-label="Tempi di attesa delle reazioni del ciclo CNO"></canvas>
+  </div>
+</section>
+<!-- ============ 4. BILANCIO ============ -->
+<section id="s3">
+  <div class="ttl">Il bilancio energetico: da dove arrivano i 26,73 MeV</div>
+  <p class="sub">Quattro protoni pesano più di un nucleo di elio. La massa mancante diventa energia, Q = Δm·c². Il conto si può fare con le masse nucleari o con quelle atomiche: i due modi devono dare lo stesso risultato, se si tiene conto degli elettroni. Il totale è lo stesso per il ciclo P-P e per il ciclo CNO, perché in entrambi quattro protoni diventano un nucleo di elio: cambiano le reazioni in cui l'energia viene liberata e la quota che si portano via i neutrini.</p>
+  <div class="bar">
+    <span>Masse:</span>
+    <button class="sel" data-m="nuc">nucleari</button>
+    <button class="sel" data-m="atom">atomiche</button>
+    <span style="margin-left:12px">Ciclo:</span>
+    <button class="sel" data-k="pp">Ciclo P-P</button>
+    <button class="sel" data-k="cno">Ciclo CNO</button>
+  </div>
+  <div class="two">
+    <canvas class="cv" id="cBal" style="height:370px" aria-label="Bilancia delle masse"></canvas>
+    <canvas class="cv" id="cBar" style="height:370px" aria-label="Ripartizione dell'energia"></canvas>
+  </div>
+  <div class="card" style="margin-top:10px" id="mTxt"></div>
+  <canvas class="cv" id="cFuga" style="height:250px;margin-top:10px" aria-label="Neutrini e fotoni escono dal Sole"></canvas>
+  <div class="card" style="margin-top:10px">
+    Il fotone continua il suo viaggio nell'animazione <a href="fotoni_sole.html">Il viaggio dei fotoni nel Sole</a>.
+    <div class="grid" id="gGlob"></div>
+  </div>
+</section>
+
+
+<p class="note">Modello didattico: i tempi dell'animazione sono accelerati e alcuni elementi grafici sono ingranditi; i valori numerici (energie, tempi caratteristici, ritmi delle reazioni) sono quelli fisici. Le curve ε(T) usano le formule analitiche standard dei tassi non risonanti (Kippenhahn e Weigert, <i>Stellar Structure and Evolution</i>) con densità e composizione fisse ai valori del centro solare.</p>
+
+<script>
+'use strict';
+const $=id=>document.getElementById(id);
+const TAU=Math.PI*2;
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const COL={p:'#E24B4A',n:'#8C939E',ep:'#D4537E',em:'#378ADD',g:'#EF9F27',nu:'#E4CF2A',pp:'#1D9E75',cno:'#7F77DD',amb:'#BA7517',blu:'#378ADD'};
+let C={};
+function readCss(){const s=getComputedStyle(document.documentElement);const v=n=>s.getPropertyValue(n).trim();C={txt:v('--text-primary'),txt2:v('--text-secondary'),bd:v('--border'),bdS:v('--border-strong'),bg:v('--bg'),nuT:v('--nu-text')}}
+function fit(c){const r=c.getBoundingClientRect(),d=devicePixelRatio||1;const w=Math.max(1,Math.round(r.width*d)),h=Math.max(1,Math.round(r.height*d));if(c.width!==w||c.height!==h){c.width=w;c.height=h}const g=c.getContext('2d');g.setTransform(d,0,0,d,0,0);g.clearRect(0,0,r.width,r.height);return[g,r.width,r.height]}
+const fmt=(x,d=2)=>x.toFixed(d).replace('.',',');
+function sci(x,d=1){if(x===0)return'0';const e=Math.floor(Math.log10(Math.abs(x)));const m=x/Math.pow(10,e);const sup=String(e).split('').map(c=>'⁰¹²³⁴⁵⁶⁷⁸⁹'['0123456789'.indexOf(c)]||'⁻').join('');return fmt(m,d)+'×10'+sup}
+const ease=t=>t<0?0:t>1?1:t*t*(3-2*t);
+function font(g,sz,w=400){g.font=`${w} ${sz}px -apple-system,"Segoe UI",Roboto,sans-serif`}
+function text(g,s,x,y,{sz=12,w=400,col=C.txt,al='left',bl='alphabetic'}={}){font(g,sz,w);g.fillStyle=col;g.textAlign=al;g.textBaseline=bl;g.fillText(s,x,y)}
+function line(g,x1,y1,x2,y2,col,lw=1,dash=null){g.beginPath();g.moveTo(x1,y1);g.lineTo(x2,y2);g.strokeStyle=col;g.lineWidth=lw;g.setLineDash(dash||[]);g.stroke();g.setLineDash([])}
+function arrowHead(g,x,y,ang,col,s=7){g.beginPath();g.moveTo(x,y);g.lineTo(x-s*Math.cos(ang-0.4),y-s*Math.sin(ang-0.4));g.lineTo(x-s*Math.cos(ang+0.4),y-s*Math.sin(ang+0.4));g.closePath();g.fillStyle=col;g.fill()}
+function rrect(g,x,y,w,h,r){g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath()}
+
+/* ---------- particelle ---------- */
+const SP={p:{Z:1,A:1,l:'p'},d:{Z:1,A:2,l:'d'},he3:{Z:2,A:3,l:'³He'},he4:{Z:2,A:4,l:'⁴He'},be7:{Z:4,A:7,l:'⁷Be'},li7:{Z:3,A:7,l:'⁷Li'},b8:{Z:5,A:8,l:'⁸B'},be8:{Z:4,A:8,l:'⁸Be*'},
+ c12:{Z:6,A:12,l:'¹²C'},n13:{Z:7,A:13,l:'¹³N'},c13:{Z:6,A:13,l:'¹³C'},n14:{Z:7,A:14,l:'¹⁴N'},o15:{Z:8,A:15,l:'¹⁵O'},n15:{Z:7,A:15,l:'¹⁵N'},
+ ep:{Z:1,A:0,L:-1,l:'e⁺',lep:1},em:{Z:-1,A:0,L:1,l:'e⁻',lep:1},nu:{Z:0,A:0,L:1,l:'νₑ',ray:1},g:{Z:0,A:0,L:0,l:'γ',ray:1}};
+const NUCL={};
+function nucleons(A,Z){const k=A+'_'+Z;if(NUCL[k])return NUCL[k];const o=[];for(let i=0;i<A;i++){const a=i*2.39996,r=A==1?0:0.62*Math.sqrt(i+0.5);o.push({x:r*Math.cos(a),y:r*Math.sin(a),p:Math.floor((i+1)*Z/A)>Math.floor(i*Z/A)})}return NUCL[k]=o}
+function nucRadius(key,s=1){const sp=SP[key];return 6.5*s*(1+1.6*0.62*Math.sqrt(Math.max(0,sp.A-1)+0.5)*(sp.A>1?1:0))}
+function drawNuc(g,x,y,key,s=1,label=true){
+  const sp=SP[key];const rn=6.5*s;const ns=nucleons(sp.A,sp.Z);
+  for(let i=ns.length-1;i>=0;i--){const n=ns[i];g.beginPath();g.arc(x+n.x*rn*1.6,y+n.y*rn*1.6,rn,0,TAU);g.fillStyle=n.p?COL.p:COL.n;g.fill();g.lineWidth=1;g.strokeStyle=C.bg;g.stroke()}
+  if(label)text(g,sp.l,x,y+nucRadius(key,s)+13*s,{sz:12*Math.max(.85,s),w:500,al:'center'});
+}
+function drawLep(g,x,y,key,label=true){g.beginPath();g.arc(x,y,5,0,TAU);g.fillStyle=key=='ep'?COL.ep:COL.em;g.fill();if(label)text(g,SP[key].l,x+7,y-7,{sz:12,w:500,col:key=='ep'?COL.ep:COL.em})}
+function drawRay(g,x,y,ang,len,key,label=true){
+  const col=key=='nu'?COL.nu:COL.g;const ca=Math.cos(ang),sa=Math.sin(ang);
+  if(key=='nu'){line(g,x-ca*len,y-sa*len,x,y,col,2,[5,4])}
+  else{g.beginPath();for(let i=0;i<=40;i++){const u=i/40,d=-len*(1-u);const w=Math.sin(u*TAU*3)*4;g.lineTo(x+ca*d-sa*w,y+sa*d+ca*w)}g.strokeStyle=col;g.lineWidth=2;g.stroke()}
+  arrowHead(g,x,y,ang,col,8);
+  if(label)text(g,SP[key].l,x+ca*6-sa*12,y+sa*6+ca*12-2,{sz:13,w:600,col,al:'center'});
+}
+function drawAny(g,x,y,key,s=1,ang=0,len=40,label=true){const sp=SP[key];if(sp.ray)drawRay(g,x,y,ang,len,key,label);else if(sp.lep)drawLep(g,x,y,key,label);else drawNuc(g,x,y,key,s,label)}
+
+/* ---------- stato globale ---------- */
+let run=!RM,spd=1,tab=0,last=performance.now();
+const bP=$('bP');function setRun(v){run=v;bP.textContent=run?'❚❚':'▶';bP.setAttribute('aria-label',run?'Pausa':'Avvia')}setRun(run);
+bP.onclick=()=>setRun(!run);
+$('spd').oninput=e=>{spd=+e.target.value;$('spdO').textContent='×'+fmt(spd,spd%1?2:0)};
+$('bR').onclick=()=>RESET[tab]();
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>setTab(+b.dataset.t));
+function setTab(t){tab=t;document.querySelectorAll('.tab').forEach(b=>b.setAttribute('aria-selected',+b.dataset.t===t));document.querySelectorAll('section').forEach((s,i)=>s.classList.toggle('on',i===t));try{history.replaceState(null,'','#'+(t+1))}catch(e){}ENTER[t]&&ENTER[t]()}
+
+/* =====================================================================
+   1. BARRIERA E PICCO DI GAMOW
+   ===================================================================== */
+const KB=8.617333e-8;          // keV/K
+const AMU=931494.1;            // keV
+const ALPHA=1/137.036, HC_E2=1440; // e²/(4πε0) in keV·fm
+const REAC={pp:{m1:1.007276,m2:1.007276,A2:1,Z:1,lab:'p + p'},pc:{m1:1.007276,m2:11.9967,A2:12,Z:6,lab:'p + ¹²C'},pn:{m1:1.007276,m2:13.9992,A2:14,Z:7,lab:'p + ¹⁴N'}};
+let rk='pp',T1=15.7;
+function rp(k){const r=REAC[k];const mu=AMU*r.m1*r.m2/(r.m1+r.m2);const EG=2*mu*Math.pow(Math.PI*ALPHA*r.Z,2);const R=1.2*(1+Math.cbrt(r.A2));return{EG,R,Vb:HC_E2*r.Z/R,Z:r.Z}}
+const kT=T=>KB*T*1e6;
+const E0f=(EG,T)=>Math.cbrt(EG*kT(T)*kT(T)/4);
+function rate(EG,T){const k=kT(T),E0=E0f(EG,T),D=4/Math.sqrt(3)*Math.sqrt(E0*k);let a=Math.max(1e-4,E0-7*D),b=E0+8*D,n=500,h=(b-a)/n,s=0;for(let i=0;i<=n;i++){const E=a+i*h;s+=(i==0||i==n?.5:1)*Math.exp(-E/k-Math.sqrt(EG/E))}return s*h*Math.pow(k,-1.5)}
+document.querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>{rk=b.dataset.r;upd1()});
+$('tT').oninput=e=>{T1=+e.target.value;upd1()};
+$('tSun').onclick=()=>{T1=15.7;$('tT').value=15.7;upd1()};
+function upd1(){
+  document.querySelectorAll('[data-r]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.r===rk));
+  $('tTO').textContent=fmt(T1,1)+' MK';
+  const P=rp(rk),k=kT(T1),E0=E0f(P.EG,T1),D=4/Math.sqrt(3)*Math.sqrt(E0*k),tau=3*E0/k,nu=(tau-2)/3;
+  const rt=HC_E2*P.Z/E0,Pt=Math.exp(-Math.sqrt(P.EG/E0));
+  const rel=rate(P.EG,T1)/rate(P.EG,15.7),up=rate(P.EG,T1*1.1)/rate(P.EG,T1);
+  const items=[
+    ['Energia termica tipica kT',fmt(k,2)+' keV'],
+    ['Altezza della barriera',(P.Vb>=1000?fmt(P.Vb/1000,2)+' MeV':fmt(P.Vb,0)+' keV')+' a '+fmt(P.R,1)+' fm'],
+    ['Barriera / kT','≈ '+Math.round(P.Vb/k).toLocaleString('it-IT')+' volte'],
+    ['Energia di Gamow E_G',P.EG>=1000?fmt(P.EG/1000,1)+' MeV':fmt(P.EG,0)+' keV'],
+    ['Picco di Gamow E₀',fmt(E0,1)+' keV ('+fmt(E0/k,1)+' kT)'],
+    ['Larghezza del picco ΔE',fmt(D,1)+' keV'],
+    ['Spessore da attraversare a E₀','≈ '+Math.round(rt)+' fm'],
+    ['Probabilità di tunnel a E₀','≈ '+sci(Pt,1)],
+    ['Sensibilità: ritmo ∝ Tᵛ','ν ≈ '+fmt(nu,1)],
+    ['Ritmo rispetto al centro del Sole','× '+(rel>=100||rel<0.01?sci(rel,1):fmt(rel,rel<1?3:2))],
+    ['Se T aumenta del 10%','ritmo × '+fmt(up,2)]];
+  $('gRead').innerHTML=items.map(i=>`<div><span>${i[0]}</span><b>${i[1]}</b></div>`).join('');
+}
+function draw1(dt){
+  const P=rp(rk),k=kT(T1),E0=E0f(P.EG,T1);
+  const E0max=E0f(P.EG,35);
+  const [g,W,H]=fit($('cGam'));
+  const L2=40,R2=W-16,T2=40,B2=H-42,Emax=2.3*E0max;
+  const X2=E=>L2+(R2-L2)*E/Emax,Y2=v=>B2-(B2-T2)*v;
+  text(g,'Chi riesce a fondersi?',L2,20,{sz:14,w:500});
+  line(g,L2,B2,R2,B2,C.bdS);line(g,L2,T2,L2,B2,C.bdS);
+  const est=Emax>60?20:Emax>25?10:5;
+  for(let e=0;e<=Emax;e+=est){line(g,X2(e),B2,X2(e),B2+4,C.bdS);text(g,e+'',X2(e),B2+16,{sz:11,col:C.txt2,al:'center'})}
+  text(g,'energia relativa E (keV)',(L2+R2)/2,H-8,{sz:11,col:C.txt2,al:'center'});
+  const N=500,kR=kT(15.7),mb=[],tp=[],pr=[],ref=[];let pmax=0,pref=0;const Pend=Math.exp(-Math.sqrt(P.EG/Emax));
+  for(let i=0;i<=N;i++){const E=Math.max(1e-6,Emax*i/N);
+    mb.push(Math.exp(-E/k));tp.push(Math.exp(-Math.sqrt(P.EG/E))/Pend);
+    const q=Math.pow(kR/k,1.5)*Math.exp(-E/k-Math.sqrt(P.EG/E));pr.push(q);pmax=Math.max(pmax,q);
+    const r=Math.exp(-E/kR-Math.sqrt(P.EG/E));ref.push(r);pref=Math.max(pref,r)}
+  // fattore (kR/k)^1.5 = normalizzazione di Maxwell-Boltzmann: così l'area è proporzionale al ritmo di reazione
+  // scala fissa: il picco al centro del Sole occupa il 15% dell'altezza
+  const sc=0.15/pref;
+  const curve=(arr,col,lw,fill,s=1,dash)=>{g.beginPath();arr.forEach((v,i)=>{const x=X2(Emax*i/N),y=Y2(Math.min(1.05,v*s));i?g.lineTo(x,y):g.moveTo(x,y)});if(fill){g.lineTo(R2,B2);g.lineTo(L2,B2);g.closePath();g.fillStyle=fill;g.fill()}g.setLineDash(dash||[]);g.strokeStyle=col;g.lineWidth=lw;g.stroke();g.setLineDash([])};
+  g.save();g.beginPath();g.rect(L2,T2-4,R2-L2,B2-T2+4);g.clip();
+  curve(pr,COL.amb,2,'rgba(239,159,39,.28)',sc);
+  curve(ref,'rgba(136,136,136,.95)',1.5,null,sc,[5,4]);
+  curve(mb,COL.blu,2);curve(tp,COL.p,2);g.restore();
+  line(g,X2(E0),T2,X2(E0),B2,COL.amb,1,[3,3]);text(g,'E₀',X2(E0)+4,T2+10,{sz:11,w:600,col:COL.amb});
+  line(g,X2(k),B2,X2(k),B2-12,C.txt2,1);text(g,'kT',X2(k),B2-15,{sz:10.5,col:C.txt2,al:'center'});
+  const rel=rate(P.EG,T1)/rate(P.EG,15.7);
+  text(g,'reazioni: × '+(rel>=100||rel<0.01?sci(rel,1):fmt(rel,rel<1?2:1))+' rispetto al centro del Sole',R2,20,{sz:14,w:600,col:COL.amb,al:'right'});
+  if(pmax*sc>1.05)text(g,'↑ il picco esce dal grafico',X2(E0)+8,T2+28,{sz:12,w:600,col:COL.amb});
+}
+
+/* =====================================================================
+   2. CATENA PP
+   ===================================================================== */
+const STEPS=[
+ {id:1,short:'p + p',eq:'p + p → d + e⁺ + νₑ',R:['p','p'],P:[['d',190],['ep',35],['nu',-15]],Q:'0,42 MeV',t:'≈ 10¹⁰ anni',ts:3.16e17,br:'ppI',
+  txt:'Due protoni attraversano la barriera per effetto tunnel e, nel brevissimo istante dell\'incontro, uno dei due si trasforma in neutrone: è un processo dell\'interazione debole, ed è per questo che è così raro. È il collo di bottiglia di tutto il ciclo: un singolo protone del nucleo solare aspetta in media circa 10 miliardi di anni.'},
+ {id:2,short:'e⁺ + e⁻',eq:'e⁺ + e⁻ → γ + γ',R:['ep','em'],P:[['g',90],['g',-90]],Q:'1,022 MeV',t:'immediata',ts:null,br:'ppI',
+  txt:'Il positrone incontra quasi subito un elettrone del plasma e i due si annichilano: le loro masse a riposo (0,511 MeV ciascuna) diventano due fotoni γ. Questa energia fa parte dei 26,73 MeV, ed è spesso dimenticata nei bilanci (vedi la scheda 3).'},
+ {id:3,short:'d + p',eq:'d + p → ³He + γ',R:['d','p'],P:[['he3',190],['g',25]],Q:'5,49 MeV',t:'≈ 1 secondo',ts:1,br:'ppI',
+  txt:'Il deuterio cattura un altro protone quasi immediatamente: nasce l\'elio-3 e viene emesso un fotone γ. Qui non serve l\'interazione debole, e la reazione è velocissima.'},
+ {id:4,short:'³He + ³He',eq:'³He + ³He → ⁴He + p + p',R:['he3','he3'],P:[['he4',200],['p',40],['p',-30]],Q:'12,86 MeV',t:'≈ 10⁵ anni',ts:3.16e12,br:'ppI',
+  txt:'Servono due nuclei di ³He, quindi i passi 1–3 avvengono due volte. Un nucleo di ³He attende circa centomila anni prima di incontrarne un altro. Il risultato è un nucleo di ⁴He, e due protoni tornano nel plasma. È il ramo pp I, che nel Sole produce circa l\'85% dell\'elio.'},
+ {id:5,short:'³He + ⁴He',eq:'³He + ⁴He → ⁷Be + γ',R:['he3','he4'],P:[['be7',190],['g',25]],Q:'1,59 MeV',t:'',ts:null,br:'ppII/III',
+  txt:'Nel restante 15% circa dei casi il ³He si fonde con un nucleo di ⁴He già presente nel plasma, formando berillio-7. Da qui partono i rami pp II e pp III.'},
+ {id:6,short:'⁷Be + e⁻',eq:'⁷Be + e⁻ → ⁷Li + νₑ',R:['be7','em'],P:[['li7',190],['nu',0]],Q:'0,86 MeV',t:'',ts:null,br:'ppII',
+  txt:'Il ⁷Be cattura un elettrone e diventa litio-7. Il neutrino ha un\'energia ben definita, 0,86 MeV (nel 90% dei casi) o 0,38 MeV: sono i "neutrini del ⁷Be" misurati da Borexino al Gran Sasso.'},
+ {id:7,short:'⁷Li + p',eq:'⁷Li + p → ⁴He + ⁴He',R:['li7','p'],P:[['he4',150],['he4',-30]],Q:'17,35 MeV',t:'',ts:null,br:'ppII',
+  txt:'Il ⁷Li cattura un protone e si spezza in due nuclei di ⁴He. Fine del ramo pp II.'},
+ {id:8,short:'⁷Be + p',eq:'⁷Be + p → ⁸B + γ',R:['be7','p'],P:[['b8',190],['g',25]],Q:'0,14 MeV',t:'',ts:null,br:'ppIII',
+  txt:'Molto più raramente (circa lo 0,1% dei nuclei di ⁷Be, cioè lo 0,02% del totale) il ⁷Be cattura un protone invece di un elettrone: è il ramo pp III.'},
+ {id:9,short:'⁸B → ⁸Be*',eq:'⁸B → ⁸Be* + e⁺ + νₑ',R:['b8'],P:[['be8',190],['ep',60],['nu',-10]],Q:'≈ 15 MeV',t:'',ts:null,br:'ppIII',
+  txt:'Il boro-8 decade β⁺ ed emette il neutrino più energetico del ciclo, fino a circa 15 MeV. Pur essendo rarissimi, sono i neutrini rivelati dagli esperimenti storici: Homestake, Super-Kamiokande, SNO.'},
+ {id:10,short:'⁸Be* → 2 ⁴He',eq:'⁸Be* → ⁴He + ⁴He',R:['be8'],P:[['he4',160],['he4',-20]],Q:'≈ 3 MeV',t:'immediata',ts:null,br:'ppIII',
+  txt:'Il berillio-8 è instabile e si spezza subito in due nuclei di ⁴He. Fine del ramo pp III.'}];
+let pIdx=0,pPh=0,pBr=false,flowBoxes=[];
+const seq=()=>pBr?[0,1,2,3,4,5,6,4,7,8,9]:[0,1,2,3];
+let pSeqPos=0;
+function setStep(i,fromSeq){pIdx=i;pPh=0;if(!fromSeq){const s=seq();const k=s.indexOf(i);pSeqPos=k<0?0:k}updP()}
+$('pPrev').onclick=()=>{const s=seq();pSeqPos=(pSeqPos-1+s.length)%s.length;setStep(s[pSeqPos],true)};
+$('pNext').onclick=()=>{const s=seq();pSeqPos=(pSeqPos+1)%s.length;setStep(s[pSeqPos],true)};
+$('pBr').onchange=e=>{pBr=e.target.checked;$('flow').style.height=$('cStage').style.height=pBr?'460px':'330px';if(!pBr&&pIdx>3)setStep(3);updP()};
+$('flow').addEventListener('click',e=>{const r=e.target.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;const b=flowBoxes.find(b=>x>=b.x&&x<=b.x+b.w&&y>=b.y&&y<=b.y+b.h);if(b)setStep(b.i)});
+function cons(list){return list.reduce((a,k)=>({Z:a.Z+SP[k].Z,A:a.A+SP[k].A,L:a.L+(SP[k].L||0)}),{Z:0,A:0,L:0})}
+function updP(){
+  const s=STEPS[pIdx];$('pEq').textContent=s.id+'. '+s.eq;
+  $('pTxt').textContent=s.txt;
+  const a=cons(s.R),b=cons(s.P.map(p=>p[0]));const ok=(x,y)=>x===y?' ✓':' ✗';
+  $('pCons').innerHTML=[['Energia liberata Q',s.Q],['Tempo di attesa tipico',s.t||'—'],['Carica elettrica',a.Z+' → '+b.Z+ok(a.Z,b.Z)],['Numero di nucleoni',a.A+' → '+b.A+ok(a.A,b.A)],['Numero leptonico',a.L+' → '+b.L+ok(a.L,b.L)]].map(i=>`<div><span>${i[0]}</span><b>${i[1]}</b></div>`).join('');
+}
+function draw2(dt){
+  pPh+=dt*spd/4.2;
+  if(pPh>=1){pPh=0;if(run){const s=seq();pSeqPos=(pSeqPos+1)%s.length;pIdx=s[pSeqPos];updP()}}
+  const s=STEPS[pIdx];
+  /* palcoscenico */
+  let[g,W,H]=fit($('cStage'));const cx=W/2,cy=H*0.5,ph=pPh;
+  text(g,s.eq,14,22,{sz:15,w:600});
+  text(g,'ramo '+s.br,W-14,22,{sz:12,col:s.br=='ppI'?COL.pp:COL.cno,w:500,al:'right'});
+  const n=s.R.length,S=Math.max(1,Math.min(1.6,W/300));
+  if(ph<0.42){
+    const e=ease(ph/0.36);
+    s.R.forEach((k,i)=>{let x,y=cy;if(n==1){x=cx}else{const side=i?1:-1;const gap=(SP[k].ray||SP[k].lep?8:nucRadius(k,S))+4;x=cx+side*(W*0.38-(W*0.38-gap)*e)}drawAny(g,x,y,k,S)});
+  }
+  if(ph>0.3&&ph<0.62){const f=1-Math.abs(ph-0.42)/0.16;const rad=20+60*f;const gr=g.createRadialGradient(cx,cy,0,cx,cy,rad);gr.addColorStop(0,'rgba(255,214,120,'+(.95*f)+')');gr.addColorStop(1,'rgba(239,159,39,0)');g.fillStyle=gr;g.beginPath();g.arc(cx,cy,rad,0,TAU);g.fill()}
+  if(ph>=0.42){
+    const u=ease((ph-0.42)/0.5);
+    s.P.forEach(([k,adeg])=>{const a=-adeg*Math.PI/180;const sp=SP[k];const dist=sp.ray?u*Math.max(W,H)*0.75:u*Math.min(W*0.3,H*0.34)*(sp.lep?1.2:1);
+      const x=cx+Math.cos(a)*dist,y=cy+Math.sin(a)*dist;
+      if(sp.ray){if(x>-20&&x<W+20&&y>-20&&y<H+20)drawRay(g,x,y,a,Math.min(50,dist),k)}else drawAny(g,x,y,k,S)});
+  }
+  text(g,(s.Q[0]=='≈'?'Q ':'Q = ')+s.Q,14,H-14,{sz:13,w:500,col:COL.amb});
+  if(s.t)text(g,'attesa tipica: '+s.t,W-14,H-14,{sz:13,w:500,col:C.txt2,al:'right'});
+  /* schema */
+  [g,W,H]=fit($('flow'));flowBoxes=[];
+  const rows=pBr?7:4,rh=(H-24)/rows,bh=Math.min(34,rh-12),cols=pBr?{A:W*0.2,B:W*0.5,C:W*0.8,top:W*0.35}:{top:W*0.5,A:W*0.5};
+  const bw=Math.min(pBr?W*0.29:200,150);
+  const pos={0:[cols.top,0],1:[cols.top,1],2:[cols.top,2],3:[cols.A,3]};
+  if(pBr)Object.assign(pos,{4:[cols.B,3],5:[cols.B,4],6:[cols.B,5],7:[cols.C,4],8:[cols.C,5],9:[cols.C,6]});
+  const ctr=i=>[pos[i][0],12+rh*pos[i][1]+rh/2];
+  const arr=(i,j,lab)=>{const[a,b]=ctr(i),[c,d]=ctr(j);const y1=b+bh/2,y2=d-bh/2;line(g,a,y1,c,y2-2,C.txt2,1.2);arrowHead(g,c,y2,Math.atan2(y2-y1,c-a),C.txt2,7);if(lab)text(g,lab,a+(c-a)*0.62+(c>a?10:c<a?-10:6),y1+(y2-y1)*0.62+4,{sz:11,w:500,col:C.txt2,al:c<a?'right':'left'})};
+  arr(0,1);arr(1,2);arr(2,3,pBr?'≈85%':'');
+  if(pBr){arr(2,4,'≈15%');arr(4,5,'99,9%');arr(5,6);arr(4,7,'0,1%');arr(7,8);arr(8,9)}
+  Object.keys(pos).forEach(key=>{const i=+key,[x,y]=ctr(i);const bx=x-bw/2,by=y-bh/2;const on=i===pIdx;
+    rrect(g,bx,by,bw,bh,7);g.fillStyle=on?'rgba(55,138,221,.18)':C.bg;g.fill();g.strokeStyle=on?COL.blu:(STEPS[i].br=='ppI'?COL.pp:COL.cno);g.lineWidth=on?2.2:1.2;g.stroke();
+    text(g,STEPS[i].id+'. '+STEPS[i].short,x,y+4,{sz:12,w:on?600:500,al:'center'});flowBoxes.push({i,x:bx,y:by,w:bw,h:bh})});
+  // ×2 e fine rami
+  {const[x0,y0]=ctr(0),[,y2]=ctr(2);const bx=x0+bw/2+8;line(g,bx,y0-bh/2,bx+5,y0-bh/2,C.txt2);line(g,bx+5,y0-bh/2,bx+5,y2+bh/2,C.txt2);line(g,bx,y2+bh/2,bx+5,y2+bh/2,C.txt2);text(g,'× 2',bx+10,(y0+y2)/2+4,{sz:12,w:600,col:C.txt2})}
+  const tag=(i,t)=>{const[x,y]=ctr(i);text(g,t,x,y+bh/2+14,{sz:11,w:600,col:COL.pp,al:'center'})};
+  tag(3,'fine pp I');if(pBr){tag(6,'fine pp II');tag(9,'fine pp III')}
+  /* tempi di attesa: barre affiancate che compaiono man mano */
+  {const PPB=[{st:0,l:'1. p + p',ts:3.16e17,tl:'≈ 10¹⁰ anni'},{st:2,l:'3. d + p',ts:1,tl:'≈ 1 s'},{st:3,l:'4. ³He + ³He',ts:3.16e12,tl:'≈ 10⁵ anni'}];
+   const pos=pIdx>3?99:pIdx;let shown=0,cur=-1;
+   PPB.forEach((b,i)=>{if(pos>=b.st)shown=i+1;if(pIdx===b.st)cur=i});
+   drawBars($('cTime'),'Tempo medio di attesa nel nucleo solare',PPB,shown,cur,run?ease(Math.min(1,pPh/0.45)):1,COL.pp)}
+}
+
+/* ---------- grafico a barre dei tempi di attesa (P-P e CNO) ---------- */
+let tScale='lin';
+document.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>{tScale=b.dataset.s;updS()});
+function updS(){document.querySelectorAll('[data-s]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.s===tScale))}
+// bars: [{l:nome, ts:secondi, tl:testo}], shown: quante barre sono comparse, cur: barra in corso, fr: crescita (0-1) della barra in corso
+function drawBars(cv,title,bars,shown,cur,fr,col){
+  const[g,W,H]=fit(cv);
+  text(g,title+(tScale=='lin'?' (scala lineare)':' (scala logaritmica)'),14,20,{sz:12,w:500});
+  const L=14,Rr=W-14,Tp=56,B=H-40,n=bars.length,slot=(Rr-L)/n,bw=Math.min(54,slot*0.55);
+  const vmax=Math.max(...bars.map(b=>b.ts)),lmin=-1,lmax=Math.log10(vmax);
+  const hN=v=>tScale=='lin'?v/vmax:Math.max(0,(Math.log10(v)-lmin)/(lmax-lmin));
+  line(g,L,B,Rr,B,C.bdS,1.5);
+  bars.forEach((b,i)=>{
+    const x=L+slot*(i+0.5),on=i===cur,vis=i<shown;
+    text(g,b.l,x,B+15,{sz:n>4?10.5:11.5,w:on?700:500,col:vis?(on?COL.amb:C.txt):C.txt2,al:'center'});
+    if(!vis)return;
+    const f=on?fr:1,h=(B-Tp)*hN(b.ts)*f,hh=Math.max(2,h);
+    g.fillStyle=on?COL.amb:col;g.fillRect(x-bw/2,B-hh,bw,hh);
+    if(f>=1||!on){
+      text(g,b.tl,x,B-hh-8,{sz:11,w:600,col:on?COL.amb:C.txt,al:'center'});
+      if(tScale=='lin'&&h<3)text(g,'(non visibile)',x,B-hh-22,{sz:9.5,col:C.txt2,al:'center'});
+    }
+  });
+}
+
+/* =====================================================================
+   3. BILANCIO ENERGETICO
+   ===================================================================== */
+let mMode='nuc',kMode='pp',bal={th:0,v:0},fug={nus:[],walk:[],acc:0};
+document.querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>{kMode=b.dataset.k;updK()});
+function updK(){document.querySelectorAll('[data-k]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.k===kMode))}
+// ripartizione dell'energia: [nome, MeV, colore, MeV portati via dai neutrini in quel passo]
+const SEGS={
+ pp:{tit:'Dove nascono i 26,73 MeV (ciclo P-P, ramo pp I)',nu:0.53,
+  s:[['2 × (p + p)',0.84,COL.p,0.53],['2 × annichilazione e⁺e⁻',2.044,COL.ep,0],['2 × (d + p)',10.986,COL.blu,0],['³He + ³He',12.86,COL.pp,0]]},
+ cno:{tit:'Dove nascono i 26,73 MeV (ciclo CNO)',nu:1.70,
+  s:[['¹²C + p → ¹³N + γ',1.944,COL.p,0],['¹³N → ¹³C + e⁺ + νₑ (con annichilazione)',2.221,COL.ep,0.707],['¹³C + p → ¹⁴N + γ',7.551,COL.blu,0],
+     ['¹⁴N + p → ¹⁵O + γ',7.297,COL.cno,0],['¹⁵O → ¹⁵N + e⁺ + νₑ (con annichilazione)',2.754,COL.ep,0.996],['¹⁵N + p → ¹²C + ⁴He',4.966,COL.pp,0]]}};
+const UMEV=931.494;
+const MASS={nuc:{L:1.007276,R:4.001506},atom:{L:1.007825,R:4.002603}};
+document.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{mMode=b.dataset.m;bal.th=-0.05;bal.v=0;updM()});
+function updM(){
+  document.querySelectorAll('[data-m]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.m===mMode));
+  const m=MASS[mMode],dm=4*m.L-m.R,Q=dm*UMEV,eta=dm/(4*m.L);
+  let h=`<div class="eq">4 × ${fmt(m.L,6)} u − ${fmt(m.R,6)} u = ${fmt(dm,6)} u  →  ${fmt(Q,2)} MeV  (η = ${fmt(eta*100,3)}%)</div>`;
+  h+=mMode=='nuc'
+   ?`Con le masse dei soli <b>nuclei</b> si ottengono ${fmt(Q,2)} MeV, non 26,73. Il MeV che manca viene dagli elettroni: nella reazione nascono 2 positroni, che si annichilano con <b>2 elettroni del plasma</b>. La massa di quei 2 elettroni (2 × 0,511 = 1,022 MeV) non compare tra i reagenti nucleari, ma si trasforma anch'essa in energia: ${fmt(Q,2)} + 1,02 = <b>26,73 MeV</b>.`
+   :`Le masse <b>atomiche</b> includono già gli elettroni: 4 atomi di idrogeno portano 4 elettroni, l'atomo di elio ne tiene 2, e gli altri 2 sono proprio quelli che annichilano con i positroni. Per questo il conto dà direttamente <b>${fmt(Q,2)} MeV</b> ed η ≈ 0,71%.`;
+  $('mTxt').innerHTML=h;
+}
+function globals(){
+  const L=3.828e26,Q=26.73,Qnu=0.53,MeV=1.602177e-13,c=2.99792458e8,AU=1.495979e13;
+  const nHe=L/((Q-Qnu)*MeV),mH=1.6735575e-27;
+  const items=[['Luminosità del Sole','3,828×10²⁶ W'],['Nuclei di ⁴He prodotti',sci(nHe,1)+' al secondo'],['Idrogeno trasformato','≈ '+Math.round(4*nHe*mH/1e9)+' milioni di t/s'],['Massa convertita in energia','≈ '+fmt(nHe*Q*MeV/c/c/1e9,1)+' milioni di t/s'],['Neutrini sulla Terra',sci(2*nHe/(4*Math.PI*AU*AU),1)+' per cm² al secondo']];
+  $('gGlob').innerHTML=items.map(i=>`<div><span>${i[0]}</span><b>${i[1]}</b></div>`).join('');
+}
+function draw3(dt){
+  /* bilancia */
+  let[g,W,H]=fit($('cBal'));
+  const target=0.11;bal.v+=((target-bal.th)*14-bal.v*2.6)*dt;bal.th+=bal.v*dt;
+  const px=W/2,py=74,arm=Math.min(W/2-68,190),th=bal.th;
+  text(g,'La bilancia delle masse',14,20,{sz:13,w:500});
+  g.beginPath();g.moveTo(px,py);g.lineTo(px-26,H-30);g.lineTo(px+26,H-30);g.closePath();g.fillStyle='rgba(127,127,127,.18)';g.fill();
+  const lx=px-arm*Math.cos(th),ly=py+arm*Math.sin(th),rx=px+arm*Math.cos(th),ry=py-arm*Math.sin(th);
+  line(g,lx,ly,rx,ry,C.txt,4);g.beginPath();g.arc(px,py,6,0,TAU);g.fillStyle=C.txt;g.fill();
+  const pan=(x,y,draw,lab1,lab2)=>{const dy=70;line(g,x,y,x-50,y+dy,C.txt2,1);line(g,x,y,x+50,y+dy,C.txt2,1);g.beginPath();g.ellipse(x,y+dy,58,9,0,0,Math.PI);g.strokeStyle=C.txt;g.lineWidth=2;g.stroke();line(g,x-58,y+dy,x+58,y+dy,C.txt,2);draw(x,y+dy-4);text(g,lab1,x,y+dy+30,{sz:12,w:600,al:'center'});text(g,lab2,x,y+dy+46,{sz:11.5,col:C.txt2,al:'center'})};
+  const m=MASS[mMode],atom=mMode=='atom';
+  pan(lx,ly,(x,y)=>{for(let i=0;i<4;i++){const xx=x-36+i*24,yy=y-12;drawNuc(g,xx,yy,'p',1,false);if(atom){g.beginPath();g.arc(xx,yy,11,0,TAU);g.strokeStyle='rgba(55,138,221,.5)';g.lineWidth=1;g.stroke();g.beginPath();g.arc(xx+11*Math.cos(i+performance.now()/400),yy+11*Math.sin(i+performance.now()/400),2.6,0,TAU);g.fillStyle=COL.em;g.fill()}}},atom?'4 atomi di ¹H':'4 protoni','4 × '+fmt(m.L,6)+' u');
+  pan(rx,ry,(x,y)=>{drawNuc(g,x,y-16,'he4',1,false);if(atom){g.beginPath();g.arc(x,y-16,22,0,TAU);g.strokeStyle='rgba(55,138,221,.5)';g.lineWidth=1;g.stroke();for(let j=0;j<2;j++){const a=j*Math.PI+performance.now()/500;g.beginPath();g.arc(x+22*Math.cos(a),y-16+22*Math.sin(a),2.6,0,TAU);g.fillStyle=COL.em;g.fill()}}},atom?'1 atomo di ⁴He':'1 nucleo di ⁴He',fmt(m.R,6)+' u');
+  text(g,'inclinazione esagerata: la differenza è dello 0,7%',W/2,H-10,{sz:11,col:C.txt2,al:'center'});
+
+  /* ripartizione */
+  [g,W,H]=fit($('cBar'));
+  const K=SEGS[kMode],segs=K.s;
+  text(g,K.tit,14,20,{sz:13,w:500});
+  const x0=14,x1=W-14,bwid=x1-x0,tot=26.73,bh=22,gap=30;let x=x0,y=50;
+  text(g,'Energia liberata da ogni fase',x0-2,y-9,{sz:11,w:500,col:C.txt2});
+  text(g,'di cui portata via dai neutrini',x0-2,y+bh+gap-9,{sz:11,w:500,col:C.nuT});
+  // due righe: sopra la parte che scalda il plasma, sotto (in azzurro) quella portata via dai neutrini
+  // sopra: l'energia liberata da ogni fase; sotto: la parte portata via dai neutrini, che parte dove parte la fase
+  segs.forEach(([l,v,c,nu])=>{const w=bwid*v/tot,wn=bwid*nu/tot;
+    g.fillStyle=c;g.fillRect(x,y,Math.max(1,w-1),bh);
+    if(nu>0){g.fillStyle=COL.nu;g.fillRect(x,y+bh+gap,wn,bh)}
+    x+=w});
+  // contorno di ciascuna riga
+  [y,y+bh+gap].forEach(yr=>{g.strokeStyle=C.bdS;g.lineWidth=1;g.strokeRect(x0-2.5,yr-2.5,bwid+4,bh+5)});
+  const sz=W<520?10.5:12;
+  let yy=y+2*bh+gap+26;
+  segs.forEach(([l,v,c,nu])=>{g.fillStyle=c;g.fillRect(x0,yy-9,11,11);text(g,l,x0+18,yy,{sz});text(g,fmt(v,2)+' MeV  ('+fmt(v/tot*100,1)+'%)',x1,yy,{sz,w:500,al:'right'});yy+=18});
+  const nus=segs.filter(q=>q[3]>0).map(q=>fmt(q[3],2));
+  g.fillStyle=COL.nu;g.fillRect(x0,yy-9,11,11);text(g,'neutrini ('+nus.join(' + ')+' MeV)',x0+18,yy,{sz,col:C.txt});
+  y=yy+28;
+  text(g,'Che fine fa questa energia',14,y,{sz:13,w:500});y+=14;
+  const pn=K.nu/tot*100,wn=bwid*K.nu/tot;g.fillStyle=COL.nu;g.fillRect(x0,y,wn,26);g.fillStyle=COL.amb;g.fillRect(x0+wn+1,y,bwid-wn-1,26);
+  text(g,fmt(100-pn,0)+'%: γ ed energia cinetica, scaldano il plasma',x0+wn+8,y+17,{sz:12,w:500,col:'#fff'});
+  y+=44;g.fillStyle=COL.nu;g.fillRect(x0,y-9,11,11);text(g,'neutrini: in media '+fmt(K.nu,2)+' MeV ('+fmt(pn,pn<3?0:1)+'%), escono subito',x0+18,y,{sz:12});
+
+
+  /* fuga dal Sole */
+  [g,W,H]=fit($('cFuga'));
+  const R=Math.min(H*0.42,W*0.22),sx=R+24,sy=H/2;
+  g.beginPath();g.arc(sx,sy,R,0,TAU);g.fillStyle='rgba(239,159,39,.20)';g.fill();
+  g.beginPath();g.arc(sx,sy,0.71*R,0,TAU);g.fillStyle='rgba(239,159,39,.22)';g.fill();
+  g.beginPath();g.arc(sx,sy,0.25*R,0,TAU);g.fillStyle='rgba(226,75,74,.35)';g.fill();
+  text(g,'nucleo',sx,sy+0.25*R+13,{sz:10.5,col:C.txt2,al:'center'});
+  text(g,'zona radiativa',sx,sy-0.55*R,{sz:10.5,col:C.txt2,al:'center'});
+  const ex=W-26;g.beginPath();g.arc(ex,sy,9,0,TAU);g.fillStyle=COL.blu;g.fill();text(g,'Terra',ex,sy+24,{sz:11,col:C.txt2,al:'center'});
+  if(run){fug.acc+=dt*spd;while(fug.acc>0.12){fug.acc-=0.12;const a=(Math.random()-.5)*2.2;fug.nus.push({a,r:0.1*R})}}
+  fug.nus.forEach(n=>{if(run)n.r+=dt*spd*R*1.4});fug.nus=fug.nus.filter(n=>n.r<W*1.3);
+  fug.nus.forEach(n=>{const x=sx+n.r*Math.cos(n.a),y=sy+n.r*Math.sin(n.a);if(x<W+10&&y>-10&&y<H+10){line(g,x-16*Math.cos(n.a),y-16*Math.sin(n.a),x,y,COL.nu,2,[4,3])}});
+  if(!fug.walk.length)fug.walk=[[0,0]];
+  if(run)for(let i=0;i<Math.ceil(3*spd);i++){const p=fug.walk[fug.walk.length-1];const a=Math.random()*TAU,st=0.035;const q=[p[0]+st*Math.cos(a),p[1]+st*Math.sin(a)];if(Math.hypot(q[0],q[1])>0.71){fug.walk=[[0,0]];break}fug.walk.push(q)}
+  g.beginPath();fug.walk.forEach((p,i)=>{const x=sx+p[0]*R,y=sy+p[1]*R;i?g.lineTo(x,y):g.moveTo(x,y)});g.strokeStyle=COL.g;g.lineWidth=1.2;g.stroke();
+  const lp=fug.walk[fug.walk.length-1];g.beginPath();g.arc(sx+lp[0]*R,sy+lp[1]*R,3,0,TAU);g.fillStyle=COL.g;g.fill();
+  const tx=sx+R+24;
+  if(W-tx>480){
+  text(g,'Neutrini',tx,sy-48,{sz:13,w:600,col:C.nuT});
+  text(g,'attraversano il Sole senza urti: ≈ 2,3 s per uscire, 8,3 minuti per arrivare alla Terra',tx,sy-31,{sz:11.5,col:C.txt});
+  text(g,'Fotoni γ',tx,sy+26,{sz:13,w:600,col:COL.g});
+  text(g,'assorbiti e riemessi in direzioni casuali (cammino libero ≈ 0,1–1 mm):',tx,sy+43,{sz:11.5,col:C.txt});
+  text(g,'l\'energia impiega ≈ 10⁵ – 5×10⁵ anni per lasciare la zona radiativa',tx,sy+59,{sz:11.5,col:C.txt});
+  } else {const x2=sx+R+12;text(g,'Neutrini',x2,sy-46,{sz:12,w:600,col:C.nuT});text(g,'escono in ≈ 2,3 s',x2,sy-31,{sz:11});text(g,'Fotoni γ',x2,sy+30,{sz:12,w:600,col:COL.g});text(g,'≈ 10⁵ – 5×10⁵ anni',x2,sy+45,{sz:11})}
+}
+
+/* =====================================================================
+   4. CICLO CNO
+   ===================================================================== */
+const CNO=[
+ {from:'c12',to:'n13',type:'cap',eq:'¹²C + p → ¹³N + γ',info:'1,94 MeV',infoS:'1,94 MeV',w:0.6},
+ {from:'n13',to:'c13',type:'beta',eq:'¹³N → ¹³C + e⁺ + νₑ',info:'t½ = 9,97 min',infoS:'t½ 9,97 min',w:0.9},
+ {from:'c13',to:'n14',type:'cap',eq:'¹³C + p → ¹⁴N + γ',info:'7,55 MeV',infoS:'7,55 MeV',w:0.6},
+ {from:'n14',to:'o15',type:'cap',eq:'¹⁴N + p → ¹⁵O + γ',info:'7,30 MeV · il passo più lento',infoS:'il più lento',w:1.8},
+ {from:'o15',to:'n15',type:'beta',eq:'¹⁵O → ¹⁵N + e⁺ + νₑ',info:'t½ = 122 s',infoS:'t½ 122 s',w:0.8},
+ {from:'n15',to:'c12',type:'alpha',eq:'¹⁵N + p → ¹²C + ⁴He',info:'4,97 MeV',infoS:'4,97 MeV',w:0.6}];
+let cI=0,cPh=0,cHe=0,cParts=[],cTe=15.7,cEmit=false;
+// tempi medi di attesa al centro del Sole (T = 15,7 MK, ρ = 150 g/cm³, X = 0,34); per i decadimenti β⁺ il tempo di dimezzamento
+const CNOB=[{l:'1. ¹²C + p',ts:3.2e13,tl:'≈ 10⁶ anni'},{l:'2. ¹³N β⁺',ts:598,tl:'≈ 10 min'},{l:'3. ¹³C + p',ts:6e12,tl:'≈ 2·10⁵ anni'},
+ {l:'4. ¹⁴N + p',ts:1.1e16,tl:'≈ 3·10⁸ anni'},{l:'5. ¹⁵O β⁺',ts:122,tl:'≈ 2 min'},{l:'6. ¹⁵N + p',ts:3.2e11,tl:'≈ 10⁴ anni'}];
+function setC(i){cI=(i+6)%6;cPh=0;cEmit=false;cParts=[];updCEq()}
+$('cPrev').onclick=()=>setC(cI-1);
+$('cNext').onclick=()=>setC(cI+1);
+$('cT').oninput=e=>{cTe=+e.target.value;updC()};
+$('cSun').onclick=()=>{cTe=15.7;$('cT').value=15.7;updC()};
+function epp(T6){const T9=T6/1000,g=1+3.82*T9+1.51*T9*T9+0.144*T9**3-0.0114*T9**4;return 2.57e4*g*150*0.34*0.34*T9**(-2/3)*Math.exp(-3.381*T9**(-1/3))*1e-4}
+function ecno(T6){const T9=T6/1000,g=1-2*T9+3.41*T9*T9-2.43*T9**3;return 8.24e25*g*0.0095*0.34*150*T9**(-2/3)*Math.exp(-15.231*T9**(-1/3)-(T9/0.8)**2)*1e-4}
+const slope=(f,T)=>(Math.log(f(T*1.0001))-Math.log(f(T)))/Math.log(1.0001);
+let TX=null;(function(){let lo=10,hi=30;for(let i=0;i<60;i++){const m=(lo+hi)/2;ecno(m)>epp(m)?hi=m:lo=m}TX=(lo+hi)/2})();
+function updC(){
+  $('cTO').textContent=fmt(cTe,1)+' MK';
+  const a=epp(cTe),b=ecno(cTe);
+  $('cRead').innerHTML=[['ε ciclo P-P',sci(a,2)+' W/kg'],['ε ciclo CNO',sci(b,2)+' W/kg'],['Quota CNO a questa T',fmt(100*b/(a+b),1)+'%'],['Sensibilità P-P: ε ∝ Tᵛ','ν ≈ '+fmt(slope(epp,cTe),1)],['Sensibilità CNO: ε ∝ Tᵛ','ν ≈ '+fmt(slope(ecno,cTe),1)],['Le curve si incrociano a','≈ '+fmt(TX,1)+' MK']].map(i=>`<div><span>${i[0]}</span><b>${i[1]}</b></div>`).join('');
+}
+function draw4(dt){
+  /* ruota */
+  let[g,W,H]=fit($('cWheel'));
+  const narrow=W<520,cx=W/2,cy=H/2+6,R=Math.min(H*0.33,W/2-(narrow?92:150));
+  const npos=i=>{const a=-Math.PI/2+i*TAU/6;return[cx+R*Math.cos(a),cy+R*Math.sin(a),a]};
+  if(run){cPh+=dt*spd/(1.6*CNO[cI].w+0.9);if(cPh>=1){cPh=0;cEmit=false;if(CNO[cI].type=='alpha')cHe++;cI=(cI+1)%6;updCEq()}}
+  const st=CNO[cI],wait=0.55,ph=cPh;
+  // archi
+  for(let i=0;i<6;i++){const[,,a1]=npos(i),a2=a1+TAU/6;g.beginPath();g.arc(cx,cy,R,a1+0.2,a2-0.2);g.strokeStyle=i===cI?COL.cno:C.bdS;g.lineWidth=i===cI?2.5:1.2;g.stroke();
+    const ex=cx+R*Math.cos(a2-0.2),ey=cy+R*Math.sin(a2-0.2);arrowHead(g,ex,ey,a2-0.2+Math.PI/2,i===cI?COL.cno:C.bdS,7);
+    const am=(a1+a2)/2,lr=R+30;const lx=cx+lr*Math.cos(am),ly=cy+lr*Math.sin(am);const al=Math.cos(am)>0.3?'left':Math.cos(am)<-0.3?'right':'center';
+    const c=CNO[i];text(g,c.type=='cap'?(narrow?'+p → γ':'+ p, emette γ'):c.type=='beta'?(narrow?'β⁺: e⁺ νₑ':'decade β⁺: e⁺ + νₑ'):(narrow?'+p → ⁴He':'+ p, emette ⁴He'),lx,ly,{sz:11,w:500,col:i===cI?COL.cno:C.txt2,al});
+    text(g,narrow?c.infoS:c.info,lx,ly+14,{sz:10.5,col:i===3?COL.p:C.txt2,al,w:i===3?600:400})}
+  // nodi
+  for(let i=0;i<6;i++){const[x,y]=npos(i);const k=CNO[i].from;g.beginPath();g.arc(x,y,21,0,TAU);g.fillStyle=C.bg;g.fill();g.strokeStyle=k=='c12'?COL.pp:C.bdS;g.lineWidth=k=='c12'?2:1;g.stroke();text(g,SP[k].l,x,y+5,{sz:14,w:600,al:'center'})}
+  // nucleo in movimento
+  const[x1,y1,a1]=npos(cI);let tx,ty,key=st.from;
+  if(ph<wait){tx=x1;ty=y1}else{const u=ease((ph-wait)/(1-wait));const a=a1+u*TAU/6;tx=cx+R*Math.cos(a);ty=cy+R*Math.sin(a);if(u>0.5)key=st.to}
+  g.beginPath();g.arc(tx,ty,30,0,TAU);g.fillStyle='rgba(127,119,221,.15)';g.fill();
+  drawNuc(g,tx,ty,key,0.62,false);
+  // protone in arrivo
+  if(st.type!='beta'&&ph<wait){const u=ease(ph/wait);const ox=x1+(x1-cx)*0.9,oy=y1+(y1-cy)*0.9;const ang=Math.atan2(y1-cy,x1-cx)+0.5;const sx=x1+Math.cos(ang)*R*0.9,sy=y1+Math.sin(ang)*R*0.9;drawNuc(g,sx+(x1-sx)*u,sy+(y1-sy)*u,'p',0.9,false)}
+  // emissioni
+  if(ph>=wait&&!cEmit){cEmit=true;
+    const out=Math.atan2(ty-cy,tx-cx);
+    if(st.type=='cap')cParts.push({k:'g',x:tx,y:ty,a:out,d:0});
+    if(st.type=='beta'){cParts.push({k:'nu',x:tx,y:ty,a:out-0.35,d:0});cParts.push({k:'ep',x:tx,y:ty,a:out+0.35,d:0})}
+    if(st.type=='alpha')cParts.push({k:'he4',x:tx,y:ty,a:out,d:0});
+  }
+  cParts.forEach(p=>{if(run)p.d+=dt*spd*(SP[p.k].ray?260:90)});cParts=cParts.filter(p=>p.d<(SP[p.k].ray?Math.max(W,H):R*0.9));
+  cParts.forEach(p=>{const x=p.x+Math.cos(p.a)*p.d,y=p.y+Math.sin(p.a)*p.d;const s=SP[p.k];if(s.ray)drawRay(g,x,y,p.a,Math.min(40,p.d),p.k);else if(s.lep)drawLep(g,x,y,p.k);else drawNuc(g,x,y,p.k,0.8,true)});
+  text(g,'¹²C esce intatto:',cx,cy-18,{sz:12,w:500,col:COL.pp,al:'center'});text(g,'è un catalizzatore',cx,cy-3,{sz:11.5,col:C.txt2,al:'center'});
+  text(g,'⁴He prodotti: '+cHe,cx,cy+20,{sz:12,w:600,al:'center'});text(g,'protoni usati: '+cHe*4,cx,cy+35,{sz:11,col:C.txt2,al:'center'});
+
+  /* grafico ε(T) */
+  [g,W,H]=fit($('cEps'));
+  const L=50,Rr=W-14,Tp=34,B=H-40,tmin=8,tmax=30,emin=-8,emax=2;
+  const X=T=>L+(Rr-L)*(T-tmin)/(tmax-tmin),Y=e=>B-(B-Tp)*(Math.log10(e)-emin)/(emax-emin);
+  text(g,'Energia prodotta per kg al centro del Sole',L-36,18,{sz:13,w:500});
+  line(g,L,B,Rr,B,C.bdS);line(g,L,Tp,L,B,C.bdS);
+  for(let T=10;T<=30;T+=5){line(g,X(T),B,X(T),B+4,C.bdS);text(g,T+'',X(T),B+16,{sz:11,col:C.txt2,al:'center'})}
+  text(g,'temperatura (milioni di K)',(L+Rr)/2,H-8,{sz:11,col:C.txt2,al:'center'});
+  for(let e=emin;e<=emax;e+=2){line(g,L-4,Y(10**e),Rr,Y(10**e),e===emin?C.bdS:C.bd);text(g,'10'+(e<0?'⁻':'')+'⁰¹²³⁴⁵⁶⁷⁸⁹'[Math.abs(e)],L-7,Y(10**e)+4,{sz:11,col:C.txt2,al:'right'})}
+  g.save();g.translate(12,(Tp+B)/2);g.rotate(-Math.PI/2);text(g,'ε (W/kg)',0,0,{sz:11,col:C.txt2,al:'center'});g.restore();
+  g.save();g.beginPath();g.rect(L,Tp,Rr-L,B-Tp);g.clip();
+  [[epp,COL.pp],[ecno,COL.cno]].forEach(([f,c])=>{g.beginPath();for(let i=0;i<=200;i++){const T=tmin+(tmax-tmin)*i/200;const y=Y(Math.max(1e-12,f(T)));i?g.lineTo(X(T),y):g.moveTo(X(T),y)}g.strokeStyle=c;g.lineWidth=2.5;g.stroke()});
+  g.restore();
+  text(g,'ciclo P-P',X(27),Y(epp(27))+18,{sz:12,w:600,col:COL.pp,al:'center'});
+  text(g,'ciclo CNO',X(21.5)-6,Y(ecno(21.5)),{sz:12,w:600,col:COL.cno,al:'right'});
+  g.beginPath();g.arc(X(TX),Y(epp(TX)),5,0,TAU);g.strokeStyle=C.txt;g.lineWidth=1.5;g.stroke();
+  text(g,'incrocio ≈ '+fmt(TX,1)+' MK',X(TX)+8,Y(epp(TX))+18,{sz:11,col:C.txt});
+  line(g,X(15.7),Tp,X(15.7),B,COL.amb,1,[3,3]);text(g,'centro del Sole',X(15.7)-4,Tp+12,{sz:11,col:COL.amb,al:'right'});
+  line(g,X(cTe),Tp,X(cTe),B,C.txt,1.5);
+  [[epp,COL.pp],[ecno,COL.cno]].forEach(([f,c])=>{const v=f(cTe);if(Math.log10(v)>emin){g.beginPath();g.arc(X(cTe),Y(v),5,0,TAU);g.fillStyle=c;g.fill()}});
+  /* tempi di attesa */
+  drawBars($('cTimeC'),'Tempo medio di attesa al centro del Sole',CNOB,cI+1,cI,run?ease(Math.min(1,cPh/0.45)):1,COL.cno);
+}
+function updCEq(){const s=CNO[cI];$('cEq').textContent=(cI+1)+'. '+s.eq+'  ·  '+s.info}
+
+/* ---------- reset / ingresso ---------- */
+const RESET=[()=>{T1=15.7;$('tT').value=15.7;upd1()},()=>{setStep(0)},()=>{cI=0;cPh=0;cHe=0;cParts=[];cEmit=false;updCEq()},()=>{bal.th=-0.05;bal.v=0;fug.nus=[];fug.walk=[]}];
+const ENTER=[null,null,null,()=>{bal.th=-0.05;bal.v=0}];
+const DRAW=[draw1,draw2,draw4,draw3];
+
+function loop(now){const dtr=Math.min(0.05,(now-last)/1000);last=now;readCss();DRAW[tab](run?dtr:0);requestAnimationFrame(loop)}
+upd1();updP();updM();globals();updC();updCEq();updS();updK();
+const h=parseInt(location.hash.slice(1));setTab(h>=1&&h<=4?h-1:0);
+requestAnimationFrame(loop);
+</script>
+</body></html>

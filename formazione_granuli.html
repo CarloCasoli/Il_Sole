@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<!--
+  © 2026 Carlo Casoli — "Il Sole: Osservazione e Fisica"
+  Licenza CC BY-NC-ND 4.0: https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it
+  Vietati l'uso commerciale e la distribuzione di versioni modificate senza autorizzazione scritta dell'autore.
+-->
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Granulazione solare — simulazione</title>
+<style>
+  :root{ --bg:#0e0704; --ink:#e9c98a; --dim:#8a6a3f; }
+  html,body{margin:0;height:100%;background:var(--bg);overflow:hidden;font-family:Georgia,'Times New Roman',serif;}
+  #c{display:block;width:100vw;height:100vh;}
+  .hud{position:fixed;left:16px;bottom:14px;color:var(--dim);font-size:12px;letter-spacing:.02em;user-select:none;pointer-events:none;}
+  .hud b{color:var(--ink);font-weight:600;}
+  .btn{position:fixed;right:16px;bottom:14px;background:rgba(20,12,6,.55);border:1px solid rgba(233,201,138,.25);color:var(--ink);
+       font-family:inherit;font-size:12px;padding:7px 12px;border-radius:3px;cursor:pointer;backdrop-filter:blur(2px);}
+  .btn:hover{border-color:rgba(233,201,138,.55);}
+  .btn:focus-visible{outline:2px solid var(--ink);outline-offset:2px;}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div class="hud"><b>Fotosfera simulata</b> — granuli in convezione, vista dall'alto</div>
+<button class="btn" id="toggle">pausa</button>
+<script>
+const cv = document.getElementById('c');
+const ctx = cv.getContext('2d');
+let W,H,DPR;
+function resize(){
+  DPR = Math.min(window.devicePixelRatio||1, 2);
+  W = cv.clientWidth = window.innerWidth;
+  H = cv.clientHeight = window.innerHeight;
+  cv.width = W*DPR; cv.height = H*DPR;
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+}
+window.addEventListener('resize', resize);
+resize();
+
+const rand=(a,b)=>a+Math.random()*(b-a);
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const ease=t=>t<0.5 ? 4*t*t*t : 1-Math.pow(-2*t+2,3)/2;
+
+let granules=[];
+const SPACING = 46; // px tra centri, definisce dimensione media dei granuli
+
+let base = document.createElement('canvas');
+let baseCtx = base.getContext('2d');
+function buildBase(){
+  base.width = W*DPR; base.height = H*DPR;
+  baseCtx.setTransform(DPR,0,0,DPR,0,0);
+  baseCtx.fillStyle = '#0e0704';
+  baseCtx.fillRect(0,0,W,H);
+  const cols = Math.ceil(W/SPACING)+2, rows = Math.ceil(H/SPACING)+2;
+  for(let i=-1;i<cols;i++){
+    for(let j=-1;j<rows;j++){
+      const x = i*SPACING + rand(-SPACING*0.3,SPACING*0.3);
+      const y = j*SPACING + rand(-SPACING*0.3,SPACING*0.3);
+      const r = SPACING*rand(1.1,1.4);
+      const g = baseCtx.createRadialGradient(x,y,0,x,y,r);
+      g.addColorStop(0.0,'rgba(150,100,45,0.9)');
+      g.addColorStop(0.55,'rgba(95,60,24,0.85)');
+      g.addColorStop(1.0,'rgba(30,16,7,0.6)');
+      baseCtx.fillStyle=g;
+      baseCtx.beginPath();
+      baseCtx.arc(x,y,r,0,Math.PI*2);
+      baseCtx.fill();
+    }
+  }
+}
+
+function newGranule(x,y,t,fresh){
+  return{
+    x, y,
+    maxR: SPACING*rand(0.85,1.15),
+    seed: rand(0,1000),
+    wob: rand(0.12,0.24),
+    birth: fresh ? t : t - rand(0, 1)*rand(3200,7200),
+    life: rand(3200,7200)
+  };
+}
+
+window.addEventListener('resize', ()=>{ buildBase(); });
+
+function initField(){
+  buildBase();
+  granules=[];
+  const cols = Math.ceil(W/SPACING)+2, rows = Math.ceil(H/SPACING)+2;
+  const t0 = performance.now();
+  for(let i=-1;i<cols;i++){
+    for(let j=-1;j<rows;j++){
+      const x = i*SPACING + rand(-SPACING*0.35,SPACING*0.35);
+      const y = j*SPACING + rand(-SPACING*0.35,SPACING*0.35);
+      granules.push(newGranule(x,y,t0,false));
+    }
+  }
+}
+initField();
+
+const FLOOR = 0.4; // i granuli non collassano mai a raggio zero, solo si affievoliscono
+function sizeFactor(p){
+  if(p<0.22) return FLOOR + (1-FLOOR)*ease(p/0.22);
+  if(p<0.72) return 1;
+  return FLOOR + (1-FLOOR)*(1-ease((p-0.72)/0.28));
+}
+
+function drawGranule(g,t){
+  const age = t-g.birth;
+  const p = age/g.life;
+  if(p<0 || p>1) return;
+  const sf = sizeFactor(p);
+  if(sf<=0.01) return;
+  const r = g.maxR*sf;
+  const N = 10;
+  ctx.beginPath();
+  for(let k=0;k<=N;k++){
+    const a = (k/N)*Math.PI*2;
+    const wob = 1 + g.wob*Math.sin(a*3 + g.seed + t*0.00045);
+    const rr = r*wob;
+    const px = g.x + Math.cos(a)*rr;
+    const py = g.y + Math.sin(a)*rr;
+    if(k===0) ctx.moveTo(px,py); else ctx.lineTo(px,py);
+  }
+  ctx.closePath();
+  const grad = ctx.createRadialGradient(g.x,g.y,0,g.x,g.y,r*1.05);
+  const flick = 0.9+0.1*Math.sin(t*0.0016+g.seed);
+  grad.addColorStop(0.00, `rgba(255,244,206,${0.98*sf*flick})`);
+  grad.addColorStop(0.35, `rgba(236,182,84,${0.92*sf})`);
+  grad.addColorStop(0.68, `rgba(150,92,32,${0.65*sf})`);
+  grad.addColorStop(1.00, `rgba(20,10,4,0)`);
+  ctx.fillStyle = grad;
+  ctx.fill();
+  if(p>0.25 && p<0.7){
+    ctx.strokeStyle = `rgba(35,17,6,${0.28*sf})`;
+    ctx.lineWidth = 1.2;
+    ctx.stroke();
+  }
+}
+
+let running=true;
+let last=performance.now();
+
+function frame(t){
+  if(running){
+    ctx.fillStyle='#0e0704';
+    ctx.fillRect(0,0,W,H);
+    ctx.drawImage(base,0,0,W,H);
+
+    // rigenera i granuli morti in prossimità della loro posizione originale
+    for(let g of granules){
+      if(t-g.birth > g.life){
+        const nx = g.x + rand(-SPACING*0.3,SPACING*0.3);
+        const ny = g.y + rand(-SPACING*0.3,SPACING*0.3);
+        Object.assign(g, newGranule(nx,ny,t,true));
+      }
+    }
+    for(let g of granules) drawGranule(g,t);
+
+    // leggera vignettatura per profondità
+    const vg = ctx.createRadialGradient(W/2,H/2,Math.min(W,H)*0.3,W/2,H/2,Math.max(W,H)*0.75);
+    vg.addColorStop(0,'rgba(0,0,0,0)');
+    vg.addColorStop(1,'rgba(0,0,0,0.35)');
+    ctx.fillStyle=vg;
+    ctx.fillRect(0,0,W,H);
+  }
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+document.getElementById('toggle').addEventListener('click', e=>{
+  running = !running;
+  e.target.textContent = running ? 'pausa' : 'riprendi';
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,708 @@
+<!doctype html>
+<!--
+  © 2026 Carlo Casoli — "Il Sole: Osservazione e Fisica"
+  Licenza CC BY-NC-ND 4.0: https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it
+  Vietati l'uso commerciale e la distribuzione di versioni modificate senza autorizzazione scritta dell'autore.
+-->
+<html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Cella convettiva che si divide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;1,400;1,500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: scena 3D a tutta altezza a sinistra, pannello comandi fisso a destra (versione PC) */
+:root{
+  --bg:#0e0705; --stage:#0e0705; --panel:#160c08; --raise:#21130d; --line:#3a2318;
+  --fg:#f3e6d8; --mut:#b59c89; --dim:#7d6556; --acc:#f4a44c; --hot:#ffe7ae; --cold:#8a2410;
+  --display:'Spectral',Georgia,'Times New Roman',serif;
+  --ui:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  color-scheme:dark;
+}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.45 var(--ui);overflow:hidden}
+.app{height:100%;display:grid;grid-template-columns:minmax(0,1fr) 320px}
+.stage{position:relative;min-width:0;background:var(--stage);overflow:hidden}
+.stage canvas{display:block;width:100%;height:100%}
+#labels{position:absolute;inset:0;pointer-events:none}
+.lbl{position:absolute;left:0;top:0;display:flex;align-items:center;gap:7px;white-space:nowrap;font:500 12.5px/1.2 var(--ui);color:var(--fg);transition:opacity .3s}
+.lbl i{width:7px;height:7px;border-radius:50%;background:var(--acc);box-shadow:0 0 0 3px rgba(244,164,76,.22);flex:none}
+.lbl span{background:rgba(14,7,5,.72);border:1px solid var(--line);padding:3px 8px;border-radius:4px}
+.lbl.layer i{background:transparent;box-shadow:none;width:0}
+.lbl.layer span{background:none;border:none;color:var(--mut);font:italic 400 14px/1.2 var(--display);padding:0}
+.lbl.cold i{background:#c4462a;box-shadow:0 0 0 3px rgba(196,70,42,.25)}
+.lbl.hot i{background:var(--hot);box-shadow:0 0 0 3px rgba(255,231,174,.2)}
+
+.hud{position:absolute;top:0;bottom:84px;left:0;width:250px;box-sizing:border-box;overflow-y:auto;background:rgba(14,7,5,.82);border-right:1px solid var(--line);padding:20px 18px;display:flex;flex-direction:column;justify-content:flex-end;gap:14px;backdrop-filter:blur(4px)}
+.gens{display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+.gens b{font:600 11px/1 var(--ui);letter-spacing:.08em;text-transform:uppercase;color:var(--dim);margin-right:4px}
+.chip{font:600 11px/1 var(--ui);letter-spacing:.06em;padding:4px 8px;border-radius:20px;border:1px solid var(--line);color:var(--dim)}
+.chip.on{color:#1a0d06;background:var(--acc);border-color:var(--acc)}
+.chip.done{color:var(--mut);border-color:#5a3826}
+.steps{display:flex;flex-direction:column;gap:6px}
+.steps span{font:600 10.5px/1.2 var(--ui);letter-spacing:.05em;text-transform:uppercase;color:var(--dim);border-left:3px solid var(--raise);padding:3px 0 3px 9px}
+.steps span.on{color:var(--acc);border-color:var(--acc)}
+.steps span.done{color:var(--mut);border-color:#5a3826}
+#phT{margin:0;font:italic 500 22px/1.15 var(--display);text-wrap:balance}
+#phD{margin:0;color:var(--mut);font-size:13.5px}
+.vel{display:grid;grid-template-columns:1fr auto;gap:6px 10px;align-items:center;font-size:11.5px;color:var(--mut);letter-spacing:.04em}
+.vel .vbar{grid-column:1/-1;grid-row:2}
+.vbar{height:6px;border-radius:3px;background:var(--raise);overflow:hidden}
+.vbar div{height:100%;width:0;background:linear-gradient(90deg,#c4462a,var(--acc),var(--hot));border-radius:3px}
+#velTxt{font-variant-numeric:tabular-nums;color:var(--fg);min-width:70px;text-align:right}
+
+.tl{position:absolute;left:20px;right:20px;bottom:16px;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:14px;align-items:center;background:rgba(14,7,5,.78);border:1px solid var(--line);border-radius:8px;padding:10px 14px;backdrop-filter:blur(4px)}
+.track{position:relative}
+.ticks{position:absolute;left:0;right:0;top:-15px;height:12px;font:600 10px/1 var(--ui);color:var(--dim);letter-spacing:.06em}
+.ticks span{position:absolute;transform:translateX(-50%)}
+#time{font-variant-numeric:tabular-nums;color:var(--mut);font-size:12px;min-width:92px;text-align:right}
+
+.panel{background:var(--panel);border-left:1px solid var(--line);overflow-y:auto;padding:22px 20px 28px;display:flex;flex-direction:column;gap:22px}
+.panel h1{margin:0;font:600 23px/1.15 var(--display);text-wrap:balance}
+.panel .lead{margin:6px 0 0;color:var(--mut);font-size:13px}
+.grp{display:flex;flex-direction:column;gap:10px}
+.grp h2{margin:0;font:600 11px/1 var(--ui);letter-spacing:.12em;text-transform:uppercase;color:var(--acc)}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+button{font:500 13px/1 var(--ui);color:var(--fg);background:var(--raise);border:1px solid var(--line);border-radius:6px;padding:8px 12px;cursor:pointer}
+button:hover{border-color:#6b4430}
+button:focus-visible,input:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+button.pri{background:var(--acc);border-color:var(--acc);color:#1a0d06;font-weight:600}
+button.sel{border-color:var(--acc);color:var(--acc)}
+.sl{display:grid;grid-template-columns:1fr auto;gap:4px 10px;font-size:13px;color:var(--mut)}
+.sl output{color:var(--fg);font-variant-numeric:tabular-nums}
+.sl input{grid-column:1/-1}
+input[type=range]{width:100%;accent-color:var(--acc);margin:0}
+.ck{display:flex;align-items:center;gap:9px;font-size:13.5px;cursor:pointer}
+.ck input{accent-color:var(--acc);width:15px;height:15px;margin:0}
+.hint{color:var(--dim);font-size:12px;margin:0}
+.scale{height:10px;border-radius:5px;background:linear-gradient(90deg,#4d0805,#d9330a,#ff8c1f,#ffeab5)}
+.scale-l{display:flex;justify-content:space-between;font-size:11.5px;color:var(--mut);margin-top:5px}
+.note{font-size:12px;color:var(--dim);margin:0;border-top:1px solid var(--line);padding-top:12px}
+kbd{font:500 11px var(--ui);border:1px solid var(--line);border-radius:3px;padding:1px 4px;color:var(--mut)}
+@media (prefers-reduced-motion:reduce){.lbl{transition:none}}
+</style>
+
+<div class="app">
+  <div class="stage" id="stage">
+    <div id="labels"></div>
+    <div class="hud">
+      <div class="gens"><b>Livello</b><span class="chip" id="g0">1 · cella madre</span><span class="chip" id="g1">2 · figlie</span><span class="chip" id="g2">3 · granuli</span></div>
+      <div class="steps" id="steps"><span>Risalita</span><span>Allargamento</span><span>Instabilità</span><span id="lastStep">Divisione del flusso</span></div>
+      <h2 id="phT">Risalita rapida</h2>
+      <p id="phD"></p>
+      <div class="vel"><span>Velocità di risalita</span><span id="velTxt">alta</span><div class="vbar"><div id="velBar"></div></div></div>
+    </div>
+    <div class="tl">
+      <button id="play" class="pri" aria-label="Pausa">Pausa</button>
+      <div class="track"><div class="ticks" id="ticks"></div><input type="range" id="tl" min="0" max="1000" value="0" aria-label="Tempo dell'animazione"></div>
+      <span id="time">0 s</span>
+    </div>
+  </div>
+
+  <aside class="panel">
+    <div>
+      <h1>Una cella convettiva che si divide</h1>
+      <p class="lead">Una grande bolla di gas caldo sale e rallenta. In cima si allarga, diventa orizzontale e piega i bordi verso il basso. Poi il bordo si instabilizza, corsie di gas freddo scendono dalla sommità e dividono il grande flusso in flussi più piccoli. Solo allora questi crescono come nuove celle. In ogni cella la maggior parte del gas ricircola sul posto: solo una piccola parte sale al livello successivo, mentre il gas raffreddato in superficie scende in getti stretti fino alla base. Gli strati sono sempre più sottili salendo verso la superficie.</p>
+    </div>
+
+    <div class="grp">
+      <h2>Riproduzione</h2>
+      <div class="row"><button id="restart">Ricomincia</button><button id="variant">Nuova variante</button></div>
+      <button id="dl" hidden>Scarica il file .html</button>
+      <p class="hint" id="dlMsg" hidden></p>
+      <label class="sl" for="speed">Velocità animazione <output id="speedO">1,0×</output><input type="range" id="speed" min="0.25" max="3" step="0.05" value="1"></label>
+    </div>
+
+    <div class="grp">
+      <h2>Divisione</h2>
+      <label class="sl" for="nkids">Flussi principali nella prima divisione <output id="nkidsO">5 (1 al centro + 4)</output><input type="range" id="nkids" min="4" max="7" step="1" value="5"></label>
+      <label class="sl" for="irr">Irregolarità della forma <output id="irrO">100%</output><input type="range" id="irr" min="0" max="2" step="0.05" value="1"></label>
+    </div>
+
+    <div class="grp">
+      <h2>Rappresentazione</h2>
+      <label class="ck"><input type="checkbox" id="cShell" checked>Guscio della cella</label>
+      <label class="sl" for="op">Opacità del guscio <output id="opO">100%</output><input type="range" id="op" min="0.2" max="1.8" step="0.05" value="1"></label>
+      <label class="ck"><input type="checkbox" id="cPart" checked>Particelle del gas</label>
+      <label class="ck"><input type="checkbox" id="cHi">Evidenzia il gas che cambia livello</label>
+      <label class="ck"><input type="checkbox" id="cLbl" checked>Etichette</label>
+      <label class="ck"><input type="checkbox" id="cRot">Rotazione automatica</label>
+    </div>
+
+    <div class="grp">
+      <h2>Vista</h2>
+      <div class="row"><button data-view="obl" class="sel">Obliqua</button><button data-view="side">Laterale</button><button data-view="top">Dall'alto</button></div>
+      <p class="hint">Trascina per ruotare, rotella per lo zoom, tasto destro per spostare. <kbd>Spazio</kbd> pausa.</p>
+    </div>
+
+    <div class="grp">
+      <h2>Temperatura del gas</h2>
+      <div><div class="scale"></div><div class="scale-l"><span>più freddo, sprofonda</span><span>più caldo, sale</span></div></div>
+    </div>
+
+    <p class="note">Schema qualitativo: dimensioni, profondità e tempi non sono in scala. Nel Sole le celle giganti misurano oltre 100&nbsp;Mm, i supergranuli circa 30&nbsp;Mm, i granuli circa 1&nbsp;Mm.</p>
+  </aside>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+(function(){
+'use strict';
+// copia del documento originale, presa prima che lo script lo modifichi: è il file che si scarica
+const SRC=(function(){const d=document.documentElement.cloneNode(true);
+  d.querySelectorAll('script').forEach(sc=>{const src=sc.getAttribute('src')||'';if(src?!/three@/.test(src):!/buildTree/.test(sc.textContent))sc.remove();});
+  d.querySelectorAll('base,meta[http-equiv]').forEach(e=>e.remove());
+  return '<!doctype html>\n'+d.outerHTML;})();
+
+// ---------------- parametri ----------------
+const RES=[[96,60],[56,40],[24,16]];     // risoluzione del guscio per livello: azimut, profilo
+const PG=[1800,300,22];                  // particelle per cella, per livello
+// fasi: risalita, allargamento, instabilità, divisione del flusso
+const GEN=[
+  {T:[14,8,6,10], om:1.15, ps:.10},
+  {T:[10,6,5,8],  om:1.1,  ps:.07},
+  {T:[7,4.5,4,0], om:1.25, ps:.05}
+];
+const RATIO=[.75,.60,.50];               // spessore dello strato / diametro della cella, per livello
+const HALF=7.5, LAG=.4;
+
+const clamp=(x,a=0,b=1)=>Math.max(a,Math.min(b,x));
+const sstep=(a,b,x)=>{x=clamp((x-a)/(b-a));return x*x*(3-2*x)};
+const lerp=(a,b,t)=>a+(b-a)*t;
+function rng(s){return function(){s|=0;s=s+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function heat(t,o){t=clamp(t);const C=[[.30,.03,.02],[.85,.20,.04],[1,.55,.12],[1,.93,.70]];
+  let a,b,f;if(t<.33){a=C[0];b=C[1];f=t/.33}else if(t<.66){a=C[1];b=C[2];f=(t-.33)/.33}else{a=C[2];b=C[3];f=(t-.66)/.34}
+  o[0]=a[0]+(b[0]-a[0])*f;o[1]=a[1]+(b[1]-a[1])*f;o[2]=a[2]+(b[2]-a[2])*f;return o;}
+function cr(a,b,c,d,t){const t2=t*t,t3=t2*t;return .5*(2*b+(-a+c)*t+(2*a-5*b+4*c-d)*t2+(-a+3*b-3*c+d)*t3);}
+function angDist(a,b){let d=(a-b)%(2*Math.PI);if(d>Math.PI)d-=2*Math.PI;if(d<-Math.PI)d+=2*Math.PI;return d;}
+
+// ---------------- stato globale ----------------
+let N=5, seed=11, T=2, Tend=80, playing=true, speed=1, irr=1;
+let showShell=true, showPart=true, showLbl=true, shellOp=1, hi=false;
+let cells=[], rep=[], LAYERS=[0,5.6,7.3,7.8];
+
+// ---------------- three ----------------
+const stage=document.getElementById('stage');
+const renderer=new THREE.WebGLRenderer({antialias:true});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+renderer.setClearColor(0x0e0705,1);
+stage.prepend(renderer.domElement);
+const scene=new THREE.Scene();
+scene.fog=new THREE.Fog(0x0e0705,26,62);
+const camera=new THREE.PerspectiveCamera(38,1,.1,200);
+camera.position.set(14,9.5,14);
+const controls=new THREE.OrbitControls(camera,renderer.domElement);
+controls.target.set(0,4.2,0);controls.enableDamping=true;controls.dampingFactor=.08;
+controls.autoRotateSpeed=.6;controls.minDistance=3;controls.maxDistance=60;controls.update();
+const LIGHT=new THREE.Vector3(.5,.9,.35).normalize();
+
+(function floor(){
+  const cv=document.createElement('canvas');cv.width=cv.height=256;
+  const g=cv.getContext('2d'),gr=g.createRadialGradient(128,128,0,128,128,128);
+  gr.addColorStop(0,'rgba(255,120,40,0.35)');gr.addColorStop(.35,'rgba(160,50,15,0.18)');gr.addColorStop(1,'rgba(0,0,0,0)');
+  g.fillStyle=gr;g.fillRect(0,0,256,256);
+  const glow=new THREE.Mesh(new THREE.PlaneGeometry(14,14),new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(cv),transparent:true,depthWrite:false}));
+  glow.rotation.x=-Math.PI/2;glow.position.y=-.02;scene.add(glow);
+  const grid=new THREE.GridHelper(HALF*2,15,0x5a3322,0x2c1810);grid.position.y=-.03;scene.add(grid);
+})();
+const envGroup=new THREE.Group();scene.add(envGroup);
+function buildLayers(){
+  envGroup.children.forEach(o=>{o.geometry&&o.geometry.dispose();o.material&&o.material.dispose();});envGroup.clear();
+  LAYERS.slice(1).forEach((y,i)=>{
+    const surf=i===2;
+    const pl=new THREE.Mesh(new THREE.PlaneGeometry(HALF*2,HALF*2),new THREE.MeshBasicMaterial({color:surf?0xffa050:0xff8a40,transparent:true,opacity:surf?.05:.02,depthWrite:false,side:THREE.DoubleSide}));
+    pl.rotation.x=-Math.PI/2;pl.position.y=y;envGroup.add(pl);
+    const e=HALF,pts=[new THREE.Vector3(-e,y,-e),new THREE.Vector3(e,y,-e),new THREE.Vector3(e,y,e),new THREE.Vector3(-e,y,e)];
+    envGroup.add(new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(pts),new THREE.LineBasicMaterial({color:surf?0xb8693a:0x6e4029,transparent:true,opacity:surf?.9:.6})));
+    if(surf){const sg=new THREE.GridHelper(HALF*2,30,0x6e3d24,0x3d2014);sg.position.y=y;sg.material.transparent=true;sg.material.opacity=.3;envGroup.add(sg);}
+  });
+  const vs=[];[[-1,-1],[1,-1],[1,1],[-1,1]].forEach(([a,b])=>{vs.push(new THREE.Vector3(a*HALF,0,b*HALF),new THREE.Vector3(a*HALF,LAYERS[3],b*HALF))});
+  envGroup.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(vs),new THREE.LineBasicMaterial({color:0x4a2b1c,transparent:true,opacity:.5})));
+}
+
+// ---------------- shader ----------------
+const HEAT=`vec3 heat(float t){t=clamp(t,0.,1.);vec3 c0=vec3(.30,.03,.02),c1=vec3(.85,.20,.04),c2=vec3(1.,.55,.12),c3=vec3(1.,.93,.70);
+ return t<.33?mix(c0,c1,t/.33):t<.66?mix(c1,c2,(t-.33)/.33):mix(c2,c3,(t-.66)/.34);}`;
+const SHELL_VS=`attribute float aLane;attribute float aU;varying vec3 vN;varying vec3 vW;varying float vLane;varying float vU;
+void main(){vec4 w=modelMatrix*vec4(position,1.);vW=w.xyz;vN=normalize(mat3(modelMatrix)*normal);vLane=aLane;vU=aU;gl_Position=projectionMatrix*viewMatrix*w;}`;
+const SHELL_FS=`uniform float uTemp;uniform float uAlpha;uniform float uOp;uniform float uCut;uniform float uCutW;uniform float uFade;uniform vec3 uLight;
+varying vec3 vN;varying vec3 vW;varying float vLane;varying float vU;${HEAT}
+void main(){
+ float keep=1.-smoothstep(uCut-uCutW,uCut+uCutW,vW.y)*uFade;
+ if(keep<.01)discard;
+ vec3 N=normalize(vN);if(!gl_FrontFacing)N=-N;vec3 V=normalize(cameraPosition-vW);
+ float fr=pow(1.-abs(dot(N,V)),2.0);float dif=.40+.60*max(dot(N,uLight),0.);
+ float lane=clamp(vLane,0.,1.);
+ float t=uTemp*(.55+.45*vU)*(1.-.75*lane);
+ vec3 col=heat(t)*dif*(.70+.70*fr);
+ float al=(.07+.78*fr)*uOp;if(!gl_FrontFacing)al*=.5;al*=1.+1.4*lane;
+ gl_FragColor=vec4(col,clamp(al,0.,1.)*uAlpha*keep);}`;
+const PT_VS=`attribute vec3 aCol;attribute float aSize;uniform float uScale;varying vec3 vC;
+void main(){vC=aCol;vec4 mv=modelViewMatrix*vec4(position,1.);gl_PointSize=max(1.,aSize*uScale/-mv.z);gl_Position=projectionMatrix*mv;}`;
+const PT_FS=`varying vec3 vC;void main(){vec2 d=gl_PointCoord-.5;float r=length(d);if(r>.5)discard;gl_FragColor=vec4(vC*smoothstep(.5,0.,r),1.);}`;
+
+// ---------------- albero delle celle ----------------
+// ogni divisione: una figlia al centro e n-1 attorno, che insieme coprono la sezione della madre.
+// la madre resta attiva sotto le figlie e le alimenta.
+function mkNoise(R){const ms=[2,3,4,5,7].sort(()=>R()-.5),A=[1,.8,.6,.5,.4];
+  return ms.map((m,i)=>({m,a:A[i]/1.7,b:.6+1.2*R(),w:(.03+.07*R())*(R()<.5?-1:1),p:R()*6.283}));}
+function layout(n,Rf,R){
+  const m=n-1,d=.6*Rf,rr=Rf*Math.min(.38,.6*Math.sin(Math.PI/m)*.95),base=R()*6.283,out=[];
+  out.push({x:(R()-.5)*.06*Rf,z:(R()-.5)*.06*Rf,r:Rf*.28,a:null});
+  for(let k=0;k<m;k++){const a=base+2*Math.PI*k/m+(R()-.5)*.25*Math.PI/m,dd=d*(.95+.1*R());
+    out.push({x:Math.cos(a)*dd,z:Math.sin(a)*dd,r:rr*(.92+.16*R()),a});}
+  return out;
+}
+function buildTree(n,sd){
+  const R=rng(sd),list=[];
+  const R0=3.8,top0=5.6,top1=top0+2.2,top2=top1+1.25;
+  LAYERS=[0,top0,top1,top2];
+  function mk(gen,cx,cz,Rc,yb,ybStart,h0top,birth,pre,parent){
+    const g=GEN[gen],T=g.T.map(x=>x*(.92+.16*R()));
+    const c={gen,cx,cz,R:Rc,yb,ybStart,h0top,top:LAYERS[gen+1],birth,pre,T,n,kids:[],kidsL:[],lobes:[],parent,noise:mkNoise(R),res:RES[gen]};
+    c.tc=(T[0]+T[1])/3.2;list.push(c);return c;
+  }
+  // L: figlie in coordinate locali della madre {x,z,r}
+  function divide(c,L,lobeSrc){
+    const [T1,T2,T3,T4]=c.T,kidTop=LAYERS[c.gen+2];
+    c.kidsL=L;
+    c.lobes=lobeSrc.filter(k=>Math.hypot(k.x,k.z)>.2*c.R).map(k=>Math.atan2(k.z,k.x));
+    c.cutBase=c.top-c.R*.12;
+    const kb=c.birth+c.pre+T1+T2+T3;
+    L.forEach(k=>c.kids.push(mk(c.gen+1,c.cx+k.x,c.cz+k.z,k.r*1.2,c.cutBase,c.top,c.top,kb+R()*.6,T4,c)));
+    c.divEnd=kb+T4;
+  }
+  const root=mk(0,0,0,R0,0,0,2.0,.4,0,null),Rf=R0*1.05;
+  // livello 2: flussi principali (1 al centro + anello) e flussi minori che riempiono i vuoti
+  const main=layout(n,Rf,R);
+  const fill=pack(Rf*1.02,main,Math.min(...main.slice(1).map(m=>m.r))*.7,Rf*.13,R);
+  divide(root,main.concat(fill),main);
+  // livello 3: granuli di dimensione tipica che coprono tutta la sommità; ognuno appartiene alla figlia sottostante
+  const gr=pack(Rf*1.05,[],.34,.12,R),own=root.kids.map(()=>[]);
+  gr.forEach(g=>{let best=0,bd=1e9;root.kids.forEach((k,i)=>{const d=Math.hypot(g.x-(k.cx-root.cx),g.z-(k.cz-root.cz))-k.R;if(d<bd){bd=d;best=i;}});
+    const k=root.kids[best];own[best].push({x:g.x-(k.cx-root.cx),z:g.z-(k.cz-root.cz),r:g.r});});
+  root.kids.forEach((k,i)=>{if(own[i].length)divide(k,own[i],own[i].filter(g=>Math.hypot(g.x,g.z)>.2*k.R).sort((a,b)=>b.r-a.r).slice(0,3));});
+  list.forEach(c=>{
+    if(c.gen===2){c.life=10+8*R();c.loff=R();}
+    if(!c.kids.length){const base=R()*6.283,m=2+Math.floor(R()*2);for(let k=0;k<m;k++)c.lobes.push(base+2*Math.PI*k/m+(R()-.5)*.8);}
+    c.lw=.75*Math.PI/Math.max(1,c.lobes.length);
+    c.end=c.birth+c.pre+c.T[0]+c.T[1]+c.T[2]+(c.kids.length?c.T[3]:0);
+  });
+  return list;
+}
+// riempimento a cerchi: sceglie ogni volta il punto più lontano da tutto, fino a non lasciare vuoti più grandi di rMin
+function pack(Rd,fixed,rCap,rMin,R){
+  const step=rMin*.45,cand=[];
+  for(let x=-Rd;x<=Rd;x+=step)for(let z=-Rd;z<=Rd;z+=step){
+    const px=x+(R()-.5)*step*.6,pz=z+(R()-.5)*step*.6,d=Math.hypot(px,pz);
+    if(d<Rd)cand.push([px,pz,Rd-d+.35*rMin]);}
+  const out=[],apply=c=>{for(const q of cand){const v=Math.hypot(q[0]-c.x,q[1]-c.z)-c.r;if(v<q[2])q[2]=v;}};
+  fixed.forEach(apply);
+  for(let it=0;it<500;it++){
+    let best=null;for(const q of cand)if(!best||q[2]>best[2])best=q;
+    if(!best||best[2]<rMin)break;
+    const c={x:best[0],z:best[1],r:Math.min(best[2],rCap)};out.push(c);apply(c);}
+  return out;
+}
+
+function state(c,T){
+  const tau0=T-c.birth;if(tau0<0)return null;
+  const tau=tau0-c.pre,[T1,T2,T3,T4]=c.T,gen=c.gen,first=gen===0,hasK=c.kids.length>0;
+  const yb=c.pre>0&&tau<0?lerp(c.ybStart,c.yb,sstep(0,1,tau0/c.pre)):c.yb;
+  const tr=first?0:.3*T1,warp=t=>t<=0?0:(tr?t-tr*(1-Math.exp(-t/tr)):t),tw=warp(tau);
+  const p=tau>0?clamp((1-Math.exp(-tw/c.tc))/(1-Math.exp(-warp(T1+T2)/c.tc))):0;
+  const A=sstep(T1+T2,T1+T2+T3,tau)*(gen===2?.6:1);
+  const S=hasK?sstep(T1+T2+T3,T1+T2+T3+T4,tau):0;
+  // dopo la formazione completa: i granuli nascono, vivono, si spengono e vengono sostituiti; alcuni esplodono
+  let sz=1,tF=1,aF=1,X=0,ox=0,oz=0,rot=0;
+  if(gen===2&&T>Tend){
+    const life=T-Tend,amp=sstep(0,6,life),x=life/c.life+c.loff,k=Math.floor(x),u=x-k;
+    const h=n=>{const v=Math.sin((c.idx*131+k*17+n)*12.9898)*43758.5453;return v-Math.floor(v);};
+    const ex=h(1)<.28;
+    const s1=u<.15?lerp(.35,1,sstep(0,.15,u)):u<.65?1+.08*(u-.15)/.5:lerp(1.08,ex?1.12:.45,sstep(.65,1,u));
+    const t1=u<.15?lerp(1.15,1,u/.15):u<.65?1:lerp(1,.35,sstep(.65,1,u));
+    const a1=sstep(0,.08,u)*(1-sstep(.86,1,u));
+    sz=lerp(1,s1*(.85+.3*h(2)),amp);tF=lerp(1,t1,amp);aF=lerp(1,a1,amp);
+    X=ex?sstep(.5,.85,u)*amp:0;ox=(h(3)-.5)*.35*c.R*amp;oz=(h(4)-.5)*.35*c.R*amp;rot=h(5)*6.283*amp;
+  }
+  const R=c.R*sz;
+  const rc=R*(first?.55+.45*Math.pow(p,1.2):.88+.12*p)*(1+.05*A);
+  const rs=rc*.8, rs0=rs*(first?.88:1);
+  const H=c.top-yb,h0=Math.max(.04,c.h0top-yb);
+  const hTop=Math.max(.04,h0+(H-h0)*p);
+  const ct=Math.min(R*(first?.38-.2*p:.26-.1*p),.6*hTop);
+  const sk=Math.min(R*.22*sstep(.35,1,p),.3*hTop);
+  const yTop=yb+hTop,yU=yTop-ct;
+  const cutY=hasK&&S>0?yTop+.05*R-S*(yTop+.05*R-c.cutBase):1e4;
+  const loopTop=hasK&&S>0?Math.max(c.cutBase,Math.min(yTop,cutY+.05*R)):yTop;
+  const lam=1/c.tc,f=.18,P0=t=>t<=0?0:f*t+(1-f)*(1-Math.exp(-lam*t))/lam,P=t=>P0(warp(t));
+  const gf=1;
+  const al=sstep(0,first?1.2:1.6,tau0)*gf*aF;
+  const pal=al*(c.pre>0?sstep(-.5,1.5,tau):1);
+  const temp=clamp(1-.15*p-.15*A)*[1,.97,.94][gen]*tF;
+  const eps=(.04+.03*A)*irr;
+  return{cx:c.cx+ox,cz:c.cz+oz,rot,X,tau,yb,p,A,S,R,rc,rs,rs0,ct,sk,hTop,yTop,yU,cutY,loopTop,P,al,pal,temp,eps,growing:tau<0};
+}
+
+function lobeL(c,th){if(!c.lobes.length)return 1;let s=0;for(const a of c.lobes){const d=angDist(th,a)/c.lw;s+=Math.exp(-d*d);}return Math.min(1,s);}
+function noiseN(c,th,yr,tau){let s=0;for(const q of c.noise)s+=q.a*Math.sin(q.m*th+q.b*yr+q.w*tau+q.p);return s;}
+// ondulazione laterale del bordo + irregolarità
+const MOD=[0,0,0];
+function deform(c,st,th,rad,y,cw,out){
+  const L=lobeL(c,th-st.rot),w=2*L-1;
+  let r=rad,yy=y;
+  const wRim=Math.max(cw,.6*sstep(st.yU-1.5*st.ct,st.yU,y));
+  r*=1+st.A*wRim*.06*w;
+  yy+=st.A*cw*.15*st.ct*w*(rad/Math.max(st.rc,1e-3));
+  let lv=(1-L)*(1-L)*st.A*wRim*.5;
+  if(st.X>0&&c.lobes.length){const m=Math.max(2,c.lobes.length),lx=Math.pow((1-Math.cos(m*(th-st.rot-c.lobes[0])))/2,3);
+    r*=1-.7*st.X*lx;yy-=st.X*lx*cw*st.ct*1.2;lv=Math.max(lv,st.X*lx);}
+  const yr=(y-st.yb)/st.R;
+  r*=1+st.eps*noiseN(c,th,yr,Math.max(0,st.tau));
+  yy+=st.eps*.35*st.ct*cw*noiseN(c,th+1.7,yr*.7,Math.max(0,st.tau)*.8);
+  out[0]=Math.max(0,r);out[1]=yy;out[2]=lv;return out;
+}
+
+// profilo meridiano: colonna quasi cilindrica → sottocappello corto → bordo piegato in basso → sommità piatta
+const PROF=new Float32Array(61*4);
+function profile(c,st,NS){
+  const b=st.yb,yu=st.yU,yt=st.yTop,ct=st.ct,sk=st.sk,rc=st.rc,rs=st.rs,rs0=st.rs0;
+  // sommità a bulbo pieno: la colonna si gonfia sotto la cima, spalla arrotondata, sommità piatta (niente lamine)
+  const y2=Math.max(lerp(b,yu,.55),yu-.9*ct-.5*sk);
+  const pts=[
+    [rs0,b,0,0],
+    [lerp(rs0,rs,.5),lerp(b,y2,.5),0,.35],
+    [rs,y2,.2,.55],
+    [rc*.985,Math.max(lerp(y2,yu,.5),yu-.25*ct-.4*sk),.8,.62],
+    [rc,yu+.3*ct,1,.75],
+    [rc*.82,yt-.05*ct,1,.88],
+    [rc*.4,yt,1,.95],
+    [0,yt,1,1]
+  ];
+  const P=[[2*pts[0][0]-pts[1][0],2*pts[0][1]-pts[1][1],0,0],...pts,[-pts[6][0],pts[6][1],1,1]],nseg=pts.length-1;
+  for(let j=0;j<=NS;j++){
+    const t=j/NS*nseg,i=Math.min(nseg-1,Math.floor(t)),u=t-i;
+    for(let k=0;k<4;k++)PROF[j*4+k]=k<2?cr(P[i][k],P[i+1][k],P[i+2][k],P[i+3][k],u):lerp(P[i+1][k],P[i+2][k],u);
+    if(PROF[j*4]<0)PROF[j*4]=0;
+  }
+}
+
+// ---------------- mesh ----------------
+const cellGroup=new THREE.Group();scene.add(cellGroup);
+function makeMesh(c){
+  const [NT,NS]=c.res,nv=(NT+1)*(NS+1),g=new THREE.BufferGeometry();
+  const dyn=(n,s)=>new THREE.BufferAttribute(new Float32Array(n*s),s).setUsage(THREE.DynamicDrawUsage);
+  g.setAttribute('position',dyn(nv,3));g.setAttribute('normal',dyn(nv,3));g.setAttribute('aLane',dyn(nv,1));g.setAttribute('aU',dyn(nv,1));
+  const idx=[];for(let i=0;i<NT;i++)for(let j=0;j<NS;j++){const a=i*(NS+1)+j,b=(i+1)*(NS+1)+j;idx.push(a,b,a+1,b,b+1,a+1);}
+  g.setIndex(idx);
+  const m=new THREE.ShaderMaterial({uniforms:{uTemp:{value:1},uAlpha:{value:1},uOp:{value:1},uCut:{value:1e4},uCutW:{value:.15},uFade:{value:0},uLight:{value:LIGHT}},vertexShader:SHELL_VS,fragmentShader:SHELL_FS,transparent:true,depthWrite:false,side:THREE.DoubleSide});
+  const mesh=new THREE.Mesh(g,m);mesh.renderOrder=3;mesh.frustumCulled=false;cellGroup.add(mesh);c.mesh=mesh;
+}
+function updateCell(c,st){
+  const vis=st&&st.al>.004&&showShell;c.mesh.visible=!!vis;if(!vis)return;
+  const [NT,NS]=c.res;
+  profile(c,st,NS);
+  const g=c.mesh.geometry,p=g.attributes.position.array,l=g.attributes.aLane.array,u=g.attributes.aU.array;
+  for(let i=0;i<=NT;i++){const th=2*Math.PI*i/NT,co=Math.cos(th),s=Math.sin(th);
+    for(let j=0;j<=NS;j++){const v=i*(NS+1)+j;
+      deform(c,st,th,PROF[j*4],PROF[j*4+1],PROF[j*4+2],MOD);
+      p[v*3]=st.cx+MOD[0]*co;p[v*3+1]=MOD[1];p[v*3+2]=st.cz+MOD[0]*s;l[v]=MOD[2];u[v]=PROF[j*4+3];}}
+  g.attributes.position.needsUpdate=g.attributes.aLane.needsUpdate=g.attributes.aU.needsUpdate=true;
+  g.computeVertexNormals();
+  const U=c.mesh.material.uniforms;U.uTemp.value=st.temp;U.uAlpha.value=st.al;U.uOp.value=shellOp;if(c.kids.length){U.uCut.value=c.cutBase+.04*c.R;U.uCutW.value=.07*c.R;U.uFade.value=sstep(0,.4,st.S);}else{U.uFade.value=0;}
+}
+
+// ---------------- particelle ----------------
+let PP=null;const ptGroup=new THREE.Group();scene.add(ptGroup);
+const ptMat=new THREE.ShaderMaterial({uniforms:{uScale:{value:600}},vertexShader:PT_VS,fragmentShader:PT_FS,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending});
+const lnMat=new THREE.LineBasicMaterial({vertexColors:true,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending});
+// Tre famiglie di particelle:
+//  - ricircolo locale (la maggioranza): sale, si rovescia in cima alla propria cella, riscende ai bordi
+//  - F1: poche particelle che dalla cella madre salgono in una figlia, si rovesciano lì e tornano giù fino alla base
+//  - F2: pochissime che arrivano ai granuli; raffreddate in superficie scendono in getti stretti che si uniscono fino alla base
+const CIRC=[50,3];                      // particelle F1 per ogni figlia, F2 per ogni granulo
+function buildParticles(){
+  ptGroup.clear();if(PP){PP.pg.dispose();PP.lg.dispose();}
+  let tot=0;cells.forEach(c=>{c.p0=tot;tot+=PG[c.gen];});
+  const nLoc=tot,R=rng(seed*31+5),circ=[];
+  cells.forEach(c=>{if(c.gen===0)return;const m=CIRC[c.gen-1];
+    for(let k=0;k<m;k++)circ.push({type:c.gen,child:c.gen===1?c:c.parent,gran:c.gen===2?c:null,i:tot++,
+      s0:R()*20,sp:.3+.1*R(),a:R()*6.283,jx:(R()-.5),jz:(R()-.5),jy:(R()-.5)});});
+  const d={rho:new Float32Array(tot),u0:new Float32Array(tot),sp:new Float32Array(tot),th:new Float32Array(tot),jx:new Float32Array(tot)};
+  for(let i=0;i<nLoc;i++){d.rho[i]=.08+.85*Math.sqrt(R());d.u0[i]=R()*8;d.sp[i]=.8+.4*R();d.th[i]=R()*6.283;d.jx[i]=R()-.5;}
+  const pg=new THREE.BufferGeometry(),lg=new THREE.BufferGeometry(),sz=new Float32Array(tot);
+  cells.forEach(c=>{for(let i=0;i<PG[c.gen];i++)sz[c.p0+i]=GEN[c.gen].ps*(.7+.6*R());});
+  circ.forEach(q=>{sz[q.i]=(q.type===1?.09:.07)*(.85+.3*R());});
+  const dyn=(n,s)=>new THREE.BufferAttribute(new Float32Array(n*s),s).setUsage(THREE.DynamicDrawUsage);
+  pg.setAttribute('position',dyn(tot,3));pg.setAttribute('aCol',dyn(tot,3));pg.setAttribute('aSize',new THREE.BufferAttribute(sz,1));
+  lg.setAttribute('position',dyn(tot*2,3));lg.setAttribute('color',dyn(tot*2,3));
+  const pts=new THREE.Points(pg,ptMat),lns=new THREE.LineSegments(lg,lnMat);
+  pts.frustumCulled=lns.frustumCulled=false;pts.renderOrder=lns.renderOrder=2;
+  ptGroup.add(lns);ptGroup.add(pts);PP={tot,nLoc,d,pg,lg,circ};
+}
+// percorso chiuso nel piano meridiano: su al centro, in orizzontale sotto la sommità, giù fuori dal bordo, rientro alla base
+const LOOP=new Float32Array(16),TEMP=[1,1,1,.8,.45,.2,.12,.15,.6];
+function loopPts(st,rho,jx){
+  const b=st.yb,yt=st.loopTop,ct=Math.min(st.ct,.5*(yt-b)),yu=yt-ct,sk=Math.min(st.sk,.3*(yt-b)),rc=st.rc,rs0=st.rs0,rs=st.rs,H=yt-b;
+  LOOP[0]=rho*rs0*.8;   LOOP[1]=b+.05*H;
+  LOOP[2]=rho*lerp(rs0,rs,.5)*.8;LOOP[3]=lerp(b,yu,.5);
+  LOOP[4]=rho*rs*.8;    LOOP[5]=yu+.15*ct;
+  LOOP[6]=lerp(rho*rs*.8,rc*.95,.6+.1*jx);LOOP[7]=yt-ct*(.3+.1*jx);
+  LOOP[8]=rc*(.96+.03*jx);LOOP[9]=yu+ct*(.3+.1*jx);
+  LOOP[10]=rc*(1.02+.05*jx);LOOP[11]=yu-sk-.4*ct;
+  LOOP[12]=rc*(1.05+.08*jx);LOOP[13]=lerp(b,yu,.45);
+  LOOP[14]=rs0*(1.1+.15*jx);LOOP[15]=b+.08*H;
+}
+function evalLoop(u,o){const n=8;u=((u%n)+n)%n;const i=Math.floor(u),t=u-i;
+  const a=(i+n-1)%n,b=i,c2=(i+1)%n,d=(i+2)%n;
+  o[0]=cr(LOOP[a*2],LOOP[b*2],LOOP[c2*2],LOOP[d*2],t);o[1]=cr(LOOP[a*2+1],LOOP[b*2+1],LOOP[c2*2+1],LOOP[d*2+1],t);
+  o[2]=lerp(TEMP[i],TEMP[i+1],t);o[3]=i;return o;}
+
+// percorsi tra livelli: punti [x,y,z,temperatura] e pesi (tempo) dei tratti; salita lenta, discesa veloce
+const RP=[],RW=[];for(let i=0;i<14;i++){RP.push([0,0,0,0]);RW.push(1);}
+function setP(i,x,y,z,t,w){const p=RP[i];p[0]=x;p[1]=y;p[2]=z;p[3]=t;RW[i]=w;}
+function dirTo(a,b,ang){const dx=b.cx-a.cx,dz=b.cz-a.cz,l=Math.hypot(dx,dz);return l>.15*a.R?[dx/l,dz/l]:[Math.cos(ang),Math.sin(ang)];}
+function routePts(q,sts){
+  const r=cells[0],sr=sts[0],c=q.child,sc=sts[c.idx],g=q.gran,sg=g?sts[g.idx]:null;
+  const dR=dirTo(r,c,q.a),H=sr.hTop,jr=.3*sr.rs,jc=.3*sc.rs;
+  let n=0;
+  setP(n++,r.cx+q.jx*jr,sr.yb+.08*H,r.cz+q.jz*jr,.75,1.1);
+  setP(n++,r.cx+q.jx*jr,lerp(sr.yb,r.cutBase,.5),r.cz+q.jz*jr,1,1.1);
+  setP(n++,lerp(r.cx,c.cx,.75)+q.jx*jc,r.cutBase-.25,lerp(r.cz,c.cz,.75)+q.jz*jc,1,1);
+  setP(n++,c.cx+q.jx*jc,lerp(c.yb,sc.loopTop,.5),c.cz+q.jz*jc,1,.9);
+  let dC;
+  if(g){
+    dC=dirTo(c,g,q.a);const dg=[Math.cos(q.a),Math.sin(q.a)],jg=.3*sg.rs;
+    setP(n++,lerp(c.cx,sg.cx,.75)+q.jx*jg,c.cutBase-.1,lerp(c.cz,sg.cz,.75)+q.jz*jg,1,.8);
+    setP(n++,sg.cx+q.jx*jg,lerp(g.yb,sg.yU,.5),sg.cz+q.jz*jg,.95,.6);
+    setP(n++,sg.cx+dg[0]*.45*sg.rc,sg.yTop-.3*sg.ct,sg.cz+dg[1]*.45*sg.rc,.8,.5);
+    setP(n++,sg.cx+dg[0]*1.04*sg.rc,sg.yU,sg.cz+dg[1]*1.04*sg.rc,.4,.35);
+    setP(n++,c.cx+dC[0]*1.03*sc.rc,c.cutBase,c.cz+dC[1]*1.03*sc.rc,.18,.35);
+  }else{
+    dC=[Math.cos(q.a),Math.sin(q.a)];
+    setP(n++,c.cx+dC[0]*.45*sc.rc,sc.loopTop-.3*sc.ct,c.cz+dC[1]*.45*sc.rc,.8,.6);
+    setP(n++,c.cx+dC[0]*1.03*sc.rc,sc.loopTop-sc.ct,c.cz+dC[1]*1.03*sc.rc,.42,.4);
+  }
+  setP(n++,c.cx+dC[0]*1.05*sc.rc,c.yb+.2,c.cz+dC[1]*1.05*sc.rc,.15,.4);
+  setP(n++,r.cx+dR[0]*1.03*sr.rc,r.cutBase-.6,r.cz+dR[1]*1.03*sr.rc,.12,.45);
+  setP(n++,r.cx+dR[0]*1.07*sr.rc,sr.yb+.2*H,r.cz+dR[1]*1.07*sr.rc,.12,.45);
+  setP(n++,r.cx+dR[0]*.5*sr.rs0,sr.yb+.05*H,r.cz+dR[1]*.5*sr.rs0,.4,.6);
+  return n;
+}
+function evalRoute(n,u,o){
+  let W=0;for(let i=0;i<n;i++)W+=RW[i];
+  u=((u%W)+W)%W;let i=0;while(i<n-1&&u>=RW[i]){u-=RW[i];i++;}
+  const t=Math.min(1,u/RW[i]),a=RP[(i+n-1)%n],b=RP[i],c=RP[(i+1)%n],d=RP[(i+2)%n];
+  o[0]=cr(a[0],b[0],c[0],d[0],t);o[1]=cr(a[1],b[1],c[1],d[1],t);o[2]=cr(a[2],b[2],c[2],d[2],t);o[3]=lerp(b[3],c[3],t);return o;
+}
+const E1=[0,0,0,0],E2=[0,0,0,0],HC=[0,0,0];
+function updateParticles(sts){
+  const pp=PP.pg.attributes.position.array,pc=PP.pg.attributes.aCol.array,lp=PP.lg.attributes.position.array,lc=PP.lg.attributes.color.array,d=PP.d;
+  pc.fill(0);lc.fill(0);
+  if(showPart){
+    const locMul=hi?.16:.9,cirMul=hi?1.7:.85;
+    cells.forEach((c,ci)=>{
+      const st=sts[ci];if(!st||st.pal<.004)return;
+      const om=GEN[c.gen].om,tt=Math.max(0,st.tau),Ph=st.P(tt),Pt=st.P(tt-LAG),cwA=st.yU-st.sk-.3*st.ct;
+      for(let k=0;k<PG[c.gen];k++){
+        const i=c.p0+k,th=d.th[i]+.05*Math.sin(tt*.3+i),cs=Math.cos(th),sn=Math.sin(th);
+        loopPts(st,d.rho[i],d.jx[i]);
+        evalLoop(d.u0[i]+om*Ph*d.sp[i],E1);evalLoop(d.u0[i]+om*Pt*d.sp[i],E2);
+        deform(c,st,th,E1[0],E1[1],sstep(cwA,st.yU,E1[1]),MOD);const r1=MOD[0],y1=MOD[1];
+        deform(c,st,th,E2[0],E2[1],sstep(cwA,st.yU,E2[1]),MOD);const r2=MOD[0],y2=MOD[1];
+        pp[i*3]=st.cx+r1*cs;pp[i*3+1]=y1;pp[i*3+2]=st.cz+r1*sn;
+        lp[i*6]=pp[i*3];lp[i*6+1]=y1;lp[i*6+2]=pp[i*3+2];
+        lp[i*6+3]=st.cx+r2*cs;lp[i*6+4]=y2;lp[i*6+5]=st.cz+r2*sn;
+        heat(st.temp*(.12+.88*E1[2]),HC);const bb=st.pal*locMul;
+        pc[i*3]=HC[0]*bb;pc[i*3+1]=HC[1]*bb;pc[i*3+2]=HC[2]*bb;
+        if(c.gen===0){lc[i*6]=HC[0]*bb*.75;lc[i*6+1]=HC[1]*bb*.75;lc[i*6+2]=HC[2]*bb*.75;}
+      }
+    });
+    for(const q of PP.circ){
+      const top=q.gran||q.child,st=sts[top.idx];
+      if(!st||st.tau<=0||st.pal<.004)continue;
+      const a=sstep(0,3,st.tau)*st.pal*cirMul,n=routePts(q,sts),i=q.i,u=q.s0+q.sp*T;
+      evalRoute(n,u,E1);evalRoute(n,u-q.sp*LAG*1.3,E2);
+      pp[i*3]=E1[0];pp[i*3+1]=E1[1];pp[i*3+2]=E1[2];
+      lp[i*6]=E1[0];lp[i*6+1]=E1[1];lp[i*6+2]=E1[2];lp[i*6+3]=E2[0];lp[i*6+4]=E2[1];lp[i*6+5]=E2[2];
+      heat(.1+.9*E1[3],HC);
+      pc[i*3]=HC[0]*a;pc[i*3+1]=HC[1]*a;pc[i*3+2]=HC[2]*a;
+    }
+  }
+  PP.pg.attributes.position.needsUpdate=PP.pg.attributes.aCol.needsUpdate=PP.lg.attributes.position.needsUpdate=PP.lg.attributes.color.needsUpdate=true;
+}
+
+// ---------------- etichette ----------------
+const lblBox=document.getElementById('labels');
+function mkLbl(text,cls){const el=document.createElement('div');el.className='lbl '+(cls||'');el.innerHTML='<i></i><span></span>';el.lastChild.textContent=text;lblBox.appendChild(el);return el;}
+const L={
+  up:mkLbl('Risalita calda al centro','hot'),
+  over:mkLbl('In cima il flusso diventa orizzontale e piega in basso'),
+  down:mkLbl('Discesa fredda ai bordi','cold'),
+  wave:mkLbl('Il bordo ondeggia lateralmente'),
+  split:mkLbl('Il flusso si divide','hot'),
+  lane:mkLbl('Corsia fredda tra i nuovi flussi','cold'),
+  turn:mkLbl('Qui si rovescia la maggior parte del gas della cella madre'),
+  pass:mkLbl('Solo una piccola parte sale nelle figlie','hot'),
+  jet:mkLbl('Getti freddi dalla superficie scendono fino alla base','cold'),
+  l1:mkLbl('Livello 1','layer'),l2:mkLbl('Livello 2','layer'),l3:mkLbl('Livello 3','layer'),
+  surf:mkLbl('Fotosfera','layer')
+};
+const V3=new THREE.Vector3();
+function place(el,x,y,z,alpha){
+  if(!showLbl||!(alpha>.01)){el.style.opacity=0;return;}
+  V3.set(x,y,z).project(camera);if(V3.z>1){el.style.opacity=0;return;}
+  const w=stage.clientWidth,h=stage.clientHeight;
+  el.style.transform=`translate(${(V3.x*.5+.5)*w-3.5}px,${(-V3.y*.5+.5)*h-9}px)`;
+  el.style.opacity=alpha;
+}
+function updateLabels(sts){
+  const c=cells[0],st=sts[0],al=st?sstep(.3,.6,st.al):0;
+  const aCam=Math.atan2(camera.position.z-c.cz,camera.position.x-c.cx);
+  const k1=sts[c.kids[0].idx];const kidsUp=k1&&!k1.growing?sstep(0,2,k1.tau):0;
+  const g2=sts[rep[2].idx];const jetOn=g2&&g2.tau>0?sstep(2,5,g2.tau):0;
+  if(al>0){
+    const pre=(1-st.A);
+    place(L.up,c.cx,st.yb+st.hTop*.42,c.cz,al*pre);
+    place(L.over,c.cx+Math.cos(aCam+1.1)*st.rc*.95,st.yU+st.ct*.4,c.cz+Math.sin(aCam+1.1)*st.rc*.95,al*sstep(.35,.6,st.p)*pre);
+    place(L.down,c.cx+Math.cos(aCam-1.2)*st.rc*1.05,st.yb+(st.yU-st.yb)*.4,c.cz+Math.sin(aCam-1.2)*st.rc*1.05,al*sstep(.25,.5,st.p)*pre);
+    place(L.wave,c.cx+Math.cos(aCam+.5)*st.rc,st.yU+st.ct*.5,c.cz+Math.sin(aCam+.5)*st.rc,al*sstep(.15,.4,st.A)*(1-sstep(.05,.3,st.S)));
+    place(L.split,c.cx,st.yTop+.35,c.cz,al*sstep(.05,.3,st.S)*(1-kidsUp));
+    // corsia: punto medio tra la figlia centrale e la figlia dell'anello più vicina alla camera
+    let best=null,bd=-9;for(const q of c.kidsL){if(q.a===null)continue;const dd=Math.cos(angDist(q.a,aCam));if(dd>bd){bd=dd;best=q;}}
+    const ctr=c.kidsL[0];
+    place(L.lane,c.cx+(best.x+ctr.x)/2,lerp(st.yTop,st.cutY,.4),c.cz+(best.z+ctr.z)/2,al*sstep(.3,.6,st.S)*(1-kidsUp));
+    place(L.turn,c.cx+Math.cos(aCam+1.25)*st.rc*1.02,st.loopTop-st.ct*.6,c.cz+Math.sin(aCam+1.25)*st.rc*1.02,al*kidsUp*(1-jetOn));
+    const rk=rep[1];place(L.pass,lerp(c.cx,rk.cx,.75),c.cutBase-.25,lerp(c.cz,rk.cz,.75),al*kidsUp*(1-jetOn));
+    place(L.jet,c.cx+Math.cos(aCam-1.25)*st.rc*1.07,lerp(st.yb,c.cutBase,.45),c.cz+Math.sin(aCam-1.25)*st.rc*1.07,al*jetOn);
+  }else ['up','over','down','wave','split','lane','turn','pass','jet'].forEach(k=>place(L[k],0,0,0,0));
+  place(L.l1,-HALF,(LAYERS[0]+LAYERS[1])/2,HALF,1);
+  place(L.l2,-HALF,(LAYERS[1]+LAYERS[2])/2,HALF,1);
+  place(L.l3,-HALF,(LAYERS[2]+LAYERS[3])/2,HALF,1);
+  place(L.surf,HALF,LAYERS[3]+.12,-HALF,1);
+}
+
+// ---------------- testi ----------------
+const TXT=[
+  [['Risalita rapida','Una grande bolla di gas caldo, più leggera di quello che la circonda, sale veloce lungo il suo canale centrale.'],
+   ['Frenata e allargamento','Il gas incontra strati sempre meno densi e rallenta. In cima si allarga, diventa orizzontale e ai bordi si piega verso il basso.'],
+   ['Il bordo si instabilizza','Il bordo ondeggia lateralmente e le ondulazioni crescono: il flusso in cima non riesce più a restare unico.'],
+   ['Il flusso si divide','Corsie di gas freddo scendono dalla sommità e separano il grande flusso in flussi più piccoli: {n} principali, uno al centro e {m} attorno, più alcuni minori che riempiono gli spazi.']],
+  [['Nascono le celle figlie','Solo ora i {n} flussi separati salgono per conto proprio. La cella madre resta attiva: gran parte del suo gas si rovescia sotto le figlie, solo una piccola parte sale dentro di esse.'],
+   ['Le figlie si allargano','Lo strato è più sottile del precedente: le figlie frenano presto, si appiattiscono e piegano i bordi verso il basso.'],
+   ['Nuova instabilità','I bordi delle celle figlie ondeggiano a loro volta: anche il loro flusso sta per dividersi.'],
+   ['Seconda divisione','Le celle figlie si dividono nei granuli, flussi tutti di dimensione simile che coprono l\u2019intera sommità senza lasciare vuoti.']],
+  [['Verso la superficie','I flussi più piccoli attraversano l’ultimo strato, sottilissimo: sono i granuli che si osservano in fotosfera.'],
+   ['I granuli si appiattiscono','In superficie il gas si espande orizzontalmente e irradia il suo calore nello spazio.'],
+   ['Granuli che si frammentano','Il bordo dei granuli più grandi si increspa, come nei granuli esplosivi osservati in fotosfera.'],
+   ['La struttura completa','In ogni cella la maggior parte del gas ricircola sul posto e poco passa al livello sopra. Il gas raffreddato in superficie scende in getti stretti che si uniscono e arrivano fino alla base.']]
+];
+const phT=document.getElementById('phT'),phD=document.getElementById('phD'),velBar=document.getElementById('velBar'),velTxt=document.getElementById('velTxt');
+const chips=[0,1,2].map(i=>document.getElementById('g'+i)),stepEls=[...document.querySelectorAll('#steps span')],lastStep=document.getElementById('lastStep');
+let lastKey='';
+const LIFE=[['Struttura completa','I tre livelli sono formati. Premi Avvia per vedere la vita dei granuli: in superficie nascono, si allargano e si spengono in pochi minuti, mentre sotto le celle grandi cambiano in giorni o settimane.'],
+  ['La vita dei granuli','I granuli vivono solo 5\u201310 minuti: nascono caldi, si allargano, si raffreddano e si spengono, e il loro posto è subito preso da nuovi granuli. Alcuni, più grandi, si spezzano in due o tre: sono i granuli esplosivi. Sotto, supergranuli e celle giganti cambiano in giorni o settimane.']];
+function updateHud(){
+  if(T>=Tend){const li=T>Tend+.01?1:0,k='life'+li;
+    if(k!==lastKey){lastKey=k;phT.textContent=LIFE[li][0];phD.textContent=LIFE[li][1];lastStep.textContent='Vita dei granuli';
+      chips.forEach((e,i)=>{e.classList.toggle('on',i===2);e.classList.toggle('done',i<2);});
+      stepEls.forEach((e,i)=>{e.classList.toggle('on',i===3);e.classList.toggle('done',i<3);});}
+    velBar.style.width='2%';velTxt.textContent='quasi ferma';return;}
+  let g=0;for(let i=1;i<3;i++){if(T>=rep[i-1].divEnd)g=i;}
+  const c=rep[g],tau=T-c.birth-c.pre,[T1,T2,T3]=c.T;
+  const ki=tau<T1?0:tau<T1+T2?1:tau<T1+T2+T3?2:3;
+  const v=tau<0?0:Math.exp(-tau/c.tc)*(tau<T1+T2?1:0);
+  const k=g+'-'+ki+'-'+N;
+  if(k!==lastKey){lastKey=k;const t=TXT[g][ki];phT.textContent=t[0];phD.textContent=t[1].replace(/\{n\}/g,N).replace(/\{m\}/g,N-1);
+    lastStep.textContent=g===2?'Struttura completa':'Divisione del flusso';
+    chips.forEach((e,i)=>{e.classList.toggle('on',i===g);e.classList.toggle('done',i<g);});
+    stepEls.forEach((e,i)=>{e.classList.toggle('on',i===ki);e.classList.toggle('done',i<ki);});}
+  velBar.style.width=(Math.max(v,.02)*100).toFixed(1)+'%';
+  velTxt.textContent=v>.55?'alta':v>.25?'media':v>.06?'bassa':'quasi ferma';
+}
+
+// ---------------- ricostruzione ----------------
+const tl=document.getElementById('tl'),timeEl=document.getElementById('time'),ticks=document.getElementById('ticks');
+function rebuild(keepT){
+  cells.forEach(c=>{c.mesh.geometry.dispose();c.mesh.material.dispose();});cellGroup.clear();
+  cells=buildTree(N,seed);cells.forEach((c,i)=>{c.idx=i;makeMesh(c);});
+  buildLayers();
+  rep=[cells[0]];rep[1]=rep[0].kids.slice(1).find(k=>k.kids.length)||rep[0].kids[0];rep[2]=rep[1].kids[0]||rep[1];
+  if(!rep[1].divEnd)rep[1].divEnd=rep[1].end;
+  Tend=Math.max(...cells.map(c=>c.end))+2;
+  buildParticles();
+  ticks.innerHTML='';
+  [['L2',rep[0].divEnd],['L3',rep[1].divEnd]].forEach(([s,t])=>{const e=document.createElement('span');e.textContent=s;e.style.left=(t/Tend*100)+'%';ticks.appendChild(e);});
+  T=keepT?Math.min(T,Tend-.01):2;lastKey='';
+}
+
+// ---------------- vista ----------------
+let camAnim=null;
+const VIEWS={obl:[[14,9.5,14],[0,4.2,0]],side:[[22,4.6,.01],[0,4.4,0]],top:[[.01,24,.01],[0,4.5,0]]};
+function setView(k){const [p,t]=VIEWS[k];camAnim={t:0,p0:camera.position.clone(),t0:controls.target.clone(),p1:new THREE.Vector3(...p),t1:new THREE.Vector3(...t)};
+  document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('sel',b.dataset.view===k));}
+function resize(){const w=stage.clientWidth,h=stage.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;
+  const hw=(document.querySelector('.hud')||{offsetWidth:0}).offsetWidth;camera.setViewOffset(w,h,-hw/2,0,w,h);camera.updateProjectionMatrix();
+  ptMat.uniforms.uScale.value=h*renderer.getPixelRatio()/(2*Math.tan(camera.fov*Math.PI/360));}
+new ResizeObserver(resize).observe(stage);
+
+// ---------------- ciclo ----------------
+let last=performance.now(),scrubbing=false,autoStopped=false;
+function frame(now){
+  const dt=Math.min(.05,(now-last)/1000);last=now;
+  if(playing&&!scrubbing){const prev=T;T+=dt*speed;if(!autoStopped&&prev<Tend&&T>=Tend){T=Tend;autoStopped=true;setPlay(false);}}
+  if(camAnim){camAnim.t=Math.min(1,camAnim.t+dt/.9);const e=sstep(0,1,camAnim.t);
+    camera.position.lerpVectors(camAnim.p0,camAnim.p1,e);controls.target.lerpVectors(camAnim.t0,camAnim.t1,e);if(camAnim.t>=1)camAnim=null;}
+  controls.update();
+  const sts=cells.map(c=>state(c,T));
+  cells.forEach((c,i)=>updateCell(c,sts[i]));
+  updateParticles(sts);
+  renderer.render(scene,camera);
+  updateLabels(sts);updateHud();
+  if(!scrubbing)tl.value=Math.min(1000,Math.round(T/Tend*1000));
+  timeEl.textContent=T<Tend?`${T.toFixed(1).replace('.',',')} s / ${Math.round(Tend)} s`:T>Tend+.01?'vita dei granuli':'struttura completa';
+  requestAnimationFrame(frame);
+}
+
+// ---------------- comandi ----------------
+const $=id=>document.getElementById(id),playBtn=$('play');
+function setPlay(p){playing=p;playBtn.textContent=p?'Pausa':'Avvia';playBtn.setAttribute('aria-label',p?'Pausa':'Avvia');}
+playBtn.onclick=()=>setPlay(!playing);
+$('restart').onclick=()=>{T=0;autoStopped=false;setPlay(true);};
+$('variant').onclick=()=>{seed=(seed*9301+49297)%233280;rebuild(true);};
+$('speed').oninput=e=>{speed=+e.target.value;$('speedO').textContent=speed.toFixed(1).replace('.',',')+'×';};
+$('nkids').oninput=e=>{N=+e.target.value;$('nkidsO').textContent=`${N} (1 al centro + ${N-1})`;rebuild(true);};
+$('irr').oninput=e=>{irr=+e.target.value;$('irrO').textContent=Math.round(irr*100)+'%';};
+$('op').oninput=e=>{shellOp=+e.target.value;$('opO').textContent=Math.round(shellOp*100)+'%';};
+$('cShell').onchange=e=>{showShell=e.target.checked;};
+$('cPart').onchange=e=>{showPart=e.target.checked;};
+$('cLbl').onchange=e=>{showLbl=e.target.checked;};
+$('cRot').onchange=e=>{controls.autoRotate=e.target.checked;};
+$('cHi').onchange=e=>{hi=e.target.checked;};
+document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>setView(b.dataset.view));
+tl.addEventListener('input',()=>{scrubbing=true;T=tl.value/1000*Tend;if(T<Tend-.05)autoStopped=false;});
+tl.addEventListener('change',()=>{scrubbing=false;});
+tl.addEventListener('pointerup',()=>{scrubbing=false;});
+window.addEventListener('keydown',e=>{if(e.code==='Space'&&!(e.target instanceof HTMLInputElement&&e.target.type!=='range')){e.preventDefault();setPlay(!playing);}});
+if(window.matchMedia('(prefers-reduced-motion: reduce)').matches)speed=.6;
+
+// ---------------- download ----------------
+(async()=>{
+  const btn=$('dl'),msg=$('dlMsg');
+  let dlc=null;try{dlc=await window.claude?.use?.('downloads');}catch(e){dlc=null;}
+  if(!dlc)return;
+  btn.hidden=false;
+  btn.onclick=async()=>{
+    msg.hidden=true;
+    try{await dlc.save({filename:'cella-convettiva.html',data:SRC});msg.textContent='File salvato: si apre con un doppio clic in qualsiasi browser (serve la connessione per caricare il motore 3D).';msg.hidden=false;}
+    catch(e){const c=e&&e.code;if(c==='declined')return;
+      if(c==='rate_limited'){msg.textContent='C’è già una richiesta di salvataggio aperta.';msg.hidden=false;return;}
+      btn.hidden=true;}
+  };
+})();
+
+rebuild(false);resize();requestAnimationFrame(frame);
+})();
+</script>
+
+</body></html>
