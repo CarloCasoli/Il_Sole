@@ -1,0 +1,401 @@
+<!doctype html>
+<!--
+  © 2026 Carlo Casoli — "Il Sole: Osservazione e Fisica"
+  Licenza CC BY-NC-ND 4.0: https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it
+  Vietati l'uso commerciale e la distribuzione di versioni modificate senza autorizzazione scritta dell'autore.
+-->
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>L'altimetro virtuale della cromosfera</title>
+<style>
+:root{--text-primary:#1f1e1d;--text-secondary:#5f5e5a;--border:rgba(0,0,0,.12);--border-strong:rgba(0,0,0,.25);--bg:#ffffff;--panel:rgba(0,0,0,.03);--grid:rgba(0,0,0,.08)}
+@media (prefers-color-scheme:dark){:root{--text-primary:#f1efe8;--text-secondary:#b4b2a9;--border:rgba(255,255,255,.12);--border-strong:rgba(255,255,255,.28);--bg:#1f1f1e;--panel:rgba(255,255,255,.04);--grid:rgba(255,255,255,.08)}}
+*{box-sizing:border-box}
+body{margin:0;padding:16px;background:var(--bg);color:var(--text-primary);font-family:-apple-system,"Segoe UI",Roboto,sans-serif;max-width:1280px;margin:0 auto}
+a{color:#378ADD}
+button{background:transparent;color:var(--text-primary);border:1px solid var(--border-strong);border-radius:8px;cursor:pointer;font-family:inherit}
+button:hover{background:rgba(127,127,127,.12)}
+.top{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 14px;margin-bottom:8px}
+.top h1{font-size:19px;font-weight:600;margin:0}
+.top a{font-size:13px;text-decoration:none}
+.sub{font-size:13px;color:var(--text-secondary);margin:0 0 10px;max-width:980px;line-height:1.45}
+.bar{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center;margin:0 0 8px;font-size:12px;color:var(--text-secondary)}
+.bar button{font-size:12px;padding:5px 10px}
+.bar .lbl{min-width:92px}
+.bar input[type=range]{flex:1 1 160px;min-width:120px;max-width:340px}
+.bar b{font-weight:500;color:var(--text-primary);min-width:62px;display:inline-block}
+.sel[aria-pressed=true]{background:#378ADD;color:#fff;border-color:#378ADD}
+.sel small{opacity:.8;font-weight:400}
+.main{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:10px;align-items:start}
+.left{display:flex;flex-direction:column;gap:10px;min-width:0}
+.cv{width:100%;display:block;border:1px solid var(--border);border-radius:10px;background:var(--panel)}
+#cProf{height:310px;touch-action:pan-y;cursor:ew-resize}
+#cCol{height:560px}
+#cPrev{height:240px;background:#000}
+.cap{font-size:12px;color:var(--text-secondary);margin:4px 2px 0;line-height:1.4}
+.card{border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:13px;line-height:1.5;background:var(--panel);margin-top:10px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:8px 14px;font-size:12.5px}
+.grid div span{display:block;color:var(--text-secondary);font-size:11.5px}
+.grid div b{font-weight:500;font-size:14px}
+.warn{display:none;margin:0 0 8px;font-size:12px;padding:6px 10px;border-radius:8px;border:1px solid #D4537E;color:var(--text-primary);background:rgba(212,83,126,.08)}
+.warn.on{display:block}
+.note{margin-top:12px;font-size:12px;color:var(--text-secondary);line-height:1.45}
+@media (max-width:760px){
+  body{padding:12px}.top h1{font-size:17px}
+  .main{grid-template-columns:minmax(0,1fr)}
+  .left{display:contents}
+  #cProf{order:1;height:260px}#wCol{order:2}#wPrev{order:3}
+  #cCol{height:460px}#cPrev{height:190px}
+  .bar .lbl{min-width:0;width:100%}
+  .bar input[type=range]{max-width:none}
+  .bar button{padding:7px 11px;font-size:12.5px}
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+</style></head><body>
+
+<div class="top">
+  <h1>L'altimetro virtuale della cromosfera<span class="cc-badge"><span class="cc-n">© 2026 Carlo Casoli ·</span> <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it" target="_blank" rel="license noopener">CC BY-NC-ND 4.0</a></span> <a class="cc-badge cc-doc" href="#scheda" data-scheda>📖 Scheda dell'animazione</a></h1>
+  <a href="index.html">← Indice delle animazioni</a>
+</div>
+<p class="sub">Scegli una lunghezza d'onda dentro la riga spettrale trascinando il cursore sul profilo. A destra si vede da quale quota dell'atmosfera quella luce riesce a sfuggire, cioè dove la profondità ottica vale τ ≈ μ (§7.4 e Approfondimento 7.4). Al centro della riga l'opacità è altissima e la luce esce dall'alta cromosfera; nelle ali il plasma diventa trasparente e si vede la fotosfera. Il filtro raccoglie tutte le lunghezze d'onda della sua banda: più è largo, più luce fotosferica entra nell'immagine.</p>
+
+<div class="bar" role="group" aria-label="Riga spettrale">
+  <span class="lbl">Riga spettrale</span>
+  <button class="sel" data-l="ha">Hα <small>656,3 nm</small></button>
+  <button class="sel" data-l="cak">Ca II K <small>393,4 nm</small></button>
+  <button class="sel" data-l="na">Na D₂ <small>589,0 nm</small></button>
+  <button class="sel" data-l="mg">Mg II k <small>279,6 nm</small></button>
+  <button id="bP" aria-label="Pausa" style="min-width:36px;margin-left:auto">❚❚</button>
+</div>
+<div class="warn" id="mgWarn">Mg II k cade nell'ultravioletto (279,6 nm), che l'atmosfera terrestre assorbe: questa riga si osserva solo da satellite (per esempio con IRIS).</div>
+<div class="bar">
+  <label class="lbl" for="sDl">Lunghezza d'onda</label>
+  <input type="range" id="sDl" min="-1000" max="1000" step="1" value="0"><b id="oDl"></b>
+  <button id="bCore">Centro riga</button><button id="bWing">Ala</button>
+</div>
+<div class="bar">
+  <label class="lbl" for="sFw">Banda del filtro</label>
+  <input type="range" id="sFw" min="-1" max="1" step="0.01" value="-0.15"><b id="oFw"></b>
+  <span id="presets" style="display:contents"></span>
+</div>
+<div class="bar">
+  <label class="lbl" for="sMu">Posizione sul disco</label>
+  <input type="range" id="sMu" min="0.2" max="1" step="0.01" value="1"><b id="oMu" style="min-width:150px"></b>
+  <button id="bCen">Centro del disco</button><button id="bLimb">Vicino al bordo</button>
+</div>
+
+<div class="main">
+  <div class="left">
+    <canvas class="cv" id="cProf" aria-label="Profilo della riga spettrale con il cursore e la banda del filtro"></canvas>
+    <div id="wPrev">
+      <canvas class="cv" id="cPrev" aria-label="Anteprima schematica dell'immagine che si otterrebbe"></canvas>
+      <p class="cap" id="capPrev">Cosa vedresti: anteprima schematica. Granulazione (fotosfera), rete e plage (bassa cromosfera), fibrille e filamento (alta cromosfera) si mescolano secondo le quote raccolte dal filtro.</p>
+    </div>
+  </div>
+  <div id="wCol">
+    <canvas class="cv" id="cCol" aria-label="Colonna d'atmosfera con la curva di temperatura e la quota di formazione"></canvas>
+  </div>
+</div>
+
+<div class="card"><div class="grid" id="gRead"></div></div>
+
+<p class="note">Modello didattico qualitativo. Le quote di formazione al centro del disco e la curva di temperatura riprendono la Figura 7.1; il passaggio dal centro alle ali usa la relazione h ≈ H·ln(κ<sub>riga</sub>/κ<sub>cont</sub>) con un'unica altezza di scala H = 180 km, e lo spostamento verso il bordo la relazione di Eddington-Barbier, τ ≈ μ. I profili delle righe sono forme schematiche ispirate agli atlanti osservativi, non il risultato di un calcolo di trasporto radiativo non-LTE.</p>
+
+<script>
+'use strict';
+const $=id=>document.getElementById(id);
+const TAU=Math.PI*2;
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+let C={};
+function readCss(){const s=getComputedStyle(document.documentElement);const v=n=>s.getPropertyValue(n).trim();C={txt:v('--text-primary'),txt2:v('--text-secondary'),bd:v('--border'),bdS:v('--border-strong'),bg:v('--bg'),grid:v('--grid'),dark:matchMedia('(prefers-color-scheme: dark)').matches}}
+function fit(c){const r=c.getBoundingClientRect(),d=devicePixelRatio||1;const w=Math.max(1,Math.round(r.width*d)),h=Math.max(1,Math.round(r.height*d));if(c.width!==w||c.height!==h){c.width=w;c.height=h}const g=c.getContext('2d');g.setTransform(d,0,0,d,0,0);g.clearRect(0,0,r.width,r.height);return[g,r.width,r.height]}
+const fmt=(x,d=2)=>x.toFixed(d).replace('.',',');
+const fmtK=x=>Math.round(x).toString().replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+function font(g,sz,w=400){g.font=`${w} ${sz}px -apple-system,"Segoe UI",Roboto,sans-serif`}
+function text(g,s,x,y,{sz=12,w=400,col=C.txt,al='left',bl='alphabetic'}={}){font(g,sz,w);g.fillStyle=col;g.textAlign=al;g.textBaseline=bl;g.fillText(s,x,y)}
+function line(g,x1,y1,x2,y2,col,lw=1,dash=null){g.beginPath();g.moveTo(x1,y1);g.lineTo(x2,y2);g.strokeStyle=col;g.lineWidth=lw;g.setLineDash(dash||[]);g.stroke();g.setLineDash([])}
+function rrect(g,x,y,w,h,r){g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath()}
+function hexA(hex,a){const n=parseInt(hex.slice(1),16);return`rgba(${n>>16&255},${n>>8&255},${n&255},${a})`}
+function interp(tab,x){if(x<=tab[0][0])return tab[0][1];for(let i=1;i<tab.length;i++){if(x<=tab[i][0]){const[x0,y0]=tab[i-1],[x1,y1]=tab[i];const t=(x-x0)/(x1-x0);const s=t*t*(3-2*t);return y0+(y1-y0)*(0.35*t+0.65*s)}}return tab[tab.length-1][1]}
+
+/* ---------- atmosfera (Figura 7.1) ---------- */
+const HMAX=3000, HSC=180, HPHOT=500;
+const TEMP=[[0,6250],[100,5850],[200,5150],[300,4550],[420,4150],[520,4200],[700,4480],[900,4800],[1100,5250],[1300,5750],[1500,6080],[1700,6400],[1900,6900],[2100,7450],[2300,7950],[2450,8120],[2550,8300],[2700,8900],[2850,9600],[3000,10000]];
+const Tof=h=>interp(TEMP,Math.max(0,Math.min(HMAX,h)));
+const REG=[{a:0,b:500,n:'fotosfera',c:'#EF9F27'},{a:500,b:1200,n:'bassa cromosfera',c:'#D85A30'},{a:1200,b:2000,n:'media cromosfera',c:'#D4537E'},{a:2000,b:3000,n:'alta cromosfera',c:'#7F77DD'}];
+const regOf=h=>REG.find(r=>h<r.b)||REG[3];
+
+/* ---------- righe ---------- */
+const lor=(x,w)=>1/(1+(x/w)*(x/w)), gau=(x,w)=>Math.exp(-(x/w)*(x/w));
+const FW2=0.6436; /* filtro: profilo di Airy approssimato da una lorentziana al quadrato, w = FWHM/(2*0.6436) */
+const filt=(x,fwhm)=>{const q=lor(x,fwhm/2/FW2);return q*q};
+const LINES={
+ ha:{n:'Hα',el:'idrogeno',l0:656.28,R:5,a:0.35,col:'#E24B4A',fig:[1600,2800],figN:'Hα centro 1.600–2.800 km · ali 800–2.200 km',
+  H:[[0,2600],[0.1,2450],[0.2,2200],[0.3,1900],[0.4,1600],[0.5,1300],[0.6,1050],[0.7,850],[0.85,650],[1,500],[1.5,280],[2.5,100],[4,20],[5,0]],
+  I:x=>1-0.84*(0.4*gau(x,0.8)+0.6*lor(x,1.2)),
+  pre:[[0.5,'0,5 Å · doppio etalon'],[0.7,'0,7 Å · amatoriale'],[3,'3 Å · interferenziale largo']],wing:1.5},
+ cak:{n:'Ca II K',el:'calcio ionizzato',l0:393.37,R:10,a:0.3,col:'#7F77DD',fig:[200,1800],figN:'Ca II K 200–1.800 km',
+  H:[[0,1800],[0.1,1650],[0.2,1350],[0.3,1050],[0.45,750],[0.7,560],[1,460],[1.5,380],[2.5,280],[4,180],[7,80],[10,30]],
+  I:x=>{const ax=Math.abs(x);return 1-0.95*lor(x,6)-0.015*gau(ax-0.45,0.15)+0.035*gau(ax-0.2,0.08)+0.015*gau(x,0.07)},
+  pre:[[0.3,'0,3 Å · professionale'],[2.4,'2,4 Å · amatoriale'],[8,'8 Å · filtro largo']],wing:2.5},
+ na:{n:'Na D₂',el:'sodio',l0:588.995,R:3,a:0.15,col:'#C9A400',fig:[0,600],figN:'Na D 0–600 km',
+  H:[[0,600],[0.05,540],[0.1,450],[0.2,320],[0.3,230],[0.5,140],[1,60],[2,15],[3,0]],
+  I:x=>1-0.95*(0.6*gau(x,0.18)+0.4*lor(x,0.25)),
+  pre:[[0.1,'0,1 Å · stretto'],[0.5,'0,5 Å · medio'],[3,'3 Å · largo']],wing:0.5},
+ mg:{n:'Mg II k',el:'magnesio ionizzato',l0:279.55,R:10,a:0.3,col:'#1D9E75',fig:[1100,2400],figN:'Mg II k 1.100–2.400 km',
+  H:[[0,2400],[0.1,2150],[0.2,1800],[0.3,1450],[0.4,1150],[0.6,850],[1,550],[2,300],[4,120],[8,30],[10,10]],
+  I:x=>{const ax=Math.abs(x);return 1-0.95*lor(x,4)-0.01*gau(ax-0.35,0.12)+0.065*gau(ax-0.15,0.06)+0.02*gau(x,0.05)},
+  pre:[[0.1,'0,1 Å · spettrografo'],[1,'1 Å'],[4,'4 Å · largo']],wing:2}
+};
+let L=LINES.ha, lk='ha';
+const h1=(x)=>interp(L.H,Math.abs(x));                 /* quota di formazione al centro del disco */
+const hMu=(x,mu)=>Math.min(HMAX+200,h1(x)+HSC*Math.log(1/mu)); /* Eddington-Barbier: tau = mu */
+const opac=x=>Math.exp(h1(x)/HSC);                       /* kappa_riga / kappa_cont implicito */
+
+/* ---------- stato ---------- */
+let u=0, fw=0.7, mu=1, run=!RM;
+const dlOf=v=>L.a*Math.sinh(v*Math.asinh(L.R/L.a));
+const uOf=x=>Math.asinh(x/L.a)/Math.asinh(L.R/L.a);
+let dl=0;
+const NS=700; let samp=[], hist=new Float32Array(60), fPh=0, hMean=0, wReg=[0,0,0,0];
+function compute(){
+  dl=dlOf(u); samp=[]; hist=new Float32Array(60); wReg=[0,0,0,0];
+  let W=0,Wp=0,Hm=0;
+  for(let i=0;i<NS;i++){
+    const uu=-1+2*(i+0.5)/NS, x=dlOf(uu), dx=dlOf(uu+1/NS)-dlOf(uu-1/NS);
+    const tr=filt(x-dl,fw), I=L.I(x), w=tr*I*dx;
+    const h=hMu(x,mu);
+    samp.push([x,w,h]); W+=w; Hm+=w*h;
+    if(h<HPHOT)Wp+=w;
+    hist[Math.min(59,Math.max(0,Math.floor(h/HMAX*60)))]+=w;
+    wReg[REG.indexOf(regOf(h))]+=w;
+  }
+  fPh=Wp/W; hMean=Hm/W; for(let k=0;k<4;k++)wReg[k]/=W;
+  const sm=new Float32Array(60);for(let i=0;i<60;i++){let a=0,k=0;for(let j=-2;j<=2;j++){const q=i+j;if(q<0||q>59)continue;const c=[1,4,6,4,1][j+2];a+=hist[q]*c;k+=c}sm[i]=a/k}hist=sm;
+  let m=0;for(const v of hist)m=Math.max(m,v);for(let i=0;i<60;i++)hist[i]/=m||1;
+  let acc=0;cdf=samp.map(s=>acc+=s[1]);
+  updRead();
+}
+let cdf=[];
+function pickH(){const r=Math.random()*cdf[cdf.length-1];let lo=0,hi=cdf.length-1;while(lo<hi){const m=(lo+hi)>>1;if(cdf[m]<r)lo=m+1;else hi=m}return samp[lo][2]}
+
+/* ---------- comandi ---------- */
+function setLine(k){
+  lk=k;L=LINES[k];
+  document.querySelectorAll('[data-l]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.l===k));
+  $('mgWarn').classList.toggle('on',k==='mg');
+  const ps=$('presets');ps.innerHTML='';
+  L.pre.forEach(([v,t])=>{const b=document.createElement('button');b.className='sel';b.textContent=t;b.dataset.fw=v;b.onclick=()=>setFw(v);ps.appendChild(b)});
+  setFw(L.pre[1][0]); setU(0);
+}
+function setU(v){u=Math.max(-1,Math.min(1,v));$('sDl').value=Math.round(u*1000);compute();$('oDl').textContent=(dl>=0?'+':'−')+fmt(Math.abs(dl),2)+' Å'}
+function setFw(v){fw=v;$('sFw').value=Math.log10(v);$('oFw').textContent=fmt(v,v<1?2:1)+' Å';
+  document.querySelectorAll('[data-fw]').forEach(b=>b.setAttribute('aria-pressed',Math.abs(+b.dataset.fw-v)<1e-6));compute()}
+function setMu(v){mu=v;$('sMu').value=v;const r=Math.sqrt(1-v*v);$('oMu').textContent='μ = '+fmt(v,2)+'  ·  r/R☉ = '+fmt(r,2);compute()}
+document.querySelectorAll('[data-l]').forEach(b=>b.onclick=()=>setLine(b.dataset.l));
+$('sDl').oninput=e=>setU(e.target.value/1000);
+$('sFw').oninput=e=>setFw(Math.pow(10,+e.target.value));
+$('sMu').oninput=e=>setMu(+e.target.value);
+$('bCore').onclick=()=>setU(0);
+$('bWing').onclick=()=>setU(uOf(L.wing));
+$('bCen').onclick=()=>setMu(1);
+$('bLimb').onclick=()=>setMu(0.25);
+$('bP').onclick=()=>{run=!run;$('bP').textContent=run?'❚❚':'▶';$('bP').setAttribute('aria-label',run?'Pausa':'Riprendi')};
+if(!run){$('bP').textContent='▶';$('bP').setAttribute('aria-label','Riprendi')}
+
+/* trascinamento del cursore sul profilo */
+let PX=null;
+const cProf=$('cProf');let dragging=false;
+function profU(e){if(!PX)return;const r=cProf.getBoundingClientRect();const x=e.clientX-r.left;setU((x-PX.l)/(PX.r-PX.l)*2-1)}
+cProf.addEventListener('pointerdown',e=>{dragging=true;cProf.setPointerCapture(e.pointerId);profU(e)});
+cProf.addEventListener('pointermove',e=>{if(dragging)profU(e)});
+cProf.addEventListener('pointerup',()=>dragging=false);
+cProf.addEventListener('pointercancel',()=>dragging=false);
+document.addEventListener('keydown',e=>{if(e.target.tagName==='INPUT')return;if(e.key==='ArrowLeft')setU(u-0.01);if(e.key==='ArrowRight')setU(u+0.01)});
+
+/* ---------- lettura ---------- */
+function updRead(){
+  const hc=hMu(dl,mu), hs=Math.min(hc,HMAX), op=opac(dl), ex=Math.floor(Math.log10(op));
+  const sup=String(ex).split('').map(c=>'⁰¹²³⁴⁵⁶⁷⁸⁹'['0123456789'.indexOf(c)]).join('');
+  const items=[
+    ['Riga',L.n+' · '+L.el],
+    ['Lunghezza d\'onda osservata',fmt(L.l0+dl/10,3)+' nm'],
+    ['Quota di formazione (τ ≈ μ)',(hc>HMAX?'> ':'≈ ')+fmtK(Math.round(hs/10)*10)+' km'],
+    ['Temperatura a quella quota','≈ '+fmtK(Math.round(Tof(hs)/50)*50)+' K'],
+    ['Regione',regOf(hs).n],
+    ['Opacità riga / continuo',op<1.5?'≈ 1 (continuo)':op<10?'≈ '+Math.round(op):'≈ 10'+sup],
+    ['Intensità rispetto al continuo',fmt(L.I(dl)*100,0)+' %'],
+    ['Quota media nella banda','≈ '+fmtK(Math.round(Math.min(hMean,HMAX)/10)*10)+' km'],
+    ['Luce fotosferica nella banda',fmt(fPh*100,0)+' %']
+  ];
+  $('gRead').innerHTML=items.map(([a,b])=>`<div><span>${a}</span><b>${b}</b></div>`).join('');
+}
+
+/* ---------- pannello 1: profilo ---------- */
+function drawProf(){
+  const[g,W,H]=fit(cProf);
+  /* legenda (va a capo sugli schermi stretti) */
+  const leg=REG.map(rg=>[rg.n,rg.c,0]).concat([['banda del filtro','#378ADD',1]]);
+  font(g,10.5);let lx=40,ly=36;const pos=[];
+  leg.forEach(([n,c,f])=>{const w=g.measureText(n).width+30;if(lx+w>W-10){lx=40;ly+=15}pos.push([n,c,f,lx,ly]);lx+=w});
+  const l=40,r=W-14,t=ly+16,b=H-44;PX={l,r};
+  pos.forEach(([n,c,f,x,y])=>{g.fillStyle=f?hexA(c,0.4):c;g.fillRect(x,y-8,14,f?6:4);text(g,n,x+18,y-3,{sz:10.5,col:C.txt2})});
+  const X=x=>l+(uOf(x)+1)/2*(r-l), Y=v=>b-(b-t)*v/1.1;
+  text(g,'Profilo della riga '+L.n+' ('+fmt(L.l0,2)+' nm)',l,18,{sz:13,w:600});
+  /* griglia */
+  for(const v of[0,0.25,0.5,0.75,1]){line(g,l,Y(v),r,Y(v),C.grid);text(g,fmt(v,v%1?2:0).replace(',00',''),l-6,Y(v)+4,{sz:10.5,col:C.txt2,al:'right'})}
+  text(g,'continuo = 1',(l+r)/2+60,Y(1)-6,{sz:10.5,col:C.txt2,al:'left'});
+  const ticks=[0,0.1,0.25,0.5,1,2,5,10].filter(v=>v<=L.R*1.0001);
+  const minGap=W<520?30:22;const shown=[];
+  ticks.forEach(v=>[v,-v].forEach((s,k)=>{if(k&&!v)return;const xx=X(s);if(shown.some(q=>Math.abs(q-xx)<minGap))return;shown.push(xx);line(g,xx,b,xx,b+4,C.txt2);text(g,(s<0?'−':s>0?'+':'')+fmt(Math.abs(s),v<1&&v?(v===0.25?2:1):0),xx,b+16,{sz:10.5,col:C.txt2,al:'center'})}));
+  text(g,'Δλ dal centro della riga (Å) · asse espanso vicino al centro',(l+r)/2,b+34,{sz:11,col:C.txt2,al:'center'});
+  /* banda del filtro */
+  g.beginPath();g.moveTo(l,b);
+  for(let i=0;i<=300;i++){const x=-L.R+2*L.R*i/300;g.lineTo(X(x),Y(filt(x-dl,fw)))}
+  g.lineTo(r,b);g.closePath();g.fillStyle=hexA('#378ADD',0.13);g.fill();
+  g.beginPath();for(let i=0;i<=300;i++){const x=-L.R+2*L.R*i/300;const p=[X(x),Y(filt(x-dl,fw))];i?g.lineTo(...p):g.moveTo(...p)}
+  g.strokeStyle=hexA('#378ADD',0.6);g.lineWidth=1;g.setLineDash([4,3]);g.stroke();g.setLineDash([]);
+  /* profilo colorato per regione di formazione */
+  const N=500;let prev=null;
+  for(let i=0;i<=N;i++){const x=dlOf(-1+2*i/N);const p=[X(x),Y(L.I(x))];
+    if(prev){g.beginPath();g.moveTo(...prev);g.lineTo(...p);g.strokeStyle=regOf(Math.min(HMAX,hMu(x,mu))).c;g.lineWidth=3;g.stroke()}prev=p}
+  /* cursore */
+  const cx=X(dl);line(g,cx,t-2,cx,b,C.txt,1.5);
+  g.beginPath();g.arc(cx,Y(L.I(dl)),6,0,TAU);g.fillStyle=L.col;g.fill();g.lineWidth=2;g.strokeStyle=C.bg;g.stroke();
+  rrect(g,cx-9,t-8,18,12,4);g.fillStyle=C.txt;g.fill();
+  text(g,'⇔',cx,t+1.5,{sz:10,col:C.bg,al:'center'});
+  /* legenda */
+}
+
+/* ---------- pannello 2: colonna d'atmosfera ---------- */
+const cCol=$('cCol');let CX=null;
+const phot=[];let spawnAcc=0;
+function drawCol(dt){
+  const[g,W,H]=fit(cCol);
+  const l=52,r=W-46,t=34,b=H-40;CX={l,r,t,b};
+  const Y=h=>b-(b-t)*h/HMAX, Xt=T=>l+(r-l)*(T-3800)/(10500-3800);
+  text(g,'Colonna d\'atmosfera',l,20,{sz:13,w:600});
+  /* regioni */
+  REG.forEach(rg=>{g.fillStyle=hexA(rg.c,C.dark?0.10:0.08);g.fillRect(l,Y(rg.b),r-l,Y(rg.a)-Y(rg.b));
+    line(g,l,Y(rg.b),r,Y(rg.b),hexA(rg.c,0.35),1,[2,3]);
+    text(g,rg.n,r-6,Y(rg.b)+14,{sz:10.5,w:600,col:rg.c,al:'right'})});
+  /* asse quote */
+  for(let h=0;h<=HMAX;h+=500){line(g,l-4,Y(h),l,Y(h),C.txt2);text(g,fmtK(h),l-7,Y(h)+4,{sz:10.5,col:C.txt2,al:'right'})}
+  g.save();g.translate(13,(t+b)/2);g.rotate(-Math.PI/2);text(g,'quota sopra la fotosfera (km)',0,0,{sz:11,col:C.txt2,al:'center'});g.restore();
+  /* asse temperatura */
+  [4000,6000,8000,10000].forEach(T=>{line(g,Xt(T),b,Xt(T),b+4,C.txt2);text(g,fmtK(T),Xt(T),b+16,{sz:10.5,col:C.txt2,al:'center'})});
+  text(g,'temperatura (K)',(l+r)/2,b+32,{sz:11,col:C.txt2,al:'center'});
+  /* intervallo Figura 7.1 */
+  const fx=r+10;g.fillStyle=hexA(L.col,0.35);rrect(g,fx,Y(L.fig[1]),8,Y(L.fig[0])-Y(L.fig[1]),3);g.fill();
+  g.save();g.translate(fx+22,(Y(L.fig[0])+Y(L.fig[1]))/2);g.rotate(-Math.PI/2);text(g,'Fig. 7.1',0,0,{sz:10,col:C.txt2,al:'center'});g.restore();
+  /* fascia raccolta dal filtro */
+  for(let i=0;i<60;i++){const v=hist[i];if(v<0.01)continue;const y0=Y((i+1)*HMAX/60),y1=Y(i*HMAX/60);
+    g.fillStyle=hexA(L.col,0.04+0.5*v);g.fillRect(l,y0,r-l,y1-y0+0.5)}
+  /* fotoni */
+  if(dt>0){spawnAcc+=dt*(W<500?28:45);while(spawnAcc>1){spawnAcc--;const hf=Math.min(HMAX,pickH());
+    phot.push({x:l+8+Math.random()*(r-l-16),h:Math.max(-60,hf-120-Math.random()*260),hf,esc:false,a:1,trail:[]})}}
+  const st=(b-t)/HMAX;
+  for(let i=phot.length-1;i>=0;i--){const p=phot[i];
+    if(dt>0){
+      if(!p.esc){const ang=Math.random()*TAU,s=9+Math.random()*7;p.x+=Math.cos(ang)*s;p.h+=(Math.sin(ang)*s+2.2)/st;p.x=Math.max(l+3,Math.min(r-3,p.x));p.trail.push([p.x,p.h]);if(p.trail.length>6)p.trail.shift();
+        if(p.h>=p.hf){p.esc=true;p.trail=[];p.x0=p.x;p.y0=p.h}}
+      else{p.h+=dt*900;p.a-=dt*0.9;if(p.a<=0||Y(p.h)<t-10){phot.splice(i,1);continue}}
+    }
+    if(!p.esc){if(p.h<0)continue;g.beginPath();p.trail.forEach(([x,h],k)=>k?g.lineTo(x,Y(h)):g.moveTo(x,Y(h)));g.strokeStyle=hexA(L.col,0.25);g.lineWidth=1;g.stroke();
+      g.beginPath();g.arc(p.x,Y(p.h),1.8,0,TAU);g.fillStyle=hexA(L.col,0.7);g.fill()}
+    else{const y=Y(Math.min(p.h,HMAX+300)),y0=Y(p.y0);if(y>t-4)line(g,p.x,y,p.x,Math.min(y0,y+14),hexA(L.col,Math.max(0,p.a)*0.9),1.6)}
+  }
+  /* curva di temperatura */
+  g.beginPath();for(let h=0;h<=HMAX;h+=20){const p=[Xt(Tof(h)),Y(h)];h?g.lineTo(...p):g.moveTo(...p)}
+  g.strokeStyle=C.txt;g.lineWidth=2.2;g.stroke();
+  text(g,'T(h)',Xt(Tof(120))+8,Y(120)+4,{sz:11,w:600});
+  text(g,'← minimo di temperatura',Xt(Tof(450))+10,Y(450)+4,{sz:10.5,col:C.txt2});
+  /* quota della lunghezza d'onda del cursore */
+  const hc=Math.min(HMAX,hMu(dl,mu)),yc=Y(hc);
+  line(g,l,yc,r,yc,L.col,2.5);
+  g.beginPath();g.arc(Xt(Tof(hc)),yc,6,0,TAU);g.fillStyle=L.col;g.fill();g.lineWidth=2;g.strokeStyle=C.bg;g.stroke();
+  const lab='τ ≈ μ  ·  '+fmtK(Math.round(hc/10)*10)+' km  ·  '+fmtK(Math.round(Tof(hc)/50)*50)+' K';
+  font(g,11.5,600);const tw=g.measureText(lab).width+12;const lx=Xt(Tof(hc))>(l+r)/2?l+6:r-tw-6;const ly=hc>HMAX-180?yc+6:yc-24;
+  rrect(g,lx,ly,tw,18,5);g.fillStyle=C.bg;g.globalAlpha=0.85;g.fill();g.globalAlpha=1;g.strokeStyle=L.col;g.lineWidth=1;g.stroke();
+  text(g,lab,lx+6,ly+13,{sz:11.5,w:600});
+  if(hMu(dl,mu)>HMAX)text(g,'↑ oltre i 3.000 km',r-4,t+12,{sz:10.5,col:C.txt2,al:'right'});
+}
+
+/* ---------- pannello 3: anteprima ---------- */
+const cPrev=$('cPrev');let IMG=null;
+function rnd(seed){return()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296}}
+function makeImgs(){
+  const Wd=480,Hd=240,R=rnd(7);
+  const AR={x:150,y:130}, AR2={x:215,y:118};
+  function cv(){const c=document.createElement('canvas');c.width=Wd;c.height=Hd;return c}
+  function voro(n,jit,seed){const r=rnd(seed),pts=[];const cs=Wd/n;for(let i=-1;i<=n;i++)for(let j=-1;j<=Math.ceil(Hd/cs);j++)pts.push([(i+0.5+(r()-0.5)*jit)*cs,(j+0.5+(r()-0.5)*jit)*cs]);return{pts,cs}}
+  function edge(V,x,y){let d1=1e9,d2=1e9;const{pts,cs}=V;const i0=Math.floor(x/cs),j0=Math.floor(y/cs);for(const p of pts){if(Math.abs(p[0]-x)>cs*2||Math.abs(p[1]-y)>cs*2)continue;const d=Math.hypot(p[0]-x,p[1]-y);if(d<d1){d2=d1;d1=d}else if(d<d2)d2=d}return[d1,d2]}
+  /* fotosfera: granulazione */
+  const P=cv(),gP=P.getContext('2d'),dP=gP.createImageData(Wd,Hd),V1=voro(40,0.9,11);
+  for(let y=0;y<Hd;y++)for(let x=0;x<Wd;x++){const[d1,d2]=edge(V1,x,y);const e=Math.min(1,(d2-d1)/5);let v=0.55+0.4*e*(1-0.35*d1/V1.cs);
+    const ds=Math.hypot(x-AR.x,y-AR.y);if(ds<9)v*=0.15;else if(ds<16)v*=0.55;
+    const k=(y*Wd+x)*4;dP.data[k]=dP.data[k+1]=dP.data[k+2]=Math.round(255*v);dP.data[k+3]=255}
+  gP.putImageData(dP,0,0);
+  /* bassa cromosfera: rete, plage */
+  const B=cv(),gB=B.getContext('2d'),dB=gB.createImageData(Wd,Hd),V2=voro(7,0.8,23),r2=rnd(5);
+  for(let y=0;y<Hd;y++)for(let x=0;x<Wd;x++){const[d1,d2]=edge(V2,x,y);const e=Math.exp(-(d2-d1)/4.5);
+    let v=0.28+0.05*Math.sin(x*0.21+y*0.13)*Math.sin(y*0.17-x*0.07)+0.5*e*(0.6+0.4*Math.sin(x*0.5)*Math.sin(y*0.43));
+    const dp=Math.hypot((x-(AR.x+AR2.x)/2)/1.5,y-(AR.y+AR2.y)/2);v+=0.55*Math.exp(-dp*dp/(2*28*28))*(0.75+0.25*Math.sin(x*0.6+y*0.4));
+    const ds=Math.hypot(x-AR.x,y-AR.y);if(ds<9)v=0.08;else if(ds<15)v*=0.6;
+    const k=(y*Wd+x)*4;dB.data[k]=dB.data[k+1]=dB.data[k+2]=Math.round(255*Math.min(1,v));dB.data[k+3]=255}
+  gB.putImageData(dB,0,0);
+  /* alta cromosfera: fibrille, plage, filamento */
+  const F=cv(),gF=F.getContext('2d');gF.fillStyle='#6a6a6a';gF.fillRect(0,0,Wd,Hd);
+  const poles=[[AR.x,AR.y,1],[AR2.x+40,AR2.y+10,-1],[420,40,0.6],[330,220,-0.6],[40,200,0.5]];
+  function B_(x,y){let bx=0.002,by=0.0006;for(const[px,py,q]of poles){const dx=x-px,dy=y-py,d2=dx*dx+dy*dy+60,d=Math.sqrt(d2);bx+=q*dx/(d2*d);by+=q*dy/(d2*d)}const n=Math.hypot(bx,by)||1;return[bx/n,by/n]}
+  const rf=rnd(3);
+  for(let k=0;k<1400;k++){let x=rf()*Wd,y=rf()*Hd;const len=8+rf()*22,dark=rf()<0.55;
+    gF.beginPath();gF.moveTo(x,y);for(let s=0;s<len;s++){const[bx,by]=B_(x,y);x+=bx*1.2;y+=by*1.2;gF.lineTo(x,y)}
+    gF.strokeStyle=dark?`rgba(25,25,25,${0.25+rf()*0.35})`:`rgba(230,230,230,${0.18+rf()*0.3})`;gF.lineWidth=0.8+rf()*1.6;gF.stroke()}
+  const gr=gF.createRadialGradient((AR.x+AR2.x)/2+15,AR.y,5,(AR.x+AR2.x)/2+15,AR.y,62);gr.addColorStop(0,'rgba(255,255,255,.75)');gr.addColorStop(1,'rgba(255,255,255,0)');
+  gF.save();gF.scale(1.4,1);gF.fillStyle=gr;gF.beginPath();gF.arc(((AR.x+AR2.x)/2+15)/1.4,AR.y,62,0,TAU);gF.fill();gF.restore();
+  gF.beginPath();for(let i=0;i<=60;i++){const s=i/60;const x=270+170*s,y=60+40*s+12*Math.sin(s*9);i?gF.lineTo(x,y):gF.moveTo(x,y)}
+  gF.strokeStyle='rgba(15,15,15,.85)';gF.lineWidth=5;gF.lineCap='round';gF.stroke();gF.strokeStyle='rgba(15,15,15,.5)';gF.lineWidth=9;gF.stroke();
+  gF.beginPath();gF.arc(AR.x,AR.y,9,0,TAU);gF.fillStyle='#111';gF.fill();
+  IMG=[P,B,F];
+}
+function drawPrev(){
+  const[g,W,H]=fit(cPrev);if(!IMG)makeImgs();
+  const wP=wReg[0],wB=wReg[1],wF=wReg[2]+wReg[3];
+  g.fillStyle='#000';g.fillRect(0,0,W,H);
+  /* copre il riquadro mantenendo le proporzioni */
+  const s=Math.max(W/480,H/240),dw=480*s,dh=240*s,ox=(W-dw)/2,oy=(H-dh)/2;
+  g.globalCompositeOperation='lighter';
+  [[IMG[0],wP],[IMG[1],wB],[IMG[2],wF]].forEach(([im,w])=>{if(w>0.002){g.globalAlpha=w;g.drawImage(im,ox,oy,dw,dh)}});
+  g.globalAlpha=1;
+  /* contrasto: la luce fotosferica diffusa "lava via" i dettagli cromosferici */
+  g.globalCompositeOperation='source-over';
+  g.fillStyle=`rgba(150,150,150,${0.45*fPh*(1-fPh)*2})`;g.fillRect(0,0,W,H);
+  g.globalCompositeOperation='multiply';g.fillStyle=L.col;g.fillRect(0,0,W,H);
+  g.globalCompositeOperation='source-over';
+  /* oscuramento verso il bordo */
+  if(mu<0.99){g.fillStyle=`rgba(0,0,0,${0.35*(1-mu)})`;g.fillRect(0,0,W,H)}
+  rrect(g,8,8,Math.min(W-16,260),22,6);g.fillStyle='rgba(0,0,0,.55)';g.fill();
+  text(g,'Cosa vedresti · '+L.n+', banda '+fmt(fw,fw<1?2:1)+' Å',16,23,{sz:11.5,w:600,col:'#f2efe6'});
+  const bars=[['fotosfera',wP,REG[0].c],['bassa crom.',wB,REG[1].c],['media/alta crom.',wF,REG[3].c]];
+  let by=H-12-bars.length*15;bars.forEach(([n,w,c])=>{g.fillStyle='rgba(0,0,0,.55)';g.fillRect(8,by-11,170,14);g.fillStyle=c;g.fillRect(96,by-8,76*w,8);text(g,n,12,by,{sz:10.5,col:'#f2efe6'});by+=15});
+}
+
+/* ---------- ciclo ---------- */
+let last=performance.now();
+function loop(now){const dt=Math.min(0.05,(now-last)/1000);last=now;readCss();drawProf();drawCol(run?dt:0);drawPrev();requestAnimationFrame(loop)}
+readCss();setMu(1);setLine('ha');
+if(RM){for(let i=0;i<40;i++)drawCol(0.05)}
+requestAnimationFrame(loop);
+</script>
+<style id="cc-copyright">
+.cc-badge{display:inline-block;vertical-align:middle;margin:0 0 0 .5em;padding:2px 8px;border:1px solid currentColor;border-radius:999px;font:400 11.5px/1.35 -apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;letter-spacing:0;text-transform:none;white-space:normal;max-width:100%;box-sizing:border-box;opacity:.8;color:inherit;text-shadow:none;pointer-events:auto}
+.cc-n,.cc-badge a{white-space:nowrap}
+.cc-badge.cc-doc{text-decoration:none;opacity:1;font-weight:600;margin-left:.4em}
+.cc-badge a{color:inherit;text-decoration:underline;text-underline-offset:2px}
+.cc-badge.cc-fixed{position:fixed;top:10px;right:10px;margin:0;z-index:2147483000;background:rgba(10,10,18,.62);color:#f2efe6;border-color:rgba(242,239,230,.45);opacity:1;backdrop-filter:blur(4px)}
+@media (max-width:520px){.cc-badge{font-size:11px;padding:2px 7px}}
+</style>
+
+<script src="altimetro_cromosfera_scheda.js"></script>
+<script src="scheda.js"></script>
+</body></html>
