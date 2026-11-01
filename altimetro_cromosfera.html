@@ -128,18 +128,19 @@ function interp(tab,x){const n=tab.length;if(x<=tab[0][0])return tab[0][1];if(x>
 const gn=()=>{let a=0;for(let i=0;i<6;i++)a+=Math.random();return(a-3)/Math.SQRT2};
 
 /* ---------- atmosfera: temperatura del plasma (Figura 7.1) ---------- */
-const HMAX=3000, HTOP=4000, HSC=180, HPHOT=500, NB=80, BW=50; /* HMAX: fine della Figura 7.1; HTOP: cima del disegno */
+const HMAX=3000, HTOP=4000, HSC=180, HPHOT=400, NB=80, BW=50; /* HMAX: fine della Figura 7.1; HTOP: cima del disegno */
 const TEMP=[[0,6250],[100,5850],[200,5150],[300,4550],[420,4150],[520,4200],[700,4480],[900,4800],[1100,5250],[1300,5750],[1500,6080],[1700,6400],[1900,6900],[2100,7450],[2300,7950],[2450,8120],[2550,8300],[2700,8900],[2850,9600],[3000,10000]];
 const Tof=h=>h<0?Math.min(8000,6250-4*h):interp(TEMP,Math.min(HMAX,h));
-const REG=[{a:0,b:500,n:'fotosfera',c:'#EF9F27'},{a:500,b:1200,n:'bassa cromosfera',c:'#D85A30'},{a:1200,b:2000,n:'media cromosfera',c:'#D4537E'},{a:2000,b:3000,n:'alta cromosfera',c:'#7F77DD'}];
+const REG=[{a:0,b:400,n:'fotosfera',c:'#EF9F27'},{a:400,b:1200,n:'bassa cromosfera',c:'#D85A30'},{a:1200,b:2000,n:'media cromosfera',c:'#D4537E'},{a:2000,b:3000,n:'alta cromosfera',c:'#7F77DD'}];
 const regOf=h=>REG.find(r=>h<r.b)||REG[3];
 
 /* ---------- righe ----------
    H: quota di formazione (centro della funzione di contributo) al centro del disco, in funzione di |Δλ| (Å)
    S: temperatura di radiazione della riga, cioè la funzione sorgente S(h) espressa come temperatura (K)   */
 const lor=(x,w)=>1/(1+(x/w)*(x/w));
-const FW2=0.6436; /* filtro a doppio etalon: lorentziana al quadrato, w = FWHM/(2*0.6436) */
-const filt=(x,fwhm)=>{const q=lor(x,fwhm/2/FW2);return q*q};
+/* forma del filtro: sotto 1 Å etalon Fabry-Pérot (lorentziana al quadrato, ali estese);
+   da 1 Å in su filtro interferenziale multicavità (fianchi ripidi, ali quasi nulle) */
+const filt=(x,fwhm)=>{if(fwhm<1){const q=lor(x,fwhm/2/0.6436);return q*q}return 1/(1+Math.pow(Math.abs(x)/(fwhm/2),8))};
 const LINES={
  ha:{n:'Hα',el:'idrogeno',l0:656.28,R:5,a:0.35,col:'#E24B4A',fig:[1600,2800],
   H:[[0,2600],[0.1,2450],[0.2,2200],[0.3,1900],[0.4,1600],[0.5,1300],[0.6,1050],[0.7,850],[0.85,550],[1,320],[1.5,150],[2.5,50],[4,10],[5,0]],
@@ -190,7 +191,7 @@ function compute(){
     for(let k=-12;k<=12;k++){const h=c+s*k/4,b=Math.max(0,Math.min(NB-1,Math.floor(h/BW)));hist[b]+=w*gk[k+12]/gs}
   }
   let tot=0;for(const v of hist)tot+=v;
-  fPh=0;wZ=[0,0,0];for(let b=0;b<NB;b++){const h=(b+0.5)*BW,v=hist[b]/tot;if(h<500){fPh+=v;wZ[0]+=v}else if(h<1200)wZ[1]+=v;else wZ[2]+=v}
+  fPh=0;wZ=[0,0,0];for(let b=0;b<NB;b++){const h=(b+0.5)*BW,v=hist[b]/tot;if(h<HPHOT){fPh+=v;wZ[0]+=v}else if(h<1200)wZ[1]+=v;else wZ[2]+=v}
   hMean=Hm/W;
   let acc=0;cdf=[];for(let i=0;i<NS;i++){const uu=-1+2*(i+0.5)/NS,x=dlOf(uu),dx=dlOf(uu+1/NS)-dlOf(uu-1/NS);acc+=filt(x-dl,fw)*Iof(x)*dx;cdf.push(acc)}
   let m=0;for(const v of hist)m=Math.max(m,v);for(let b=0;b<NB;b++)hist[b]/=m||1;

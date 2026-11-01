@@ -54,7 +54,7 @@ Le curve della temperatura di radiazione sono schematiche: riproducono l'andamen
 
 - **Riga spettrale**: Hα (656,3 nm, idrogeno), Ca II K (393,4 nm, calcio ionizzato), Na D₂ (589,0 nm, sodio), Mg II k (279,6 nm, magnesio ionizzato). Mg II k cade nell'ultravioletto, assorbito dall'atmosfera terrestre: si osserva solo da satellite, per esempio con la missione IRIS.
 - **Lunghezza d'onda**: distanza $\Delta\lambda$ dal centro della riga, in ångström. Si regola con il cursore sul profilo, con lo slider o con le frecce sinistra e destra della tastiera. Il pulsante *Centro riga* riporta il cursore al centro; il pulsante *Ala* lo sposta in un'ala della riga.
-- **Banda del filtro**: larghezza a metà altezza della trasmissione, da 0,1 a 10 Å. Per ogni riga sono disponibili tre valori tipici; per Hα sono quattro: 0,3 Å (strumenti professionali), 0,5 Å (doppio etalon), 0,7 Å (filtro amatoriale) e 3 Å (filtro interferenziale largo). All'avvio è selezionato il filtro amatoriale. La forma della trasmissione imita quella di un filtro a doppio etalon Fabry–Pérot: un picco centrale con ali che si allargano ai lati, per cui anche lunghezze d'onda lontane dal centro contribuiscono un poco all'immagine.
+- **Banda del filtro**: larghezza a metà altezza della trasmissione, da 0,1 a 10 Å. Per ogni riga sono disponibili tre valori tipici; per Hα sono quattro: 0,3 Å (strumenti professionali), 0,5 Å (doppio etalon), 0,7 Å (filtro amatoriale) e 3 Å (filtro interferenziale largo). All'avvio è selezionato il filtro amatoriale. La forma della trasmissione dipende dal tipo di filtro. Sotto 1 Å è quella di un etalon Fabry–Pérot, come nei filtri Hα: un picco centrale con ali che si allargano ai lati, per cui anche lunghezze d'onda lontane dal centro contribuiscono un poco all'immagine. Da 1 Å in su è quella di un filtro interferenziale a più cavità, come i filtri Ca-K amatoriali o i filtri Hα larghi: una banda quasi piatta con fianchi ripidi, che lascia passare pochissima luce fuori banda.
 - **Posizione sul disco**: il coseno $\mu$ dell'angolo tra la linea di vista e la verticale locale, da 1 (centro del disco) a 0,2 (vicino al bordo). Accanto è indicata la distanza dal centro in raggi solari, $r/R_\odot = \sqrt{1-\mu^2}$. I pulsanti *Centro del disco* e *Vicino al bordo* impostano 1 e 0,25.
 - **Pausa / Riprendi**: ferma e riavvia il moto dei fotoni.
 
@@ -72,17 +72,17 @@ Sotto i pannelli sono riportati:
 - l'opacità della riga rispetto al continuo, come ordine di grandezza;
 - l'intensità del profilo rispetto al continuo;
 - la quota media della luce raccolta da tutta la banda del filtro;
-- la frazione della luce raccolta che proviene dalla fotosfera (quote inferiori a 500 km).
+- la frazione della luce raccolta che proviene dalla fotosfera (quote inferiori a 400 km, il limite della fotosfera nella Figura 7.1).
 
 ## Suggerimenti di utilizzo
 
-Con Hα, portare il cursore al centro della riga e passare dal filtro da 3 Å a quelli da 0,7, 0,5 e 0,3 Å: la luce fotosferica nella banda scende da circa l'80% al 19%, al 10% e infine al 3%, e la quota media sale da circa 400 a oltre 2.200 km. Sempre al centro della riga, confrontare i due contatori delle temperature: il plasma è a circa 8.500 K, ma la luce esce con una temperatura di radiazione di circa 4.150 K. È la differenza tra LTE e non-LTE descritta negli Approfondimenti 7.1 e 7.2.
+Con Hα, portare il cursore al centro della riga e passare dal filtro da 3 Å a quelli da 0,7, 0,5 e 0,3 Å: la luce fotosferica nella banda scende da circa il 63% al 17%, all'8% e infine al 2%, e la quota media sale da circa 600 a oltre 2.200 km. Sempre al centro della riga, confrontare i due contatori delle temperature: il plasma è a circa 8.500 K, ma la luce esce con una temperatura di radiazione di circa 4.150 K. È la differenza tra LTE e non-LTE descritta negli Approfondimenti 7.1 e 7.2.
 
 Trascinare lentamente il cursore dal centro verso un'ala: la campana di contributo scende dall'alta cromosfera alla fotosfera, si restringe, e nell'anteprima le fibrille lasciano il posto alla granulazione. È l'altimetro virtuale descritto nell'Approfondimento 7.4.
 
 Passare da Hα a Ca II K e poi a Mg II k tenendo il cursore al centro: la curva tratteggiata cambia forma, e con essa il profilo e l'immagine. In Ca II K il cursore spostato di circa 0,2 Å cade sul picco K2, dove la curva tratteggiata raggiunge il suo massimo.
 
-Tenendo il cursore al centro della riga, allargare la banda del filtro: la fascia nella colonna si allunga verso il basso e la frazione di luce fotosferica cresce. Le ali della riga sono molto più luminose del centro, quindi anche una piccola trasmissione del filtro nelle ali porta molta luce fotosferica. Confrontare per Ca II K il filtro da 0,3 Å con quello amatoriale da 2,4 Å.
+Tenendo il cursore al centro della riga, allargare la banda del filtro: la fascia nella colonna si allunga verso il basso e la frazione di luce fotosferica cresce. Le ali della riga sono molto più luminose del centro, quindi anche una piccola trasmissione del filtro nelle ali porta molta luce fotosferica. Confrontare per Ca II K il filtro da 0,3 Å con quello amatoriale da 2,4 Å: con il primo la luce viene dalla media cromosfera (circa 1.300 km), con il secondo soprattutto dalla bassa cromosfera, attorno ai picchi K2 e ai minimi K1 (circa 700 km), con circa un quarto di luce fotosferica.
 
 Con il cursore nel continuo (ala lontana) spostare la posizione verso il bordo: anche il continuo emerge da strati più alti e più freddi. È l'origine dell'oscuramento al bordo.
 
