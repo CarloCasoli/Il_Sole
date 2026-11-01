@@ -29,7 +29,7 @@ button:hover{background:rgba(127,127,127,.12)}
 .left{display:flex;flex-direction:column;gap:10px;min-width:0}
 .cv{width:100%;display:block;border:1px solid var(--border);border-radius:10px;background:var(--panel)}
 #cProf{height:310px;touch-action:pan-y;cursor:ew-resize}
-#cCol{height:640px}
+#cCol{height:720px}
 #cPrev{height:230px;background:#000;border-radius:10px 10px 0 0}
 .see{border:1px solid var(--border);border-top:0;border-radius:0 0 10px 10px;padding:9px 12px 10px;font-size:13px;line-height:1.5;background:var(--panel)}
 .see h3{margin:0 0 3px;font-size:13.5px;font-weight:600}
@@ -47,7 +47,7 @@ button:hover{background:rgba(127,127,127,.12)}
   .main{grid-template-columns:minmax(0,1fr)}
   .left{display:contents}
   #cProf{order:1;height:260px}#wCol{order:2}#wPrev{order:3}
-  #cCol{height:520px}#cPrev{height:190px}
+  #cCol{height:590px}#cPrev{height:190px}
   .bar .lbl{min-width:0;width:100%}
   .bar input[type=range]{max-width:none}
   .bar button{padding:7px 11px;font-size:12.5px}
@@ -118,14 +118,20 @@ function text(g,s,x,y,{sz=12,w=400,col=C.txt,al='left',bl='alphabetic'}={}){font
 function line(g,x1,y1,x2,y2,col,lw=1,dash=null){g.beginPath();g.moveTo(x1,y1);g.lineTo(x2,y2);g.strokeStyle=col;g.lineWidth=lw;g.setLineDash(dash||[]);g.stroke();g.setLineDash([])}
 function rrect(g,x,y,w,h,r){g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath()}
 function hexA(hex,a){const n=parseInt(hex.slice(1),16);return`rgba(${n>>16&255},${n>>8&255},${n&255},${a})`}
-function interp(tab,x){if(x<=tab[0][0])return tab[0][1];for(let i=1;i<tab.length;i++){if(x<=tab[i][0]){const[x0,y0]=tab[i-1],[x1,y1]=tab[i];const t=(x-x0)/(x1-x0);const s=t*t*(3-2*t);return y0+(y1-y0)*(0.35*t+0.65*s)}}return tab[tab.length-1][1]}
+/* interpolazione cubica monotona (Fritsch-Carlson): curve lisce, senza oscillazioni */
+const PCH=new WeakMap();
+function slopes(tab){const n=tab.length,d=[],m=new Array(n);for(let i=0;i<n-1;i++)d.push((tab[i+1][1]-tab[i][1])/(tab[i+1][0]-tab[i][0]));
+  m[0]=d[0];m[n-1]=d[n-2];for(let i=1;i<n-1;i++){if(d[i-1]*d[i]<=0)m[i]=0;else{const h0=tab[i][0]-tab[i-1][0],h1=tab[i+1][0]-tab[i][0],w1=2*h1+h0,w2=h1+2*h0;m[i]=(w1+w2)/(w1/d[i-1]+w2/d[i])}}return m}
+function interp(tab,x){const n=tab.length;if(x<=tab[0][0])return tab[0][1];if(x>=tab[n-1][0])return tab[n-1][1];let m=PCH.get(tab);if(!m){m=slopes(tab);PCH.set(tab,m)}
+  let i=1;while(x>tab[i][0])i++;const[x0,y0]=tab[i-1],[x1,y1]=tab[i],h=x1-x0,t=(x-x0)/h,t2=t*t,t3=t2*t;
+  return(2*t3-3*t2+1)*y0+(t3-2*t2+t)*h*m[i-1]+(-2*t3+3*t2)*y1+(t3-t2)*h*m[i]}
 const gn=()=>{let a=0;for(let i=0;i<6;i++)a+=Math.random();return(a-3)/Math.SQRT2};
 
 /* ---------- atmosfera: temperatura del plasma (Figura 7.1) ---------- */
-const HMAX=3000, HSC=180, HPHOT=500, NB=64, BW=50;
+const HMAX=3000, HTOP=4000, HSC=180, HPHOT=500, NB=80, BW=50; /* HMAX: fine della Figura 7.1; HTOP: cima del disegno */
 const TEMP=[[0,6250],[100,5850],[200,5150],[300,4550],[420,4150],[520,4200],[700,4480],[900,4800],[1100,5250],[1300,5750],[1500,6080],[1700,6400],[1900,6900],[2100,7450],[2300,7950],[2450,8120],[2550,8300],[2700,8900],[2850,9600],[3000,10000]];
 const Tof=h=>h<0?Math.min(8000,6250-4*h):interp(TEMP,Math.min(HMAX,h));
-const REG=[{a:0,b:500,n:'fotosfera',c:'#EF9F27'},{a:500,b:1200,n:'bassa cromosfera',c:'#D85A30'},{a:1200,b:2000,n:'media cromosfera',c:'#D4537E'},{a:2000,b:3200,n:'alta cromosfera',c:'#7F77DD'}];
+const REG=[{a:0,b:500,n:'fotosfera',c:'#EF9F27'},{a:500,b:1200,n:'bassa cromosfera',c:'#D85A30'},{a:1200,b:2000,n:'media cromosfera',c:'#D4537E'},{a:2000,b:3000,n:'alta cromosfera',c:'#7F77DD'}];
 const regOf=h=>REG.find(r=>h<r.b)||REG[3];
 
 /* ---------- righe ----------
@@ -138,7 +144,7 @@ const LINES={
  ha:{n:'Hα',el:'idrogeno',l0:656.28,R:5,a:0.35,col:'#E24B4A',fig:[1600,2800],
   H:[[0,2600],[0.1,2450],[0.2,2200],[0.3,1900],[0.4,1600],[0.5,1300],[0.6,1050],[0.7,850],[0.85,550],[1,320],[1.5,150],[2.5,50],[4,10],[5,0]],
   S:[[0,6250],[100,6000],[250,5500],[400,5100],[600,4800],[900,4600],[1400,4450],[2000,4280],[2600,4100],[3200,4000]],
-  pre:[[0.5,'0,5 Å · doppio etalon'],[0.7,'0,7 Å · amatoriale'],[3,'3 Å · interferenziale largo']],wing:1.5},
+  pre:[[0.3,'0,3 Å · professionale'],[0.5,'0,5 Å · doppio etalon'],[0.7,'0,7 Å · amatoriale'],[3,'3 Å · interferenziale largo']],wing:1.5},
  cak:{n:'Ca II K',el:'calcio ionizzato',l0:393.37,R:10,a:0.3,col:'#7F77DD',fig:[200,1800],
   H:[[0,1800],[0.08,1600],[0.15,1250],[0.25,900],[0.35,650],[0.45,520],[0.6,450],[1,400],[1.5,360],[2.5,300],[4,250],[7,150],[10,80]],
   S:[[0,6250],[100,5850],[200,5150],[300,4550],[420,4150],[520,4200],[700,4480],[900,4720],[1100,4800],[1300,4720],[1500,4560],[1800,4400],[2200,4250],[3200,4100]],
@@ -161,7 +167,9 @@ const ST=h=>h<0?Math.min(8000,6250-4*h):interp(L.S,Math.min(HMAX+200,h));
 const C2=()=>1.4388e7/L.l0;                                            /* h c / (λ k) in K */
 const Bl=T=>1/(Math.exp(C2()/T)-1);
 const Trad=I=>C2()/Math.log(1+1/I);
-function Iraw(x){const c=hMu(x,mu),s=sig(c);let a=0,w=0;for(let k=-24;k<=24;k++){const q=k/8,g=Math.exp(-q*q/2);a+=g*Bl(ST(c+s*q));w+=g}return a/w}
+/* sopra la cromosfera (regione di transizione) il plasma è troppo rarefatto per emettere nella riga: la funzione di contributo si annulla */
+const cut=h=>h<=HMAX?1:Math.exp(-(((h-HMAX)/70)**2));
+function Iraw(x){const c=hMu(x,mu),s=sig(c);let a=0,w=0;for(let k=-24;k<=24;k++){const q=k/8,g=Math.exp(-q*q/2)*cut(c+s*q);a+=g*Bl(ST(c+s*q));w+=g}return a/w}
 
 /* ---------- stato e calcolo ---------- */
 let u=0, fw=0.7, mu=1, run=!RM, dl=0;
@@ -178,7 +186,8 @@ function compute(){
     const uu=-1+2*(i+0.5)/NS, x=dlOf(uu), dx=dlOf(uu+1/NS)-dlOf(uu-1/NS);
     const w=filt(x-dl,fw)*Iof(x)*dx, c=hMu(x,mu), s=sig(c);
     samp.push([c,s]); W+=w; Hm+=w*c;
-    for(let k=-12;k<=12;k++){const q=k/4,h=c+s*q,b=Math.max(0,Math.min(NB-1,Math.floor(h/BW)));hist[b]+=w*Math.exp(-q*q/2)}
+    let gs=0;const gk=[];for(let k=-12;k<=12;k++){const q=k/4,v=Math.exp(-q*q/2)*cut(c+s*q);gk.push(v);gs+=v}
+    for(let k=-12;k<=12;k++){const h=c+s*k/4,b=Math.max(0,Math.min(NB-1,Math.floor(h/BW)));hist[b]+=w*gk[k+12]/gs}
   }
   let tot=0;for(const v of hist)tot+=v;
   fPh=0;wZ=[0,0,0];for(let b=0;b<NB;b++){const h=(b+0.5)*BW,v=hist[b]/tot;if(h<500){fPh+=v;wZ[0]+=v}else if(h<1200)wZ[1]+=v;else wZ[2]+=v}
@@ -187,7 +196,7 @@ function compute(){
   let m=0;for(const v of hist)m=Math.max(m,v);for(let b=0;b<NB;b++)hist[b]/=m||1;
   updRead();updSee();
 }
-function pickH(){const r=Math.random()*cdf[cdf.length-1];let lo=0,hi=cdf.length-1;while(lo<hi){const m=(lo+hi)>>1;if(cdf[m]<r)lo=m+1;else hi=m}const[c,s]=samp[lo];return c+s*gn()}
+function pickH(){const r=Math.random()*cdf[cdf.length-1];let lo=0,hi=cdf.length-1;while(lo<hi){const m=(lo+hi)>>1;if(cdf[m]<r)lo=m+1;else hi=m}const[c,s]=samp[lo];for(let t=0;t<20;t++){const h=c+s*gn();if(Math.random()<cut(h))return h}return Math.min(c,HMAX)}
 
 /* ---------- comandi ---------- */
 function setLine(k){
@@ -196,7 +205,7 @@ function setLine(k){
   $('mgWarn').classList.toggle('on',k==='mg');
   const ps=$('presets');ps.innerHTML='';
   L.pre.forEach(([v,t])=>{const b=document.createElement('button');b.className='sel';b.textContent=t;b.dataset.fw=v;b.onclick=()=>setFw(v);ps.appendChild(b)});
-  fw=L.pre[1][0];$('sFw').value=Math.log10(fw);markFw();setU(0);
+  fw=(L.pre.find(q=>/amatoriale/.test(q[1]))||L.pre[1])[0];$('sFw').value=Math.log10(fw);markFw();setU(0);
 }
 function markFw(){$('oFw').textContent=fmt(fw,fw<1?2:1)+' Å';document.querySelectorAll('[data-fw]').forEach(b=>b.setAttribute('aria-pressed',Math.abs(+b.dataset.fw-fw)<1e-6))}
 function setU(v){u=Math.max(-1,Math.min(1,v));$('sDl').value=Math.round(u*1000);compute();$('oDl').textContent=(dl>=0?'+':'−')+fmt(Math.abs(dl),2)+' Å'}
@@ -228,14 +237,14 @@ function updRead(){
   const items=[
     ['Riga',L.n+' · '+L.el],
     ['Lunghezza d\'onda osservata',fmt(L.l0+dl/10,3)+' nm'],
-    ['Quota di formazione (τ ≈ μ)',(hc>HMAX?'> 3.000':'≈ '+fmtK(Math.round(hc/10)*10))+' km'],
+    ['Quota di formazione (τ ≈ μ)',(hc>HTOP?'> 4.000':'≈ '+fmtK(Math.round(hc/10)*10))+' km'],
     ['Spessore della zona di formazione','± '+fmtK(Math.round(s/10)*10)+' km'],
     ['Temperatura del plasma a quella quota','≈ '+fmtK(Math.round(Tof(hc)/50)*50)+' K'],
     ['Temperatura di radiazione della luce','≈ '+fmtK(Math.round(Tr/50)*50)+' K'],
     ['Regione',regOf(hc).n],
     ['Opacità riga / continuo',op<1.5?'≈ 1 (continuo)':op<10?'≈ '+Math.round(op):'≈ 10'+sup],
     ['Intensità rispetto al continuo',fmt(Ir*100,0)+' %'],
-    ['Quota media nella banda','≈ '+fmtK(Math.round(Math.min(hMean,HMAX)/10)*10)+' km'],
+    ['Quota media nella banda','≈ '+fmtK(Math.round(Math.min(hMean,HTOP)/10)*10)+' km'],
     ['Luce fotosferica nella banda',fmt(fPh*100,0)+' %']
   ];
   $('gRead').innerHTML=items.map(([a,b])=>`<div><span>${a}</span><b>${b}</b></div>`).join('');
@@ -244,7 +253,7 @@ function updRead(){
 /* ---------- pannello 1: profilo ---------- */
 function drawProf(){
   const[g,W,H]=fit(cProf);
-  text(g,'Profilo della riga '+L.n+' ('+fmt(L.l0,2)+' nm) · calcolato dalla funzione sorgente',40,18,{sz:13,w:600});
+  text(g,'Profilo della riga '+L.n+' ('+fmt(L.l0,2)+' nm)'+(W>620?' · calcolato dalla funzione sorgente':''),40,18,{sz:13,w:600});
   const leg=REG.map(rg=>[rg.n,rg.c,0]).concat([['banda del filtro','#378ADD',1]]);
   font(g,10.5);let lx=40,ly=36;const pos=[];
   leg.forEach(([n,c,f])=>{const w=g.measureText(n).width+30;if(lx+w>W-10){lx=40;ly+=15}pos.push([n,c,f,lx,ly]);lx+=w});
@@ -277,18 +286,21 @@ function drawCol(dt){
   leg.forEach(it=>{const w=g.measureText(it[0]).width+30;if(lx+w>W-10){lx=52;ly+=15}pos.push([...it,lx,ly]);lx+=w});
   const l=52,r=W-46,t=ly+18,b=H-40;
   pos.forEach(([n,c,k,x,y])=>{if(k===0)line(g,x,y-5,x+14,y-5,c,2.2);else if(k===1)line(g,x,y-5,x+14,y-5,c,2.2,[4,3]);else if(k===2){g.fillStyle=hexA(c,0.45);g.fillRect(x,y-9,14,8)}else{g.fillStyle=hexA(c,0.22);g.fillRect(x,y-9,14,8)}text(g,n,x+18,y-1,{sz:10.5,col:C.txt2})});
-  const Y=h=>b-(b-t)*h/HMAX, Xt=T=>l+(r-l)*(T-3200)/(10500-3200);
+  const Y=h=>b-(b-t)*h/HTOP, Xt=T=>l+(r-l)*(T-3200)/(10500-3200);
   g.save();g.beginPath();g.rect(l,t,r-l,b-t);g.clip();
   REG.forEach(rg=>{g.fillStyle=hexA(rg.c,C.dark?0.10:0.07);g.fillRect(l,Y(rg.b),r-l,Y(rg.a)-Y(rg.b));line(g,l,Y(rg.a),r,Y(rg.a),hexA(rg.c,0.35),1,[2,3])});
+  /* sopra la cromosfera: plasma trasparente anche alla riga */
+  const gz=g.createLinearGradient(0,Y(HTOP),0,Y(HMAX));gz.addColorStop(0,C.dark?'rgba(0,0,0,.45)':'rgba(20,20,40,.16)');gz.addColorStop(1,C.dark?'rgba(0,0,0,.15)':'rgba(20,20,40,.05)');
+  g.fillStyle=gz;g.fillRect(l,Y(HTOP),r-l,Y(HMAX)-Y(HTOP));line(g,l,Y(HMAX),r,Y(HMAX),C.txt2,1,[5,4]);
   /* luce raccolta dal filtro */
   for(let i=0;i<NB;i++){const v=hist[i];if(v<0.01)continue;g.fillStyle=hexA(L.col,0.03+0.32*v);g.fillRect(l,Y((i+1)*BW),r-l,Y(i*BW)-Y((i+1)*BW)+0.6)}
   /* fotoni */
   if(dt>0){spawnAcc+=dt*(W<500?26:40);while(spawnAcc>1){spawnAcc--;const hf=pickH();phot.push({x:l+8+Math.random()*(r-l-16),h:hf-100-Math.random()*240,hf,esc:false,a:1,trail:[]})}}
-  const st=(b-t)/HMAX;
+  const st=(b-t)/HTOP;
   for(let i=phot.length-1;i>=0;i--){const p=phot[i];
     if(dt>0){
       if(!p.esc){const ang=Math.random()*TAU,s=9+Math.random()*7;p.x+=Math.cos(ang)*s;p.h+=(Math.sin(ang)*s+2.2)/st;p.x=Math.max(l+3,Math.min(r-3,p.x));p.trail.push([p.x,p.h]);if(p.trail.length>6)p.trail.shift();if(p.h>=p.hf){p.esc=true;p.trail=[];p.y0=p.h}}
-      else{p.h+=dt*900;p.a-=dt*0.9;if(p.a<=0||Y(p.h)<t-10){phot.splice(i,1);continue}}
+      else{p.h+=dt*1100;p.a-=dt*0.45;if(p.a<=0||Y(p.h)<t-10){phot.splice(i,1);continue}}
     }
     if(!p.esc){if(p.h<0)continue;g.beginPath();p.trail.forEach(([x,h],k)=>k?g.lineTo(x,Y(h)):g.moveTo(x,Y(h)));g.strokeStyle=hexA(L.col,0.25);g.lineWidth=1;g.stroke();g.beginPath();g.arc(p.x,Y(p.h),1.8,0,TAU);g.fillStyle=hexA(L.col,0.7);g.fill()}
     else{const y=Y(p.h),y0=Y(p.y0);if(y>t-4)line(g,p.x,y,p.x,Math.min(y0,y+14),hexA(L.col,Math.max(0,p.a)*0.9),1.6)}
@@ -296,30 +308,36 @@ function drawCol(dt){
   /* funzione di contributo della lunghezza d'onda del cursore */
   const hc=hMu(dl,mu), sc=sig(hc), wmax=0.24*(r-l);
   g.beginPath();g.moveTo(r,Y(hc-3.2*sc));
-  for(let k=-32;k<=32;k++){const q=k/10;g.lineTo(r-wmax*Math.exp(-q*q/2),Y(hc+sc*q))}
-  g.lineTo(r,Y(hc+3.2*sc));g.closePath();g.fillStyle=hexA(L.col,0.38);g.fill();g.strokeStyle=L.col;g.lineWidth=1.2;g.stroke();
+  const top=Math.min(hc+3.2*sc,HMAX+250);for(let k=-32;k<=32;k++){const q=k/10;if(hc+sc*q>top)break;g.lineTo(r-wmax*Math.exp(-q*q/2)*cut(hc+sc*q),Y(hc+sc*q))}
+  g.lineTo(r,Y(top));g.closePath();g.fillStyle=hexA(L.col,0.38);g.fill();g.strokeStyle=L.col;g.lineWidth=1.2;g.stroke();
   /* temperatura di radiazione della riga */
   g.beginPath();for(let h=0;h<=HMAX;h+=20){const p=[Xt(ST(h)),Y(h)];h?g.lineTo(...p):g.moveTo(...p)}
   g.strokeStyle=L.col;g.lineWidth=2.4;g.setLineDash([6,4]);g.stroke();g.setLineDash([]);
   /* temperatura del plasma */
   g.beginPath();for(let h=0;h<=HMAX;h+=20){const p=[Xt(Tof(h)),Y(h)];h?g.lineTo(...p):g.moveTo(...p)}
   g.strokeStyle=C.txt;g.lineWidth=2.2;g.stroke();
+  /* sopra i 3.000 km la temperatura sale a 10^5-10^6 K: fuori scala */
+  {const x0=Xt(Tof(HMAX)),y0=Y(HMAX),x1=r-4,y1=Y(HMAX+170);g.beginPath();g.moveTo(x0,y0);g.quadraticCurveTo(x0+8,y1+4,x1,y1);g.strokeStyle=C.txt;g.lineWidth=2.2;g.setLineDash([3,3]);g.stroke();g.setLineDash([]);
+   g.beginPath();g.moveTo(x1+2,y1);g.lineTo(x1-7,y1-4);g.lineTo(x1-6,y1+5);g.closePath();g.fillStyle=C.txt;g.fill()}
   g.restore();
+  text(g,'→ regione di transizione, 10⁵–10⁶ K (§7.7)',r-6,Y(HMAX+170)-8,{sz:10.5,w:600,col:C.txt,al:'right'});
+  {const yz=Y(HMAX+620);text(g,'Sopra la cromosfera il plasma è trasparente',(l+r)/2,yz,{sz:11.5,w:600,col:C.txt2,al:'center'});
+   text(g,'anche alla riga (τ ≪ 1): i fotoni viaggiano liberi',(l+r)/2,yz+15,{sz:11.5,w:600,col:C.txt2,al:'center'})}
   REG.forEach(rg=>text(g,rg.n,r-6,Y(Math.min(rg.b,HMAX))+14,{sz:10.5,w:600,col:rg.c,al:'right'}));
-  for(let h=0;h<=HMAX;h+=500){line(g,l-4,Y(h),l,Y(h),C.txt2);text(g,fmtK(h),l-7,Y(h)+4,{sz:10.5,col:C.txt2,al:'right'})}
+  for(let h=0;h<=HTOP;h+=500){line(g,l-4,Y(h),l,Y(h),C.txt2);text(g,fmtK(h),l-7,Y(h)+4,{sz:10.5,col:C.txt2,al:'right'})}
   g.save();g.translate(13,(t+b)/2);g.rotate(-Math.PI/2);text(g,'quota sopra la fotosfera (km)',0,0,{sz:11,col:C.txt2,al:'center'});g.restore();
   [4000,6000,8000,10000].forEach(T=>{line(g,Xt(T),b,Xt(T),b+4,C.txt2);text(g,fmtK(T),Xt(T),b+16,{sz:10.5,col:C.txt2,al:'center'})});
   text(g,'temperatura (K)',(l+r)/2,b+32,{sz:11,col:C.txt2,al:'center'});
   const fx=r+10;g.fillStyle=hexA(L.col,0.35);rrect(g,fx,Y(L.fig[1]),8,Y(L.fig[0])-Y(L.fig[1]),3);g.fill();
   g.save();g.translate(fx+22,(Y(L.fig[0])+Y(L.fig[1]))/2);g.rotate(-Math.PI/2);text(g,'Fig. 7.1',0,0,{sz:10,col:C.txt2,al:'center'});g.restore();
   /* quota del cursore */
-  if(hc<=HMAX){const yc=Y(hc);line(g,l,yc,r,yc,L.col,1.5);
+  if(hc<=HTOP){const yc=Y(hc);line(g,l,yc,r,yc,L.col,1.5);
     g.beginPath();g.arc(Xt(Tof(hc)),yc,5,0,TAU);g.fillStyle=C.txt;g.fill();
     g.beginPath();g.arc(Xt(ST(hc)),yc,6,0,TAU);g.fillStyle=L.col;g.fill();g.lineWidth=2;g.strokeStyle=C.bg;g.stroke();
     const lab='τ ≈ μ · '+fmtK(Math.round(hc/10)*10)+' km';
-    font(g,11.5,600);const tw=g.measureText(lab).width+12;const lx2=l+6,ly2=hc>HMAX-200?yc+6:yc-24;
+    font(g,11.5,600);const tw=g.measureText(lab).width+12;const lx2=l+6,ly2=hc>HTOP-200?yc+6:yc-24;
     rrect(g,lx2,ly2,tw,18,5);g.fillStyle=C.bg;g.globalAlpha=0.88;g.fill();g.globalAlpha=1;g.strokeStyle=L.col;g.lineWidth=1;g.stroke();text(g,lab,lx2+6,ly2+13,{sz:11.5,w:600})}
-  else text(g,'↑ oltre i 3.000 km',r-4,t+12,{sz:10.5,col:C.txt2,al:'right'});
+  else text(g,'↑ oltre i 4.000 km',r-4,t+12,{sz:10.5,col:C.txt2,al:'right'});
 }
 
 /* ---------- pannello 3: anteprima (immagini schematiche, diverse per riga) ---------- */
@@ -341,7 +359,7 @@ function scene(p){
     let v=p.base;
     if(p.gran){const[d1,d2]=edge(VG,x,y);const e=Math.min(1,(d2-d1)/5);const gr=e*(1-0.35*d1/VG.cs)-0.5;v+=p.gran*gr}
     if(p.net){const[d1,d2]=edge(VN,x,y);const e=Math.exp(-(d2-d1)/p.netW);v+=p.net*e*(0.55+0.45*Math.sin(x*0.5)*Math.sin(y*0.43))}
-    const pl=plageAt(x,y);if(p.plage)v+=p.plage*pl*(0.75+0.25*Math.sin(x*0.6+y*0.4));
+    const pl=plageAt(x,y);if(p.plage)v+=p.plage*pl*(0.8+0.12*Math.sin(x*0.13+1)*Math.sin(y*0.17)+0.08*Math.sin(x*0.071-y*0.093));
     if(p.fac){const[d1,d2]=edge(VN,x,y);v+=p.fac*pl*Math.exp(-(d2-d1)/3)}
     const ds=Math.hypot(x-AR.x,y-AR.y);if(ds<9)v=v*(1-p.spot)+0.03*p.spot;else if(ds<16)v*=1-0.45*p.spot;
     const k=(y*IW+x)*4;d.data[k]=d.data[k+1]=d.data[k+2]=Math.round(255*Math.max(0,Math.min(1,v)));d.data[k+3]=255}
@@ -354,16 +372,19 @@ function scene(p){
   return c;
 }
 const SCENES={
-  ph:{base:0.62,gran:0.42,plage:0,fac:0.12,spot:1},
-  ha:{low:{base:0.5,gran:0.06,net:0,netW:4,plage:0.2,fib:900,fibL:[4,10],fibD:0.55,fibB:0.12,fibNear:true,fil:0.35,spot:0.9,seed:5},
+  ha:{ph:{base:0.62,gran:0.4,plage:0,fac:0.06,spot:1},
+      low:{base:0.5,gran:0.06,net:0,netW:4,plage:0.2,fib:900,fibL:[4,10],fibD:0.55,fibB:0.12,fibNear:true,fil:0.35,spot:0.9,seed:5},
       high:{base:0.45,plage:0.42,fib:1500,fibL:[10,30],fibD:0.55,fibB:0.3,fil:1,spot:0.8,seed:3}},
-  cak:{low:{base:0.26,gran:-0.1,net:0.6,netW:3.2,plage:0.6,spot:0.95},
-       high:{base:0.24,net:0.55,netW:5.5,plage:0.8,fib:260,fibL:[6,16],fibD:0.15,fibB:0.15,fibNear:true,fil:0.18,spot:0.7,seed:9}},
-  na:{low:{base:0.5,gran:-0.16,net:0.25,netW:2.2,plage:0.12,spot:0.95}},
-  mg:{low:{base:0.2,gran:-0.06,net:0.7,netW:3.5,plage:0.7,spot:0.9},
-      high:{base:0.2,net:0.55,netW:5,plage:0.85,fib:800,fibL:[8,22],fibD:0.3,fibB:0.28,fibNear:true,fil:0.6,spot:0.6,seed:7}}
+  cak:{ph:{base:0.42,gran:-0.12,net:0.28,netW:1.6,plage:0.25,fac:0.25,spot:1},
+       low:{base:0.26,gran:-0.1,net:0.6,netW:3.2,plage:0.6,spot:0.95},
+       high:{base:0.3,net:0.55,netW:5.5,plage:0.75,fib:260,fibL:[6,16],fibD:0.15,fibB:0.15,fibNear:true,fil:0.18,spot:0.7,seed:9}},
+  na:{ph:{base:0.6,gran:0.34,plage:0,fac:0.08,spot:1},
+      low:{base:0.5,gran:-0.16,net:0.25,netW:2.2,plage:0.12,spot:0.95}},
+  mg:{ph:{base:0.36,gran:-0.1,net:0.32,netW:1.6,plage:0.3,fac:0.3,spot:1},
+      low:{base:0.2,gran:-0.06,net:0.7,netW:3.5,plage:0.7,spot:0.9},
+      high:{base:0.32,net:0.5,netW:5,plage:0.75,fib:800,fibL:[8,22],fibD:0.3,fibB:0.28,fibNear:true,fil:0.6,spot:0.6,seed:7}}
 };
-function sceneImg(k,z){const key=k+z;if(!SCN[key]){const p=z==='ph'?SCENES.ph:(SCENES[k][z]||SCENES[k].low);SCN[key]=scene(p)}return SCN[key]}
+function sceneImg(k,z){const key=k+z;if(!SCN[key]){const p=SCENES[k][z]||SCENES[k].low;SCN[key]=scene(p)}return SCN[key]}
 function drawPrev(){
   const[g,W,H]=fit(cPrev);
   g.fillStyle='#000';g.fillRect(0,0,W,H);
@@ -380,18 +401,18 @@ function drawPrev(){
 
 /* ---------- descrizione (cambia con riga e zona prevalente) ---------- */
 const SEE={
-  ha:{ph:['Ali lontane di Hα: la fotosfera','Si vede la fotosfera, come in luce bianca ma con contrasto basso: granulazione e macchie. Le strutture cromosferiche sono scomparse.'],
-      low:['Ali vicine di Hα: la bassa cromosfera','Le fibrille si accorciano e diventano piccole macchie scure allungate (mottles) raccolte attorno alla rete. Le strutture in moto lungo la linea di vista compaiono in una sola delle due ali per effetto Doppler. I filamenti perdono gran parte del contrasto.'],
-      high:['Centro di Hα: media e alta cromosfera','Fibrille scure allungate che seguono il campo magnetico e si irradiano dalle regioni attive; filamenti molto scuri e contrastati lungo le linee di inversione di polarità; plage luminose attorno alle macchie. L\'intensità al centro di Hα dipende più dalla densità del plasma lungo le fibrille che dalla sua temperatura: la temperatura di radiazione della riga resta bassa anche dove il plasma è caldo.']},
-  cak:{ph:['Ali di Ca II K: la fotosfera alta','Granulazione a basso contrasto e facole luminose vicino alle regioni attive.'],
-       low:['Picchi K2 e minimi K1: la bassa cromosfera','La rete cromosferica appare come una trama di cordoni e punti luminosi ai bordi delle supergranule; all\'interno delle celle si intravede una granulazione "invertita" dovuta alle onde acustiche. Le plage sono molto brillanti. Le fibrille e i filamenti quasi non si vedono. È l\'aspetto tipico delle immagini Ca-K con filtri di qualche ångström.'],
-       high:['Centro di Ca II K (K3): la media cromosfera','Domina la rete luminosa, più diffusa; le plage sono brillantissime. Compaiono deboli fibrille attorno alle regioni attive e i filamenti sono appena percettibili, molto meno che in Hα: la riga è sensibile soprattutto al riscaldamento del plasma, non alla sua densità.']},
-  na:{ph:['Ali di Na D₂: la fotosfera','Granulazione e macchie, come in luce bianca.'],
-      low:['Centro di Na D₂: alta fotosfera e bassa cromosfera','Immagine a basso contrasto: punti luminosi della rete magnetica e granulazione invertita. Le plage sono deboli e i filamenti non si vedono. La temperatura di radiazione scende sotto il minimo di temperatura del plasma: il nucleo della riga è più scuro di quanto la sola temperatura farebbe prevedere.'],
+  ha:{ph:['Prevale la fotosfera (ali lontane di Hα)','Si vede la fotosfera, come in luce bianca ma con contrasto basso: granulazione e macchie. Le strutture cromosferiche sono scomparse.'],
+      low:['Prevale la bassa cromosfera (ali vicine di Hα)','Le fibrille si accorciano e diventano piccole macchie scure allungate (mottles) raccolte attorno alla rete. Le strutture in moto lungo la linea di vista compaiono in una sola delle due ali per effetto Doppler. I filamenti perdono gran parte del contrasto.'],
+      high:['Prevale la media e alta cromosfera (centro di Hα)','Fibrille scure allungate che seguono il campo magnetico e si irradiano dalle regioni attive; filamenti molto scuri e contrastati lungo le linee di inversione di polarità; plage luminose attorno alle macchie. L\'intensità al centro di Hα dipende più dalla densità del plasma lungo le fibrille che dalla sua temperatura: la temperatura di radiazione della riga resta bassa anche dove il plasma è caldo.']},
+  cak:{ph:['Prevale la fotosfera alta (ali di Ca II K)','Granulazione a basso contrasto, in parte invertita; i punti luminosi della rete magnetica e le facole attorno alle regioni attive restano ben visibili, perché nelle ali di Ca II K gli elementi magnetici sono più caldi dell\'ambiente circostante. Fibrille e filamenti non si vedono.'],
+       low:['Prevale la bassa cromosfera (picchi K2 e minimi K1)','La rete cromosferica appare come una trama di cordoni e punti luminosi ai bordi delle supergranule; all\'interno delle celle si intravede una granulazione "invertita" dovuta alle onde acustiche. Le plage sono molto brillanti. Le fibrille e i filamenti quasi non si vedono. È l\'aspetto tipico delle immagini Ca-K con filtri di qualche ångström.'],
+       high:['Prevale la media cromosfera (centro di Ca II K, K3)','Domina la rete luminosa, più diffusa; le plage sono brillantissime. Compaiono deboli fibrille attorno alle regioni attive e i filamenti sono appena percettibili, molto meno che in Hα: la riga è sensibile soprattutto al riscaldamento del plasma, non alla sua densità.']},
+  na:{ph:['Prevale la fotosfera (ali di Na D₂)','Granulazione e macchie, come in luce bianca.'],
+      low:['Prevale la bassa cromosfera (centro di Na D₂)','Immagine a basso contrasto: punti luminosi della rete magnetica e granulazione invertita. Le plage sono deboli e i filamenti non si vedono. La temperatura di radiazione scende sotto il minimo di temperatura del plasma: il nucleo della riga è più scuro di quanto la sola temperatura farebbe prevedere.'],
       high:['Centro di Na D₂','La riga non raggiunge la media cromosfera.']},
-  mg:{ph:['Ali di Mg II k: la fotosfera alta','Granulazione a basso contrasto.'],
-      low:['Picchi k2 e minimi k1: la bassa e media cromosfera','Rete e plage molto luminose, come in Ca II K ma con contrasto maggiore.'],
-      high:['Centro di Mg II k (k3): l\'alta cromosfera','Rete e plage brillanti, fibrille ben visibili attorno alle regioni attive, filamenti scuri. È la riga che sonda le quote più vicine alla regione di transizione tra quelle mostrate; si osserva solo da satellite (IRIS).']}
+  mg:{ph:['Prevale la fotosfera alta (ali di Mg II k)','Granulazione a basso contrasto con la rete magnetica e le facole luminose, come nelle ali di Ca II K.'],
+      low:['Prevale la bassa cromosfera (picchi k2 e minimi k1)','Rete e plage molto luminose, come in Ca II K ma con contrasto maggiore.'],
+      high:['Prevale l\'alta cromosfera (centro di Mg II k, k3)','Rete e plage brillanti, fibrille ben visibili attorno alle regioni attive, filamenti scuri. È la riga che sonda le quote più vicine alla regione di transizione tra quelle mostrate; si osserva solo da satellite (IRIS).']}
 };
 function updSee(){
   const z=['ph','low','high'][wZ.indexOf(Math.max(...wZ))];const[t,d]=SEE[lk][z];
