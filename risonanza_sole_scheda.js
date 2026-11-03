@@ -3,7 +3,7 @@ SCHEDA = String.raw`
 %%   ## titolo   **grassetto**   *corsivo*   - elenco   formule tra $...$
 %%   Non usare l'accento grave.
 
-# Dal caos alla risonanza
+# Risonanza acustica e modi di oscillazione del Sole
 
 ## Che cosa mostra l'animazione
 
@@ -29,15 +29,37 @@ I valori citati in questa sezione sono quelli del Sole, cioè con raggio e tempe
 
 ## Cambiare la stella
 
-Due cursori permettono di cambiare il **raggio** della stella e la **temperatura del gas**, da 0,8 a 1,3 volte i valori del Sole. La temperatura cambia nella stessa proporzione in tutti gli strati. A ogni modifica la registrazione riparte da zero, perché le note sono cambiate e la registrazione precedente non vale più. Il pulsante "Torna al Sole" ripristina i valori reali.
+Due cursori permettono di cambiare il **raggio** della stella e la **temperatura del gas**, da 0,8 a 1,3 volte i valori del Sole. La temperatura cambia nella stessa proporzione in tutti gli strati. A ogni modifica la registrazione riparte da zero, perché le note sono cambiate e la registrazione precedente non vale più: bisogna attendere che i picchi riemergano. Il pulsante "Torna al Sole" ripristina i valori reali.
 
-Che cosa succede:
+### Che cosa succede cambiando il raggio
 
-- **Le note.** La frequenza di una nota dipende dal tempo che l'onda impiega a compiere il proprio giro, cioè dalla lunghezza della strada divisa per la velocità del suono. Una stella più grande ha una strada più lunga e note più basse; un gas più caldo trasmette il suono più in fretta, perché la velocità del suono cresce come la radice quadrata della temperatura, e alza le note. Nel complesso le frequenze cambiano come $\sqrt{T}/R$, e con loro cambia la spaziatura $\Delta\nu$, riportata sotto lo spettro. Nella sezione la stella è disegnata più grande o più piccola, con il contorno del Sole reale tratteggiato, e le onde impiegano più o meno tempo a fare il giro.
-- **La zona di energia dei colpi e la frequenza di taglio.** Dipendono dalla gravità in superficie e dalla temperatura: a parità di massa si spostano come $1/(R^2\sqrt{T})$. Si spostano quindi insieme alle note, ma non nella stessa proporzione. Il periodo tipico delle oscillazioni, riportato sotto lo spettro, cambia di conseguenza. Per tenere tutto dentro il grafico, la scala delle frequenze si adatta automaticamente.
-- **Il confronto con il Sole.** Quando la stella è diversa dal Sole, delle tacche grigie sull'asse indicano dove si trovano le note di grado 0 del Sole reale.
+Si immagini di ingrandire il Sole lasciando invariate la massa e la temperatura del gas. Cambiano due cose, in misura diversa.
 
-**Una semplificazione importante.** In una stella vera raggio e temperatura non sono indipendenti: a parità di massa, una stella più grande ha un interno più freddo. I due cursori separati sono quindi un esperimento "cosa succederebbe se", utile per vedere l'effetto di ciascun fattore. È lo stesso principio con cui l'asterosismologia ricava dalle note la densità media delle stelle osservate dai telescopi Kepler e TESS (Approfondimento 10.1).
+**1. Le note scendono, in proporzione al raggio.** La frequenza di una nota dipende dal tempo che l'onda impiega a compiere il proprio giro, dalla superficie al centro e ritorno. In una stella più grande la strada è più lunga, mentre la velocità del suono non cambia, perché la temperatura è la stessa. Il giro dura di più e tutte le note scendono. Con un raggio di 1,3 volte quello del Sole il giro passa da circa 2 ore a circa 2,7 ore, e tutte le frequenze si riducono di 1,3 volte. Si riduce nella stessa proporzione anche la distanza tra due note successive dello stesso tipo, la spaziatura $\Delta\nu$: da 135 a circa 104 μHz. Una stella più grande suona più grave, con note più fitte.
+
+**2. La zona dei "5 minuti" scende molto di più.** La zona in cui i granuli forniscono più energia (la curva tratteggiata) e la frequenza di taglio (la banda grigia) non dipendono dal tempo del giro, ma dalla gravità in superficie. A parità di massa la gravità diminuisce come il quadrato del raggio: con un raggio di 1,3 volte è circa 1,7 volte più debole. Gli strati superficiali sono più "molli" e le oscillazioni più lente. La zona di energia si sposta da 3,1 a circa 1,8 mHz e il periodo tipico passa da circa 5,4 a circa 9 minuti.
+
+**3. Il risultato: la stella "suona" note diverse.** La zona di energia si sposta più delle note, quindi i colpi dei granuli fanno vibrare un altro gruppo di modi. Nel Sole i modi più forti sono quelli con circa 21 nodi lungo il raggio. In una stella di raggio 1,3 sono quelli con circa 16, in una di raggio 0,8 quelli con circa 27. Sotto la curva tratteggiata della stella grande ci sono quindi meno picchi, quella della stella piccola ne contiene di più.
+
+### Come leggere il grafico
+
+- **La scala delle frequenze si adatta da sola.** Così la zona di energia e la frequenza di taglio restano sempre nella stessa posizione sullo schermo. Per questo, a occhio, sembra che si spostino solo i picchi. Conviene leggere i numeri sull'asse, non le posizioni.
+- **Nella stella grande i picchi sembrano più distanziati, ma in realtà sono più vicini.** La scala dell'asse si è compressa più della spaziatura tra i picchi. Il valore vero è quello di $\Delta\nu$ sotto lo spettro: 104 μHz contro i 135 del Sole.
+- **Le tacche grigie sull'asse** indicano dove si trovano le note di grado 0 del Sole reale. Nella stella grande i picchi cadono a sinistra delle tacche, cioè a frequenze più basse; nella stella piccola a destra.
+- **Il riquadro di ingrandimento** segue la coppia di note vicinissime più vicina al centro della zona di energia. Nella stella grande le due note sono più vicine (circa 7 μHz contro 9) e servono circa 40 ore di osservazione per separarle, contro le circa 31 del Sole. Nella stella piccola (circa 11 μHz) ne bastano circa 25.
+- **La larghezza dei picchi non cambia** in μHz, perché la durata dei modi è la stessa. Rispetto alla spaziatura, quindi, i picchi della stella grande appaiono relativamente più larghi.
+
+### Valori di riferimento, a temperatura invariata
+
+- **Raggio 0,8**: giro dell'onda ≈ 1,6 h; $\Delta\nu$ ≈ 169 μHz; periodo tipico ≈ 3,4 min; frequenza di taglio ≈ 8,3 mHz; coppia nel riquadro ≈ 11 μHz.
+- **Sole**: giro dell'onda ≈ 2,05 h; $\Delta\nu$ = 135 μHz; periodo tipico ≈ 5,4 min; frequenza di taglio ≈ 5,3 mHz; coppia nel riquadro ≈ 9 μHz.
+- **Raggio 1,3**: giro dell'onda ≈ 2,7 h; $\Delta\nu$ ≈ 104 μHz; periodo tipico ≈ 9,1 min; frequenza di taglio ≈ 3,1 mHz; coppia nel riquadro ≈ 7 μHz.
+
+### E la temperatura?
+
+Il cursore della temperatura agisce sulla velocità del suono, che cresce come la radice quadrata della temperatura. Un gas più caldo del 30% trasmette il suono circa il 14% più in fretta, e tutte le note salgono di circa il 14%. Effetto più debole rispetto al raggio: con il raggio aumentato del 30% le note scendono di circa il 23%.
+
+**Una semplificazione importante.** In una stella vera raggio e temperatura non sono indipendenti: a parità di massa, una stella più grande ha un interno più freddo, e la spaziatura $\Delta\nu$ diminuisce ancora più rapidamente, come la radice quadrata della densità media. I due cursori separati sono un esperimento "cosa succederebbe se", utile per isolare l'effetto di ciascun fattore. La relazione tra $\Delta\nu$ e densità media è quella con cui l'asterosismologia studia le stelle osservate dai telescopi Kepler e TESS (Approfondimento 10.1).
 
 ## Comandi
 
