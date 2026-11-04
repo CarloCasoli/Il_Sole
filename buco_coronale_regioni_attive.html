@@ -1,0 +1,629 @@
+<!doctype html>
+<!--
+  © 2026 Carlo Casoli — "Il Sole: Osservazione e Fisica"
+  Licenza CC BY-NC-ND 4.0: https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it
+  Vietati l'uso commerciale e la distribuzione di versioni modificate senza autorizzazione scritta dell'autore.
+-->
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dalle regioni attive al buco coronale</title>
+<style>
+:root{--text-primary:#1f1e1d;--text-secondary:#5f5e5a;--border:rgba(0,0,0,.12);--border-strong:rgba(0,0,0,.25);--bg:#ffffff;--panel:rgba(0,0,0,.03)}
+@media (prefers-color-scheme:dark){:root{--text-primary:#f1efe8;--text-secondary:#b4b2a9;--border:rgba(255,255,255,.12);--border-strong:rgba(255,255,255,.28);--bg:#1f1f1e;--panel:rgba(255,255,255,.04)}}
+*{box-sizing:border-box}
+body{margin:0 auto;padding:16px;background:var(--bg);color:var(--text-primary);font-family:-apple-system,"Segoe UI",Roboto,sans-serif;max-width:1280px}
+a{color:#378ADD}
+button{background:transparent;color:var(--text-primary);border:1px solid var(--border-strong);border-radius:8px;cursor:pointer;font-family:inherit}
+button:hover{background:rgba(127,127,127,.12)}
+.top{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 14px;margin-bottom:8px}
+.top h1{font-size:19px;font-weight:600;margin:0}.top a{font-size:13px;text-decoration:none}
+.sub{font-size:13px;color:var(--text-secondary);margin:0 0 10px;max-width:1040px;line-height:1.45}
+.bar{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;margin:0 0 8px;font-size:12px;color:var(--text-secondary)}
+.bar button{font-size:12.5px;padding:6px 11px}
+.sel[aria-pressed=true]{background:#378ADD;color:#fff;border-color:#378ADD}
+.tl{flex:1 1 460px;display:flex;flex-direction:column;gap:2px;min-width:260px}
+.tl input{width:100%}
+.tl .ph{display:flex;font-size:10.5px;color:var(--text-secondary)}
+.tl .ph span{text-align:center;border-top:2px solid var(--border-strong);padding-top:2px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+#prog{font-size:12px;color:#D4537E}
+#oZ{min-width:36px;color:var(--text-primary)}
+.cv{width:100%;display:block;border:1px solid var(--border);border-radius:10px;background:#0a0c12}
+/* la figura sta sempre tutta nella finestra: larghezza limitata dall'altezza disponibile */
+#cv{aspect-ratio:3/2;width:min(100%,calc((100vh - 120px) * 1.5));margin:0 auto;touch-action:none;cursor:grab}
+.below{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:10px;margin-top:10px;align-items:start}
+.card{border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:13px;line-height:1.5;background:var(--panel)}
+.card h3{margin:0 0 6px;font-size:13.5px;font-weight:600}
+.row{display:grid;grid-template-columns:230px 1fr 46px;gap:8px;align-items:center;margin:5px 0;font-size:12.5px}
+.row span{color:var(--text-secondary)}.row b{font-weight:500;text-align:right}
+.meter{position:relative;height:10px;border-radius:5px;background:rgba(127,127,127,.18);overflow:hidden}
+.meter i{display:block;height:100%;border-radius:5px}
+#oDay{font-size:13px;color:var(--text-secondary)}#oPhase{font-weight:600;font-size:14px;margin-bottom:4px}
+#oEv{color:var(--text-secondary);font-size:12.5px;margin-top:6px;min-height:3.9em}
+.legend{display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--text-secondary)}
+.legend .sw{display:inline-block;width:22px;height:0;border-top:3px solid;margin-right:8px;vertical-align:middle}
+.legend .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin:0 15px 0 7px;vertical-align:middle}
+.state{font-size:12px;color:var(--text-primary);padding:5px 10px;border-radius:8px;border:1px solid var(--border);background:var(--panel)}
+.state.low{border-color:#D4537E;background:rgba(212,83,126,.08)}
+.note{margin-top:12px;font-size:12px;color:var(--text-secondary);line-height:1.45}
+@media (max-width:760px){body{padding:12px}.top h1{font-size:17px}.below{grid-template-columns:minmax(0,1fr)}#cv{aspect-ratio:1/1;width:min(100%,calc(100vh - 120px))}.row{grid-template-columns:160px 1fr 42px}}
+</style></head><body>
+<div class="top">
+  <h1>Dalle regioni attive al buco coronale<span class="cc-badge"><span class="cc-n">© 2026 Carlo Casoli ·</span> <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it" target="_blank" rel="license noopener">CC BY-NC-ND 4.0</a></span></h1>
+  <a href="index.html">← Indice delle animazioni</a>
+</div>
+<p class="sub">Un tratto del lembo solare, in scala, seguito per 50 giorni. Due regioni attive intense accumulano energia, fino a un'eruzione (CME); tra le due il flusso di polarità + è richiuso sulle loro polarità −. Quando le regioni attive decadono, il flusso + non viene più catturato e si apre: nasce un buco coronale. Dopo circa due settimane emergono nuove regioni attive che lo richiudono (§8.5, §8.6, §11.8). Sotto la fotosfera, i tubi di flusso nello strato superficiale della zona convettiva. Trascina la figura per spostarla lateralmente; con la rotella o i pulsanti lo zoom cambia quanta corona si vede, mentre la fotosfera resta in basso.</p>
+<div class="bar">
+  <button id="bP">▶ Avvia</button><button id="bR">Ricomincia</button>
+  <div class="tl"><input type="range" id="sT" min="0" max="1000" value="0" aria-label="Tempo (giorni)">
+    <div class="ph"><span style="width:28%">regioni attive intense</span><span style="width:16%">declino</span><span style="width:32%">buco coronale</span><span style="width:24%">nuove regioni attive</span></div></div>
+  <span id="spd" data-v="1" hidden></span>
+  <span>Velocità</span><button class="sel" data-sp="0.5">×0,5</button><button class="sel" data-sp="1" aria-pressed="true">×1</button><button class="sel" data-sp="2">×2</button>
+</div>
+<div class="bar">
+  <span>Zoom</span><button id="zOut" aria-label="Rimpicciolisci">−</button><b id="oZ"></b><button id="zIn" aria-label="Ingrandisci">+</button><button id="z0">Vista iniziale</button>
+  <span style="width:10px"></span><label for="sE">Riscaldamento del plasma</label><input type="range" id="sE" min="0" max="100" step="1" value="75" style="max-width:160px">
+  <span style="width:10px"></span><span>Mostra</span>
+  <button class="sel" id="tPl" aria-pressed="true">Moti del plasma</button><button class="sel" id="tSub" aria-pressed="true">Sotto la fotosfera</button><button class="sel" id="tLab" aria-pressed="true">Etichette</button>
+  <span id="prog"></span>
+</div>
+<div class="bar"><span class="state" id="oE"></span></div>
+<canvas class="cv" id="cv" aria-label="Linee di campo della corona e tubi di flusso sotto la fotosfera"></canvas>
+<div class="below">
+  <div class="card"><h3>Stato</h3>
+    <div id="oDay"></div><div id="oPhase"></div>
+    <div class="row"><span>Flusso aperto della zona +</span><div class="meter"><i id="mOpen" style="background:#378ADD;width:0"></i></div><b id="oOpen"></b></div>
+    <div class="row"><span id="nE0">Energia</span><div class="meter"><i id="mE0" style="width:0"></i></div><b id="oE0"></b></div>
+    <div class="row"><span id="nE1">Energia</span><div class="meter"><i id="mE1" style="width:0"></i></div><b id="oE1"></b></div>
+    <div id="oEv"></div></div>
+  <div class="card"><h3>Legenda</h3><div class="legend">
+    <div><span class="sw" style="border-color:#D85A30"></span>Archi delle regioni attive</div>
+    <div><span class="sw" style="border-color:#EF9F27"></span>Archi della corona quieta</div>
+    <div><span class="sw" style="border-color:#378ADD"></span>Linee aperte dal centro del buco: vento veloce</div>
+    <div><span class="sw" style="border-color:#7F77DD"></span>Linee aperte ai bordi del buco: vento lento</div>
+    <div><span class="sw" style="border-color:#8b90a6"></span>Altre linee aperte</div>
+    <div><span class="dot" style="background:#ffd2b0;margin-left:7px"></span>plasma che scorre lungo gli archi, in un solo verso (dal piede + al piede −)</div>
+    <div><span class="dot" style="background:#a9d2ff;margin-left:7px"></span>vento solare; sotto la soglia di riscaldamento il plasma sale e ricade (<span style="color:#ffb3a8">●</span> in discesa)</div>
+    <div><b style="color:#ffd98a;margin:0 4px 0 6px">+</b><b style="color:#8fc3ff;margin-right:10px">−</b>polarità; sotto la fotosfera, tubi di flusso dello stesso colore</div>
+    <div>Energia 100% = soglia di eruzione</div>
+  </div></div>
+</div>
+<p class="note">Modello didattico, in scala. Il campo della corona è calcolato in ogni istante come equilibrio "force-free" in due dimensioni sul lembo con il raggio solare vero: correnti elettriche lungo il campo sono presenti solo negli archi delle regioni attive e rappresentano l'energia accumulata. Gonfiamento degli archi, apertura e chiusura del buco coronale sono il risultato del calcolo; la soglia di eruzione è posta dove gli archi raggiungono circa 250 Mm. Sono schematici: la CME (durante l'eruzione il tempo rallenta, perché un'eruzione dura alcune ore), i moti del plasma (accelerati rispetto ai giorni) e i tubi sotto la fotosfera, che seguono le polarità calcolate alla superficie. Oltre 800 Mm di quota il campo è imposto radiale.</p>
+<script>
+/* Modello 2,5D force-free della corona su un tratto del lembo solare, in scala.
+   Coordinate conformi: x = R·φ (lungo la superficie), z = R·ln(r/R);  ∇²_polare = (R/r)² ∇²_(x,z).
+   Grad–Shafranov force-free:  ∇²_(x,z) A = −(r/R)² F(A) F'(A),  con B fuori dal piano = F(A).
+   Correnti solo negli archi delle regioni attive:  F = λ_i (A − A_th,i)  nella cupola i.
+   Fotosfera: A = A_b(x) dal magnetogramma; quota di apertura: ∂A/∂z = 0 (campo radiale).
+   A = B0·x + Ap, con Ap periodico in x.  Griglia in z non uniforme (fitta vicino alla superficie). */
+'use strict';
+const M = {};
+M.RSUN = 696;
+M.P = 972;                          // larghezza del dominio di calcolo (Mm), 80°
+M.SECT = M.P / M.RSUN;
+M.VIEW = 940;                       // tratto in cui si disegnano le linee (Mm): quasi tutto il dominio
+M.XL = -M.P / 2;
+M.HS = 800;                         // quota di apertura (Mm)
+M.ZS = M.RSUN * Math.log(1 + M.HS / M.RSUN);
+M.NX = 405; M.DX = M.P / M.NX;     // passo 2,4 Mm
+M.Z0 = 1.2; M.GQ = 1.035;           // primo passo verticale e fattore di crescita
+M.NZ = Math.ceil(Math.log(1 + (M.GQ - 1) * M.ZS / M.Z0) / Math.log(M.GQ)) + 1;
+M.zr = new Float64Array(M.NZ); for (let j = 0; j < M.NZ; j++) M.zr[j] = Math.min(M.ZS, M.Z0 * (Math.pow(M.GQ, j) - 1) / (M.GQ - 1));
+M.jOf = z => Math.log(1 + (M.GQ - 1) * Math.max(0, z) / M.Z0) / Math.log(M.GQ);
+M.hz = z => M.RSUN * (Math.exp(z / M.RSUN) - 1);
+M.zp = h => M.RSUN * Math.log(1 + h / M.RSUN);
+const sm = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
+const wrapd = d => ((d + M.P / 2) % M.P + M.P) % M.P - M.P / 2;
+M.sm = sm; M.wrapd = wrapd;
+
+/* ---------- la storia, in giorni (0–50) ----------
+   giorni 0–14: due regioni attive intense (A, B) accumulano energia e producono CME
+   giorni 12–26: declino; il flusso + disperso si raccoglie al centro (zona unipolare)
+   giorni ~22–40: buco coronale aperto
+   giorni 35–44: emergono due nuove regioni attive (C, D); le loro polarità − richiudono il buco */
+M.DAYS = 50;
+M.state = function (day) {
+  const dec = sm(12, 26, day);                              // declino di A e B
+  const em = sm(37, 43.5, day);                             // flusso emerso di C e D (il tubo risale sotto la superficie dal giorno 33)
+  const capOld = 1 - sm(16, 25, day), capNew = sm(38.5, 44.5, day);
+  const s = { day, dec, em,
+    ar: [
+      { name: 'A', x: -112, sep: 56, amp: 70, f: 1 - 0.93 * dec, sig: 8 + 12 * dec, inner: -1, cap: 0.5 * capOld },
+      { name: 'B', x: +112, sep: 56, amp: 64, f: 1 - 0.93 * dec, sig: 8 + 12 * dec, inner: -1, cap: 0.5 * capOld },
+      { name: 'C', x: -118, sep: 52, amp: 66, f: em, sig: 8, inner: -1, cap: 0.5 * capNew },
+      { name: 'D', x: +122, sep: 52, amp: 60, f: em, sig: 8, inner: -1, cap: 0.5 * capNew }
+    ],
+    ch: { x: 0, w: 40 + 25 * dec, amp: 3 + 12 * dec }
+  };
+  return s;
+};
+M.magnetogram = function (s, NS) {
+  const out = new Float64Array(NS), chFlux = s.ch.amp * s.ch.w;
+  for (let i = 0; i < NS; i++) {
+    const x = M.XL + (i + 0.5) * M.P / NS, u = 2 * Math.PI * (x - M.XL) / M.P;
+    /* rete della corona quieta: polarità miste su piccola scala, bilanciate */
+    let net = 2.2 * Math.sin(37 * u + 0.7) + 1.8 * Math.sin(49 * u + 2.1) + 1.4 * Math.sin(27 * u + 4.0) + 1.1 * Math.sin(63 * u + 1.3);   // scale ≈ 15–35 Mm
+    let b = 0;
+    const dc = Math.abs(wrapd(x - s.ch.x)), inside = 1 - sm(s.ch.w / 2 - 10, s.ch.w / 2 + 10, dc);
+    b += s.ch.amp * inside; net *= 1 - 0.85 * inside;
+    for (const a of s.ar) {
+      if (a.f <= 0.002 && a.cap <= 0.002) continue;
+      const g = d => Math.exp(-d * d / (2 * a.sig * a.sig)), norm = a.sig * Math.sqrt(2 * Math.PI), k0 = 8 / a.sig;
+      const side = a.x > 0 ? -1 : 1, xin = a.x + side * a.sep / 2, xout = a.x - side * a.sep / 2;
+      b += a.inner * (a.amp * k0 * a.f + a.cap * chFlux / norm) * g(wrapd(x - xin));   // il polo interno bilancia parte del flusso centrale
+      b += -a.inner * a.amp * k0 * a.f * g(wrapd(x - xout));
+    }
+    out[i] = b + net;
+  }
+  return out;
+};
+M.poles = a => { const side = a.x > 0 ? -1 : 1; return { xin: a.x + side * a.sep / 2, xout: a.x - side * a.sep / 2 }; };
+
+/* ---------- soluzione ---------- */
+M.create = () => { const N = M.NX * M.NZ; return { Ap: new Float64Array(N), A: new Float64Array(N), mask: new Int8Array(N), init: false, B0: 0, Ab: new Float64Array(M.NX), info: null, Bs: null }; };
+const rfac = new Float64Array(M.NZ); for (let j = 0; j < M.NZ; j++) rfac[j] = Math.exp(2 * M.zr[j] / M.RSUN);  // (r/R)²
+const cN = new Float64Array(M.NZ), cS = new Float64Array(M.NZ);
+for (let j = 1; j < M.NZ; j++) { const hm = M.zr[j] - M.zr[j - 1], hp = j < M.NZ - 1 ? M.zr[j + 1] - M.zr[j] : hm; cN[j] = 2 / (hp * (hm + hp)); cS[j] = 2 / (hm * (hm + hp)); }
+M.setBoundary = function (F, s) {
+  const NS = M.NX * 4, b = M.magnetogram(s, NS); let m = 0; for (const v of b) m += v; m /= NS; F.B0 = m; F.Bs = b;
+  const ab = new Float64Array(NS + 1); for (let i = 0; i < NS; i++) ab[i + 1] = ab[i] + (b[i] - m) * M.P / NS;
+  for (let i = 0; i < M.NX; i++) F.Ab[i] = ab[i * 4];
+};
+const KP = 120, COS = new Float64Array((KP + 1) * M.NX), SIN = new Float64Array((KP + 1) * M.NX), FAC = new Float64Array((KP + 1) * M.NZ);
+for (let n = 1; n <= KP; n++) { for (let i = 0; i < M.NX; i++) { const u = 2 * Math.PI * n * i / M.NX; COS[n * M.NX + i] = Math.cos(u); SIN[n * M.NX + i] = Math.sin(u); }
+  const k = 2 * Math.PI * n / M.P; for (let j = 0; j < M.NZ; j++) FAC[n * M.NZ + j] = Math.cosh(Math.min(80, k * (M.ZS - M.zr[j]))) / Math.cosh(Math.min(80, k * M.ZS)); }
+/* campo potenziale (senza correnti) come stato di partenza di ogni calcolo */
+M.potential = function (F) {
+  const NX = M.NX, K = KP, a = new Float64Array(K + 1), b = new Float64Array(K + 1); let mean = 0;
+  for (let i = 0; i < NX; i++) mean += F.Ab[i]; mean /= NX;
+  for (let n = 1; n <= K; n++) { let c = 0, s = 0; for (let i = 0; i < NX; i++) { c += F.Ab[i] * COS[n * NX + i]; s += F.Ab[i] * SIN[n * NX + i]; } a[n] = 2 * c / NX; b[n] = 2 * s / NX; }
+  for (let j = 0; j < M.NZ; j++) for (let i = 0; i < NX; i++) { let v = mean;
+    for (let n = 1; n <= K; n++) { const f = FAC[n * M.NZ + j]; if (f < 1e-9) break; v += (a[n] * COS[n * NX + i] + b[n] * SIN[n * NX + i]) * f; } F.Ap[j * NX + i] = v; }
+  F.init = true;
+};
+const xOf = i => M.XL + i * M.DX;
+M.fullA = F => { const NX = M.NX; for (let j = 0; j < M.NZ; j++) for (let i = 0; i < NX; i++) F.A[j * NX + i] = F.Ap[j * NX + i] + F.B0 * (xOf(i) - M.XL); };
+/* cupola di una regione attiva: componente connessa attorno all'estremo di A_b sopra la regione,
+   delimitata dal livello che racchiude la frazione f del suo flusso */
+M.domes = function (F, s, f = 0.8) {
+  const NX = M.NX, NZ = M.NZ, A = F.A, mask = F.mask; mask.fill(0); const res = [];
+  s.ar.forEach((a, idx) => {
+    if (a.f < 0.15) { res.push(null); return; }
+    const i0 = Math.round((a.x - a.sep / 2 - 2 * a.sig - M.XL) / M.DX), i1 = Math.round((a.x + a.sep / 2 + 2 * a.sig - M.XL) / M.DX);
+    const row = k => A[((k % NX) + NX) % NX];
+    const sg = (a.x > 0 ? a.inner : -a.inner) > 0 ? 1 : -1;
+    let ie = i0, ext = row(i0) * sg; for (let k = i0; k <= i1; k++) if (row(k) * sg > ext) { ext = row(k) * sg; ie = k; }
+    const edge = Math.max(row(i0) * sg, row(i1) * sg), th = ext - f * (ext - edge);
+    const st = [NX + ((ie % NX) + NX) % NX], seen = new Uint8Array(NX * NZ); seen[st[0]] = 1; let leak = false, top = 0;
+    while (st.length) { const k = st.pop(), j = (k / NX) | 0, i = k % NX; if (j > top) top = j; if (j >= NZ - 2) leak = true;
+      for (const q of [j > 0 ? k - NX : -1, j < NZ - 1 ? k + NX : -1, j * NX + (i + 1) % NX, j * NX + (i + NX - 1) % NX])
+        if (q >= 0 && !seen[q] && A[q] * sg > th) { seen[q] = 1; st.push(q); } }
+    for (let k = NX; k < NX * NZ; k++) if (seen[k]) mask[k] = idx + 1;
+    res.push({ sg, th: th * sg, top: M.zr[top], leak });
+  });
+  return res;
+};
+M.solve = function (F, s, lam, opt = {}) {
+  M.setBoundary(F, s); if (!F.init || opt.reset) M.potential(F);
+  const NX = M.NX, NZ = M.NZ, Ap = F.Ap, mask = F.mask, cx = 1 / (M.DX * M.DX), om = opt.om || 1.7;
+  for (let i = 0; i < NX; i++) Ap[i] = F.Ab[i];
+  let info = null, it = 0, ok = true; const outer = opt.outer || 6, inner = opt.inner || 120;
+  for (let o = 0; o < outer && ok; o++) {
+    M.fullA(F); info = M.domes(F, s, opt.f || 0.8);
+    info.forEach((d, i) => { if (d && d.leak && !opt.keepLeak) for (let k = 0; k < mask.length; k++) if (mask[k] === i + 1) mask[k] = 0; });
+    const q2 = lam.map(l => l * l);
+    for (let n = 0; n < inner; n++, it++) {
+      let res = 0;
+      for (let j = 1; j < NZ && ok; j++) { const last = j === NZ - 1, rf = rfac[j], cn = cN[j], cs = cS[j], den0 = 2 * cx + cn + cs;
+        for (let i = 0; i < NX; i++) { const k = j * NX + i;
+          const aN = last ? Ap[k - NX] : Ap[k + NX];
+          let sum = cx * (Ap[j * NX + (i + 1) % NX] + Ap[j * NX + (i + NX - 1) % NX]) + cn * aN + cs * Ap[k - NX], den = den0;
+          const m = mask[k];
+          if (m && info[m - 1]) { const q = (q2[m - 1] || 0) * rf; sum += -q * (F.B0 * (xOf(i) - M.XL) - info[m - 1].th); den -= q; }
+          const d = sum / den - Ap[k]; if (Math.abs(d) > res) res = Math.abs(d); Ap[k] += om * d;
+          if (!isFinite(Ap[k]) || Math.abs(Ap[k]) > 1e7) { ok = false; break; } } }
+      if (!ok || res < 1e-5) break;
+    }
+  }
+  M.fullA(F); F.info = M.domes(F, s, opt.f || 0.8);
+  return { ok, it, info: F.info };
+};
+M.bAt = function (F, x, z) {
+  const NX = M.NX, Ap = F.Ap;
+  const fi = ((x - M.XL) % M.P + M.P) % M.P / M.DX, fj = Math.min(M.NZ - 1.001, M.jOf(z));
+  const i = Math.floor(fi) % NX, j = Math.floor(fj), u = fi - Math.floor(fi), w = fj - j;
+  const g = (ii, jj) => { const jC = Math.max(0, Math.min(M.NZ - 1, jj)), iC = ((ii % NX) + NX) % NX;
+    const ax = (Ap[jC * NX + (iC + 1) % NX] - Ap[jC * NX + (iC + NX - 1) % NX]) / (2 * M.DX) + F.B0;
+    const jN = Math.min(M.NZ - 1, jC + 1), jS = Math.max(0, jC - 1);
+    const az = (Ap[jN * NX + iC] - Ap[jS * NX + iC]) / (M.zr[jN] - M.zr[jS] || 1);
+    return [-az, ax]; };
+  const a = g(i, j), b = g(i + 1, j), c = g(i, j + 1), d = g(i + 1, j + 1);
+  return [(1 - w) * ((1 - u) * a[0] + u * b[0]) + w * ((1 - u) * c[0] + u * d[0]), (1 - w) * ((1 - u) * a[1] + u * b[1]) + w * ((1 - u) * c[1] + u * d[1])];
+};
+M.trace = function (F, x, z, sg, keep) {
+  const pts = keep ? [[x, z]] : null; let pdx = 0, pdz = 0;
+  for (let n = 0; n < 1500; n++) {
+    const h = Math.min(4, 0.5 + z * 0.02);
+    let [bx, bz] = M.bAt(F, x, z); let nb = Math.hypot(bx, bz) || 1e-12;
+    const xm = x + 0.5 * h * sg * bx / nb, zm = z + 0.5 * h * sg * bz / nb; [bx, bz] = M.bAt(F, xm, zm); nb = Math.hypot(bx, bz) || 1e-12;
+    const dx = h * sg * bx / nb, dz = h * sg * bz / nb; if (pdx * dx + pdz * dz < -0.5 * h * h) return { end: 'null', x, z, pts };
+    pdx = dx; pdz = dz; x += dx; z += dz;
+    if (z <= 0) { if (keep) pts.push([x, 0]); return { end: 'surf', x, z: 0, pts }; }
+    if (z >= M.ZS - 0.5) { if (keep) pts.push([x, z]); return { end: 'top', x, z, pts }; }
+    if (keep) pts.push([x, z]);
+  }
+  return { end: 'max', x, z, pts };
+};
+M.surfB = (F, x) => { const b = F.Bs, f = ((x - M.XL) % M.P + M.P) % M.P / M.P * b.length; return b[Math.floor(f) % b.length]; };
+/* frazione del flusso + della zona centrale che raggiunge la quota di apertura */
+M.openFrac = function (F, s) {
+  const NS = 200; let o = 0, t = 0;
+  for (let i = 0; i < NS; i++) { const x = s.ch.x - s.ch.w / 2 - 8 + (i + 0.5) * (s.ch.w + 16) / NS, bz = M.surfB(F, x); if (bz <= 0) continue;
+    t += bz; if (M.trace(F, x, 0.3, 1, false).end === 'top') o += bz; }
+  return t ? o / t : 0;
+};
+'use strict';
+const $ = id => document.getElementById(id);
+const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const fmt = (x, d = 0) => x.toFixed(d).replace('.', ',');
+const COL = { quiet: '#EF9F27', ar: '#D85A30', fast: '#378ADD', slow: '#7F77DD', open: '#8b90a6' };
+const POS = '#ffd98a', NEG = '#8fc3ff';           // polarità + e − (alla base e sotto la fotosfera)
+
+/* ---------- energia delle regioni attive ----------
+   e = 1 (100%) è la soglia di eruzione. La soglia è posta dove gli archi gonfiati raggiungono circa 250 Mm:
+   nel calcolo bidimensionale l'equilibrio si perderebbe solo più in alto, ma nel Sole (tridimensionale)
+   l'eruzione avviene prima. λ = e · k_i · λc_i, con λc lo shear critico 2D calcolato per ciascuna regione. */
+const LC = [[.02057, .02010, .02455, .02490], [.02150, .02139, .02455, .02490]];
+const KTH = [0.735, 0.735, 0.79, 0.80];
+function lamc(day, i) { const u = Math.min(1, Math.max(0, (day - 14) / 4)); return LC[0][i] + u * (LC[1][i] - LC[0][i]); }
+/* una sola eruzione per ciclo di regioni attive: dalla regione A al giorno 8 (primo ciclo)
+   e dalla regione C al giorno 48,4 (secondo ciclo). B e D accumulano energia ma restano sotto la soglia. */
+const EV = [[8], [], [48.4], []], E0 = [0.4, 0.5, 0.25, 0.25], START = [0, 0, 41, 41];
+function ampOld(d) { return d < 13 ? 1 : d < 20 ? 1 - 0.7 * (d - 13) / 7 : Math.max(0.1, 0.3 - 0.2 * (d - 20) / 6); }
+function energy(d, i) {
+  if (d < START[i]) return 0.15;
+  const ev = EV[i], amp = i < 2 ? ampOld(d) : 1;
+  let a = START[i], ea = E0[i];
+  for (const t of ev) { if (d < t) return amp * (ea + (1 - ea) * (d - a) / (t - a)); a = t; ea = 0.35; }
+  return amp * Math.min(0.82, ea + 0.08 * (d - a));        /* dopo l'ultima eruzione l'energia risale lentamente, sotto la soglia */
+}
+const cmeBetween = (d0, d1, i) => EV[i].some(t => d0 < t && d1 >= t);
+const PH = [[0, 14, 'Regioni attive intense'], [14, 22, 'Declino delle regioni attive'], [22, 38, 'Buco coronale aperto'], [38, 50.01, 'Nuove regioni attive: il buco si chiude']];
+const phaseOf = d => PH.find(p => d >= p[0] && d < p[1]);
+
+/* ---------- fotogrammi ---------- */
+const STEP = 0.4, NF = Math.round(M.DAYS / STEP) + 1, FR = new Array(NF), FIELD = M.create();
+let computed = 0, tot0 = 0;
+const arOf = (s, x) => { for (let i = 0; i < s.ar.length; i++) { const a = s.ar[i]; if (a.f < 0.15) continue; if (Math.abs(M.wrapd(x - a.x)) < a.sep / 2 + 2.2 * a.sig) return i; } return -1; };
+function unwrap(p) { const q = [p[0]]; for (let i = 1; i < p.length; i++) { let x = p[i][0]; const px = q[i - 1][0]; while (x - px > M.P / 2) x -= M.P; while (x - px < -M.P / 2) x += M.P; q.push([x, p[i][1]]); } return q; }
+function lineObj(k, pts, ai) {
+  const p = unwrap(pts).map(([x, z]) => [x, M.hz(z)]);       // x lungo la superficie, quota fisica h
+  const cum = [0]; for (let i = 1; i < p.length; i++) cum.push(cum[i - 1] + Math.hypot(p[i][0] - p[i - 1][0], p[i][1] - p[i - 1][1]));
+  let top = 0; for (const q of p) top = Math.max(top, q[1]);
+  return { k, p, cum, len: cum[cum.length - 1], ai, top, ph: Math.random(), fx: pts[0][0] };
+}
+function buildLines(s) {
+  const b = FIELD.Bs, NS = b.length, dl = M.P / NS; let tot = 0; const cum = [0];
+  for (let i = 0; i < NS; i++) { const x = M.XL + (i + 0.5) * dl; const w = Math.abs(x) < M.VIEW / 2 + 20 ? 1 : 0; tot += Math.abs(b[i]) * dl * w; cum.push(tot); }
+  if (!tot0) tot0 = tot;
+  const N = Math.max(46, Math.round(120 * tot / tot0)), step = tot / N, L = [], chHalf = s.ch.w / 2 + 8;
+  const add = (x, bz, extra) => {
+    const tr = M.trace(FIELD, x, 0.3, bz >= 0 ? 1 : -1, true); if (tr.pts.length < 3) return;
+    if (tr.end === 'top') { if (!extra) L.push(lineObj(Math.abs(M.wrapd(x - s.ch.x)) < chHalf && bz > 0 ? 'ch' : 'open', tr.pts, -1)); return; }
+    if (tr.end !== 'surf' || bz < 0) return;
+    const i1 = arOf(s, x), i2 = arOf(s, tr.x), k = i1 >= 0 && i1 === i2 ? 'ar' : 'quiet';
+    if (extra && k !== 'quiet') return;
+    L.push(lineObj(k, tr.pts, k === 'ar' ? i1 : -1));
+  };
+  let lev = step / 2, i = 0;
+  while (lev < tot) { while (cum[i + 1] < lev) i++; const u = (lev - cum[i]) / ((cum[i + 1] - cum[i]) || 1), x = M.XL + (i + u) * dl; add(x, M.surfB(FIELD, x), false); lev += step; }
+  for (let x = -M.VIEW / 2 - 10; x < M.VIEW / 2 + 10; x += 9) { const bz = M.surfB(FIELD, x); if (bz > 0.9 && arOf(s, x) < 0 && Math.abs(M.wrapd(x - s.ch.x)) > chHalf) add(x, bz, true); }
+  /* linee del buco: vento veloce dal centro, vento lento dai bordi (vicino agli archi chiusi) */
+  const chl = L.filter(l => l.k === 'ch');
+  if (chl.length) { const lo = Math.min(...chl.map(l => l.fx)), hi = Math.max(...chl.map(l => l.fx)), half = (hi - lo) / 2;
+    for (const l of chl) { const d = Math.min(l.fx - lo, hi - l.fx); l.k = half > 6 && d > 0.3 * half ? 'fast' : 'slow'; } }
+  return L;
+}
+/* tubi di flusso sotto la fotosfera (schematici, legati alle polarità calcolate alla superficie) */
+function subsurface(s) {
+  const T = { legs: [], frags: [], ch: [], net: [], omega: [], trunk: [] };
+  s.ar.forEach((a, i) => {
+    const { xin, xout } = M.poles(a), w = Math.max(3, 2.2 * a.sig * Math.sqrt(a.f) * (i < 2 ? 1 : 1));
+    if (i < 2) {                                   // A e B: mature, già staccate dalle radici
+      const conn = s.dec < 0.08;
+      if (a.f > 0.35) { T.legs.push({ x: xin, w: 2.4 * 8 * Math.sqrt(a.f), sgn: -1, conn, ai: i }, { x: xout, w: 2.4 * 8 * Math.sqrt(a.f), sgn: 1, conn, ai: i }); }
+      if (s.dec < 0.45) T.trunk.push({ xin, xout, a: conn ? 1 : Math.max(0, 1 - s.dec / 0.45), fray: !conn ? Math.min(1, s.dec / 0.3) : 0 });
+      if (s.dec > 0.05 && a.f > 0.03) {             // frammentazione e dispersione
+        const n = Math.round(4 + 10 * s.dec);
+        for (const [xc, sg] of [[xin, -1], [xout, 1]]) for (let k = 0; k < n; k++) {
+          const off = ((k * 0.618 + i * 0.3) % 1 - 0.5) * 2 * (a.sig * 2.4);
+          T.frags.push({ x: xc + off, sgn: sg, a: Math.min(1, a.f * 1.5) * (0.5 + 0.5 * s.dec) });
+        }
+      }
+    } else if (s.day > 27) {                       // C e D: un tubo a Ω risale dalla base della zona convettiva ed emerge
+      T.trunk.push({ xin, xout, a: Math.min(1, (s.day - 27) / 2), fray: s.day < 46.5 ? 0 : Math.min(1, (s.day - 46.5) / 3) });
+      if (s.day < 37) T.omega.push({ xin, xout, apex: s.day < 34 ? null : -(TR + 2) * (1 - (s.day - 34) / 3) });
+      else { const conn = s.day < 46.5, ww = 2.4 * 8 * Math.sqrt(Math.max(0.15, a.f)); T.legs.push({ x: xin, w: ww, sgn: -1, conn, ai: i }, { x: xout, w: ww, sgn: 1, conn, ai: i }); }
+    }
+  });
+  /* buco coronale: molti tubi sottili quasi verticali della stessa polarità */
+  const nCh = Math.round(s.ch.w / 3.2);
+  for (let k = 0; k < nCh; k++) { const x = s.ch.x - s.ch.w / 2 + (k + 0.5) * s.ch.w / nCh + Math.sin(k * 2.3) * 1.2; T.ch.push({ x, a: Math.min(1, s.ch.amp / 12) }); }
+  /* rete della corona quieta: piccoli tubi di polarità mista */
+  for (let x = -M.VIEW / 2; x < M.VIEW / 2; x += 3) { const b = M.surfB(FIELD, x); if (Math.abs(b) > 3.2 && arOf(s, x) < 0 && Math.abs(x - s.ch.x) > s.ch.w / 2 + 4) T.net.push({ x, sgn: Math.sign(b) }); }
+  return T;
+}
+function computeFrame(k) {
+  const day = k * STEP, s = M.state(day), e = [0, 1, 2, 3].map(i => energy(day, i));
+  /* ogni istante si calcola partendo dal campo potenziale, con lo stesso numero di iterazioni usato per la taratura */
+  let lam = e.map((v, i) => (s.ar[i].f > 0.15 && v > 0.3 ? Math.min(v, 1) * KTH[i] * lamc(day, i) : 0)), r, tries = 0;
+  const any = lam.some(l => l > 0);
+  do { r = M.solve(FIELD, s, lam, { reset: true, outer: any ? 5 : 0, inner: 150, keepLeak: false });
+    if (r.ok) break; lam = lam.map(l => l * 0.85); tries++; } while (tries < 5);
+  const d0 = k > 0 ? (k - 1) * STEP : -1;
+  FR[k] = { day, s, e, lines: buildLines(s), sub: subsurface(s), open: M.openFrac(FIELD, s), cme: [0, 1, 2, 3].map(i => k > 0 && cmeBetween(d0, day, i)) };
+}
+function work() {
+  const t0 = performance.now();
+  while (computed < NF && performance.now() - t0 < 35) { computeFrame(computed); computed++; }
+  $('prog').textContent = computed < NF ? `Calcolo dell'evoluzione: ${Math.round(100 * computed / NF)}%` : '';
+  if (computed < NF) setTimeout(work, 0);
+}
+
+/* ---------- vista con zoom ---------- */
+const cv = $('cv'); let W = 900, H = 600, dpr = 1;
+const V = { cx: 0, cy: M.RSUN + 190, half: 360 };     // centro della vista (Mm) e mezza larghezza visibile
+let zoom = 1;
+function fit() { const r = cv.getBoundingClientRect(); dpr = devicePixelRatio || 1; const w = Math.round(r.width), h = Math.round(r.height);
+  if (w !== W || h !== H || cv.width !== Math.round(w * dpr)) { W = w; H = h; cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); } }
+const DB = 60, HV = 470;                           // profondità mostrata sotto la fotosfera e altezza della vista iniziale (Mm)
+const scale = () => H / HV * zoom;
+function XY(x, h) { const r = M.RSUN + h, f = x / M.RSUN; return [r * Math.sin(f), r * Math.cos(f)]; }
+/* il fondo della figura resta sempre DB Mm sotto la fotosfera: lo zoom cambia solo quanta corona si vede sopra */
+function scr(X, Y) { const k = scale(), cy = M.RSUN - DB + H / 2 / k; return [W / 2 + (X - V.cx) * k, H / 2 - (Y - cy) * k]; }
+const P = (x, h) => { const [X, Y] = XY(x, h); return scr(X, Y); };
+function label(g, s, x, h, { col = '#f1efe8', sz = 12, al = 'center' } = {}) {
+  let [px, py] = P(x, h); g.font = `500 ${sz}px -apple-system,"Segoe UI",Roboto,sans-serif`; g.textAlign = al; g.textBaseline = 'middle';
+  const tw = g.measureText(s).width, l = al === 'center' ? px - tw / 2 : al === 'right' ? px - tw : px; px += Math.max(0, 6 - l) - Math.max(0, l + tw - (W - 6));
+  g.lineWidth = 3.5; g.strokeStyle = 'rgba(0,0,0,.78)'; g.strokeText(s, px, py); g.fillStyle = col; g.fillText(s, px, py);
+}
+function poly(g, pts, close) { pts.forEach((p, i) => i ? g.lineTo(p[0], p[1]) : g.moveTo(p[0], p[1])); if (close) g.closePath(); }
+
+/* ---------- CME (sequenza schematica) ---------- */
+const CMES = [];
+function spawnCME(i, fr) { const a = fr.s.ar[i]; CMES.push({ i, x: a.x, t: 0, dur: 5.5 }); }
+function cmeGeom(c) { const u = c.t / c.dur, h = 45 + 950 * u * u + 60 * u, rho = 14 + 230 * u; return { u, h, rho }; }
+function displace(c, x, h) {
+  /* gli archi sopra la bolla vengono spinti verso l'esterno e stirati verso l'alto */
+  const { h: hc, rho } = cmeGeom(c), [X, Y] = XY(x, h), [Xc, Yc] = XY(c.x, hc), dx = X - Xc, dy = Y - Yc, d = Math.hypot(dx, dy) || 1;
+  const R = rho * 1.25; if (d > R * 1.6) return [X, Y];
+  const push = Math.max(0, R * 1.6 - d) * 0.55 * (1 - cmeGeom(c).u * 0.4);
+  return [X + dx / d * push, Y + dy / d * push];
+}
+
+/* ---------- plasma ---------- */
+const ETHR = 40, hMax = E => 15 + 320 * Math.pow(Math.min(E, ETHR) / ETHR, 2);   /* quota massima raggiunta sotto la soglia (Mm) */
+function heatState() { const E = +$('sE').value, st = $('oE'), w = 0.6 + 0.4 * Math.min(1, (E - ETHR) / 35) + 0.15 * Math.max(0, (E - 75) / 25);
+  if (E < ETHR) { st.textContent = `sotto soglia: plasma troppo freddo per il vento (come nelle spicole) · sulle linee aperte sale fino a ≈ ${fmt(hMax(E))} Mm e ricade`; st.className = 'state low'; }
+  else { st.textContent = `corona a milioni di gradi: vento continuo · veloce (centro del buco) ≈ ${fmt(750 * w)} km/s, lento (bordi) ≈ ${fmt(350 * w)} km/s a grande distanza`; st.className = 'state'; } }
+function drawPlasma(g, fr, now) {
+  const sp = +$('spd').dataset.v || 1;
+  for (const ln of fr.lines) {
+    if (ln.len < 4) continue;
+    if (ln.k === 'ar' || ln.k === 'quiet') {
+      /* flusso di plasma lungo l'arco, in un solo verso: dal piede + al piede − (le linee partono dal piede +) */
+      const n = ln.k === 'ar' ? 3 : 1, v = ln.k === 'ar' ? 26 : 16, alpha = ln.k === 'ar' ? 0.95 : 0.5;
+      for (let m = 0; m < n; m++) {
+        const u = ((now * v * sp / Math.max(30, ln.len) + ln.ph + m / n) % 1), [x, h] = at(ln, u * ln.len), [px, py] = P(x, h);
+        g.globalAlpha = alpha * Math.min(1, 6 * u, 6 * (1 - u)); g.beginPath(); g.arc(px, py, ln.k === 'ar' ? 2.3 : 1.7, 0, 2 * Math.PI); g.fillStyle = ln.k === 'ar' ? '#ffd2b0' : '#ffe6b0'; g.fill();
+      }
+    } else {
+      const E = +$('sE').value, fast = ln.k === 'fast', col = fast ? '#a9d2ff' : ln.k === 'slow' ? '#cdb8ff' : '#c4c8d6';
+      if (E >= ETHR) {
+        /* vento solare: parte lento e accelera; quello veloce esce dal centro del buco */
+        const rate = (fast ? 0.15 : 0.075) * (0.6 + 0.4 * Math.min(1, (E - ETHR) / 35)) * sp;
+        for (let m = 0; m < 3; m++) { const u = ((now * rate + ln.ph + m / 3) % 1), s = ln.len * u * u, [x, h] = at(ln, s), [px, py] = P(x, h);
+          g.globalAlpha = 0.9; g.beginPath(); g.arc(px, py, 2, 0, 2 * Math.PI); g.fillStyle = col; g.fill(); }
+      } else {
+        /* plasma troppo freddo per formare il vento: sale lungo la linea aperta, si ferma e ricade */
+        const hmax = hMax(E); let sMax = ln.len; for (let i = 0; i < ln.p.length; i++) if (ln.p[i][1] >= hmax) { sMax = ln.cum[i]; break; }
+        const T = 1.6 + hmax / 90;
+        for (let m = 0; m < 2; m++) { const u = ((now * sp / T + ln.ph + m / 2) % 1), s = sMax * (1 - (2 * u - 1) ** 2), [x, h] = at(ln, s), [px, py] = P(x, h);
+          g.globalAlpha = 0.9; g.beginPath(); g.arc(px, py, 2, 0, 2 * Math.PI); g.fillStyle = u < 0.5 ? col : '#ffb3a8'; g.fill(); }
+      }
+    }
+  }
+  g.globalAlpha = 1;
+}
+function at(ln, s) { const c = ln.cum; let lo = 0, hi = c.length - 1; s = Math.max(0, Math.min(ln.len, s)); while (hi - lo > 1) { const m = (lo + hi) >> 1; if (c[m] > s) hi = m; else lo = m; }
+  const u = (s - c[lo]) / ((c[hi] - c[lo]) || 1), a = ln.p[lo], b = ln.p[hi]; return [a[0] + u * (b[0] - a[0]), a[1] + u * (b[1] - a[1])]; }
+
+/* ---------- disegno ---------- */
+function draw(fr, now) {
+  fit(); const g = cv.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0);
+  g.fillStyle = '#0a0c12'; g.fillRect(0, 0, W, H);
+  const k = scale(), [ox, oy] = scr(0, 0), a0 = -Math.PI / 2 - M.SECT / 2, a1 = -Math.PI / 2 + M.SECT / 2;
+  const showSub = $('tSub').getAttribute('aria-pressed') === 'true', showLab = $('tLab').getAttribute('aria-pressed') === 'true', showPl = $('tPl').getAttribute('aria-pressed') === 'true';
+  /* corona: occupa tutta la finestra, senza bordi interni */
+  g.save();
+  const gr = g.createRadialGradient(ox, oy, M.RSUN * k, ox, oy, (M.RSUN + 400) * k); gr.addColorStop(0, '#1d2232'); gr.addColorStop(1, '#0c0f17'); g.fillStyle = gr; g.fillRect(0, 0, W, H);
+  g.setLineDash([2, 5]); g.strokeStyle = 'rgba(255,255,255,.13)'; g.lineWidth = 1;
+  for (const hh of [50, 100, 150, 200, 300, 400, 600]) { g.beginPath(); g.arc(ox, oy, (M.RSUN + hh) * k, a0, a1); g.stroke(); }
+  g.setLineDash([]);
+  if (fr) {
+    const act = CMES.filter(c => c.t < c.dur);
+    for (const ln of fr.lines) {
+      const c = ln.ai >= 0 ? act.find(c => c.i === ln.ai) : null;
+      g.beginPath(); ln.p.forEach((q, i) => { const [X, Y] = c ? displace(c, q[0], q[1]) : XY(q[0], q[1]), [px, py] = scr(X, Y); i ? g.lineTo(px, py) : g.moveTo(px, py); });
+      if (ln.k === 'fast' || ln.k === 'slow' || ln.k === 'open') { const q = ln.p[ln.p.length - 1], [px, py] = P(q[0], 3000); g.lineTo(px, py); }   // sopra la quota di apertura il campo è radiale
+      g.strokeStyle = COL[ln.k]; g.lineWidth = ln.k === 'ar' ? 1.5 : 1.25; g.globalAlpha = ln.k === 'quiet' ? 0.8 : 0.95; g.stroke(); g.globalAlpha = 1;
+    }
+    if (showPl) drawPlasma(g, fr, now);
+    for (const c of act) drawCME(g, c);
+  }
+  g.restore();
+  /* interno del Sole */
+  g.save(); g.beginPath(); g.arc(ox, oy, M.RSUN * k, 0, 2 * Math.PI); g.clip();
+  const gd = g.createRadialGradient(ox, oy, (M.RSUN - 120) * k, ox, oy, M.RSUN * k); gd.addColorStop(0, '#5a2410'); gd.addColorStop(0.85, '#9a3f17'); gd.addColorStop(1, '#c95a22'); g.fillStyle = gd; g.fillRect(0, 0, W, H);
+  if (fr && showSub) drawSub(g, fr, showLab);
+  g.restore();
+  g.beginPath(); g.arc(ox, oy, M.RSUN * k, a0 - 0.2, a1 + 0.2); g.strokeStyle = '#f2a656'; g.lineWidth = 2; g.stroke();
+  /* scala delle quote */
+  g.font = '11px -apple-system,sans-serif'; g.fillStyle = 'rgba(255,255,255,.55)'; g.textAlign = 'left'; g.textBaseline = 'middle';
+  for (const hh of [50, 100, 150, 200, 300, 400, 600]) { const rr = M.RSUN + hh; for (let f = -M.SECT / 2; f < 0; f += 0.002) { const [px, py] = scr(rr * Math.sin(f), rr * Math.cos(f)); if (px > 4 && py > 8 && py < H - 8) { g.fillText(hh + ' Mm', px + 3, py - 7); break; } } }
+  if (!fr) return;
+  /* polarità alla base */
+  g.font = '700 14px -apple-system,sans-serif'; g.textAlign = 'center';
+  const sign = (x, s, col) => { const [px, py] = P(x, -2); if (py > H || py < 0) return; g.lineWidth = 3; g.strokeStyle = 'rgba(0,0,0,.7)'; g.strokeText(s, px, py + 9); g.fillStyle = col; g.fillText(s, px, py + 9); };
+  fr.s.ar.forEach(a => { if (a.f < 0.3) return; const { xin, xout } = M.poles(a); sign(xin, '−', NEG); sign(xout, '+', POS); });
+  if (fr.s.ch.amp > 5) sign(fr.s.ch.x, '+', POS);
+  if (showLab) {
+    fr.s.ar.forEach((a, i) => { if (a.f > 0.3) label(g, 'Regione attiva', a.x, 40 + 120 * Math.min(1, fr.e[i]) ** 2, { col: '#ffb48f', sz: 11.5 }); });
+    if (fr.open > 0.05) label(g, 'Buco coronale', fr.s.ch.x, 230, { col: '#9cc9ff' });
+    else if (fr.s.ch.amp > 6 && fr.day < 30) label(g, 'zona unipolare +, linee ancora chiuse', fr.s.ch.x, 14, { col: POS, sz: 11 });
+    for (const c of CMES) if (c.t < c.dur) { const { h, rho } = cmeGeom(c); label(g, 'CME', c.x, h + rho + 12, { col: '#ffc2b8', sz: 13 }); if (c.t > 0.8) label(g, 'foglio di corrente', c.x + 40, Math.max(30, h - rho - 30), { col: '#ffd7a8', sz: 10.5, al: 'left' }); }
+  }
+}
+function drawCME(g, c) {
+  const { u, h, rho } = cmeGeom(c), [cx, cy] = P(c.x, h), k = scale(), r = rho * k, fade = 1 - Math.max(0, (u - 0.75) / 0.25);
+  /* fronte luminoso, cavità scura e corda di flusso al centro */
+  g.globalAlpha = 0.55 * fade; g.beginPath(); g.ellipse(cx, cy, r * 1.15, r * 1.25, 0, 0, 2 * Math.PI); g.fillStyle = 'rgba(8,10,16,.5)'; g.fill();
+  g.globalAlpha = 0.9 * fade; g.lineWidth = Math.max(2, r * 0.12); g.strokeStyle = '#ffd7b0'; g.beginPath(); g.ellipse(cx, cy, r * 1.15, r * 1.25, 0, Math.PI * 1.05, Math.PI * 1.95); g.stroke();
+  g.lineWidth = 1.3; g.strokeStyle = '#ff9a7a';
+  for (const f of [0.25, 0.45, 0.65]) { g.beginPath(); g.ellipse(cx, cy + r * 0.15, r * f, r * f * 0.8, 0, 0, 2 * Math.PI); g.stroke(); }
+  /* foglio di corrente e archi post-eruttivi */
+  const [bx, by] = P(c.x, Math.max(25, h - rho * 1.1)), [sx, sy] = P(c.x, 25);
+  if (c.t > 0.6) { g.globalAlpha = 0.85 * fade; g.strokeStyle = '#ffe3b8'; g.lineWidth = 1.6; g.setLineDash([4, 3]); g.beginPath(); g.moveTo(sx, sy); g.lineTo(bx, by); g.stroke(); g.setLineDash([]);
+    g.strokeStyle = '#ffb08a'; g.lineWidth = 1.6; for (const w of [10, 16, 22]) { const [lx, ly] = P(c.x - w, 0), [rx, ry] = P(c.x + w, 0), [tx, ty] = P(c.x, w * 1.05); g.beginPath(); g.moveTo(lx, ly); g.quadraticCurveTo(tx, ty - (ty - ly) * 0.2, rx, ry); g.stroke(); } }
+  g.globalAlpha = 1;
+}
+function tube(g, x0, h0, x1, h1, w, col, alpha, dashLow) {
+  const [p0x, p0y] = P(x0, h0), [p1x, p1y] = P(x1, h1), k = scale(), ww = Math.max(1.2, w * k);
+  g.globalAlpha = alpha; g.strokeStyle = col; g.lineWidth = ww; g.lineCap = 'round'; g.beginPath(); g.moveTo(p0x, p0y); g.lineTo(p1x, p1y); g.stroke();
+  g.globalAlpha = alpha * 0.9; g.strokeStyle = 'rgba(60,30,10,.55)'; g.lineWidth = Math.max(0.6, ww * 0.12);
+  for (const f of [-0.28, 0, 0.28]) { const ox = (p1y - p0y), oy = -(p1x - p0x), L = Math.hypot(ox, oy) || 1; g.beginPath(); g.moveTo(p0x + ox / L * ww * f, p0y + oy / L * ww * f); g.lineTo(p1x + ox / L * ww * f, p1y + oy / L * ww * f); g.stroke(); }
+  g.globalAlpha = 1; g.lineCap = 'butt';
+}
+const DS = 34, TR = 25;                            // TR: quota del tronco (parte alta dell'anello a Ω), Mm sotto la fotosfera                                     // spessore dello strato mostrato sotto la fotosfera (Mm)
+/* fascio di tubi sottili lungo una spezzata, deformati dalla convezione */
+function bundle(g, x0, w, h0, h1, col, alpha, fray, seed) {
+  const n = 5, k = scale();
+  for (let j = 0; j < n; j++) {
+    const off = (j / (n - 1) - 0.5) * w * 0.8, pts = [];
+    for (let i = 0; i <= 30; i++) { const h = h0 + (h1 - h0) * i / 30, depth = -h;
+      const spread = fray ? Math.max(0, depth - 6) * 0.9 : 0;          // sotto il distacco i tubi si sfrangiano
+      const wig = (2 + depth * 0.12) * Math.sin(depth / 6 + seed + j * 1.7);
+      pts.push(P(x0 + off * (1 + spread / 6) + wig, h)); }
+    g.globalAlpha = alpha * (fray ? 1 : 1); g.strokeStyle = col; g.lineWidth = Math.max(1, (w / n) * 0.9 * k); g.lineCap = 'round'; g.beginPath(); poly(g, pts); g.stroke();
+  }
+  g.globalAlpha = 1; g.lineCap = 'butt';
+}
+function drawSub(g, fr, showLab) {
+  const T = fr.sub, D = 6;
+  /* convezione: celle che rimescolano lo strato superficiale (come negli Script 4.5 e 4.6) */
+  g.strokeStyle = 'rgba(255,200,160,.10)'; g.lineWidth = 1.2;
+  for (let x = -M.VIEW / 2; x < M.VIEW / 2; x += 34) { const pts = []; for (let i = 0; i <= 20; i++) { const u = i / 20; pts.push(P(x + 34 * u, -26 * Math.sin(Math.PI * u) - 1)); } g.beginPath(); poly(g, pts); g.stroke(); }
+  /* tronco: parte alta, quasi orizzontale, dell'anello a Ω salito dalla base della zona convettiva (come nello Script dell'emersione delle macchie) */
+  T.trunk.forEach((t, ti) => {
+    if (t.a <= 0.02) return;
+    const x0 = Math.min(t.xin, t.xout) - 30, x1 = Math.max(t.xin, t.xout) + 30, k = scale();
+    for (let j = 0; j < 5; j++) { const off = (j - 2) * 2.2, pts = [];
+      for (let i = 0; i <= 50; i++) { const u = i / 50, x = x0 + (x1 - x0) * u, sp = t.fray * (j - 2) * 3 * Math.sin(Math.PI * u) + t.fray * 4 * Math.sin(u * 13 + j * 2.1);
+        pts.push(P(x, -TR - 2 + off + sp + 1.2 * Math.sin(u * 7 + j))); }
+      g.globalAlpha = 0.85 * t.a; g.strokeStyle = '#e8c27a'; g.lineWidth = Math.max(1, 1.1 * k); g.lineCap = 'round'; g.beginPath(); poly(g, pts); g.stroke(); }
+    /* gambe dell'anello a Ω che scendono verso il tubo toroidale (fuori scala, ~200 Mm) */
+    g.setLineDash([5, 4]); g.globalAlpha = 0.6 * t.a; g.lineWidth = Math.max(1, 2 * k);
+    for (const [xa, dir] of [[x0, -1], [x1, 1]]) { const pts = []; for (let i = 0; i <= 20; i++) { const u = i / 20; pts.push(P(xa + dir * 18 * Math.sin(Math.PI / 2 * u), -TR - 2 - (u * u) * 60 - 12 * u)); } g.beginPath(); poly(g, pts); g.stroke(); }
+    g.setLineDash([]); g.globalAlpha = 1; g.lineCap = 'butt';
+    if (showLab && ti === 0 && t.a > 0.5) {
+      label(g, t.fray > 0.3 ? 'il tronco si sfilaccia: le gambe si staccano' : "parte alta dell'anello a Ω", (t.xin + t.xout) / 2, -TR - 9, { col: '#f6d79a', sz: 10.5 });
+      label(g, '↓ verso il tubo toroidale (~200 Mm, base della zona convettiva)', (t.xin + t.xout) / 2, -TR - 20, { col: 'rgba(246,215,154,.8)', sz: 10 });
+    }
+  });
+  /* tubi delle regioni attive */
+  for (const l of T.legs) {
+    const col = l.sgn > 0 ? POS : NEG;
+    if (l.conn) bundle(g, l.x, l.w, 0, -TR, col, 0.9, false, l.x * 0.13);
+    else { bundle(g, l.x, l.w, 0, -D, col, 0.92, false, l.x * 0.13); bundle(g, l.x, l.w, -D, -TR, col, 0.3, true, l.x * 0.13); }
+  }
+  for (const f of T.frags) tube(g, f.x, 0, f.x + Math.sin(f.x) * 1.5, -D, 1.4, f.sgn > 0 ? POS : NEG, 0.75 * f.a);
+  T.omega.forEach((o, oi) => {
+    if (o.apex == null) return;
+    /* sommità del tubo a Ω che attraversa lo strato superficiale */
+    const c = (o.xin + o.xout) / 2, half = (o.xout - o.xin) / 2;
+    for (let j = 0; j < 5; j++) { const pts = []; const off = (j - 2) * 2.2;
+      for (let i = 0; i <= 40; i++) { const u = i / 40, ang = Math.PI * u, x = c - (half + off) * Math.cos(ang), h = -TR - 2 + (o.apex + TR + 2 + off * 0.6) * Math.sin(ang) + 2 * Math.sin(u * 9 + j); pts.push(P(x, h)); }
+      g.globalAlpha = 0.9; g.strokeStyle = '#e8c27a'; g.lineWidth = Math.max(1, 1.2 * scale()); g.beginPath(); poly(g, pts); g.stroke(); }
+    g.globalAlpha = 1;
+    if (showLab && oi === 0) label(g, 'sommità del tubo a Ω che emerge', c, o.apex + 10, { col: '#f6d79a', sz: 10.5 });
+  });
+  /* sotto il buco coronale: tubi sottili quasi verticali, connessione profonda incerta */
+  for (const c of T.ch) { tube(g, c.x, 0, c.x, -D, 0.6, POS, 0.85 * c.a); tube(g, c.x, -D, c.x + Math.sin(c.x) * 2, -20, 0.5, POS, 0.25 * c.a); }
+  for (const n of T.net) tube(g, n.x, 0, n.x, -3, 0.6, n.sgn > 0 ? POS : NEG, 0.6);
+  if (showLab) {
+    if (fr.s.ch.amp > 6) label(g, 'connessione profonda incerta', fr.s.ch.x, -14, { col: '#f6d79a', sz: 10.5 });
+    const L = T.legs.find(l => !l.conn); if (L && scale() > 2.2) label(g, 'distacco dalle radici (2–6 Mm)', L.x + 14, -D - 3, { col: '#f6d79a', sz: 10.5, al: 'left' });
+    label(g, 'zona convettiva: tubi deformati dalla convezione', 230, -22, { col: 'rgba(255,220,190,.8)', sz: 10.5 });
+  }
+}
+
+/* ---------- pannello ---------- */
+function panel(fr) {
+  if (!fr) return;
+  const ph = phaseOf(fr.day);
+  $('oDay').textContent = `Giorno ${fmt(fr.day, 0)} di 50`; $('oPhase').textContent = ph[2];
+  $('oOpen').textContent = fmt(100 * fr.open) + '%'; $('mOpen').style.width = (100 * fr.open).toFixed(1) + '%';
+  const L = fr.s.ar[2].f > fr.s.ar[0].f ? 2 : 0, R = fr.s.ar[3].f > fr.s.ar[1].f ? 3 : 1;
+  [[L, 'E0'], [R, 'E1']].forEach(([i, id]) => { const a = fr.s.ar[i], e = a.f > 0.15 ? fr.e[i] : 0; $('o' + id).textContent = a.f > 0.15 ? fmt(100 * Math.min(e, 1)) + '%' : '—';
+    const m = $('m' + id); m.style.width = Math.min(100, 100 * e).toFixed(1) + '%'; m.style.background = e > 0.9 ? '#D4537E' : '#D85A30';
+    $('n' + id).textContent = `Energia · regione attiva ${a.name} (${i % 2 ? 'destra' : 'sinistra'})`; });
+  const live = CMES.filter(c => c.t < c.dur).map(c => fr.s.ar[c.i].name);
+  $('oEv').textContent = live.length ? `Eruzione dalla regione attiva ${live.join(' e ')} (tempo rallentato: l'eruzione dura alcune ore). Gli archi soprastanti vengono stirati e la CME si allontana; sotto, nel foglio di corrente, la riconnessione forma nuovi archi.`
+    : fr.day < 14 ? 'L\'energia si accumula negli archi delle regioni attive A e B, che si gonfiano verso l\'alto.'
+    : fr.day < 22 ? 'Le regioni attive decadono e si frammentano; il flusso + si raccoglie nella zona centrale.'
+    : fr.day < 38 ? (+$('sE').value >= ETHR ? 'Il flusso della zona unipolare non è più catturato: le linee sono aperte. Dal centro del buco esce il vento veloce, dai bordi il vento lento.' : 'Le linee del buco sono aperte, ma il plasma è troppo freddo per formare il vento: sale e ricade.')
+    : fr.open > 0.02 ? 'Emergono le nuove regioni attive C e D: le loro polarità − ricatturano il flusso +.' : 'Il buco coronale è chiuso: tutto il flusso + è di nuovo richiuso in archi.';
+}
+
+/* ---------- comandi e ciclo ---------- */
+let playing = false, day = 0, lastK = -1;
+const DPS = 1 / 1.3;                               // giorni al secondo a velocità ×1
+function frameAt(d) { const k = Math.min(computed - 1, Math.round(d / STEP)); return k >= 0 ? FR[k] : null; }
+function setPlay(v) { playing = v; $('bP').textContent = v ? '❚❚ Pausa' : '▶ Avvia'; }
+$('bP').onclick = () => { if (!playing && day >= M.DAYS) { day = 0; lastK = -1; } setPlay(!playing); };
+$('bR').onclick = () => { day = 0; lastK = -1; CMES.length = 0; $('sT').value = 0; setPlay(false); };
+$('sT').addEventListener('input', () => { day = +$('sT').value / 1000 * M.DAYS; setPlay(false); });
+document.querySelectorAll('[data-sp]').forEach(b => b.onclick = () => { $('spd').dataset.v = b.dataset.sp; document.querySelectorAll('[data-sp]').forEach(c => c.setAttribute('aria-pressed', c === b)); });
+for (const id of ['tLab', 'tSub', 'tPl']) $(id).onclick = () => $(id).setAttribute('aria-pressed', $(id).getAttribute('aria-pressed') !== 'true');
+function zoomMin() { /* la vista resta dentro il tratto calcolato (80°), così non compaiono bordi */
+  for (let z = 0.3; z < 3; z += 0.02) { const k = H / HV * z, cy = M.RSUN - DB + H / 2 / k, Xh = W / 2 / k + Math.abs(V.cx), Ytop = cy + H / 2 / k;
+    if (Math.atan2(Xh, Ytop) < M.SECT / 2 - 0.02 && Math.atan2(Xh, M.RSUN - DB) < M.SECT / 2 - 0.02) return z; } return 1; }
+function setZoom(z, fx) { const z0 = zoom; zoom = Math.max(zoomMin(), Math.min(6, z)); if (fx != null) { const k0 = H / HV * z0, k1 = H / HV * zoom; V.cx += (fx - W / 2) * (1 / k0 - 1 / k1); } $('oZ').textContent = '×' + fmt(zoom, zoom < 1 ? 2 : 1); }
+$('zIn').onclick = () => setZoom(zoom * 1.5); $('zOut').onclick = () => setZoom(zoom / 1.5);
+$('z0').onclick = () => { zoom = 1; V.cx = 0; setZoom(1); };
+cv.addEventListener('wheel', e => { e.preventDefault(); const r = cv.getBoundingClientRect(); setZoom(zoom * (e.deltaY < 0 ? 1.15 : 1 / 1.15), e.clientX - r.left); }, { passive: false });
+let drag = null;
+cv.addEventListener('pointerdown', e => { drag = { x: e.clientX, y: e.clientY }; cv.setPointerCapture(e.pointerId); });
+cv.addEventListener('pointermove', e => { if (!drag) return; const k = scale(); V.cx -= (e.clientX - drag.x) / k; setZoom(zoom); drag = { x: e.clientX, y: e.clientY }; });
+cv.addEventListener('pointerup', () => drag = null); cv.addEventListener('pointercancel', () => drag = null);
+addEventListener('keydown', e => { if (e.code === 'Space' && !/INPUT|BUTTON/.test(document.activeElement.tagName)) { e.preventDefault(); $('bP').click(); } });
+let last = performance.now();
+function loop(now) {
+  const dt = Math.min(0.05, (now - last) / 1000); last = now; const sp = +$('spd').dataset.v || 1;
+  const slow = CMES.some(c => c.t < c.dur) ? 0.06 : 1;   /* durante un'eruzione il tempo rallenta: la CME si svolge in poche ore */
+  if (playing) { const lim = (computed - 1) * STEP; const nd = day + dt * DPS * sp * slow; if (nd <= lim) day = nd; if (day >= M.DAYS) { day = M.DAYS; setPlay(false); } $('sT').value = Math.round(day / M.DAYS * 1000); }
+  const fr = frameAt(day), k = fr ? Math.round(fr.day / STEP) : -1;
+  if (fr && k !== lastK) { if (lastK >= 0 && k > lastK && k - lastK < 4) for (let j = lastK + 1; j <= k; j++) FR[j].cme.forEach((on, i) => { if (on) spawnCME(i, FR[j]); }); lastK = k; }
+  for (const c of CMES) c.t += dt * (RM ? 0.5 : 1) * sp;
+  while (CMES.length && CMES[0].t > CMES[0].dur) CMES.shift();
+  draw(fr, now / 1000); panel(fr);
+  requestAnimationFrame(loop);
+}
+$('sE').addEventListener('input', heatState); heatState();
+setZoom(1); setTimeout(work, 30); requestAnimationFrame(loop);
+</script>
+<style id="cc-copyright">
+.cc-badge{display:inline-block;vertical-align:middle;margin:0 0 0 .5em;padding:2px 8px;border:1px solid currentColor;border-radius:999px;font:400 11.5px/1.35 -apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;letter-spacing:0;text-transform:none;white-space:normal;max-width:100%;box-sizing:border-box;opacity:.8;color:inherit;text-shadow:none;pointer-events:auto}
+.cc-n,.cc-badge a{white-space:nowrap}
+.cc-badge a{color:inherit;text-decoration:underline;text-underline-offset:2px}
+@media (max-width:520px){.cc-badge{font-size:11px;padding:2px 7px}}
+</style>
+</body></html>
