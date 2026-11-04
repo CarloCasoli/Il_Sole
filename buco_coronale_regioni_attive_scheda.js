@@ -20,8 +20,8 @@ Il buco coronale non è disegnato a mano: la sua apertura e la sua chiusura sono
 
 ## Che cosa si vede sopra la fotosfera
 
-- **Archi delle regioni attive** (rosso mattone): linee chiuse che collegano le due polarità di una regione attiva. I puntini che le percorrono rappresentano il plasma, che scorre in un solo verso, dal piede + al piede −, uguale per tutta la regione.
-- **Archi della corona quieta** (arancione): linee chiuse più deboli, tra la zona + e le regioni attive o tra piccole polarità della rete.
+- **Archi delle regioni attive** (rosso mattone): linee chiuse che collegano le due polarità della stessa regione attiva. Gli archi più alti superano di poco i 100 Mm, come nelle regioni attive reali. I puntini che le percorrono rappresentano il plasma, che scorre in un solo verso, dal piede + al piede −, uguale per tutta la regione.
+- **Archi con almeno un piede fuori dalle regioni attive** (giallo-arancio): linee chiuse che partono dalla corona quieta. Ci sono quelle che collegano le piccole polarità della rete e, soprattutto, quelle che partono dalla zona + centrale e si richiudono sulle polarità − delle regioni attive: è il flusso che, quando le regioni attive decadono, si apre e forma il buco coronale.
 - **Linee aperte del buco coronale**: azzurre al centro del buco (vento veloce), viola ai bordi, vicino agli archi chiusi (vento lento). Le linee grigie sono altre linee aperte, fuori dal buco.
 - **CME**: quando l'energia di una regione attiva raggiunge il 100%, gli archi più alti si staccano e una bolla di plasma e campo sale verso l'alto; sotto restano un foglio di corrente e archi post-eruttivi. Durante l'eruzione il tempo dell'animazione rallenta, perché una CME si svolge in alcune ore, non in giorni.
 
@@ -47,14 +47,16 @@ Il riscaldamento agisce solo sul moto del plasma: non cambia la forma del campo,
 
 ## Il modello fisico
 
-Il campo della corona è calcolato in ogni istante come equilibrio *force-free* in due dimensioni sulla sezione del lembo, con il raggio solare vero: le forze magnetiche si bilanciano da sole, perché le correnti elettriche scorrono parallele al campo. Le correnti sono presenti solo negli archi delle regioni attive e rappresentano l'energia accumulata; altrove il campo è potenziale. L'equazione che si risolve è l'equazione di Grad–Shafranov:
+Il campo della corona è calcolato in ogni istante come equilibrio *force-free* sulla sezione del lembo, con il raggio solare vero: le forze magnetiche si bilanciano da sole, perché le correnti elettriche scorrono parallele al campo. Le correnti sono presenti solo negli archi delle regioni attive e rappresentano l'energia accumulata; altrove il campo è potenziale. L'equazione che si risolve è l'equazione di Grad–Shafranov:
 
 $$\nabla^2 A = -\left(\frac{r}{R_\odot}\right)^2 F\,F'(A)$$
 
 dove $A$ è il potenziale vettore, le cui curve di livello sono le linee di campo, e $F(A)$ descrive la corrente lungo ogni linea. A 800 Mm di quota il campo è imposto radiale (superficie sorgente): oltre quella quota le linee sono aperte.
 
+- **Lunghezza finita delle regioni attive.** Un calcolo puramente bidimensionale tratta ogni regione attiva come se fosse infinitamente lunga nella direzione perpendicolare alla figura: il suo campo calerebbe con la distanza come $1/r^2$ invece che come $1/r^3$ e gli archi diventerebbero alti varie centinaia di Mm, troppo per una regione attiva reale. Per questo il campo delle regioni attive è calcolato come quello di una struttura lunga circa 100 Mm: ogni componente di lunghezza d'onda $\lambda$ cala in quota con $\sqrt{k^2+\kappa^2}$, dove $k = 2\pi/\lambda$ e $\kappa = \pi/(100\ \mathrm{Mm})$, invece che con $k$. Il campo della zona unipolare e della rete, che si estende molto di più, resta bidimensionale.
+
 - **Superficie.** Le regioni attive sono coppie di polarità opposte; durante il declino si allargano e si indeboliscono, come fa il flusso disperso dalla convezione e dalla rotazione differenziale. A queste si aggiungono la zona unipolare + e le piccole polarità della rete.
-- **Energia e CME.** L'energia di una regione attiva è la corrente nei suoi archi. Cresce nel tempo; la soglia di eruzione (100%) è posta dove gli archi raggiungono circa 250 Mm. In due dimensioni gli archi possono gonfiarsi molto più che nel Sole reale, quindi la soglia è un parametro scelto, non il risultato del calcolo. Dopo l'eruzione l'energia riparte da un valore più basso.
+- **Energia e CME.** L'energia di una regione attiva è la corrente nei suoi archi. Cresce nel tempo; la soglia di eruzione (100%) è posta dove la parte centrale della regione attiva, che contiene l'80% del suo flusso, raggiunge circa 100 Mm, cioè circa il doppio dell'altezza senza correnti. La soglia è un parametro scelto, non il risultato del calcolo. Dopo l'eruzione l'energia riparte da un valore più basso.
 - **Apertura del buco.** È il risultato del calcolo: finché le polarità − delle regioni attive sono forti, il flusso + si richiude su di esse; quando si indeboliscono, le linee + si aprono (riconnessione di interscambio). Lo stato riporta la frazione di flusso + aperto.
 
 ## Comandi
@@ -71,7 +73,7 @@ Il riquadro *Stato* riporta il giorno, la fase, la frazione di flusso aperto del
 
 ## Il modello e le sue semplificazioni
 
-- Il calcolo è in due dimensioni: le regioni attive sono sezioni di strutture che nel Sole reale sono tridimensionali. Per questo la soglia di eruzione è fissata a mano.
+- Il calcolo è in due dimensioni, con la correzione per la lunghezza finita delle regioni attive: è un'approssimazione del campo tridimensionale reale. Per questo la soglia di eruzione è fissata a mano.
 - La CME, i moti del plasma e i tubi sotto la fotosfera sono schematici. I tubi seguono le polarità calcolate alla superficie, ma non sono il risultato di un calcolo magnetoidrodinamico.
 - Le durate sono tipiche ma semplificate: regioni attive intense per circa due settimane, buco coronale aperto per circa due settimane. I buchi coronali alle basse latitudini durano di solito meno di una rotazione solare.
 - I moti del plasma sono accelerati rispetto ai giorni dell'animazione, altrimenti sarebbero invisibili.

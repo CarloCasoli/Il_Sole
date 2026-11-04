@@ -47,7 +47,7 @@ button:hover{background:rgba(127,127,127,.12)}
 @media (max-width:760px){body{padding:12px}.top h1{font-size:17px}.below{grid-template-columns:minmax(0,1fr)}#cv{aspect-ratio:1/1;width:min(100%,calc(100vh - 120px))}.row{grid-template-columns:160px 1fr 42px}}
 </style></head><body>
 <div class="top">
-  <h1>Dalle regioni attive al buco coronale<span class="cc-badge"><span class="cc-n">© 2026 Carlo Casoli ·</span> <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it" target="_blank" rel="license noopener">CC BY-NC-ND 4.0</a></span></h1>
+  <h1>Dalle regioni attive al buco coronale<span class="cc-badge"><span class="cc-n">© 2026 Carlo Casoli ·</span> <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it" target="_blank" rel="license noopener">CC BY-NC-ND 4.0</a></span> <a class="cc-badge cc-doc" href="#scheda" data-scheda>📖 Scheda dell'animazione</a></h1>
   <a href="index.html">← Indice delle animazioni</a>
 </div>
 <p class="sub">Un tratto del lembo solare, in scala, seguito per 50 giorni. Due regioni attive intense accumulano energia, fino a un'eruzione (CME); tra le due il flusso di polarità + è richiuso sulle loro polarità −. Quando le regioni attive decadono, il flusso + non viene più catturato e si apre: nasce un buco coronale. Dopo circa due settimane emergono nuove regioni attive che lo richiudono (§8.5, §8.6, §11.8). Sotto la fotosfera, i tubi di flusso nello strato superficiale della zona convettiva. Trascina la figura per spostarla lateralmente; con la rotella o i pulsanti lo zoom cambia quanta corona si vede, mentre la fotosfera resta in basso.</p>
@@ -76,7 +76,7 @@ button:hover{background:rgba(127,127,127,.12)}
     <div id="oEv"></div></div>
   <div class="card"><h3>Legenda</h3><div class="legend">
     <div><span class="sw" style="border-color:#D85A30"></span>Archi delle regioni attive</div>
-    <div><span class="sw" style="border-color:#EF9F27"></span>Archi della corona quieta</div>
+    <div><span class="sw" style="border-color:#EF9F27"></span>Archi con almeno un piede fuori dalle regioni attive (corona quieta, zona +)</div>
     <div><span class="sw" style="border-color:#378ADD"></span>Linee aperte dal centro del buco: vento veloce</div>
     <div><span class="sw" style="border-color:#7F77DD"></span>Linee aperte ai bordi del buco: vento lento</div>
     <div><span class="sw" style="border-color:#8b90a6"></span>Altre linee aperte</div>
@@ -86,7 +86,7 @@ button:hover{background:rgba(127,127,127,.12)}
     <div>Energia 100% = soglia di eruzione</div>
   </div></div>
 </div>
-<p class="note">Modello didattico, in scala. Il campo della corona è calcolato in ogni istante come equilibrio "force-free" in due dimensioni sul lembo con il raggio solare vero: correnti elettriche lungo il campo sono presenti solo negli archi delle regioni attive e rappresentano l'energia accumulata. Gonfiamento degli archi, apertura e chiusura del buco coronale sono il risultato del calcolo; la soglia di eruzione è posta dove gli archi raggiungono circa 250 Mm. Sono schematici: la CME (durante l'eruzione il tempo rallenta, perché un'eruzione dura alcune ore), i moti del plasma (accelerati rispetto ai giorni) e i tubi sotto la fotosfera, che seguono le polarità calcolate alla superficie. Oltre 800 Mm di quota il campo è imposto radiale.</p>
+<p class="note">Modello didattico, in scala. Il campo della corona è calcolato in ogni istante come equilibrio "force-free" sul lembo con il raggio solare vero. Il calcolo è in due dimensioni, ma il campo delle regioni attive tiene conto della loro lunghezza finita nella terza dimensione (circa 100 Mm), così che cala in quota come nel Sole reale e gli archi hanno altezze realistiche. Correnti elettriche lungo il campo sono presenti solo negli archi delle regioni attive e rappresentano l'energia accumulata. Gonfiamento degli archi, apertura e chiusura del buco coronale sono il risultato del calcolo; la soglia di eruzione è posta dove gli archi raggiungono circa 100 Mm. Sono schematici: la CME (durante l'eruzione il tempo rallenta, perché un'eruzione dura alcune ore), i moti del plasma (accelerati rispetto ai giorni) e i tubi sotto la fotosfera, che seguono le polarità calcolate alla superficie. Oltre 800 Mm di quota il campo è imposto radiale.</p>
 <script>
 /* Modello 2,5D force-free della corona su un tratto del lembo solare, in scala.
    Coordinate conformi: x = R·φ (lungo la superficie), z = R·ln(r/R);  ∇²_polare = (R/r)² ∇²_(x,z).
@@ -136,7 +136,7 @@ M.state = function (day) {
   return s;
 };
 M.magnetogram = function (s, NS) {
-  const out = new Float64Array(NS), chFlux = s.ch.amp * s.ch.w;
+  const out = new Float64Array(NS), outAR = new Float64Array(NS), chFlux = s.ch.amp * s.ch.w;
   for (let i = 0; i < NS; i++) {
     const x = M.XL + (i + 0.5) * M.P / NS, u = 2 * Math.PI * (x - M.XL) / M.P;
     /* rete della corona quieta: polarità miste su piccola scala, bilanciate */
@@ -148,17 +148,19 @@ M.magnetogram = function (s, NS) {
       if (a.f <= 0.002 && a.cap <= 0.002) continue;
       const g = d => Math.exp(-d * d / (2 * a.sig * a.sig)), norm = a.sig * Math.sqrt(2 * Math.PI), k0 = 8 / a.sig;
       const side = a.x > 0 ? -1 : 1, xin = a.x + side * a.sep / 2, xout = a.x - side * a.sep / 2;
-      b += a.inner * (a.amp * k0 * a.f + a.cap * chFlux / norm) * g(wrapd(x - xin));   // il polo interno bilancia parte del flusso centrale
-      b += -a.inner * a.amp * k0 * a.f * g(wrapd(x - xout));
+      const bip = a.amp * k0 * a.f * (g(wrapd(x - xin)) - g(wrapd(x - xout))) * a.inner;   // coppia bipolare della regione attiva
+      b += bip; outAR[i] += bip;
+      b += a.inner * a.cap * chFlux / norm * g(wrapd(x - xin));                            // il polo interno cattura parte del flusso centrale
     }
     out[i] = b + net;
   }
+  out.ar = outAR;
   return out;
 };
 M.poles = a => { const side = a.x > 0 ? -1 : 1; return { xin: a.x + side * a.sep / 2, xout: a.x - side * a.sep / 2 }; };
 
 /* ---------- soluzione ---------- */
-M.create = () => { const N = M.NX * M.NZ; return { Ap: new Float64Array(N), A: new Float64Array(N), mask: new Int8Array(N), init: false, B0: 0, Ab: new Float64Array(M.NX), info: null, Bs: null }; };
+M.create = () => { const N = M.NX * M.NZ; return { Apot: new Float64Array(N), LP: new Float64Array(N), AbAR: new Float64Array(M.NX), Ap: new Float64Array(N), A: new Float64Array(N), mask: new Int8Array(N), init: false, B0: 0, Ab: new Float64Array(M.NX), info: null, Bs: null }; };
 const rfac = new Float64Array(M.NZ); for (let j = 0; j < M.NZ; j++) rfac[j] = Math.exp(2 * M.zr[j] / M.RSUN);  // (r/R)²
 const cN = new Float64Array(M.NZ), cS = new Float64Array(M.NZ);
 for (let j = 1; j < M.NZ; j++) { const hm = M.zr[j] - M.zr[j - 1], hp = j < M.NZ - 1 ? M.zr[j + 1] - M.zr[j] : hm; cN[j] = 2 / (hp * (hm + hp)); cS[j] = 2 / (hm * (hm + hp)); }
@@ -166,17 +168,33 @@ M.setBoundary = function (F, s) {
   const NS = M.NX * 4, b = M.magnetogram(s, NS); let m = 0; for (const v of b) m += v; m /= NS; F.B0 = m; F.Bs = b;
   const ab = new Float64Array(NS + 1); for (let i = 0; i < NS; i++) ab[i + 1] = ab[i] + (b[i] - m) * M.P / NS;
   for (let i = 0; i < M.NX; i++) F.Ab[i] = ab[i * 4];
+  let mr = 0; for (const v of b.ar) mr += v; mr /= NS; const ar = new Float64Array(NS + 1); for (let i = 0; i < NS; i++) ar[i + 1] = ar[i] + (b.ar[i] - mr) * M.P / NS;
+  for (let i = 0; i < M.NX; i++) F.AbAR[i] = ar[i * 4];
 };
-const KP = 120, COS = new Float64Array((KP + 1) * M.NX), SIN = new Float64Array((KP + 1) * M.NX), FAC = new Float64Array((KP + 1) * M.NZ);
-for (let n = 1; n <= KP; n++) { for (let i = 0; i < M.NX; i++) { const u = 2 * Math.PI * n * i / M.NX; COS[n * M.NX + i] = Math.cos(u); SIN[n * M.NX + i] = Math.sin(u); }
-  const k = 2 * Math.PI * n / M.P; for (let j = 0; j < M.NZ; j++) FAC[n * M.NZ + j] = Math.cosh(Math.min(80, k * (M.ZS - M.zr[j]))) / Math.cosh(Math.min(80, k * M.ZS)); }
+/* lunghezza finita delle regioni attive nella terza dimensione: il loro campo cala in quota come in 3D
+   (ogni modo decresce con sqrt(k² + κ²) invece che con k); il resto del campo (zona unipolare, rete) resta 2D */
+M.LAR = 100; const KAP = Math.PI / M.LAR;
+const KP = 120, COS = new Float64Array((KP + 1) * M.NX), SIN = new Float64Array((KP + 1) * M.NX), FAC = new Float64Array((KP + 1) * M.NZ), FACK = new Float64Array((KP + 1) * M.NZ);
+const fac = (k, z) => Math.exp(-k * z) * (1 + Math.exp(-2 * k * (M.ZS - z))) / (1 + Math.exp(-2 * k * M.ZS));   // cosh(k(ZS−z))/cosh(k ZS)
+for (let n = 0; n <= KP; n++) { for (let i = 0; i < M.NX; i++) { const u = 2 * Math.PI * n * i / M.NX; COS[n * M.NX + i] = Math.cos(u); SIN[n * M.NX + i] = Math.sin(u); }
+  const k = 2 * Math.PI * n / M.P, kk = Math.hypot(k, KAP); for (let j = 0; j < M.NZ; j++) { FAC[n * M.NZ + j] = n ? fac(k, M.zr[j]) : 1; FACK[n * M.NZ + j] = fac(kk, M.zr[j]); } }
 /* campo potenziale (senza correnti) come stato di partenza di ogni calcolo */
 M.potential = function (F) {
-  const NX = M.NX, K = KP, a = new Float64Array(K + 1), b = new Float64Array(K + 1); let mean = 0;
-  for (let i = 0; i < NX; i++) mean += F.Ab[i]; mean /= NX;
-  for (let n = 1; n <= K; n++) { let c = 0, s = 0; for (let i = 0; i < NX; i++) { c += F.Ab[i] * COS[n * NX + i]; s += F.Ab[i] * SIN[n * NX + i]; } a[n] = 2 * c / NX; b[n] = 2 * s / NX; }
-  for (let j = 0; j < M.NZ; j++) for (let i = 0; i < NX; i++) { let v = mean;
-    for (let n = 1; n <= K; n++) { const f = FAC[n * M.NZ + j]; if (f < 1e-9) break; v += (a[n] * COS[n * NX + i] + b[n] * SIN[n * NX + i]) * f; } F.Ap[j * NX + i] = v; }
+  const NX = M.NX, NZ = M.NZ, K = KP;
+  const four = src => { const a = new Float64Array(K + 1), b = new Float64Array(K + 1);
+    for (let n = 0; n <= K; n++) { let c = 0, s = 0; for (let i = 0; i < NX; i++) { c += src[i] * COS[n * NX + i]; s += src[i] * SIN[n * NX + i]; } a[n] = (n ? 2 : 1) * c / NX; b[n] = 2 * s / NX; } return [a, b]; };
+  const rest = new Float64Array(NX); for (let i = 0; i < NX; i++) rest[i] = F.Ab[i] - F.AbAR[i];
+  const [a1, b1] = four(rest), [a2, b2] = four(F.AbAR);
+  for (let j = 0; j < NZ; j++) for (let i = 0; i < NX; i++) { let v = 0;
+    for (let n = 0; n <= K; n++) { const f1 = FAC[n * NZ + j], f2 = FACK[n * NZ + j]; if (f1 < 1e-9 && f2 < 1e-9) break;
+      v += (a1[n] * COS[n * NX + i] + b1[n] * SIN[n * NX + i]) * f1 + (a2[n] * COS[n * NX + i] + b2[n] * SIN[n * NX + i]) * f2; }
+    F.Ap[j * NX + i] = v; }
+  for (let i = 0; i < NX; i++) F.Ap[i] = F.Ab[i];
+  F.Apot.set(F.Ap);
+  /* laplaciano discreto del campo di partenza: il calcolo successivo aggiunge solo il campo delle correnti */
+  const cx = 1 / (M.DX * M.DX); F.LP.fill(0);
+  for (let j = 1; j < NZ; j++) { const last = j === NZ - 1; for (let i = 0; i < NX; i++) { const k = j * NX + i, P = F.Apot;
+    F.LP[k] = cx * (P[j * NX + (i + 1) % NX] + P[j * NX + (i + NX - 1) % NX]) + cN[j] * (last ? P[k - NX] : P[k + NX]) + cS[j] * P[k - NX] - (2 * cx + cN[j] + cS[j]) * P[k]; } }
   F.init = true;
 };
 const xOf = i => M.XL + i * M.DX;
@@ -215,7 +233,7 @@ M.solve = function (F, s, lam, opt = {}) {
       for (let j = 1; j < NZ && ok; j++) { const last = j === NZ - 1, rf = rfac[j], cn = cN[j], cs = cS[j], den0 = 2 * cx + cn + cs;
         for (let i = 0; i < NX; i++) { const k = j * NX + i;
           const aN = last ? Ap[k - NX] : Ap[k + NX];
-          let sum = cx * (Ap[j * NX + (i + 1) % NX] + Ap[j * NX + (i + NX - 1) % NX]) + cn * aN + cs * Ap[k - NX], den = den0;
+          let sum = cx * (Ap[j * NX + (i + 1) % NX] + Ap[j * NX + (i + NX - 1) % NX]) + cn * aN + cs * Ap[k - NX] - F.LP[k], den = den0;
           const m = mask[k];
           if (m && info[m - 1]) { const q = (q2[m - 1] || 0) * rf; sum += -q * (F.B0 * (xOf(i) - M.XL) - info[m - 1].th); den -= q; }
           const d = sum / den - Ap[k]; if (Math.abs(d) > res) res = Math.abs(d); Ap[k] += om * d;
@@ -268,11 +286,11 @@ const COL = { quiet: '#EF9F27', ar: '#D85A30', fast: '#378ADD', slow: '#7F77DD',
 const POS = '#ffd98a', NEG = '#8fc3ff';           // polarità + e − (alla base e sotto la fotosfera)
 
 /* ---------- energia delle regioni attive ----------
-   e = 1 (100%) è la soglia di eruzione. La soglia è posta dove gli archi gonfiati raggiungono circa 250 Mm:
+   e = 1 (100%) è la soglia di eruzione. La soglia è posta dove gli archi gonfiati raggiungono circa 100 Mm:
    nel calcolo bidimensionale l'equilibrio si perderebbe solo più in alto, ma nel Sole (tridimensionale)
    l'eruzione avviene prima. λ = e · k_i · λc_i, con λc lo shear critico 2D calcolato per ciascuna regione. */
-const LC = [[.02057, .02010, .02455, .02490], [.02150, .02139, .02455, .02490]];
-const KTH = [0.735, 0.735, 0.79, 0.80];
+const LC = [[.03240, .03135, .03779, .03791], [.03381, .03334, .03779, .03791]];
+const KTH = [0.78, 0.78, 0.84, 0.84];
 function lamc(day, i) { const u = Math.min(1, Math.max(0, (day - 14) / 4)); return LC[0][i] + u * (LC[1][i] - LC[0][i]); }
 /* una sola eruzione per ciclo di regioni attive: dalla regione A al giorno 8 (primo ciclo)
    e dalla regione C al giorno 48,4 (secondo ciclo). B e D accumulano energia ma restano sotto la soglia. */
@@ -292,7 +310,7 @@ const phaseOf = d => PH.find(p => d >= p[0] && d < p[1]);
 /* ---------- fotogrammi ---------- */
 const STEP = 0.4, NF = Math.round(M.DAYS / STEP) + 1, FR = new Array(NF), FIELD = M.create();
 let computed = 0, tot0 = 0;
-const arOf = (s, x) => { for (let i = 0; i < s.ar.length; i++) { const a = s.ar[i]; if (a.f < 0.15) continue; if (Math.abs(M.wrapd(x - a.x)) < a.sep / 2 + 2.2 * a.sig) return i; } return -1; };
+const arOf = (s, x, m = 0) => { for (let i = 0; i < s.ar.length; i++) { const a = s.ar[i]; if (a.f < 0.15) continue; if (Math.abs(M.wrapd(x - a.x)) < a.sep / 2 + 2.2 * a.sig + m) return i; } return -1; };
 function unwrap(p) { const q = [p[0]]; for (let i = 1; i < p.length; i++) { let x = p[i][0]; const px = q[i - 1][0]; while (x - px > M.P / 2) x -= M.P; while (x - px < -M.P / 2) x += M.P; q.push([x, p[i][1]]); } return q; }
 function lineObj(k, pts, ai) {
   const p = unwrap(pts).map(([x, z]) => [x, M.hz(z)]);       // x lungo la superficie, quota fisica h
@@ -309,9 +327,11 @@ function buildLines(s) {
     const tr = M.trace(FIELD, x, 0.3, bz >= 0 ? 1 : -1, true); if (tr.pts.length < 3) return;
     if (tr.end === 'top') { if (!extra) L.push(lineObj(Math.abs(M.wrapd(x - s.ch.x)) < chHalf && bz > 0 ? 'ch' : 'open', tr.pts, -1)); return; }
     if (tr.end !== 'surf' || bz < 0) return;
-    const i1 = arOf(s, x), i2 = arOf(s, tr.x), k = i1 >= 0 && i1 === i2 ? 'ar' : 'quiet';
+    /* arco di regione attiva: almeno un piede nella regione e l'altro nella regione stessa o nel suo margine (flusso esterno della stessa regione) */
+    const i1 = arOf(s, x), i2 = arOf(s, tr.x), j1 = arOf(s, x, 30), j2 = arOf(s, tr.x, 30);
+    const k = (i1 >= 0 && i1 === j2) || (i2 >= 0 && i2 === j1) ? 'ar' : 'quiet';
     if (extra && k !== 'quiet') return;
-    L.push(lineObj(k, tr.pts, k === 'ar' ? i1 : -1));
+    L.push(lineObj(k, tr.pts, k === 'ar' ? (i1 >= 0 ? i1 : i2) : -1));
   };
   let lev = step / 2, i = 0;
   while (lev < tot) { while (cum[i + 1] < lev) i++; const u = (lev - cum[i]) / ((cum[i + 1] - cum[i]) || 1), x = M.XL + (i + u) * dl; add(x, M.surfB(FIELD, x), false); lev += step; }
@@ -625,5 +645,8 @@ setZoom(1); setTimeout(work, 30); requestAnimationFrame(loop);
 .cc-n,.cc-badge a{white-space:nowrap}
 .cc-badge a{color:inherit;text-decoration:underline;text-underline-offset:2px}
 @media (max-width:520px){.cc-badge{font-size:11px;padding:2px 7px}}
+.cc-badge.cc-doc{text-decoration:none;opacity:1;font-weight:600;margin-left:.4em}
 </style>
+<script src="buco_coronale_regioni_attive_scheda.js"></script>
+<script src="scheda.js"></script>
 </body></html>
