@@ -141,11 +141,11 @@ function section(Ya,c,Yl){$('po').innerHTML='';
  $('to').innerHTML=o}
 // nastro trasportatore (lato destro): superficie verso i poli, ritorno profondo verso l'equatore
 const CV=[1,-1].map(sg=>{const p=[];for(let i=0;i<=40;i++){const a=Math.PI/2*i/40;p.push([cx+228*Math.cos(a),cy-sg*228*Math.sin(a)])}
- for(let i=1;i<=8;i++)p.push([cx,cy-sg*(228-70*i/8)]);
- for(let i=1;i<=40;i++){const a=Math.PI/2*(1-i/40);p.push([cx+158*Math.cos(a),cy-sg*158*Math.sin(a)])}
- for(let i=1;i<=8;i++)p.push([cx+158+70*i/8,cy]);return p});
+ for(let i=1;i<=8;i++)p.push([cx,cy-sg*(228-38*i/8)]);
+ for(let i=1;i<=40;i++){const a=Math.PI/2*(1-i/40);p.push([cx+190*Math.cos(a),cy-sg*190*Math.sin(a)])}
+ for(let i=1;i<=8;i++)p.push([cx+190+38*i/8,cy]);return p});
 const CVL=CV.map(p=>{const c=[0];for(let i=1;i<p.length;i++)c.push(c[i-1]+Math.hypot(p[i][0]-p[i-1][0],p[i][1]-p[i-1][1]));return c});
-const CVB=[0,40,48,88,96],CVC=[0,.2,.26,.92,1],CVS=[.2,.06,.66,.08],CV_LOOPS=3;let curYl=0;
+const CVB=[0,40,48,88,96],CVC=[0,.2,.26,.92,1],CVS=[.2,.06,.66,.08],CV_LOOPS=1; // un giro per ciclo: velocità accelerata rispetto a quella reale (~1 m/s) per renderla visibilelet curYl=0;
 function cvPhase(Yl){const v=Yl/2-(11/(4*Math.PI))*Math.sin(2*Math.PI*Yl/11);return (v/5.5*CV_LOOPS)%1}
 function cvPos(k,ph){let j=0;while(j<3&&ph>=CVC[j+1])j++;const f=(ph-CVC[j])/CVS[j],L=CVL[k],p=CV[k],d=L[CVB[j]]+(L[CVB[j+1]]-L[CVB[j]])*f;
  let i=CVB[j];while(i<CVB[j+1]-1&&L[i+1]<d)i++;const u=(d-L[i])/((L[i+1]-L[i])||1);return[p[i][0]+(p[i+1][0]-p[i][0])*u,p[i][1]+(p[i+1][1]-p[i][1])*u,j]}
@@ -154,9 +154,9 @@ function wseg(pts,w0,w1){let o='';const n=pts.length-1;
  return o}
 function conv(){let o='';CV.forEach((p,k)=>{
   o+=wseg(p.slice(0,41),2.5,2.5);   // superficie: canale sottile
-  o+=wseg(p.slice(40,49),2.5,24);   // discesa ai poli: si allarga
-  o+=wseg(p.slice(48,89),24,24);    // ritorno profondo: canale molto più spesso
-  o+=wseg(p.slice(88,97),24,2.5);   // risalita all'equatore: si restringe
+  o+=wseg(p.slice(40,49),2.5,20);   // discesa ai poli: si allarga
+  o+=wseg(p.slice(48,89),20,20);    // ritorno profondo (0,72-0,80 R, subito sopra la tachocline): canale molto più spesso
+  o+=wseg(p.slice(88,97),20,2.5);   // risalita all'equatore: si restringe
   for(let i=0;i<10;i++){const [x,y,j]=cvPos(k,(i/10+cvPhase(curYl))%1);o+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${j===0?8:j===2?6:4}" fill="${j===0?'#ff3b30':j===2?'#3fa9ff':'#6b6358'}" stroke="#fff" stroke-width="1.4"/>`}});
  $('cv').innerHTML=o}
 function text0(T){if(T<.12)return['Punto di partenza: campo verticale','Le linee di campo corrono lungo i meridiani, da un polo all\'altro. Il gas del Sole le trascina con sé (le "congela" al suo interno), quindi seguirle equivale a seguire il gas.'];
