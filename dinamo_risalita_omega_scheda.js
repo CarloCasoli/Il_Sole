@@ -90,7 +90,8 @@ Il riquadro *Strumenti* riporta il tempo (anni durante la formazione del campo t
 
 - È uno schema qualitativo, non una simulazione magnetoidrodinamica.
 - Il settore è più stretto in latitudine di quanto servirebbe per contenere l'intero sistema toroidale; i tubi toroidali nel Sole sono molti, qui ne sono disegnati otto.
-- I tubi sono disegnati molto più grossi del vero: alla base un tubo che produce una regione attiva ha un raggio di poche migliaia di km. Anche l'allargamento durante la risalita è compresso: nel Sole il tubo si allarga di circa dieci volte, qui di circa tre volte e mezza.
+- Le dimensioni della regione attiva sono quelle di una grande regione reale: le due macchie, di circa 26.000 km di diametro, emergono a circa 90.000 km l'una dall'altra (circa 7° sulla superficie). L'arco a Ω è largo alla base e stretto in cima, come nei modelli: le gambe convergono salendo verso la fotosfera.
+- Il tubo nella tachocline è disegnato un po' più grosso del vero, per restare visibile: circa 3.750 km di raggio, contro i 2.000–5.000 km di un tubo che produce una grande regione attiva. Anche l'allargamento durante la risalita è compresso: qui circa tre volte, nel Sole da cinque a dieci volte.
 - Come il campo passi da circa $10^4$ a circa $10^5$ gauss nella tachocline è ancora discusso: la sola rotazione differenziale non sembra sufficiente.
 - Tempi di risalita, spostamento verso il polo, ritardo e soglia di disgregazione seguono il modello dello Script 5.3, che riproduce l'andamento dei modelli a tubo sottile: Parker (1955); Choudhuri e Gilman (1987); D'Silva e Choudhuri (1993); Caligari, Moreno-Insertis e Schüssler (1995); Fan (2009, *Living Reviews in Solar Physics*). L'inclinazione della coppia e l'asimmetria delle gambe sono scelte per riprodurre i valori osservati.
 - Il ritorno del flusso disperso verso la tachocline è mostrato in modo schematico: nel Sole è un processo turbolento, che si osserva solo nelle simulazioni numeriche.

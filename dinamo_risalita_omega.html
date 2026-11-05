@@ -151,7 +151,7 @@ const RC=0.713/0.287*Hs;                    // raggio della base della zona conv
 const LAT0=20*D, cL=Math.cos(LAT0), sL=Math.sin(LAT0);
 const L=RC*cL*Math.PI/4;                    // ±45° di longitudine
 const ZE=0.7, ZP=1.4, Z=ZE, TACH=0.1, RAD=0.35;
-const NS=300, NR=16, r0=0.06, hI=0.16, wB=0.9;
+const NS=300, NR=16, r0=0.03, hI=0.16, wB=0.45;   // r0 ≈ 3.750 km; arco largo alla base e stretto in cima (macchie a ~90.000 km)
 const CEN=new THREE.Vector3(0,-RC,0), RSUN=RC+Hs;
 function warp(x,y,z,out){
   const ph=-x/(RC*cL), la=LAT0-z/RC, r=RC+y, cl=Math.cos(la);
@@ -185,7 +185,7 @@ const hOfU=u=>hI+(Hs-hI)*Math.pow(u,1.3);
 const uOfH=h=>Math.pow(clamp((h-hI)/(Hs-hI),0,1),1/1.3);
 const uEnd=()=>weak()?uOfH(yOfR(rFrag()+0.0525)*Hs):1;
 const phTitle=i=>i===5&&weak()?'Ritorno alla tachocline':PH[i].t;
-const EXPN=0.55,rT=y=>y<=Hs?r0*Math.pow(10,EXPN*(Math.max(0,y)/Hs)**2):r0*Math.pow(10,EXPN)*(1+0.6*(y-Hs));
+const EXPN=0.477,rT=y=>y<=Hs?r0*Math.pow(10,EXPN*(Math.max(0,y)/Hs)**2):r0*Math.pow(10,EXPN)*(1+0.6*(y-Hs));
 const ZB=[-1.25,-1,-0.75,-0.5,-0.25,0,0.25,0.5];   // latitudini dei tubi toroidali (sale quello centrale)
 function durOf(i){if(i===4)return st.B>=10?13:st.B>=6?16:15;if(i===5&&weak())return 13;return PH[i].d;}
 
@@ -208,7 +208,7 @@ function model(){
   const cd=corDev(m.h);m.dLat=c*cd.dLat;m.lag=c*cd.lag;
   m.xa=m.lag*RC*cL;            // ritardo rispetto alla rotazione (stesso modello del cap. 5)
   m.zA=-m.dLat*RC;             // spostamento verso il polo
-  m.J=c*(st.B>=10?0.17:st.B>=6?0.2:0.1)*k;
+  m.J=c*(st.B>=10?0.082:st.B>=6?0.097:0.048)*k;   // ridotto con l'arco più stretto: inclinazione di Joy invariata (~9-10°)
   m.wl=wB*(1-0.25*c*Math.min(1,k));
   m.wf=wB*(1+0.35*c*Math.min(1,k));
   return m;
@@ -440,7 +440,7 @@ const lApex=lbl('sommità dell\'Ω',new THREE.Vector3(),'hi');
 const lDrain=lbl('il plasma scivola verso i piedi',new THREE.Vector3(),'hi');
 const refMat=new THREE.LineDashedMaterial({dashSize:0.06,gapSize:0.04,transparent:true,opacity:0.9});
 const refLine=new THREE.Line(new THREE.BufferGeometry().setFromPoints([W(0,0,0),W(0,Hs+0.7,0)]),refMat);refLine.computeLineDistances();refLine.visible=false;scene.add(refLine);
-const lRef=lbl('salita radiale',W(0,Hs+0.78,0),'');
+const lRef=lbl('salita radiale',W(0.06,Hs+0.5,0),'l');
 const NTR=80,trPos=new Float32Array(NTR*3),trGeo=new THREE.BufferGeometry();trGeo.setAttribute('position',new THREE.BufferAttribute(trPos,3));
 const trMat=new THREE.LineBasicMaterial({depthTest:false,transparent:true});
 refMat.color=new THREE.Color(css('--ink'));trMat.color=new THREE.Color(css('--trail'));
@@ -466,7 +466,7 @@ const PL=[...Array(NS)].map(()=>new THREE.Vector3()),P=[...Array(NS)].map(()=>ne
 const SP=[...Array(NS)].map(()=>new THREE.Vector3()),SR=new Float32Array(NS);
 function buildTube(m){
   for(let i=0;i<NS;i++){
-    const x=-L+2*L*i/(NS-1),d=x-m.xa,w=d>0?m.wl:m.wf,s=d/w,f=Math.exp(-s*s*s*s);
+    const x=-L+2*L*i/(NS-1),d=x-m.xa,w=d>0?m.wl:m.wf,s=d/w,f=1/((1+s*s/2)*(1+s*s/2));
     const g=Math.sin(clamp(d/(1.3*w),-1,1)*Math.PI/2);
     PL[i].set(x,m.h*f,m.zA*f+m.J*g*f);warp(PL[i].x,PL[i].y,PL[i].z,P[i]);R[i]=rT(m.h*f);fArr[i]=f;
   }
@@ -530,9 +530,9 @@ function render(){
   if(showSpots){warp(so[0].l.x,Hs+0.3,so[0].l.z,lP1.v);warp(so[1].l.x,Hs+0.3,so[1].l.z,lP2.v);}
   const showRef=ph>=3&&m.frac<1&&!back;refLine.visible=showRef;lRef.show=showRef&&st.cor&&curView!=='top';
   trail.visible=ph>=4&&!back;if(trail.visible)buildTrail(m);
-  lApex.show=(ph===4&&!frag&&m.u>0.15)||(ph===5&&!wk);warp(m.apexL.x,m.apexL.y+rT(m.apexL.y)+0.16,m.apexL.z,lApex.v);
+  lApex.show=((ph===4&&!frag&&m.u>0.15)||(ph===5&&!wk))&&curView!=='top';warp(m.apexL.x,m.apexL.y+rT(m.apexL.y)+0.3,m.apexL.z,lApex.v);
   const showDrops=st.drain&&(ph===3||(ph===4&&!frag&&m.u<0.85));
-  const nFoot=Math.round(1.35*wB/(2*L/(NS-1)));
+  const nFoot=Math.round(2.2*wB/(2*L/(NS-1)));
   drops.forEach(dd=>{dd.m.visible=showDrops;if(!showDrops)return;const q=(dd.q0+st.clock*0.22)%1;const i=clamp(Math.round(m.ia+dd.side*q*nFoot),0,NS-1);dd.m.position.copy(P[i]);dd.m.scale.setScalar(0.6+0.8*(1-q));});
   lDrain.show=st.drain&&ph===3&&p>0.25;warp(m.apexL.x,m.apexL.y+0.32,m.apexL.z,lDrain.v);
   points.visible=st.conv;
