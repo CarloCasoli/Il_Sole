@@ -26,14 +26,14 @@ Il riquadro sotto la figura descrive la fase in corso.
 
 ## Le sei fasi
 
-- **1. Campo poloidale.** Alla base della zona convettiva il campo lasciato dal ciclo precedente corre da nord a sud, lungo i meridiani. È debole, dell'ordine di $10^2$ gauss.
+- **1. Campo poloidale.** Alla base della zona convettiva il campo lasciato dal ciclo precedente corre lungo i meridiani. Se il polo nord è positivo, come nell'esempio del paragrafo 5.10, alla base della zona convettiva le linee vanno da sud a nord: è il ramo interno delle linee che escono dal polo nord e rientrano dal polo sud. È debole, dell'ordine di $10^2$ gauss.
 - **2. Rotazione differenziale (effetto Ω).** Il plasma più vicino all'equatore ruota più in fretta di quello più vicino al polo; le frecce mostrano questa differenza rispetto alla latitudine centrale. Il campo è congelato nel plasma (paragrafo 5.5): ogni linea viene trascinata e stirata nel verso della rotazione. La linea evidenziata in rosso permette di seguirne una. Allungandosi, le linee si avvicinano tra loro e il campo si intensifica fino a circa $10^4$ gauss in alcuni anni.
 - **3. Nasce il tubo toroidale.** Il campo, ormai quasi tutto parallelo all'equatore, si raccoglie in tubi di flusso che corrono lungo tutta la circonferenza. Restano immagazzinati nella tachocline, dove la convezione non riesce a trascinarli via, e raggiungono circa $10^5$ gauss.
 - **4. Instabilità.** In un tubo di flusso la pressione totale è uguale a quella esterna, ma una parte è pressione magnetica:
 $$p_e = p_i + \frac{B^2}{8\pi}$$
 quindi dentro il tubo c'è meno gas e il tubo è più leggero dell'ambiente (galleggiamento magnetico, Script 5.2). Un tratto si inarca, il plasma scivola lungo il tubo verso i lati, il tratto centrale si svuota e sale ancora di più: è l'instabilità di Parker. Gli altri tubi, e il resto dello stesso tubo, rimangono nella tachocline.
 - **5. Risalita.** La sommità dell'arco attraversa la zona convettiva; i piedi restano ancorati al tubo toroidale. Salendo, la pressione esterna diminuisce: il tubo si allarga e il campo si indebolisce, perché il flusso magnetico $\Phi = B\,\pi a^2$ si conserva. Il campo nella sommità passa da circa $10^5$ a circa $10^3$ gauss.
-- **6. Emersione.** La sommità attraversa la fotosfera: è il tratto orizzontale che si vede emergere in superficie (capitolo 8, animazione *Dalle regioni attive al buco coronale*). Dove le gambe bucano la fotosfera nascono due macchie di polarità opposta: nella gamba che segue il campo esce dalla superficie (+), in quella che precede vi rientra (−), come nell'esempio della legge di Hale del paragrafo 5.10.
+- **6. Emersione.** La sommità attraversa la fotosfera: è il tratto orizzontale che si vede emergere in superficie (capitolo 8, animazione *Dalle regioni attive al buco coronale*). Dove le gambe bucano la fotosfera nascono due macchie di polarità opposta: nella gamba che precede il campo esce dalla superficie (+), in quella che segue vi rientra (−). La macchia che precede ha quindi la stessa polarità del polo nord all'inizio del ciclo, come nell'esempio della legge di Hale del paragrafo 5.10.
 
 Con il tubo debole la fase 6 è sostituita da **Ritorno alla tachocline** (vedi sotto).
 

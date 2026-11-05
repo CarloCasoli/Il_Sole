@@ -90,14 +90,14 @@ function cyc(l0,t,Y,cc,mul){const T=Math.min(1,t/MAXD),pa=PAL[cc],hi=l0===0,col=
  chunks(l0,t).forEach(h=>{const op=oOld(h.la,Y)*(mul?mul(h.la):1)*lineMul(h.la,t);if(op>.02)o+=pth(h,col,hi?3.5:1.4+1.6*T,(hi?1:.8)*op)});
  // frecce sulle linee che si avvolgono (meridiano centrale): verso decrescente di latitudine nel ciclo pari, crescente nel dispari
  if(l0%90===0)AL8.forEach(la=>{const a=pt(l0,la,t),b=pt(l0,la+.5,t),op=oOld(la,Y)*(mul?mul(la):1)*lineMul(la,t);
-  if(op>.02&&a.v&&b.v)ar+=cc?arrow(a,b,la>0?cN:cS,8,op):arrow(b,a,la>0?cN:cS,8,op)});
+  if(op>.02&&a.v&&b.v)ar+=cc?arrow(b,a,la>0?cN:cS,8,op):arrow(a,b,la>0?cN:cS,8,op)});
  return[o,ar]}
 // tubi toroidali: 6 per emisfero, nascono man mano che le linee diventano orizzontali e svaniscono lentamente dal più vicino ai poli
 const TLAT=[36,26,17,9],TOUT=[3.2,5.0,6.8,8.6],TDUR=2.2;
 function tubeP(k,t,Yl){return(1-lineMul(TLAT[k],t))*(1-sst((Yl-TOUT[k])/TDUR))}
 function tubes(t,Yl,c){let o='';
  for(let k=0;k<4;k++){const p=tubeP(k,t,Yl);if(p<.02)continue;const la=TLAT[k],hw=RT*Math.cos(rad(la)),dy=RT*Math.sin(rad(la)),om=60+250*dOm(la)/DOM_MAX;
-  [1,-1].forEach(hm=>{const y=cy-hm*dy,isR=(hm>0)!==(c===1),grad=isR?'url(#tubeR)':'url(#tubeB)',dir=((hm>0)!==(c===1))?1:-1,x1=(cx-hw).toFixed(1),x2=(cx+hw).toFixed(1),H=9;
+  [1,-1].forEach(hm=>{const y=cy-hm*dy,isR=(hm>0)!==(c===1),grad=isR?'url(#tubeR)':'url(#tubeB)',dir=((hm>0)!==(c===1))?-1:1,x1=(cx-hw).toFixed(1),x2=(cx+hw).toFixed(1),H=9;
    o+=`<g opacity="${(p).toFixed(2)}"><rect x="${x1}" y="${(y-H).toFixed(1)}" width="${(hw*2).toFixed(1)}" height="${H*2}" rx="${H}" fill="${grad}"/></g>`;
    for(let j=0;j<3;j++){const ph=rad(120*j+dir*om*Yl),cs=Math.cos(ph);if(cs<=.05)continue;const x=cx+hw*Math.sin(ph);o+=arrow({x,y},{x:x+dir*10,y},'#fff',8,p*Math.min(1,cs*2.5)*.85)}})}
  return o}
@@ -108,7 +108,7 @@ function front(t,Y,c){let o='',ar='';const early=Y<2,Yl=Y;
   let r=cyc(l0,t,Y,c,null);o+=r[0];ar+=r[1];
   if(early){const fade=1-ease(Y/1.4);r=cyc(l0,9.5*365,9.5,(c+1)%2,()=>fade);o+=r[0];ar+=r[1]}
   if(Y>3.5){chunks(l0,0).forEach(h=>{const opN=newF(h.la,Y);if(opN>.02)o+=pth(h,cB,hi?3.5:2.2,(hi?1:.85)*opN)});
-   if(l0%90===0)AL8.forEach(la=>{const a=pt(l0,la,0),b=pt(l0,la+.5,0),opN=newF(la,Y);if(opN>.02&&a.v&&b.v)ar+=c?arrow(b,a,cB,8,opN):arrow(a,b,cB,8,opN)})}}
+   if(l0%90===0)AL8.forEach(la=>{const a=pt(l0,la,0),b=pt(l0,la+.5,0),opN=newF(la,Y);if(opN>.02&&a.v&&b.v)ar+=c?arrow(a,b,cB,8,opN):arrow(b,a,cB,8,opN)})}}
  $('fl').innerHTML=o+tubes(t,Yl,c)+ar}
 // sezione: poloidale che sbiadisce + sequenza di tubi toroidali a latitudine decrescente
 const TB=[[0,1.5,2.0],[2.0,3.2,3.6],[3.6,4.8,5.2],[5.2,6.4,6.8],[6.8,8.0,8.4],[8.4,9.6,10.0]],LT=[35,29,23,17,11,5]; // [nascita, fine crescita, emersione] in anni
@@ -127,8 +127,8 @@ function section(Ya,c,Yl){$('po').innerHTML='';
  function one(k,yl,par,fade){const [ta,tg,tr]=TB[k],la=LT[k],rmax=6+2.4*k;if(yl<ta)return;
   [1,-1].forEach(hm=>{const sw=(hm>0)!==par;
    if(yl<tr){const u=ease((yl-tg)/(tr-tg)),r0=3+(rmax-3)*ease((yl-ta)/(tg-ta)),r=r0*(1-.3*u)*fade;
-    const [x,y]=PL(la+4*u,175+63*u,-1,hm);o+=tube(x,y,r,!sw,fade);
-    if(u<1){const [x2,y2]=PL(la,175,1,hm);o+=tube(x2,y2,r0*fade,sw,.45*(1-u)*fade)}
+    const [x,y]=PL(la+4*u,175+63*u,-1,hm);o+=tube(x,y,r,sw,fade);
+    if(u<1){const [x2,y2]=PL(la,175,1,hm);o+=tube(x2,y2,r0*fade,!sw,.45*(1-u)*fade)}
    }else{const age=yl-tr;if(age<2.4){const ls=la+4,a1=ease(age/1.4),a2=ease(age/2.4),sp=2.2+3.3*ease(age/0.6),c0=sw?POS:NEG,c1=sw?NEG:POS;
     const pa=PL(ls-sp-2.5*a1,238,-1,hm),pb=PL(ls+sp+(72-ls-sp)*a2,238,-1,hm),om=(1-ease(age/(0.8+0.12*k)))*fade;
     if(om>.02)o+=omega(pa,pb,om,34+8*k);

@@ -450,7 +450,7 @@ function buildTrail(m){
   for(let i=0;i<NTR;i++){const h=m.h*i/(NTR-1),cd=corDev(h),c=st.cor?1:0;warp(c*cd.lag*RC*cL,h,-c*cd.dLat*RC,v);trPos[i*3]=v.x;trPos[i*3+1]=v.y;trPos[i*3+2]=v.z;}
   trGeo.attributes.position.needsUpdate=true;
 }
-const lP1=lbl('+',new THREE.Vector3(),'pol'),lP2=lbl('−',new THREE.Vector3(),'pol');
+const lP1=lbl('−',new THREE.Vector3(),'pol'),lP2=lbl('+',new THREE.Vector3(),'pol');
 
 // ---------- camera ----------
 const V=(x,y,z)=>new THREE.Vector3(x,y,z);
@@ -568,7 +568,7 @@ function readouts(m){
 
 function caption(m){
   const ph=st.phase;let t=(ph+1)+' · '+phTitle(ph),c='';
-  if(ph===0)c='Alla base della zona convettiva il campo lasciato dal ciclo precedente è poloidale: le linee corrono da nord a sud, lungo i meridiani. È debole, dell\'ordine di 10² gauss.';
+  if(ph===0)c='Alla base della zona convettiva il campo lasciato dal ciclo precedente è poloidale: con il polo nord positivo, le linee corrono da sud a nord lungo i meridiani (è il ramo interno delle linee che escono dal polo nord e rientrano dal polo sud). È debole, dell\'ordine di 10² gauss.';
   else if(ph===1)c='Il plasma verso l\'equatore ruota più in fretta di quello verso il polo (le frecce mostrano la differenza rispetto alla latitudine centrale). Il campo è «congelato» nel plasma: ogni linea viene trascinata e stirata nel verso della rotazione e finisce per avvolgersi attorno al Sole. Più si allunga, più il campo si intensifica: è l\'effetto Ω. Segui la linea evidenziata.';
   else if(ph===2)c='Dopo alcuni anni di avvolgimento il campo è quasi tutto toroidale, parallelo all\'equatore, e si raccoglie in un grande tubo di flusso che corre lungo tutta la corona. Resta immagazzinato nella tachocline, sotto la zona convettiva, dove i moti turbolenti non riescono a portarlo via. Il campo arriva a circa '+fG(B0())+'.';
   else if(ph===3)c='Nel tubo la pressione magnetica sostituisce parte della pressione del gas: dentro c\'è meno gas e il tubo è più leggero dell\'ambiente (galleggiamento magnetico). Un tratto si inarca, il plasma scivola lungo il tubo verso i lati, il tratto centrale si svuota e sale ancora di più: è l\'instabilità di Parker. Il resto del tubo rimane in basso.';
