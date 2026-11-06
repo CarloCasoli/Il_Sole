@@ -50,7 +50,7 @@ button:hover{background:rgba(127,127,127,.12)}
   <h1>Il viaggio del fotone nella cromosfera<span class="cc-badge"><span class="cc-n">© 2026 Carlo Casoli ·</span> <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it" target="_blank" rel="license noopener">CC BY-NC-ND 4.0</a></span> <a class="cc-badge cc-doc" href="#scheda" data-scheda>📖 Scheda dell'animazione</a></h1>
   <a href="index.html">← Indice delle animazioni</a>
 </div>
-<p class="sub">Tre corsie a confronto. Ogni fotone viene assorbito e riemesso in direzioni casuali, in su o in giù con la stessa probabilità (i lampi sono gli urti con gli atomi). Se raggiunge la quota in cui la nebbia ottica si dirada, vola dritto verso l'osservatore: il fotone che vediamo è l'ultimo della catena, riemesso a quella quota (Approfondimento 7.3). Nel continuo succede in fotosfera. In Hα e Ca II K la quota è molto più alta e il fotone, che parte dalla fotosfera, spesso ricade negli strati densi, dove un urto lo spegne (lampo grigio con la croce): per questo esce solo una parte dei fotoni e la riga è scura. Allargando la banda del filtro la quota di fuga scende, escono più fotoni e il contrasto cala. <b>Colori:</b> i fotoni sono gialli finché restano nell'atmosfera; dopo l'ultima riemissione diventano rossi (Hα) o viola (Ca II K), con la traccia tratteggiata se sono usciti già dalla fotosfera (luce delle ali, fotosferica). Il colore indica lo strato dell'ultima riemissione, non un cambio di lunghezza d'onda. La fascia colorata in ogni corsia è la zona da cui esce la luce raccolta dal filtro, calcolata come nell'animazione 7.1; il riquadro delimitato da due linee è la parte centrale della luce cromosferica.</p>
+<p class="sub">Tre corsie a confronto. Ogni fotone viene assorbito e riemesso in direzioni casuali, in su o in giù con la stessa probabilità (i lampi sono gli urti con gli atomi). Se raggiunge la quota in cui la nebbia ottica si dirada, vola dritto verso l'osservatore: il fotone che vediamo è l'ultimo della catena, riemesso a quella quota (Approfondimento 7.3). Nel continuo succede in fotosfera. In Hα e Ca II K la quota è molto più alta: il fotone, che parte anche qui sotto la fotosfera, deve risalire fino in cromosfera e spesso ricade negli strati densi, dove un urto lo spegne (lampo grigio con la croce): per questo esce solo una parte dei fotoni e la riga è scura. Allargando la banda del filtro la quota di fuga scende, escono più fotoni e il contrasto cala. <b>Colori:</b> i fotoni sono gialli finché restano nell'atmosfera; dopo l'ultima riemissione diventano rossi (Hα) o viola (Ca II K), con la traccia tratteggiata se sono usciti già dalla fotosfera (luce delle ali, fotosferica). Il colore indica lo strato dell'ultima riemissione, non un cambio di lunghezza d'onda. La fascia colorata in ogni corsia è la zona da cui esce la luce raccolta dal filtro, calcolata come nell'animazione 7.1; il riquadro delimitato da due linee è la parte centrale della luce cromosferica.</p>
 
 <div class="bar">
   <span class="lbl"><i class="dot" style="background:#E24B4A"></i>Banda filtro Hα</span>
@@ -64,7 +64,7 @@ button:hover{background:rgba(127,127,127,.12)}
 </div>
 <div class="bar">
   <label class="lbl" for="sSp">Velocità</label><input type="range" id="sSp" min="0.25" max="3" step="0.25" value="1"><b id="oSp">×1</b>
-  <label for="sN" style="margin-left:6px">Fotoni per corsia</label><input type="range" id="sN" min="1" max="8" step="1" value="4" style="flex:0 1 120px"><b id="oN">4</b>
+  <label for="sN" style="margin-left:6px">Fotoni emessi al secondo</label><input type="range" id="sN" min="0.25" max="3" step="0.25" value="1" style="flex:0 1 120px"><b id="oN">1</b>
   <button id="bP" aria-label="Pausa" style="min-width:36px">❚❚</button>
   <button id="bR">↺ Azzera</button>
 </div>
@@ -73,7 +73,7 @@ button:hover{background:rgba(127,127,127,.12)}
 
 <div class="cards" id="cards"></div>
 
-<p class="note">Modello didattico qualitativo. Le quote di fuga sono quelle dell'animazione 7.1 (Figura 7.1): per Hα e Ca II K a ogni fotone viene assegnata una lunghezza d'onda dentro la banda del filtro, e da questa dipende la quota da cui riesce a sfuggire. Il cammino non ha nessuna direzione preferita: la percentuale di fotoni che escono nasce dalla distanza tra il punto di partenza e la quota di fuga. Il numero di urti invece è simbolico: un fotone reale ne subisce un numero enormemente più grande (indicato nei riquadri), con tratti brevissimi; qui i tratti sono ingranditi perché il viaggio duri pochi secondi. La probabilità di spegnimento negli strati densi è scelta in modo che al centro di Hα, con un filtro stretto, esca circa il 15–20% dei fotoni. I fotoni partono con lo spettro del continuo: è il cammino nella cromosfera, con gli spegnimenti, a scavare la riga, e le quote medie di fuga dei fotoni usciti sono vicine a quelle dell'animazione 7.1. La zona cromosferica indicata in ogni corsia comprende la parte centrale (dal 20% all'80%) della luce emessa sopra la fotosfera.</p>
+<p class="note">Modello didattico qualitativo. Le quote di fuga sono quelle dell'animazione 7.1 (Figura 7.1): per Hα e Ca II K a ogni fotone viene assegnata una lunghezza d'onda dentro la banda del filtro, e da questa dipende la quota da cui riesce a sfuggire. Il cammino non ha nessuna direzione preferita: la percentuale di fotoni che escono nasce dalla distanza tra il punto di partenza e la quota di fuga. Il numero di urti invece è simbolico: un fotone reale ne subisce un numero enormemente più grande (indicato nei riquadri), con tratti brevissimi; qui i tratti sono ingranditi perché il viaggio duri qualche secondo. In tutte e tre le corsie i fotoni partono dallo stesso strato, 300–400 km sotto la base della fotosfera. La probabilità di spegnimento negli strati densi è tarata fotone per fotone: dipende dalla quota da cui il fotone potrà sfuggire ed è tanto più alta quanto più freddo è quello strato. Così la frazione di fotoni che arrivano all'osservatore riproduce, banda per banda, l'intensità della riga del modello della Figura 7.1: per esempio circa il 17% al centro di Hα con un filtro da 0,3 Å, come nella riga osservata. Nella realtà la luce di una riga è debole sia perché molti fotoni vengono distrutti negli strati densi, sia perché lo strato da cui sfugge è più freddo; in un'animazione a fotoni i due effetti sono rappresentati insieme dagli spegnimenti. I fotoni partono con lo spettro del continuo: è il cammino, con gli spegnimenti, a scavare la riga, e le quote medie di fuga dei fotoni usciti sono vicine a quelle dell'animazione 7.1. La zona cromosferica indicata in ogni corsia comprende la parte centrale (dal 20% all'80%) della luce emessa sopra la fotosfera.</p>
 
 <script>
 'use strict';
@@ -81,7 +81,7 @@ const $=id=>document.getElementById(id);
 const TAU=Math.PI*2;
 const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
 let C={};
-function readCss(){const s=getComputedStyle(document.documentElement);const v=n=>s.getPropertyValue(n).trim();C={txt:v('--text-primary'),txt2:v('--text-secondary'),bd:v('--border'),bg:v('--bg'),grid:v('--grid'),dark:matchMedia('(prefers-color-scheme: dark)').matches}}
+function readCss(){const s=getComputedStyle(document.documentElement);const v=n=>s.getPropertyValue(n).trim();C={txt:v('--text-primary'),txt2:v('--text-secondary'),bd:v('--border'),bg:v('--bg'),panel:v('--panel'),grid:v('--grid'),dark:matchMedia('(prefers-color-scheme: dark)').matches}}
 function fit(c){const r=c.getBoundingClientRect(),d=devicePixelRatio||1;const w=Math.max(1,Math.round(r.width*d)),h=Math.max(1,Math.round(r.height*d));if(c.width!==w||c.height!==h){c.width=w;c.height=h}const g=c.getContext('2d');g.setTransform(d,0,0,d,0,0);g.clearRect(0,0,r.width,r.height);return[g,r.width,r.height]}
 const fmt=(x,d=2)=>x.toFixed(d).replace('.',',');
 const fmtK=x=>(x<0?'−':'')+Math.round(Math.abs(x)).toString().replace(/\B(?=(\d{3})+(?!\d))/g,'.');
@@ -127,6 +127,8 @@ function prep(L){
   const NS=400,Ic=Iraw(L.R);L.grid=[];
   for(let i=0;i<NS;i++){const v=-1+2*(i+0.5)/NS,x=dlOf(v),dx=dlOf(v+1/NS)-dlOf(v-1/NS);L.grid.push([x,Iraw(x)/Ic*dx,dx])}
   L.h1=h1;L.op=x=>Math.exp(h1(x)/HSC);
+  /* luminosità relativa della luce che sfugge dalla quota h (come nella Figura 7.1): B(T a quella quota) / continuo */
+  L.tOf=h=>Bl(ST(h))/Ic;
 }
 /* i fotoni partono dalla fotosfera con lo spettro del continuo (peso: trasmissione del filtro);
    è il cammino nella cromosfera, con gli spegnimenti, a scavare la riga */
@@ -164,22 +166,39 @@ const LANES=[
 ];
 LANES.forEach(l=>{l.ph=[];l.fl=[];l.esc=[];l.path=[];l.hiN=0;l.last=null;l.lastX=0;l.out=0;l.dead=0;l.hiEnd=null});
 
-let run=!RM, speed=1, NPH=4, geo=null;
+let run=!RM, speed=1, RATE=1, geo=null;   /* RATE: fotoni emessi al secondo in ogni corsia, a velocità ×1 */
+const PHMAX=60;                            /* limite di sicurezza ai fotoni presenti in una corsia */
 const YEL='#FFD43B', YELD='#7a5c00', YELT='#B8920A', YELF='#C9A400'; /* giallo: fotone ancora dentro l'atmosfera */
 const STEPS=34; /* urti al secondo, a velocità ×1 */
 /* cammino casuale senza direzione preferita: il passo medio cresce con la quota (la densità cala) */
 const L0=60, HL=700, LMAX=600;
 const stepKm=h=>Math.min(LMAX,L0*Math.exp(Math.max(HB,h)/HL));
-/* probabilità che un assorbimento spenga il fotone (urto prima della riemissione):
-   apprezzabile sotto la fotosfera, piccola in fotosfera, nulla in cromosfera. Solo per le righe:
-   nel continuo ogni assorbimento è seguito da una nuova emissione termica. */
-const pKill=h=>h<0?0.01+0.05*Math.min(1,-h/400):h<400?0.004*(1-h/400):0;
+/* forma della probabilità che un assorbimento spenga il fotone (urto prima della riemissione):
+   più alta sotto la fotosfera, piccola in fotosfera, nulla in cromosfera. Solo per le righe: nel continuo
+   ogni assorbimento è seguito da una nuova emissione. Per ogni fotone di riga va moltiplicata per il
+   fattore km, tarato sul modello della Figura 7.1 (vedi mFor). */
+const pKill=h=>h<0?0.0013+0.0026*Math.min(1,-h/400):h<400?0.004*(1-h/400):0;
 
+/* Taratura dello spegnimento. Tabella precalcolata con questo stesso cammino casuale: probabilità di arrivare
+   alla quota di fuga he (righe, da −300 a 3.200 km) partendo da sotto la fotosfera, se la probabilità di spegnimento
+   vale pKill(h)·m (colonne). A ogni fotone di riga si assegna il fattore m che rende la sua probabilità di arrivare
+   all'osservatore uguale alla luminosità della luce emessa alla sua quota di fuga, tOf(he). Così la frazione di fotoni
+   ricevuti riproduce, banda per banda, l'intensità del modello della Figura 7.1. */
+const PW={"he":[-300,-200,-100,0,100,200,300,400,500,600,700,800,900,1000,1100,1200,1300,1400,1500,1600,1700,1800,1900,2000,2100,2200,2300,2400,2500,2600,2700,2800,2900,3000,3100,3200],"m":[0,0.1,0.2,0.35,0.5,0.75,1,1.5,2,3,4,6,8,12,16,24,32,48],"P":[[1,0.998,0.9933,0.9907,0.984,0.9773,0.9773,0.9663,0.9577,0.924,0.9153,0.868,0.8537,0.789,0.7557,0.6763,0.6297,0.5663],[1,0.986,0.9707,0.957,0.9437,0.9073,0.8907,0.844,0.8,0.7293,0.6547,0.5503,0.4973,0.3827,0.3103,0.23,0.1843,0.1143],[1,0.9747,0.948,0.9137,0.8877,0.8353,0.7897,0.7033,0.6423,0.5343,0.4613,0.3697,0.3027,0.19,0.1513,0.0987,0.067,0.0423],[1,0.9643,0.9217,0.8747,0.8207,0.761,0.713,0.6007,0.539,0.416,0.3517,0.248,0.1907,0.1143,0.0883,0.0437,0.0327,0.016],[1,0.9393,0.8947,0.8253,0.7543,0.6853,0.623,0.524,0.431,0.3417,0.2653,0.1673,0.1227,0.066,0.048,0.0263,0.0173,0.0057],[1,0.932,0.8747,0.79,0.7183,0.6377,0.5377,0.4413,0.359,0.2663,0.195,0.127,0.0857,0.0447,0.0273,0.0117,0.0063,0.0027],[1,0.9033,0.839,0.7487,0.6707,0.5623,0.4863,0.399,0.293,0.204,0.1563,0.0983,0.062,0.0323,0.0143,0.01,0.005,0.001],[1,0.8907,0.7993,0.7117,0.5977,0.521,0.435,0.3283,0.271,0.159,0.136,0.0803,0.0493,0.027,0.0107,0.0037,0.0027,0.001],[1,0.8747,0.7937,0.68,0.5673,0.4593,0.4013,0.2897,0.2297,0.1437,0.1107,0.054,0.035,0.0183,0.0103,0.0037,0.001,0.0007],[1,0.8553,0.7523,0.6217,0.549,0.447,0.372,0.2807,0.1987,0.1223,0.0883,0.0473,0.035,0.0173,0.0087,0.0027,0.0013,0],[1,0.837,0.726,0.5963,0.5097,0.4127,0.3427,0.2353,0.1737,0.121,0.079,0.0457,0.031,0.015,0.008,0.002,0.0017,0],[1,0.8423,0.7173,0.5757,0.4857,0.3803,0.3187,0.221,0.169,0.115,0.07,0.0423,0.0303,0.011,0.009,0.0037,0.0013,0],[1,0.8063,0.6933,0.5613,0.462,0.356,0.2763,0.191,0.151,0.0897,0.0647,0.0353,0.0217,0.0123,0.0033,0.002,0.0007,0],[1,0.8137,0.6673,0.536,0.4237,0.3253,0.2673,0.1743,0.1353,0.087,0.0637,0.0323,0.0203,0.008,0.0043,0.002,0.0013,0],[1,0.7843,0.6557,0.511,0.4227,0.3333,0.261,0.179,0.1323,0.084,0.0503,0.0307,0.022,0.0103,0.0063,0.0013,0.001,0.001],[1,0.7603,0.6333,0.4907,0.4,0.3083,0.2423,0.1607,0.1343,0.0737,0.047,0.028,0.0213,0.0073,0.004,0.0007,0.0007,0],[1,0.765,0.622,0.4687,0.4147,0.2903,0.235,0.1517,0.1157,0.066,0.0523,0.0243,0.0143,0.0057,0.0037,0.001,0.0003,0],[1,0.751,0.5923,0.4513,0.3687,0.28,0.2023,0.1437,0.1047,0.0613,0.0427,0.0237,0.0143,0.0077,0.0053,0.0027,0.0003,0],[1,0.742,0.5843,0.4373,0.3597,0.2527,0.1963,0.136,0.092,0.0573,0.0387,0.0223,0.0133,0.0063,0.0027,0.0017,0.0003,0.0003],[1,0.7117,0.5723,0.4243,0.3327,0.234,0.1807,0.1297,0.0923,0.0547,0.046,0.021,0.0133,0.0053,0.002,0.001,0.001,0],[1,0.7153,0.5637,0.4087,0.3383,0.2233,0.1707,0.125,0.0807,0.0467,0.0387,0.023,0.012,0.003,0.001,0.001,0,0],[1,0.704,0.5297,0.4003,0.3007,0.2177,0.1717,0.1077,0.096,0.045,0.0363,0.019,0.01,0.0083,0.0033,0.001,0.0007,0.0003],[1,0.696,0.5447,0.3947,0.2953,0.2173,0.1723,0.1003,0.0777,0.0497,0.0303,0.017,0.0123,0.0037,0.0027,0.002,0.0007,0],[1,0.7003,0.513,0.3637,0.2827,0.2063,0.1523,0.106,0.0817,0.044,0.031,0.018,0.013,0.005,0.0033,0.0003,0.0003,0],[1,0.665,0.5017,0.361,0.3053,0.2007,0.1447,0.1007,0.0697,0.046,0.028,0.0173,0.0113,0.0043,0.003,0.001,0.001,0],[1,0.654,0.487,0.3643,0.272,0.2073,0.148,0.0963,0.0667,0.0413,0.0257,0.018,0.011,0.0043,0.0017,0.0003,0,0],[1,0.6417,0.48,0.3257,0.2497,0.198,0.1323,0.0927,0.0647,0.0407,0.03,0.015,0.0077,0.0043,0.003,0.002,0.0003,0.0003],[1,0.638,0.475,0.3363,0.2717,0.1887,0.1397,0.0983,0.069,0.0403,0.0273,0.0143,0.006,0.0047,0.0037,0.0003,0.0003,0.0003],[1,0.6477,0.4803,0.3327,0.245,0.174,0.1317,0.0887,0.0633,0.0417,0.0287,0.0153,0.0083,0.004,0.0027,0.001,0.0003,0.0003],[1,0.632,0.456,0.3367,0.2463,0.1677,0.139,0.0887,0.0587,0.0297,0.0243,0.012,0.0053,0.0043,0.002,0.0003,0.0003,0],[1,0.6333,0.4493,0.312,0.2337,0.184,0.1357,0.0807,0.051,0.0363,0.0237,0.0143,0.009,0.0023,0.0023,0.0007,0,0],[1,0.617,0.4597,0.313,0.223,0.166,0.117,0.0767,0.056,0.0357,0.019,0.0113,0.0103,0.0037,0.0023,0.0007,0.0003,0],[1,0.6063,0.428,0.297,0.2293,0.175,0.1187,0.0723,0.055,0.0313,0.0203,0.0097,0.0093,0.002,0.002,0.0007,0.0007,0],[1,0.6083,0.4403,0.2893,0.209,0.1657,0.1177,0.0783,0.0587,0.037,0.02,0.0143,0.0053,0.004,0.002,0.0003,0,0],[1,0.604,0.4137,0.2757,0.213,0.162,0.1143,0.072,0.047,0.0333,0.0167,0.0097,0.0057,0.005,0.0013,0.0003,0,0],[1,0.607,0.4183,0.2657,0.2093,0.1467,0.118,0.0773,0.0497,0.0313,0.02,0.0137,0.0063,0.0043,0.001,0.001,0,0]]};
+function mFor(he,t){
+  if(t>=1)return 0;
+  const H=PW.he,n=H.length,u=Math.max(0,Math.min(n-1.0001,(he-H[0])/(H[1]-H[0]))),i=Math.floor(u),f=u-i;
+  const row=PW.m.map((_,j)=>PW.P[i][j]*(1-f)+PW.P[i+1][j]*f);
+  for(let j=1;j<row.length;j++)if(row[j]<=t){const a=row[j-1],b=row[j];return b<a?PW.m[j-1]+(PW.m[j]-PW.m[j-1])*(a-t)/(a-b):PW.m[j]}
+  return PW.m[PW.m.length-1];
+}
 function newPhoton(lane,hi){
-  let x=0,he,hs;
-  if(lane.L){x=pickX(lane.L);he=escH(lane.L,x);hs=Math.random()*400}  /* righe: il fotone parte dalla fotosfera */
-  else{hs=HB+20+Math.random()*80;he=Math.max(60*gn(),hs+60)}        /* continuo: parte sotto la fotosfera */
-  const p={h:hs,s:0.15+Math.random()*0.7,he,x,hi,n:0,t:1,fh:hs,fs:0,th:hs,ts:0,fly:false,trail:[],a:1};
+  let x=0,he;
+  const hs=HB+20+Math.random()*80;                    /* tutte le corsie: il fotone parte sotto la fotosfera */
+  let km=0;
+  if(lane.L){x=pickX(lane.L);he=escH(lane.L,x);km=mFor(he,lane.L.tOf(he))}  /* righe: quota di fuga e spegnimento legati alla lunghezza d'onda */
+  else he=Math.max(60*gn(),hs+60);                    /* continuo: sfugge dalla fotosfera */
+  const p={h:hs,s:0.15+Math.random()*0.7,he,x,km,hi,n:0,t:1,fh:hs,fs:0,th:hs,ts:0,fly:false,trail:[],a:1};
   p.fs=p.ts=p.s;
   if(hi){lane.path=[[p.h,p.s]];lane.hiN=0;lane.hiX=x;lane.hiHe=he}
   /* fotone delle ali che si forma già sotto il punto di partenza: esce senza ulteriori urti */
@@ -187,9 +206,11 @@ function newPhoton(lane,hi){
   return p;
 }
 function escape(lane,p){p.fly=true;p.fh=p.h;p.fs=p.s;lane.esc.push(p.he);if(lane.esc.length>200)lane.esc.shift();lane.out++;lane.last=p.he;lane.lastX=p.x;if(p.hi)lane.hiEnd={k:'out',h:p.he}}
-function resetStats(l){l.esc=[];l.out=0;l.dead=0}
+function resetStats(l){l.esc=[];l.out=0;l.dead=0;l.rec=0}
 function zoneFor(l){const key=l.L?l.L.fw:'co';if(l.zKey!==key){l.zKey=key;l.zone=zoneOf(l.L)}return l.zone}
-function resetAll(){LANES.forEach(l=>{l.ph=[];l.fl=[];l.path=[];l.last=null;l.hiEnd=null;resetStats(l);for(let i=0;i<NPH;i++){const p=newPhoton(l,i===0);if(!p.fly)p.t=Math.random();l.ph.push(p)}})}
+/* intervallo tra due emissioni: in media 1/RATE secondi, con una piccola variazione casuale (±30%) */
+const nextGap=()=>(0.7+0.6*Math.random())/RATE;
+function resetAll(){LANES.forEach(l=>{l.ph=[];l.fl=[];l.path=[];l.deadPath=null;l.hiN=0;l.last=null;l.hiEnd=null;resetStats(l);l.nextT=Math.random()/RATE})}
 
 /* ---------- geometria: orizzontale (computer) o verticale (smartphone) ---------- */
 function layout(W,H){
@@ -221,7 +242,7 @@ function step(dt){
         if(p.n>0){lane.fl.push({h:p.h,s:p.s,a:1});if(lane.fl.length>220)lane.fl.shift()}
         if(p.h>=p.he){escape(lane,p);break}
         /* assorbimento negli strati densi: un urto spegne il fotone prima che venga riemesso */
-        if(lane.L&&p.n>0&&Math.random()<pKill(p.h)){
+        if(p.km>0&&p.n>0&&Math.random()<pKill(p.h)*p.km){
           lane.fl.push({h:p.h,s:p.s,a:1,k:'dead'});lane.dead++;
           if(p.hi){lane.hiEnd={k:'dead',h:p.h};lane.deadPath={pts:lane.path.slice(),a:1}}
           p.dead=true;break}
@@ -244,9 +265,15 @@ function step(dt){
     /* fotoni in volo libero */
     for(let j=lane.ph.length-1;j>=0;j--){const p=lane.ph[j];if(!p.fly)continue;
       p.h+=dt*speed*1500;
-      if(p.h>HTOP+250){const hi=p.hi;lane.ph.splice(j,1);if(lane.ph.length<NPH||hi)lane.ph.push(newPhoton(lane,hi))}}
-    while(lane.ph.length<NPH)lane.ph.push(newPhoton(lane,!lane.ph.some(q=>q.hi)));
-    if(lane.ph.length>NPH){const k=lane.ph.findIndex(q=>!q.hi);if(k>=0)lane.ph.splice(k,1)}
+      /* fotone arrivato all'osservatore: esce dal bordo della corsia */
+      if(!p.rcv&&p.h>=HTOP){p.rcv=true;lane.rec++}
+      if(p.h>HTOP+250)lane.ph.splice(j,1)}
+    /* emissione continua: stesso ritmo medio in tutte le corsie, indipendente da quanti fotoni sono in viaggio.
+       Se nessun fotone è evidenziato, il prossimo emesso diventa quello evidenziato. */
+    lane.nextT-=dt*speed;
+    while(lane.nextT<=0){
+      if(lane.ph.length<PHMAX)lane.ph.push(newPhoton(lane,!lane.ph.some(q=>q.hi)));
+      lane.nextT+=nextGap()}
     for(const f of lane.fl)f.a-=dt*speed*(f.k==='dead'?0.7:2.4);
     if(lane.deadPath){lane.deadPath.a-=dt*speed*0.8;if(lane.deadPath.a<=0)lane.deadPath=null}
     lane.fl=lane.fl.filter(f=>f.a>0);
@@ -282,10 +309,25 @@ function draw(){
     {const[ax,ay]=G.P(i,HB,0),[bx,by]=G.P(i,HTOP,0),zg=g.createLinearGradient(ax,ay,bx,by),am=C.dark?0.40:0.30;
       for(let b=0;b<ZN;b++)zg.addColorStop((b+0.5)/ZN,hexA(zc,am*Z.hist[b]));
       g.fillStyle=zg;g.fillRect(R.x0,R.y0,R.x1-R.x0,R.y1-R.y0);
-      /* riquadro della zona cromosferica da cui esce la luce della riga */
-      const[x0,y0]=G.P(i,Z.p10,0),[x1,y1]=G.P(i,Z.p90,1);g.fillStyle=hexA(zc,C.dark?0.16:0.12);g.fillRect(Math.min(x0,x1),Math.min(y0,y1),Math.abs(x1-x0),Math.abs(y1-y0));
-      [Z.p10,Z.p90].forEach(h=>{const[x0,y0]=G.P(i,h,0),[x1,y1]=G.P(i,h,1);line(g,x0,y0,x1,y1,hexA(zc,0.95),1.6)})}
-    [0,400,1200,2000,3000].forEach(h=>{const[x0,y0]=G.P(i,h,0),[x1,y1]=G.P(i,h,1);line(g,x0,y0,x1,y1,h===0||h===3000?C.txt2:C.grid,1,[3,3])});
+      /* riquadro della zona cromosferica da cui esce la luce della riga (solo per le righe:
+         nel continuo la luce esce dalla base della fotosfera e non c'è una zona cromosferica) */
+      if(lane.L){const[x0,y0]=G.P(i,Z.p10,0),[x1,y1]=G.P(i,Z.p90,1);g.fillStyle=hexA(zc,C.dark?0.16:0.12);g.fillRect(Math.min(x0,x1),Math.min(y0,y1),Math.abs(x1-x0),Math.abs(y1-y0));
+        [Z.p10,Z.p90].forEach(h=>{const[x0,y0]=G.P(i,h,0),[x1,y1]=G.P(i,h,1);line(g,x0,y0,x1,y1,hexA(zc,0.95),1.6)})}}
+    /* fotosfera (0–400 km) ridisegnata sopra la sfumatura, coprente e identica in tutte le corsie:
+       sfondo della corsia + tinta arancione. La luce delle ali che esce dalla fotosfera è indicata
+       dall'etichetta "luce fotosferica", dalle tracce tratteggiate e dai riquadri sotto il disegno. */
+    {const[x0,y0]=G.P(i,0,0),[x1,y1]=G.P(i,HPHOT,1),rx=Math.min(x0,x1),ry=Math.min(y0,y1),rw=Math.abs(x1-x0),rh=Math.abs(y1-y0);
+      g.fillStyle=C.bg;g.fillRect(rx,ry,rw,rh);g.fillStyle=C.panel;g.fillRect(rx,ry,rw,rh);
+      g.fillStyle=hexA(REG[1].c,C.dark?0.16:0.12);g.fillRect(rx,ry,rw,rh)}
+    [1200,2000].forEach(h=>{const[x0,y0]=G.P(i,h,0),[x1,y1]=G.P(i,h,1);line(g,x0,y0,x1,y1,C.grid,1,[3,3])});
+    [0,HPHOT].forEach(h=>{const[x0,y0]=G.P(i,h,0),[x1,y1]=G.P(i,h,1);line(g,x0,y0,x1,y1,hexA(REG[1].c,0.95),1.6,[5,3])});
+    {const[x0,y0]=G.P(i,3000,0),[x1,y1]=G.P(i,3000,1);line(g,x0,y0,x1,y1,C.txt2,1,[3,3])}
+    /* etichetta "fotosfera" in basso, dentro la fascia (nella prima corsia orizzontale c'è già la scritta in alto) */
+    {const lc=C.dark?'#F5B74A':'#B8780A';
+      if(G.hor){const xc=G.A(HPHOT/2);font(g,10,700);const wT=g.measureText('fotosfera').width;
+        g.fillStyle=hexA(C.dark?'#1f1f1e':'#ffffff',0.75);rrect(g,xc-wT/2-4,R.y1-17,wT+8,14,3);g.fill();
+        text(g,'fotosfera',xc,R.y1-6.5,{sz:10,w:700,col:lc,al:'center'})}
+      else if(i>0){const y=G.A(0)-4;text(g,'fotosfera',R.x0+4,y,{sz:9.5,w:600,col:lc})}}
     /* quote di fuga recenti (tacche sul bordo) */
     for(const h of lane.esc){const[x,y]=G.P(i,h,G.hor?0.985:0.985);const[x2,y2]=G.P(i,h,G.hor?1:1);g.fillStyle=hexA(lane.col,0.35);if(G.hor)g.fillRect(x-1,y-2,2,6);else g.fillRect(x-4,y-1,8,2)}
     /* percorso completo del fotone evidenziato */
@@ -340,12 +382,16 @@ function draw(){
         text(g,'usciti '+Math.round(100*lane.out/tot)+' %',R.x0-10,R.y1-40,{sz:10.5,w:600,col:lane.col,al:'right'});
         text(g,'spenti '+Math.round(100*lane.dead/tot)+' %',R.x0-10,R.y1-26,{sz:10.5,col:C.txt2,al:'right'})}
       drawEye(g,R.x1+26,(R.y0+R.y1)/2,0);
+      /* fotoni ricevuti dall'osservatore */
+      text(g,'ricevuti',R.x1+26,(R.y0+R.y1)/2+24,{sz:9.5,col:C.txt2,al:'center'});
+      text(g,fmtK(lane.rec||0),R.x1+26,(R.y0+R.y1)/2+39,{sz:13,w:700,col:lane.col,al:'center'});
     }else{
       text(g,lane.n,(R.x0+R.x1)/2,R.y0-22,{sz:12.5,w:700,col:lane.col,al:'center'});
       text(g,lane.L?fmt(lane.L.fw,1)+' Å':'continuo',(R.x0+R.x1)/2,R.y0-8,{sz:10,col:C.txt2,al:'center'});
       text(g,'urti: '+lane.hiN,(R.x0+R.x1)/2,R.y1+14,{sz:10.5,w:600,al:'center'});
       if(lane.L&&lane.out+lane.dead)text(g,'usciti '+Math.round(100*lane.out/(lane.out+lane.dead))+' %',(R.x0+R.x1)/2,R.y1+28,{sz:10,w:600,col:lane.col,al:'center'});
       drawEye(g,(R.x0+R.x1)/2,R.y0-52,0);
+      text(g,fmtK(lane.rec||0),(R.x0+R.x1)/2+16,R.y0-48,{sz:11.5,w:700,col:lane.col})
     }
   });
   /* asse delle quote */
@@ -369,8 +415,9 @@ function cards(){
   $('cards').innerHTML=LANES.map(l=>{
     const n=l.esc.length,mean=n?l.esc.reduce((a,b)=>a+b,0)/n:0,tot=l.out+l.dead;
     let tau0,real;
-    /* profondità ottica del punto di partenza: base della fotosfera per le righe, −400 km per il continuo */
-    if(l.L){tau0=l.L.op(l.hiX||0)}else tau0=Math.exp(-HB/HSC);
+    /* profondità ottica del punto di partenza (−400 km per tutte le corsie):
+       nelle righe τ = 1 si trova alla quota h1(x), quindi τ(−400) = exp((h1 − HB)/HSC) */
+    if(l.L){tau0=l.L.op(l.hiX||0)*Math.exp(-HB/HSC)}else tau0=Math.exp(-HB/HSC);
     const e=Math.max(1,Math.round(Math.log10(tau0*tau0)));
     const sup=String(e).split('').map(c=>'⁰¹²³⁴⁵⁶⁷⁸⁹'[+c]).join('');
     real=tau0*tau0<1000?'≈ '+Math.round(tau0*tau0/10)*10:'≈ 10'+sup;
@@ -397,7 +444,8 @@ setFw(LINES.ha,0.7,'sHa','oHa','pHa');setFw(LINES.ck,2.4,'sCk','oCk','pCk');
 $('sHa').oninput=e=>setFw(LINES.ha,Math.pow(10,+e.target.value),'sHa','oHa','pHa');
 $('sCk').oninput=e=>setFw(LINES.ck,Math.pow(10,+e.target.value),'sCk','oCk','pCk');
 $('sSp').oninput=e=>{speed=+e.target.value;$('oSp').textContent='×'+fmt(speed,speed%1?2:0).replace(',00','')};
-$('sN').oninput=e=>{NPH=+e.target.value;$('oN').textContent=NPH};
+$('sN').oninput=e=>{const old=RATE;RATE=+e.target.value;$('oN').textContent=fmt(RATE,RATE%1?2:0);
+  LANES.forEach(l=>{l.nextT=Math.min(l.nextT,l.nextT*old/RATE)})};
 $('bP').onclick=()=>{run=!run;$('bP').textContent=run?'❚❚':'▶';$('bP').setAttribute('aria-label',run?'Pausa':'Riprendi')};
 $('bR').onclick=()=>resetAll();
 if(!run){$('bP').textContent='▶';$('bP').setAttribute('aria-label','Riprendi')}
