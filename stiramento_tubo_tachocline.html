@@ -100,7 +100,7 @@ body:not(.step1) #intro,body:not(.step1) .s1{display:none!important}
       <div class="irow">
         <button id="iPlay">Avvia</button>
         <label for="iG" style="font-size:13px;color:var(--muted)">Giri dell'equatore sui poli</label>
-        <input type="range" id="iG" min="0" max="0.75" step="any" value="0">
+        <input type="range" id="iG" min="0" max="3" step="any" value="0">
         <output id="iGv">0</output>
       </div>
       <p class="note" id="iLaw" style="margin:0"></p>
@@ -139,6 +139,12 @@ body:not(.step1) #intro,body:not(.step1) .s1{display:none!important}
       <h2>Colore dei tratti</h2>
       <p style="margin:0;font-size:13px">Valore del campo magnetico B</p>
       <canvas id="cLI" class="cv" height="40"></canvas>
+    </div>
+    <div class="card s1">
+      <h2>B nel tempo, oltre la mappa</h2>
+      <canvas id="cBT" class="cv" height="200"></canvas>
+      <div class="leg"><span><i style="border-color:#D85A30"></i>tratto 30°–40°</span><span><i style="border-color:#378ADD"></i>tratto 0°–10°</span><span><i style="border-color:var(--muted)"></i>tratto 80°–90°</span></div>
+      <p class="note" style="margin:0">Tratteggio: oltre i 3 giri della mappa. Solo stiramento, senza il freno della tensione (la saturazione è nel passo 2).</p>
     </div>
     <div class="card s2">
       <div class="row">
@@ -577,7 +583,11 @@ new MutationObserver(retheme).observe(document.documentElement,{attributes:true,
 // ---------- passo 1: mappa 2D del tubo intero, con perline ogni 10° ----------
 const cI=$('cI'),iG=$('iG');let iRun=false,iLast=null,iVal=0;   // iVal: posizione dell'animazione (il cursore la mostra soltanto)
 const segStretch=(a,b,g)=>{let s=0;const n=40,tau=g*2*Math.PI/DO;for(let i=0;i<n;i++)s+=fOf(a+(b-a)*(i+0.5)/n,tau);return s/n;};
-let ISMAX=1;const calcISMAX=()=>ISMAX=Math.max(...Array.from({length:9},(_,k)=>segStretch(k*10*D,(k+1)*10*D,0.75)));
+const GMAP=3;                                        // giri mostrati nella mappa
+let ISMAX=1,GT=21,SMAXT=100;
+const calcISMAX=()=>{ISMAX=Math.max(...Array.from({length:9},(_,k)=>segStretch(k*10*D,(k+1)*10*D,GMAP)));
+  GT=2000*DO/(2*Math.PI);                            // giri in mezzo ciclo (2000 giorni)
+  SMAXT=Math.max(...Array.from({length:9},(_,k)=>segStretch(k*10*D,(k+1)*10*D,GT)));};
 calcISMAX();
 const icol=s=>'#'+cmap(Math.log(s)/Math.log(ISMAX),cc).getHexString();
 function drawIntro(){
@@ -585,24 +595,26 @@ function drawIntro(){
   cI.width=r.width*d;cI.height=r.height*d;const x=cI.getContext('2d');x.setTransform(d,0,0,d,0,0);
   const W=r.width,H=r.height,g=iVal,L=52,R=W-70,T=18,B=H-30;
   const mu=css('--muted'),ink=css('--ink'),ln=css('--line');
-  const X=ph=>L+(R-L)*(ph+12)/(282), Y=lat=>T+(B-T)*(90-lat)/180;
+  const wrap=ph=>((ph%360)+360)%360, X=ph=>L+(R-L)*(ph+6)/372, Y=lat=>T+(B-T)*(90-lat)/180;
   x.font='12px '+css('--f-body');
   for(let la=-90;la<=90;la+=10){x.strokeStyle=ln;x.lineWidth=la===0?1.5:1;x.beginPath();x.moveTo(L,Y(la));x.lineTo(R,Y(la));x.stroke();
     x.fillStyle=mu;x.textAlign='right';x.fillText((la>0?la+'° N':la<0?(-la)+'° S':'0°'),L-6,Y(la)+4);}
   x.textAlign='left';x.fillStyle=ink;x.fillText('polo nord',L+4,Y(90)-5);x.fillText('polo sud',L+4,Y(-90)+15);
   x.fillText('equatore',L+8,Y(0)-6);
-  x.textAlign='center';x.fillStyle=mu;x.fillText('longitudine, nel verso di rotazione (est) →',(L+R)/2,H-8);
+  x.textAlign='center';x.fillStyle=mu;x.fillText('longitudine, nel verso di rotazione (est) →   ciò che esce a destra rientra da sinistra',(L+R)/2,H-8);
+  x.strokeStyle=ln;x.beginPath();x.moveTo(X(360),T);x.lineTo(X(360),B);x.stroke();
   // posizione iniziale e spostamenti delle perline
   x.setLineDash([4,4]);x.strokeStyle=mu;x.lineWidth=1;x.beginPath();x.moveTo(X(0),Y(-90));x.lineTo(X(0),Y(90));x.stroke();
-  for(let la=-80;la<=80;la+=10){const ph=360*g*Wrel(la*D)/DO;if(ph>1){x.beginPath();x.moveTo(X(0),Y(la));x.lineTo(X(ph),Y(la));x.stroke();}}
+  for(let la=-80;la<=80;la+=10){const ph=360*g*Wrel(la*D)/DO;if(ph>1&&ph<360){x.beginPath();x.moveTo(X(0),Y(la));x.lineTo(X(ph),Y(la));x.stroke();}}
   x.setLineDash([]);
   // tratti colorati per allungamento
   for(let la=-90;la<90;la+=10){const a=la*D,b=(la+10)*D,st=segStretch(a,b,g);
     x.strokeStyle=icol(st);x.lineWidth=5;x.lineCap='round';x.beginPath();
-    for(let i=0;i<=30;i++){const l=a+(b-a)*i/30,ph=360*g*Wrel(l)/DO;i?x.lineTo(X(ph),Y(l/D)):x.moveTo(X(ph),Y(l/D));}x.stroke();
-    const lm=(a+b)/2,pm=360*g*Wrel(lm)/DO;x.fillStyle=ink;x.textAlign='left';x.font='500 11px '+css('--f-data');
+    let pw=null;for(let i=0;i<=240;i++){const l=a+(b-a)*i/240,ph=wrap(360*g*Wrel(l)/DO);(pw===null||Math.abs(ph-pw)>180)?x.moveTo(X(ph),Y(l/D)):x.lineTo(X(ph),Y(l/D));pw=ph;}x.stroke();
+    const lm=(a+b)/2,pm=wrap(360*g*Wrel(lm)/DO);x.fillStyle=ink;x.textAlign='left';x.font='500 11px '+css('--f-data');
     x.fillText('×'+st.toFixed(1).replace('.',','),X(pm)+9,Y(lm/D)+4);x.font='12px '+css('--f-body');}
-  for(let la=-90;la<=90;la+=10){const ph=360*g*Wrel(la*D)/DO;x.fillStyle=ink;x.beginPath();x.arc(X(ph),Y(la),4,0,7);x.fill();}
+  for(let la=-90;la<=90;la+=10){const ph=wrap(360*g*Wrel(la*D)/DO);x.fillStyle=ink;
+    for(const q of [ph,ph<6?ph+360:null,ph>354?ph-360:null])if(q!==null){x.beginPath();x.arc(X(q),Y(la),4,0,7);x.fill();}}
   // didascalia guidata e strumenti
   $('iGv').textContent=g.toFixed(2).replace('.',',');
   const s0=segStretch(0,10*D,g),s3=segStretch(30*D,40*D,g),s8=segStretch(80*D,90*D,g);
@@ -612,20 +624,40 @@ function drawIntro(){
   else if(g<0.15){T1='Le perline si spostano';P1='La rotazione differenziale porta avanti le perline verso est: quella all\'equatore più di tutte, quelle vicine ai poli quasi per niente (frecce tratteggiate). Il tubo prende la forma di una freccia con la punta all\'equatore, come nella figura 5.3.';}
   else if(g<0.35){T1='Chi si sposta di più non si allunga';P1='Guarda i due tratti accanto all\'equatore, tra 0° e 10° nord e sud: si spostano più di tutti, ma restano corti (×'+s0.toFixed(1).replace('.',',')+'). Le loro due perline viaggiano quasi appaiate, perché vicino all\'equatore la velocità cambia pochissimo con la latitudine.';}
   else if(g<0.6){T1='Si allunga chi ha le perline a velocità diverse';P1='I tratti a metà strada, tra 20° e 50°, si spostano meno ma si allungano molto (×'+s3.toFixed(1).replace('.',',')+' tra 30° e 40°): la perlina più vicina all\'equatore corre più di quella sopra, e il tratto si tende come un elastico. Vicino ai poli nessuna perlina si muove.';}
-  else{T1='Dove si allunga, B cresce';P1='Il campo di ogni tratto cresce quanto il suo allungamento: B = B₀·L/L₀. Per questo il colore va verso l\'arancione alle medie latitudini e resta blu all\'equatore e ai poli. L\'emisfero sud fa lo stesso, come in uno specchio. Passa al Sole in 3D per vedere il tubo avvolgersi.';}
+  else if(g<0.95){T1='Dove si allunga, B cresce';P1='Il campo di ogni tratto cresce quanto il suo allungamento: B = B₀·L/L₀. Per questo il colore va verso l\'arancione alle medie latitudini e resta blu all\'equatore e ai poli. L\'emisfero sud fa lo stesso, come in uno specchio. ';}
+  else{T1='Il tubo si avvolge attorno al Sole';P1='Oltre un giro il tubo esce a destra e rientra da sinistra: si sta avvolgendo attorno al Sole, come nella figura 5.4. A ogni giro i tratti alle medie latitudini si allungano ancora (×'+s3.toFixed(1).replace('.',',')+' tra 30° e 40°), mentre quelli all\'equatore e ai poli restano quasi intatti. Il grafico a destra mostra come continua la crescita fino a mezzo ciclo. Passa al Sole in 3D per vedere il tubo avvolgersi.';}
   $('iT').textContent=T1;$('iP').textContent=P1;
   const [lg,LW]=fit($('cLI'));const N=100;for(let i=0;i<N;i++){lg.fillStyle='#'+cmap(i/(N-1),cc).getHexString();lg.fillRect(8+(LW-16)*i/N,4,(LW-16)/N+1,12);}
-  lg.font='11px '+css('--f-data');lg.fillStyle=css('--muted');lg.textAlign='left';lg.fillText('B = B₀',8,34);lg.textAlign='right';lg.fillText('B = '+ISMAX.toFixed(1).replace('.',',')+' B₀ (a 0,75 giri)',LW-8,34);
+  lg.font='11px '+css('--f-data');lg.fillStyle=css('--muted');lg.textAlign='left';lg.fillText('B = B₀',8,34);lg.textAlign='right';lg.fillText('B = '+ISMAX.toFixed(1).replace('.',',')+' B₀ (a '+GMAP+' giri)',LW-8,34);
+  drawBT(g);
+}
+function drawBT(g){
+  const [x,W,H]=fit($('cBT'));const mu=css('--muted'),ink=css('--ink');
+  const l=34,r=W-10,t=10,b=H-30,ymax=Math.log10(SMAXT*1.4);
+  const X=v=>l+(r-l)*v/GT, Y=v=>b-(b-t)*Math.log10(Math.max(v,1))/ymax;
+  axes(x,l,r,t,b);x.font='11px '+css('--f-data');x.fillStyle=mu;
+  for(const v of [1,10,100,1000]){if(Math.log10(v)>ymax)break;x.textAlign='right';x.fillText(String(v),l-4,Y(v)+4);
+    x.globalAlpha=0.3;x.strokeStyle=mu;x.beginPath();x.moveTo(l,Y(v));x.lineTo(r,Y(v));x.stroke();x.globalAlpha=1;}
+  x.textAlign='center';x.fillText('0',X(0),b+13);x.fillText(String(GMAP),X(GMAP),b+13);x.fillText(Math.round(GT)+' giri',X(GT)-14,b+13);
+  x.fillText('mezzo ciclo ≈ 5,5 anni →',(X(GMAP)+r)/2,b+26);
+  x.save();x.translate(9,(t+b)/2);x.rotate(-Math.PI/2);x.fillText('B / B₀',0,0);x.restore();
+  x.setLineDash([2,3]);x.strokeStyle=mu;x.beginPath();x.moveTo(X(GMAP),t);x.lineTo(X(GMAP),b);x.stroke();x.setLineDash([]);
+  x.textAlign='left';x.fillText('fine mappa',X(GMAP)+3,t+9);
+  [[30,'#D85A30'],[0,'#378ADD'],[80,mu]].forEach(([a,c])=>{
+    for(const part of [0,1]){x.strokeStyle=c;x.lineWidth=2;x.setLineDash(part?[5,4]:[]);x.beginPath();
+      const g0=part?GMAP:0,g1=part?GT:GMAP;for(let i=0;i<=80;i++){const gg=g0+(g1-g0)*i/80,v=segStretch(a*D,(a+10)*D,gg);i?x.lineTo(X(gg),Y(v)):x.moveTo(X(gg),Y(v));}x.stroke();}
+    x.setLineDash([]);x.fillStyle=c;x.beginPath();x.arc(X(g),Y(segStretch(a*D,(a+10)*D,g)),3.5,0,7);x.fill();});
+  const vEnd=segStretch(30*D,40*D,GT);x.fillStyle=ink;x.textAlign='right';x.fillText('×'+Math.round(vEnd),r,Y(vEnd)-6);
 }
 function setIPlay(){$('iPlay').textContent=iRun?'Pausa':'Avvia';}
-$('iPlay').onclick=()=>{if(iVal>=0.75){iVal=0;iG.value=0;}iRun=!iRun;setIPlay();};
+$('iPlay').onclick=()=>{if(iVal>=GMAP){iVal=0;iG.value=0;}iRun=!iRun;setIPlay();};
 iG.oninput=()=>{iRun=false;setIPlay();iVal=+iG.value;drawIntro();};
-function iLoop(ts){if(iRun&&iLast!==null){iVal+=(ts-iLast)/1000*0.04;if(iVal>=0.75){iVal=0.75;iRun=false;setIPlay();}iG.value=iVal;drawIntro();}iLast=ts;requestAnimationFrame(iLoop);}
+function iLoop(ts){if(iRun&&iLast!==null){iVal+=(ts-iLast)/1000*0.06;if(iVal>=GMAP){iVal=GMAP;iRun=false;setIPlay();}iG.value=iVal;drawIntro();}iLast=ts;requestAnimationFrame(iLoop);}
 new ResizeObserver(drawIntro).observe(cI);
 function setStep(n){document.body.classList.toggle('step1',n===1);$('tab1').classList.toggle('on',n===1);$('tab2').classList.toggle('on',n===2);
   if(n===2){iRun=false;setIPlay();resize();needDraw=true;}else drawIntro();}
 $('tab1').onclick=()=>setStep(1);$('tab2').onclick=()=>setStep(2);$('go3d').onclick=()=>{setStep(2);window.scrollTo({top:0,behavior:'smooth'});};
-function introLaw(){$('iLaw').innerHTML='<b>Modello.</b> '+lawText()+' Rispetto ai poli un punto a latitudine λ si sposta di φ = [Ω(λ) − Ω_pol]·t'+(law==='libro'?' = ΔΩ·t·cos²λ':'')+'; un tratto si allunga di L/L₀ = √(1 + (t·cosλ·dΩ/dλ)²), con il massimo a '+Math.round(LMAX/D)+'° di latitudine. La velocità angolare è simmetrica attorno all\'equatore, quindi lì la curva resta arrotondata con qualsiasi legge; con il passare del tempo la punta si affila.';}
+function introLaw(){$('iLaw').innerHTML='<b>Modello.</b> '+lawText()+' Rispetto ai poli un punto a latitudine λ si sposta di φ = [Ω(λ) − Ω_pol]·t'+(law==='libro'?' = ΔΩ·t·cos²λ':'')+'; un tratto si allunga di L/L₀ = √(1 + (t·cosλ·dΩ/dλ)²), con il massimo a '+Math.round(LMAX/D)+'° di latitudine. La velocità angolare è simmetrica attorno all\'equatore, quindi lì la curva resta arrotondata con qualsiasi legge; con il passare del tempo la punta si affila. Questo passo mostra solo lo stiramento, senza il freno della tensione: la saturazione è nel passo 2.';}
 function setLaw(l){const f=TEND?st.t/TEND:0;law=l;setLawConsts();makeMaxCircles();build();st.t=f*TEND;calcISMAX();lastTau=-1;needDraw=true;
   $('lawB').classList.toggle('on',l==='libro');$('lawS').classList.toggle('on',l==='su');note();introLaw();drawIntro();}
 $('lawB').onclick=()=>setLaw('libro');$('lawS').onclick=()=>setLaw('su');

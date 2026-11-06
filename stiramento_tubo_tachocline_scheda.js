@@ -17,6 +17,10 @@ Le **frecce tratteggiate** mostrano di quanto si sposta ogni perlina: quella all
 
 La mappa deforma le distanze alle alte latitudini, come ogni mappa piana della sfera; i valori ×N sono calcolati sulla sfera e sono corretti.
 
+Il cursore arriva a **3 giri** dell'equatore sui poli. Oltre il primo giro il tubo esce dal bordo destro della mappa e rientra da sinistra, come accade sulla sfera: le strisce quasi orizzontali che si formano alle medie latitudini sono gli avvolgimenti della figura 5.4. Una perlina che si trova proprio sul bordo è disegnata su entrambi i lati.
+
+Il grafico **«B nel tempo, oltre la mappa»** mostra come continua la crescita fino a mezzo ciclo (circa 21 giri, 5,5 anni), in scala logaritmica, per tre tratti: 30°–40°, 0°–10° e 80°–90°. Il tratto pieno corrisponde ai 3 giri della mappa, il tratteggio al seguito. Dopo mezzo ciclo il tratto 30°–40° si è allungato circa 100 volte, quello equatoriale circa 20, quello polare solo circa 3. Il passo 1 mostra solo lo stiramento, senza il freno della tensione: con i valori reali il freno è trascurabile, mentre la saturazione è mostrata nel passo 2.
+
 ## Passo 2: che cosa si vede
 
 - La **sfera della tachocline**, a circa 0,70 raggi solari; sotto c'è la zona radiativa. La sfera trasparente esterna è la fotosfera: in mezzo c'è la zona convettiva. Sono segnati l'**asse di rotazione**, il verso di rotazione, l'**equatore** e i paralleli a **35°**.
