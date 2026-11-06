@@ -1,0 +1,1121 @@
+<!DOCTYPE html>
+<!--
+  © 2026 Carlo Casoli — "Il Sole: Osservazione e Fisica"
+  Licenza CC BY-NC-ND 4.0: https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it
+  Vietati l'uso commerciale e la distribuzione di versioni modificate senza autorizzazione scritta dell'autore.
+-->
+<html lang="it">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>La spirale di Parker - Vento solare e campo magnetico interplanetario</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --panel: #f5f4ef;
+    --text-primary: #1a1a18;
+    --text-secondary: #5f5e5a;
+    --border: #d3d1c7;
+    --blue: #378ADD;
+    --coral: #D85A30;
+    --earth: #2ECC71;
+    --sun: #F0997B;
+    --line: #8f8b80;
+    --particle: #b5701f;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #171716;
+      --panel: #222221;
+      --text-primary: #f1efe8;
+      --text-secondary: #b4b2a9;
+      --border: #444441;
+      --line: #9c988d;
+      --particle: #f0b05a;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 24px;
+    background: var(--bg);
+    color: var(--text-primary);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  @media (max-width: 520px) { body { padding: 16px; } }
+  h1 { font-size: 20px; font-weight: 500; margin: 0 0 4px; text-align: center; }
+  p.subtitle { font-size: 14px; color: var(--text-secondary); margin: 0 0 20px; max-width: 680px; text-align: center; }
+  .wrap { width: 100%; max-width: 680px; }
+
+  .seg { display: flex; gap: 6px; flex-wrap: wrap; }
+  .seg button {
+    flex: 1; min-width: 0; padding: 8px 6px; border-radius: 8px; border: 0.5px solid var(--border);
+    background: var(--panel); color: var(--text-primary); font-size: 13px; cursor: pointer; line-height: 1.25;
+  }
+  .seg button small { display: block; font-size: 11px; color: var(--text-secondary); }
+  .seg button.active { background: var(--text-primary); color: var(--bg); border-color: var(--text-primary); }
+  .seg button.active small { color: var(--bg); opacity: .75; }
+  .seg button:disabled { cursor: not-allowed; opacity: .55; }
+  .scenari { margin-bottom: 12px; }
+
+  .canvas-box {
+    position: relative; width: 100%; height: 460px;
+    border-radius: 12px; overflow: hidden; background: var(--panel); border: 0.5px solid var(--border);
+  }
+  .side-box { height: 190px; margin-top: 10px; display: none; }
+  body.polarita .side-box { display: block; }
+  canvas { width: 100%; height: 100%; display: block; }
+  .hint {
+    position: absolute; bottom: 12px; left: 12px; font-size: 12px;
+    color: var(--text-secondary); background: var(--bg);
+    padding: 6px 10px; border-radius: 8px; border: 0.5px solid var(--border); max-width: 60%;
+  }
+  .graph-box { height: 170px; display: none; }
+  .graph-cap { display: none; font-size: 12px; color: var(--text-secondary); margin: 10px 0 4px; }
+  body.sim .graph-box, body.sim .graph-cap { display: block; }
+  .holebox { display: none; flex-direction: column; gap: 12px; padding: 12px; border-radius: 10px; border: 0.5px solid var(--border); background: var(--panel); }
+  .holebox .note { font-size: 12px; color: var(--text-secondary); line-height: 1.45; margin: 0; }
+  body.buco .holebox { display: flex; }
+  body.buco .quiet-only { display: none; }
+  .buco-only, .cme-only, .sim-only { display: none !important; }
+  body.buco .buco-only, body.cme .cme-only, body.sim .sim-only { display: flex !important; }
+  body.sim p.sim-only { display: block !important; }
+  .cmebox { display: none; flex-direction: column; gap: 12px; padding: 12px; border-radius: 10px; border: 0.5px solid var(--border); background: var(--panel); }
+  .cmebox .note { font-size: 12px; color: var(--text-secondary); line-height: 1.45; margin: 0; }
+  body.cme .cmebox { display: flex; }
+  button.launch {
+    padding: 9px 14px; border-radius: 8px; border: 0.5px solid var(--text-primary); cursor: pointer;
+    background: var(--text-primary); color: var(--bg); font-size: 14px; font-weight: 500; align-self: flex-start;
+  }
+  button.launch:hover { opacity: .85; }
+  .vbar { width: 46px; height: 10px; border-radius: 2px; display: inline-block; flex-shrink: 0;
+    background: linear-gradient(90deg, #2f6fd6, #3fc2d8, #8fd16a, #f2c84b, #e8702a, #b8222a); }
+  .phase {
+    position: absolute; top: 12px; left: 12px; font-size: 12px; line-height: 1.4;
+    color: var(--text-primary); background: var(--bg); display: none;
+    padding: 6px 10px; border-radius: 8px; border: 0.5px solid var(--border); max-width: 55%;
+  }
+  .phase b { font-weight: 600; }
+  body.buco.evo .phase, body.cme .phase { display: block; }
+  @media (max-width: 520px) { .phase { font-size: 11px; padding: 4px 8px; } }
+  .evo-only { display: none; }
+  body.evo .evo-only { display: flex; }
+  @media (min-width: 1100px) {
+    body.sim .wrap { max-width: 1060px; display: grid; grid-template-columns: 680px 1fr; column-gap: 20px; align-items: start; }
+    body.sim .wrap > * { grid-column: 1; }
+    body.sim .wrap > .rightcol { grid-column: 2; grid-row: 2; position: sticky; top: 16px; }
+    body.sim .rightcol .row { flex-wrap: wrap; gap: 4px 10px; }
+    body.sim .rightcol .row label { width: 100%; }
+  }
+  .rightcol { display: none; }
+  body.sim .rightcol { display: block; margin-top: 12px; }
+  @media (min-width: 1100px) { body.sim .rightcol { margin-top: 0; } }
+  .rightcol > div { margin: 0; }
+  .side-cap { display: none; font-size: 12px; color: var(--text-secondary); margin: 10px 0 4px; }
+  body.polarita .side-cap { display: block; }
+  .side-box { margin-top: 0; }
+  .clock {
+    position: absolute; top: 12px; right: 12px; font-size: 12px; font-variant-numeric: tabular-nums;
+    color: var(--text-primary); background: var(--bg); text-align: right;
+    padding: 6px 10px; border-radius: 8px; border: 0.5px solid var(--border);
+  }
+
+  .readout { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 12px; }
+  @media (max-width: 600px) { .readout { grid-template-columns: repeat(2, 1fr); } }
+  .readout .card { background: var(--panel); border: 0.5px solid var(--border); border-radius: 8px; padding: 8px 10px; }
+  .readout .k { font-size: 11px; color: var(--text-secondary); line-height: 1.3; }
+  .readout .v { font-size: 16px; font-weight: 500; margin-top: 2px; font-variant-numeric: tabular-nums; }
+  .readout .v small { display: block; font-size: 11px; font-weight: 400; color: var(--text-secondary); }
+
+  .controls { display: flex; flex-direction: column; gap: 12px; margin-top: 16px; }
+  .row { display: flex; align-items: center; gap: 12px; }
+  .row label { font-size: 13px; color: var(--text-secondary); width: 180px; flex-shrink: 0; }
+  .row span.out { font-size: 13px; font-weight: 500; min-width: 74px; text-align: right; font-variant-numeric: tabular-nums; }
+  @media (max-width: 520px) { .row label { width: 120px; } .row span.out { min-width: 60px; } }
+  input[type=range] { flex: 1; min-width: 0; accent-color: var(--blue); }
+  .toggles { display: flex; gap: 18px; flex-wrap: wrap; }
+  .toggles label { font-size: 13px; color: var(--text-primary); display: flex; align-items: center; gap: 6px; cursor: pointer; }
+  input[type=checkbox] { accent-color: var(--blue); width: 16px; height: 16px; }
+  button.icon {
+    width: 40px; height: 36px; border-radius: 8px; border: 0.5px solid var(--border); flex-shrink: 0;
+    background: var(--panel); color: var(--text-primary); cursor: pointer; font-size: 16px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  button.icon:hover { background: var(--border); }
+  .polbox {
+    display: none; flex-direction: column; gap: 12px; padding: 12px; border-radius: 10px;
+    border: 0.5px solid var(--border); background: var(--panel);
+  }
+  body.polarita .polbox { display: flex; }
+  .polbox .note { font-size: 12px; color: var(--text-secondary); line-height: 1.45; margin: 0; }
+  .polbox .seg button { background: var(--bg); }
+  .polbox .seg button.active { background: var(--text-primary); }
+
+  .legend { display: flex; gap: 8px 16px; margin-top: 14px; flex-wrap: wrap; }
+  .legend .item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-secondary); }
+  .legend .swatch { width: 10px; height: 10px; border-radius: 2px; display: inline-block; flex-shrink: 0; }
+  .legend .pol { display: none; }
+  body.polarita .legend .pol { display: flex; }
+  body.polarita .legend .nopol { display: none; }
+  footer { margin-top: 20px; font-size: 12px; color: var(--text-secondary); text-align: center; max-width: 680px; line-height: 1.5; }
+</style>
+</head>
+<body>
+
+<h1>La spirale di Parker<span class="cc-badge"><span class="cc-n">© 2026 Carlo Casoli ·</span> <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it" target="_blank" rel="license noopener">CC BY-NC-ND 4.0</a></span> <a class="cc-badge cc-doc" href="#scheda" data-scheda>📖 Scheda dell'animazione</a></h1>
+<p class="subtitle">Il vento solare viaggia in linea retta, ma il Sole ruota: il campo magnetico trascinato dal vento si avvolge a spirale nel piano dell'eclittica.</p>
+
+<div class="wrap">
+  <div class="seg scenari" role="group" aria-label="Scenario">
+    <button data-sc="quieto" class="active" aria-pressed="true">Sole quieto<small>vento uniforme</small></button>
+    <button data-sc="buco" aria-pressed="false">Buco coronale<small>vento veloce e CIR</small></button>
+    <button data-sc="cme" aria-pressed="false">CME<small>espulsione di massa</small></button>
+  </div>
+
+  <div class="canvas-box" id="box">
+    <canvas id="cv"></canvas>
+    <div class="hint">Vista dal polo Nord dell'eclittica · Sole non in scala</div>
+    <div class="clock" id="clock">Giorno 0</div>
+    <div class="phase" id="phase"></div>
+  </div>
+
+  <div class="rightcol">
+    <div class="holebox">
+      <div class="row">
+        <label for="vslow">Vento lento</label>
+        <input type="range" min="280" max="450" value="350" step="10" id="vslow" />
+        <span class="out" id="vslow-out">350 km/s</span>
+      </div>
+      <div class="row">
+        <label for="vfast">Vento veloce dal buco coronale (al massimo)</label>
+        <input type="range" min="500" max="800" value="700" step="10" id="vfast" />
+        <span class="out" id="vfast-out">700 km/s</span>
+      </div>
+      <div class="row">
+        <label for="hw">Larghezza del buco coronale (al massimo)</label>
+        <input type="range" min="20" max="160" value="70" step="5" id="hw" />
+        <span class="out" id="hw-out">70°</span>
+      </div>
+      <div class="toggles">
+        <label><input type="checkbox" id="t-evo" checked /> Evoluzione del buco coronale: nascita, crescita, chiusura</label>
+      </div>
+      <div class="row evo-only">
+        <label for="life">Durata della vita del buco</label>
+        <input type="range" min="3" max="12" value="8" step="1" id="life" />
+        <span class="out" id="life-out">8 rotazioni</span>
+      </div>
+      <p class="note">Le modifiche partono dal Sole e si propagano con il vento: servono alcuni giorni perché arrivino alla Terra.</p>
+    </div>
+    <div class="cmebox">
+      <div class="row">
+        <label for="cvel">Velocità di lancio della CME</label>
+        <input type="range" min="400" max="2500" value="1200" step="50" id="cvel" />
+        <span class="out" id="cvel-out">1200 km/s</span>
+      </div>
+      <div class="row">
+        <label for="cw">Ampiezza angolare</label>
+        <input type="range" min="30" max="120" value="60" step="5" id="cw" />
+        <span class="out" id="cw-out">60°</span>
+      </div>
+      <div class="row">
+        <label for="cdir">Direzione di lancio rispetto alla Terra</label>
+        <input type="range" min="-90" max="90" value="0" step="5" id="cdir" />
+        <span class="out" id="cdir-out" style="min-width:96px">verso la Terra</span>
+      </div>
+      <button class="launch" id="launch">Lancia una CME</button>
+      <p class="note">Velocità, ampiezza e direzione valgono per la prossima CME lanciata. Si possono lanciare più CME una dopo l'altra.</p>
+    </div>
+  </div>
+
+  <p class="graph-cap">Ciò che misurerebbe una sonda vicino alla Terra <span id="gcap-days">negli ultimi 8 mesi</span></p>
+  <div class="canvas-box graph-box" id="graphbox">
+    <canvas id="cv3"></canvas>
+  </div>
+
+  <p class="side-cap">Sezione laterale lungo la direzione Sole–Terra: la gonna vista di fianco e la Terra</p>
+  <div class="canvas-box side-box" id="sidebox">
+    <canvas id="cv2"></canvas>
+  </div>
+
+  <div class="readout">
+    <div class="card"><div class="k">Angolo tra campo e direzione radiale alla Terra</div><div class="v" id="r-psi">–</div></div>
+    <div class="card"><div class="k" id="r-trans-k">Tempo di viaggio del vento fino alla Terra</div><div class="v" id="r-trans">–</div></div>
+    <div class="card"><div class="k">Piede sul Sole della linea che arriva alla Terra</div><div class="v" id="r-foot">–</div></div>
+    <div class="card"><div class="k">Polarità del campo alla Terra</div><div class="v" id="r-pol">–</div></div>
+  </div>
+
+  <div class="controls">
+    <div class="row quiet-only">
+      <label for="vw" id="vw-label">Velocità del vento solare</label>
+      <input type="range" min="250" max="800" value="400" step="10" id="vw" />
+      <span class="out" id="vw-out">400 km/s</span>
+    </div>
+    <div class="row">
+      <label for="zoom">Estensione della vista</label>
+      <input type="range" min="1.2" max="6" value="1.6" step="0.1" id="zoom" />
+      <span class="out" id="zoom-out">1,6 UA</span>
+    </div>
+    <div class="row">
+      <label for="spd">Velocità di riproduzione</label>
+      <input type="range" min="0.5" max="10" value="2" step="0.5" id="spd" />
+      <span class="out" id="spd-out">2 giorni/s</span>
+    </div>
+    <div class="row">
+      <label>Tempo</label>
+      <button class="icon" id="play" aria-label="Avvia o ferma l'animazione">&#10074;&#10074;</button>
+      <button class="icon" id="reset" aria-label="Riporta il tempo al 1° gennaio">&#8634;</button>
+      <span style="flex:1"></span>
+    </div>
+    <div class="toggles">
+      <label><input type="checkbox" id="t-pol" /> Mostra le polarità</label>
+      <label><input type="checkbox" id="t-trk" checked /> Segui un pacchetto di vento</label>
+    </div>
+
+    <div class="polbox">
+      <div class="seg" role="group" aria-label="Fase del ciclo solare" id="fasi">
+        <button data-fase="minimo" class="active">Minimo<small>§11.5</small></button>
+        <button data-fase="ascesa">Ascesa<small>§11.6</small></button>
+        <button data-fase="massimo">Massimo<small>§11.7</small></button>
+        <button data-fase="chiusura">Chiusura<small>§11.8</small></button>
+      </div>
+      <p class="note" id="fase-note"></p>
+      <p class="note sim-only">In questo scenario lo sfondo mostra la velocità del vento: le polarità sono indicate dal colore delle linee, dalle frecce e dalla sezione laterale.</p>
+      <div class="row">
+        <label for="tilt">Inclinazione della gonna</label>
+        <input type="range" min="0" max="80" value="10" step="1" id="tilt" />
+        <span class="out" id="tilt-out">10°</span>
+      </div>
+      <div class="row">
+        <label for="folds">Ondulazioni della gonna</label>
+        <input type="range" min="1" max="3" value="1" step="1" id="folds" />
+        <span class="out" id="folds-out">1</span>
+      </div>
+      <div class="toggles">
+        <label><input type="checkbox" id="t-flip" /> Polo Nord del Sole con campo entrante</label>
+      </div>
+    </div>
+  </div>
+
+  <div class="legend">
+    <div class="item"><span class="swatch" style="background:var(--sun);border-radius:50%"></span>Sole (non in scala)</div>
+    <div class="item"><span class="swatch" style="background:var(--earth);border-radius:50%"></span>Terra e linea di campo che la collega al Sole</div>
+    <div class="item sim-only"><span class="vbar"></span>Velocità del vento: 300 · 500 · 700 km/s</div>
+    <div class="item buco-only"><span class="swatch" style="background:var(--text-primary);border-radius:50%;opacity:.7"></span>Plasma compresso (CIR)</div>
+    <div class="item cme-only"><span class="swatch" style="background:var(--text-primary);border-radius:50%;opacity:.7"></span>Plasma compresso davanti alla CME</div>
+    <div class="item cme-only"><span class="swatch" style="background:#9b59d0;border-radius:50%"></span>Materiale della CME</div>
+    <div class="item buco-only"><span class="swatch" style="background:#1a1a18;box-shadow:0 0 0 1px var(--text-secondary)"></span>Buco coronale sul Sole</div>
+    <div class="item nopol"><span class="swatch" style="background:var(--line);"></span>Linee del campo magnetico</div>
+    <div class="item pol"><span class="swatch" style="background:var(--blue);"></span>Campo che punta lontano dal Sole</div>
+    <div class="item pol"><span class="swatch" style="background:var(--coral);"></span>Campo che punta verso il Sole</div>
+    <div class="item"><span class="swatch" style="background:var(--particle);border-radius:50%"></span>Pacchetti di vento solare</div>
+    <div class="item"><span class="swatch" style="background:var(--particle);border-radius:50%;box-shadow:0 0 0 1.5px var(--text-primary)"></span>Pacchetto seguito e suo percorso rettilineo</div>
+  </div>
+</div>
+
+<footer>Modello cinematico semplificato: pacchetti di vento in moto radiale, campo congelato nel plasma (teorema di Alfvén), corrente eliosferica descritta da un'inclinazione e da un numero di ondulazioni. Periodo di rotazione siderale del Sole: 25,4 giorni; inclinazione dell'equatore solare sull'eclittica: 7,25°.</footer>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ---------- costanti (unità: UA, giorni, radianti) ---------- */
+  var AU_KM = 1.496e8, DAY_S = 86400, DEG = Math.PI / 180;
+  var OMEGA = 2 * Math.PI / 25.38;          // rotazione siderale del Sole
+  var OMEGA_E = 2 * Math.PI / 365.25;       // moto orbitale della Terra
+  var INCL = 7.25 * DEG;                     // inclinazione equatore solare / eclittica
+  var N_LINES = 12;
+  var TRACK_LAMBDA = 15 * DEG;
+  var PLANETS = [
+    { n: 'Mercurio', a: 0.387 }, { n: 'Venere', a: 0.723 },
+    { n: 'Marte', a: 1.524 }, { n: 'Giove', a: 5.203 }
+  ];
+  var MESI = ['gen', 'feb', 'mar', 'apr', 'mag', 'giu', 'lug', 'ago', 'set', 'ott', 'nov', 'dic'];
+  var MLEN = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
+  var FASI = {
+    minimo:   { tilt: 10, folds: 1, flip: false, note: 'Gonna quasi piatta e poco inclinata: 2 settori. Con un’inclinazione così piccola conta anche la latitudine della Terra, che durante l’anno sale e scende di 7°.' },
+    ascesa:   { tilt: 35, folds: 2, flip: false, note: 'La gonna si inclina e si ondula: di solito 4 settori, di durata diversa.' },
+    massimo:  { tilt: 70, folds: 2, flip: false, note: 'Gonna molto inclinata, fino quasi ai poli; i campi polari si stanno invertendo.' },
+    chiusura: { tilt: 20, folds: 1, flip: true,  note: 'La gonna torna più piatta, ma i versi sono scambiati rispetto al minimo precedente (ciclo di Hale, §11.9).' }
+  };
+
+  function kmsToAUd(v) { return v * DAY_S / AU_KM; }
+  function AUdToKms(v) { return v * AU_KM / DAY_S; }
+  function wrap2pi(a) { a %= 2 * Math.PI; return a < 0 ? a + 2 * Math.PI : a; }
+  function fmt(x, d) { return x.toFixed(d).replace('.', ','); }
+
+  /* ---------- stato ---------- */
+  var S = { sc: 'quieto', t: 0, playing: true, vkms: 400, R: 1.6, rate: 2, pol: false, trk: true,
+            tilt: 10, folds: 1, flip: false, cmes: [], cv: 1200, cw: 60, cdir: 0, vslow: 350, vfast: 700, hw: 70, evo: true, life: 8 };
+
+  function phiEarth(t) { return Math.PI / 2 + OMEGA_E * t; }
+  var PHI_NODE = phiEarth(249) - Math.PI / 2;
+  function latEcl(phi) { return INCL * Math.sin(phi - PHI_NODE); }
+  function hcsLat(lam) { return Math.atan(Math.tan(S.tilt * DEG) * Math.sin(S.folds * lam)); }
+
+  /* =====================================================================
+     SCENARIO "BUCO CORONALE": simulazione dei pacchetti di vento
+     Lungo NR direzioni fisse nello spazio il Sole emette un pacchetto ogni
+     DTE giorni. La velocità di partenza dipende dalla longitudine solare
+     che in quel momento guarda in quella direzione (buco coronale = veloce).
+     Se un pacchetto raggiunge quello che lo precede, i due si fondono
+     conservando la quantità di moto: è la zona compressa (CIR).
+     ===================================================================== */
+  var NR = 180, DTE = 0.1, HSTEP = 0.1, HOLE_LAM = Math.PI;
+  /* CME: materiale emesso per CME_DUR giorni entro l'ampiezza angolare, con massa
+     CME_MASS volte quella del vento nello stesso intervallo (profilo a coseno) */
+  var CME_DUR = 0.4, CME_MASS = 12;
+  var H = { rays: null, simT: 0, nextE: 0, dom: 0, hist: [], lastSample: -1e9, cycleStart: 0 };
+
+  /* evoluzione del buco coronale: crescita (37,5% della vita), massimo (19%),
+     declino prima rapido poi graduale; poi una rotazione di solo vento lento
+     e nasce un nuovo buco. Le durate seguono il caso osservato da Heinemann et al. (2018). */
+  var P_SYN = 27.27;
+  function holeLife(te) {   // restituisce { A: ampiezza 0..1, fase, rot, nRot }
+    if (!S.evo) return { A: 1, fase: '', rot: 0 };
+    var L = S.life * P_SYN, per = L + P_SYN, x = te - H.cycleStart;
+    if (x < 0) return { A: 0, fase: 'prima della nascita', rot: 0 };
+    var m = x % per;
+    if (m >= L) return { A: 0, fase: 'chiuso: solo vento lento', rot: 0 };
+    var s = m / L, g = 0.375, mx = 0.5625, A, fase, u;
+    if (s < g) { u = s / g; A = u * u * (3 - 2 * u); fase = 'crescita'; }
+    else if (s < mx) { A = 1; fase = 'massimo'; }
+    else { u = (s - mx) / (1 - mx); A = (1 - u) * (1 - u); fase = 'declino'; }
+    return { A: A, fase: fase, rot: Math.floor(m / P_SYN) + 1 };
+  }
+  function vAmb() { return S.sc === 'cme' ? S.vkms : S.vslow; }
+  function v0(lam, te) {
+    if (S.sc === 'cme') return S.vkms;
+    var A = holeLife(te).A;
+    if (A < 0.01) return S.vslow;
+    var d = Math.abs(wrap2pi(lam - HOLE_LAM + Math.PI) - Math.PI);
+    var f = 0.5 * (1 + Math.tanh((S.hw * A / 2 * DEG - d) / (8 * DEG)));
+    var vf = S.vslow + (S.vfast - S.vslow) * (0.5 + 0.5 * A);   // buco più grande, vento più veloce
+    return S.vslow + (vf - S.vslow) * f;
+  }
+  function rayPhi(k) { return k * 2 * Math.PI / NR; }
+
+  function holeInit() {
+    H.dom = Math.max(3.4, S.R * 2.15);
+    H.rays = [];
+    for (var k = 0; k < NR; k++) H.rays.push([]);
+    var spin = H.dom / kmsToAUd(Math.min(vAmb(), 350)) * 1.1 + (S.sc === 'cme' ? 16 : (S.evo ? 0 : 62));
+    H.cycleStart = S.t;
+    H.simT = S.t - spin; H.nextE = H.simT; H.hist = []; H.lastSample = -1e9;
+    holeAdvance(S.t);
+  }
+
+  function holeStep(h) {
+    var t = H.simT, k, j, a;
+    for (k = 0; k < NR; k++) {
+      a = H.rays[k];
+      for (j = 0; j < a.length; j++) a[j].r += a[j].v * h;
+      for (j = 1; j < a.length;) {
+        if (a[j].r >= a[j - 1].r) {
+          var p = a[j - 1], q = a[j], m = p.m + q.m;
+          p.v = (p.m * p.v + q.m * q.v) / m;
+          p.r = (p.m * p.r + q.m * q.r) / m;
+          p.m = m; p.a = Math.min(p.a, q.a); p.b = Math.max(p.b, q.b); p.cm += q.cm;
+          a.splice(j, 1);
+          if (j > 1) j--;
+        } else j++;
+      }
+      while (a.length && a[0].r > H.dom) a.shift();
+    }
+    while (H.nextE <= t + h) {
+      var te = H.nextE;
+      for (k = 0; k < NR; k++) {
+        var v = kmsToAUd(v0(rayPhi(k) - OMEGA * te, te)), cm = 0;
+        if (S.sc === 'cme') {
+          for (var ci = 0; ci < S.cmes.length; ci++) {
+            var cme = S.cmes[ci];
+            if (te < cme.t0 || te >= cme.t0 + CME_DUR) continue;
+            var dc = Math.abs(wrap2pi(rayPhi(k) - cme.phi + Math.PI) - Math.PI);
+            if (dc >= cme.w / 2) continue;
+            var f = Math.cos(dc / (cme.w / 2) * Math.PI / 2); f *= f;
+            v = v + (kmsToAUd(cme.v) - v) * Math.sqrt(f);
+            cm = CME_MASS * f;
+          }
+        }
+        H.rays[k].push({ r: v * (t + h - te), v: v, m: 1 + cm, a: te, b: te, cm: cm });
+      }
+      H.nextE += DTE;
+    }
+    H.simT = t + h;
+  }
+
+  function holeAdvance(tTarget) {
+    if (tTarget < H.simT - 1e-6) { holeInit(); return; }
+    var guard = 0;
+    while (H.simT < tTarget - 1e-9 && guard++ < 4000) {
+      holeStep(Math.min(HSTEP, tTarget - H.simT));
+      if (H.simT - H.lastSample >= 0.25) {
+        var pe = phiEarth(H.simT);
+        var vE = AUdToKms(vAt(1, pe));
+        H.hist.push({ t: H.simT, v: vE, d: dAt(1, pe), c: cAt(1, pe) });
+        if (S.sc === 'cme') S.cmes.forEach(function (c) {
+          var age = H.simT - c.t0;
+          if (c.arr || c.missed || age < 0.3) return;
+          if (vE > S.vkms + 60) c.arr = { dt: age, v: vE };
+          else if (age > 7) c.missed = true;
+        });
+        H.lastSample = H.simT;
+        while (H.hist.length && H.hist[0].t < H.simT - 245) H.hist.shift();
+      }
+    }
+  }
+
+  function rayIdx(phi) {
+    var x = wrap2pi(phi) / (2 * Math.PI) * NR, k0 = Math.floor(x);
+    return [k0 % NR, (k0 + 1) % NR, x - k0];
+  }
+  function rOnRay(a, tau) {
+    var n = a.length, T = H.simT;
+    if (tau >= T) return 0;
+    if (!n) return Infinity;
+    var last = a[n - 1];
+    if (tau > last.b) return last.r * (T - tau) / (T - last.b);
+    if (tau < a[0].a) return Infinity;
+    var lo = 0, hi = n - 1;
+    while (lo < hi) { var mid = (lo + hi + 1) >> 1; if (a[mid].a <= tau) lo = mid; else hi = mid - 1; }
+    var p = a[lo];
+    if (tau <= p.b) return p.r;
+    var q = a[lo + 1];
+    return p.r + (q.r - p.r) * (tau - p.b) / (q.a - p.b);
+  }
+  function bracketR(a, r) { // ultimo indice con a[j].r >= r (raggi decrescenti)
+    var lo = 0, hi = a.length - 1;
+    while (lo < hi) { var mid = (lo + hi + 1) >> 1; if (a[mid].r >= r) lo = mid; else hi = mid - 1; }
+    return lo;
+  }
+  function tauOnRay(a, r) {
+    var n = a.length, T = H.simT;
+    if (!n) return T - r / kmsToAUd(vAmb());
+    var last = a[n - 1];
+    if (r <= last.r) return T - (T - last.b) * r / Math.max(last.r, 1e-9);
+    if (r > a[0].r) return a[0].a - (r - a[0].r) / a[0].v;
+    var j = bracketR(a, r), p = a[j], q = a[j + 1];
+    return p.b + (q.a - p.b) * (p.r - r) / (p.r - q.r);
+  }
+  function vOnRay(a, r) {
+    var n = a.length;
+    if (!n) return kmsToAUd(vAmb());
+    if (r <= a[n - 1].r) return a[n - 1].v;
+    if (r > a[0].r) return a[0].v;
+    var j = bracketR(a, r), p = a[j], q = a[j + 1];
+    return p.v + (q.v - p.v) * (p.r - r) / (p.r - q.r);
+  }
+  function densOf(a, j) {   // densità relativa al vento lento indisturbato
+    var n = a.length, dr;
+    if (n < 2) return 1;
+    if (j === 0) dr = a[0].r - a[1].r;
+    else if (j === n - 1) dr = a[n - 2].r - a[n - 1].r;
+    else dr = (a[j - 1].r - a[j + 1].r) / 2;
+    return a[j].m * kmsToAUd(vAmb()) * DTE / Math.max(dr, 1e-6);
+  }
+  var DWIN = 0.1; // semilarghezza della finestra di media [UA]
+  function dOnRay(a, r) {   // massa nella finestra r ± DWIN, rispetto al vento lento indisturbato
+    var n = a.length;
+    if (n < 2 || r > a[0].r) return 1;
+    var j = bracketR(a, r), m = 0, k;
+    for (k = j; k >= 0 && a[k].r <= r + DWIN; k--) m += a[k].m;
+    for (k = j + 1; k < n && a[k].r >= r - DWIN; k++) m += a[k].m;
+    return m * kmsToAUd(vAmb()) * DTE / (2 * DWIN);
+  }
+  function interpRays(fn, x, phi) {
+    var R = rayIdx(phi), v1 = fn(H.rays[R[0]], x), v2 = fn(H.rays[R[1]], x);
+    if (!isFinite(v1) || !isFinite(v2)) return Infinity;
+    return v1 + (v2 - v1) * R[2];
+  }
+  function vAt(r, phi) { return interpRays(vOnRay, r, phi); }
+  function cAt(r, phi) {   // la Terra è dentro il materiale della CME?
+    var R = rayIdx(phi), a = H.rays[R[2] < 0.5 ? R[0] : R[1]], n = a.length;
+    if (n < 2 || r > a[0].r || r <= a[n - 1].r) return false;
+    var j = bracketR(a, r);
+    return a[j].cm / a[j].m > 0.4 || a[j + 1].cm / a[j + 1].m > 0.4;
+  }
+  function dAt(r, phi) { var R = rayIdx(phi); return R[2] < 0.5 ? dOnRay(H.rays[R[0]], r) : dOnRay(H.rays[R[1]], r); }
+
+  /* ---------- funzioni comuni ai due scenari ---------- */
+  function vQuiet() { return kmsToAUd(S.vkms); }
+  function isSim() { return S.sc !== 'quieto'; }
+  function tNow() { return isSim() ? H.simT : S.t; }
+  // distanza dal Sole, al tempo attuale, del pacchetto emesso al tempo tau nella direzione phi
+  function rAt(phi, tau) { return isSim() ? interpRays(rOnRay, tau, phi) : (S.t - tau) * vQuiet(); }
+  // istante di emissione del pacchetto che ora si trova in (r, phi)
+  function tauAt(r, phi) { return isSim() ? interpRays(tauOnRay, r, phi) : S.t - r / vQuiet(); }
+  function vRef() { return isSim() ? kmsToAUd(vAmb()) : vQuiet(); }
+
+  /* polarità: la gonna "partita" dalla longitudine solare lam = phi - OMEGA*tau.
+     Sopra la gonna: verso dell'emisfero Nord; sotto: dell'emisfero Sud.
+     +1 = campo che punta lontano dal Sole, -1 = verso il Sole. */
+  function polOfLam(lam, phi) {
+    var pN = S.flip ? -1 : 1;
+    return latEcl(phi) > hcsLat(lam) ? pN : -pN;
+  }
+  function polarity(r, phi) { return polOfLam(phi - OMEGA * tauAt(r, phi), phi); }
+
+  /* scala di colori della velocità, simile a quella della Figura 11.1 */
+  var VSTOPS = [[250, [27, 42, 138]], [350, [47, 111, 214]], [450, [63, 194, 216]], [550, [143, 209, 106]],
+                [650, [242, 200, 75]], [750, [232, 112, 42]], [850, [184, 34, 42]]];
+  function vColor(v) {
+    if (v <= VSTOPS[0][0]) return VSTOPS[0][1];
+    for (var i = 1; i < VSTOPS.length; i++) {
+      if (v <= VSTOPS[i][0]) {
+        var a = VSTOPS[i - 1], b = VSTOPS[i], f = (v - a[0]) / (b[0] - a[0]);
+        return [a[1][0] + (b[1][0] - a[1][0]) * f, a[1][1] + (b[1][1] - a[1][1]) * f, a[1][2] + (b[1][2] - a[1][2]) * f];
+      }
+    }
+    return VSTOPS[VSTOPS.length - 1][1];
+  }
+
+  /* ---------- canvas ---------- */
+  var box = document.getElementById('box'), cv = document.getElementById('cv'), ctx = cv.getContext('2d');
+  var sbox = document.getElementById('sidebox'), cv2 = document.getElementById('cv2'), ctx2 = cv2.getContext('2d');
+  var gbox = document.getElementById('graphbox'), cv3 = document.getElementById('cv3'), ctx3 = cv3.getContext('2d');
+  var W = 0, H0 = 0, W2 = 0, H2 = 0, W3 = 0, H3 = 0, DPR = 1;
+  var bg = document.createElement('canvas'), bgx = bg.getContext('2d'), BGN = 150;
+  bg.width = bg.height = BGN;
+  var bgImg = bgx.createImageData(BGN, BGN);
+  function fit(c, x, el) {
+    var w = el.clientWidth, h = el.clientHeight;
+    c.width = Math.round(w * DPR); c.height = Math.round(h * DPR);
+    x.setTransform(DPR, 0, 0, DPR, 0, 0);
+    return [w, h];
+  }
+  function resize() {
+    box.style.height = Math.min(460, Math.max(320, box.clientWidth)) + 'px';
+    DPR = window.devicePixelRatio || 1;
+    var a = fit(cv, ctx, box); W = a[0]; H0 = a[1];
+    a = fit(cv2, ctx2, sbox); W2 = a[0]; H2 = a[1];
+    a = fit(cv3, ctx3, gbox); W3 = a[0]; H3 = a[1];
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  var C = {}, RGB = {};
+  function hexRgb(h) { h = h.replace('#', ''); return [parseInt(h.substr(0, 2), 16), parseInt(h.substr(2, 2), 16), parseInt(h.substr(4, 2), 16)]; }
+  function readColors() {
+    var cs = getComputedStyle(document.documentElement);
+    ['bg', 'panel', 'text-primary', 'text-secondary', 'border', 'blue', 'coral', 'earth', 'sun', 'line', 'particle']
+      .forEach(function (k) { C[k] = cs.getPropertyValue('--' + k).trim(); });
+    RGB.blue = hexRgb(C.blue); RGB.coral = hexRgb(C.coral);
+    RGB.dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+  readColors();
+  if (window.matchMedia) {
+    var mq = window.matchMedia('(prefers-color-scheme: dark)');
+    (mq.addEventListener ? mq.addEventListener.bind(mq, 'change') : mq.addListener.bind(mq))(readColors);
+  }
+  function polColor(s) { return s > 0 ? C.blue : C.coral; }
+  function rgba(rgb, a) { return 'rgba(' + Math.round(rgb[0]) + ',' + Math.round(rgb[1]) + ',' + Math.round(rgb[2]) + ',' + a + ')'; }
+
+  var cx, cy, sc, sunPx = 11;
+  function P(r, phi) { return [cx + r * sc * Math.cos(phi), cy - r * sc * Math.sin(phi)]; }
+
+  /* percorre la linea di campo con piede alla longitudine solare lam, dal Sole verso l'esterno */
+  function traceLine(lam, rLim, cb) {
+    var t = tNow(), Tmax = rLim / vRef() * 1.08, n = 320, dtau = Tmax / n;
+    for (var i = 0; i <= n; i++) {
+      var tau = t - i * dtau, phi = lam + OMEGA * tau, r = rAt(phi, tau);
+      if (!isFinite(r) || r > rLim) break;
+      cb(r, phi, tau);
+    }
+  }
+
+  function strokeLine(lam, rLim, width, alpha, fixedColor) {
+    var prev = null, prevS = 0, base = isSim() ? C['text-primary'] : C.line;
+    ctx.lineWidth = width; ctx.globalAlpha = alpha; ctx.lineCap = 'round';
+    traceLine(lam, rLim, function (r, phi) {
+      if (r * sc < sunPx) return;
+      var p = P(r, phi), s = (S.pol && !fixedColor) ? polOfLam(lam, phi) : 0;
+      if (prev) {
+        ctx.strokeStyle = fixedColor || (S.pol ? polColor(prevS) : base);
+        ctx.beginPath(); ctx.moveTo(prev[0], prev[1]); ctx.lineTo(p[0], p[1]); ctx.stroke();
+      }
+      prev = p; prevS = s;
+    });
+    ctx.globalAlpha = 1;
+  }
+
+  function arrowsOnLine(lam, rList) {
+    var pts = [];
+    traceLine(lam, S.R * 1.5, function (r, phi) { pts.push([r, phi]); });
+    rList.forEach(function (rr) {
+      for (var i = 1; i < pts.length; i++) {
+        if (pts[i][0] >= rr && pts[i - 1][0] < rr) {
+          if (rr * sc < sunPx * 2.5) return;
+          var a = P(pts[i - 1][0], pts[i - 1][1]), b = P(pts[i][0], pts[i][1]);
+          var s = polOfLam(lam, pts[i][1]);
+          var ang = Math.atan2(b[1] - a[1], b[0] - a[0]) + (s > 0 ? 0 : Math.PI), z = 5.5;
+          ctx.save(); ctx.translate(b[0], b[1]); ctx.rotate(ang);
+          ctx.beginPath(); ctx.moveTo(z, 0); ctx.lineTo(-z, -z * 0.75); ctx.lineTo(-z, z * 0.75); ctx.closePath();
+          ctx.fillStyle = polColor(s); ctx.fill(); ctx.restore();
+          return;
+        }
+      }
+    });
+  }
+
+  /* sfondo: settori (Sole quieto) o velocità del vento (buco coronale) */
+  function drawBackground() {
+    var d = bgImg.data, buco = isSim();
+    for (var j = 0; j < BGN; j++) {
+      for (var i = 0; i < BGN; i++) {
+        var x = ((i + 0.5) / BGN * W - cx) / sc, y = (cy - (j + 0.5) / BGN * H0) / sc;
+        var r = Math.sqrt(x * x + y * y), phi = Math.atan2(y, x), o = (j * BGN + i) * 4, c, al;
+        if (buco) {
+          if (r > H.dom) { d[o + 3] = 0; continue; }
+          c = vColor(AUdToKms(vAt(r, phi))); al = RGB.dark ? 150 : 135;
+        } else {
+          c = polarity(r, phi) > 0 ? RGB.blue : RGB.coral; al = 34;
+        }
+        d[o] = c[0]; d[o + 1] = c[1]; d[o + 2] = c[2]; d[o + 3] = al;
+      }
+    }
+    bgx.putImageData(bgImg, 0, 0);
+    ctx.imageSmoothingEnabled = true;
+    ctx.drawImage(bg, 0, 0, W, H0);
+  }
+
+  /* zone compresse (CIR): pacchetti fusi, più densi del vento circostante */
+  function drawCompression() {
+    var rLim = S.R * 1.5;
+    ctx.fillStyle = RGB.dark ? '#ffffff' : '#1a1a18';
+    for (var k = 0; k < NR; k++) {
+      var a = H.rays[k], phi = rayPhi(k);
+      for (var j = 0; j < a.length; j++) {
+        if (a[j].r > rLim) continue;
+        if (a[j].cm > 0.3 && a[j].cm / a[j].m > 0.3) {
+          var pc = P(a[j].r, phi);
+          ctx.save(); ctx.fillStyle = '#9b59d0'; ctx.globalAlpha = 0.75;
+          ctx.beginPath(); ctx.arc(pc[0], pc[1], 2.4, 0, 2 * Math.PI); ctx.fill(); ctx.restore();
+          continue;
+        }
+        if (a[j].m < 2) continue;
+        var D = densOf(a, j);
+        if (D < 1.6) continue;
+        var p = P(a[j].r, phi);
+        ctx.globalAlpha = Math.min(0.85, 0.25 + (D - 1.6) * 0.12);
+        ctx.beginPath(); ctx.arc(p[0], p[1], Math.min(3.2, 1.2 + (D - 1.6) * 0.25), 0, 2 * Math.PI); ctx.fill();
+      }
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  function draw() {
+    var buco = isSim(), soloBuco = S.sc === 'buco';
+    if (buco) holeAdvance(S.t);
+    var t = tNow();
+    cx = W / 2; cy = H0 / 2;
+    sc = (Math.min(W, H0) / 2 - 14) / S.R;
+    var rMax = S.R * 1.5, lam, i, j;
+
+    ctx.clearRect(0, 0, W, H0);
+    if (buco || S.pol) drawBackground();
+
+    /* orbite */
+    ctx.lineWidth = 1;
+    ctx.font = '11px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+    PLANETS.forEach(function (p) {
+      if (p.a * sc < sunPx * 2 || p.a > rMax) return;
+      ctx.setLineDash([2, 4]); ctx.strokeStyle = buco ? C['text-secondary'] : C.border;
+      ctx.beginPath(); ctx.arc(cx, cy, p.a * sc, 0, 2 * Math.PI); ctx.stroke();
+      ctx.setLineDash([]);
+      if (p.a < S.R * 1.05) {
+        ctx.fillStyle = C['text-secondary'];
+        ctx.fillText(p.n, cx + p.a * sc * 0.7071 + 3, cy + p.a * sc * 0.7071 - 3);
+      }
+    });
+    ctx.setLineDash([4, 4]); ctx.strokeStyle = C.earth; ctx.globalAlpha = buco ? 0.9 : 0.5;
+    ctx.beginPath(); ctx.arc(cx, cy, sc, 0, 2 * Math.PI); ctx.stroke();
+    ctx.globalAlpha = 1; ctx.setLineDash([]);
+
+    if (buco) drawCompression();
+
+    /* linee di campo */
+    for (i = 0; i < N_LINES; i++) {
+      lam = (i + 0.5) * 2 * Math.PI / N_LINES;
+      var isTrk = S.trk && Math.abs(lam - TRACK_LAMBDA) < 1e-6;
+      strokeLine(lam, rMax, isTrk ? 2.6 : (buco ? 1.1 : 1.3), isTrk ? 1 : (buco ? 0.6 : 0.85));
+      if (S.pol) arrowsOnLine(lam, [0.33, 0.66, 1.0, 1.33].map(function (f) { return f * S.R; }));
+    }
+
+    /* pacchetti di vento lungo le linee */
+    var dt = (S.R / 22) / vRef(), ph = t % dt;
+    ctx.fillStyle = buco ? C['text-primary'] : C.particle;
+    ctx.globalAlpha = buco ? 0.55 : 1;
+    for (i = 0; i < N_LINES; i++) {
+      lam = (i + 0.5) * 2 * Math.PI / N_LINES;
+      for (j = 0; j < 400; j++) {
+        var tau = t - ph - j * dt, phi = lam + OMEGA * tau, r = rAt(phi, tau);
+        if (!isFinite(r) || r > rMax) break;
+        if (r * sc < sunPx + 2) continue;
+        var p = P(r, phi);
+        ctx.beginPath(); ctx.arc(p[0], p[1], buco ? 1.5 : 2.1, 0, 2 * Math.PI); ctx.fill();
+      }
+    }
+    ctx.globalAlpha = 1;
+
+    /* Terra e linea di campo che la raggiunge */
+    var phiE = phiEarth(S.t);
+    var tauE = tauAt(1, phiE), lamE = phiE - OMEGA * tauE;
+    strokeLine(lamE, 1.0, 2.2, 1, C.earth);
+    var footE = P(sunPx / sc, lamE + OMEGA * t);
+    var E = P(1, phiE);
+    // direzione locale del campo alla Terra
+    var dd = 0.25, tA = tauE + dd, tB = tauE - dd;
+    var A = P(rAt(lamE + OMEGA * tA, tA), lamE + OMEGA * tA), B = P(rAt(lamE + OMEGA * tB, tB), lamE + OMEGA * tB);
+    var radA = -phiE, tanA = Math.atan2(B[1] - A[1], B[0] - A[0]);
+    var psi = wrap2pi(tanA - radA + Math.PI) - Math.PI;
+    var L = 42;
+    ctx.lineWidth = 1.2; ctx.strokeStyle = C['text-primary'];
+    ctx.setLineDash([3, 3]);
+    ctx.beginPath(); ctx.moveTo(E[0], E[1]); ctx.lineTo(E[0] + L * Math.cos(radA), E[1] + L * Math.sin(radA)); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.beginPath(); ctx.moveTo(E[0], E[1]); ctx.lineTo(E[0] + L * Math.cos(radA + psi), E[1] + L * Math.sin(radA + psi)); ctx.stroke();
+    ctx.beginPath(); ctx.arc(E[0], E[1], L * 0.6, Math.min(radA, radA + psi), Math.max(radA, radA + psi), false); ctx.stroke();
+    var mid = radA + psi / 2;
+    ctx.fillStyle = C['text-primary']; ctx.font = 'italic 13px Georgia, serif';
+    ctx.fillText('ψ', E[0] + L * 0.85 * Math.cos(mid) - 4, E[1] + L * 0.85 * Math.sin(mid) + 4);
+    ctx.fillStyle = C.earth;
+    ctx.beginPath(); ctx.arc(E[0], E[1], 6, 0, 2 * Math.PI); ctx.fill();
+    ctx.strokeStyle = C.bg; ctx.lineWidth = 1.5; ctx.stroke();
+    ctx.font = '12px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+    ctx.fillStyle = C['text-primary'];
+    ctx.textAlign = Math.cos(phiE) > 0.2 ? 'right' : (Math.cos(phiE) < -0.2 ? 'left' : 'center');
+    ctx.fillText('Terra', E[0] - 9 * Math.cos(phiE), E[1] + 9 * Math.sin(phiE) + (Math.sin(phiE) > 0 ? 14 : -6));
+    ctx.textAlign = 'left';
+
+    /* pacchetto seguito */
+    if (S.trk) {
+      var T = (S.R * 1.15) / vRef(), t0 = Math.floor(t / T) * T;
+      var dir = TRACK_LAMBDA + OMEGA * t0, rT = rAt(dir, t0);
+      if (isFinite(rT)) {
+        var a0 = P(sunPx / sc, dir), a1 = P(rT, dir);
+        ctx.setLineDash([4, 4]); ctx.lineWidth = 1.5; ctx.strokeStyle = buco ? C['text-primary'] : C.particle;
+        ctx.beginPath(); ctx.moveTo(a0[0], a0[1]); ctx.lineTo(a1[0], a1[1]); ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle = C.particle;
+        ctx.beginPath(); ctx.arc(a1[0], a1[1], 5, 0, 2 * Math.PI); ctx.fill();
+        ctx.strokeStyle = C['text-primary']; ctx.lineWidth = 1.5; ctx.stroke();
+        if (rT * sc > sunPx * 3) {
+          ctx.font = '11px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+          ctx.fillStyle = C['text-primary'];
+          var lw = ctx.measureText('pacchetto seguito').width;
+          var right = a1[0] + 9 + lw < W - 6 && (Math.cos(dir) >= 0 || a1[0] - 9 - lw < 6);
+          ctx.textAlign = right ? 'left' : 'right';
+          ctx.fillText('pacchetto seguito', a1[0] + (right ? 9 : -9), a1[1] - 8);
+          ctx.textAlign = 'left';
+        }
+      }
+    }
+
+    /* Sole, con i piedi delle linee e il buco coronale */
+    var g = ctx.createRadialGradient(cx, cy, sunPx * 0.4, cx, cy, sunPx * 2.4);
+    g.addColorStop(0, 'rgba(240,153,123,0.55)'); g.addColorStop(1, 'rgba(240,153,123,0)');
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(cx, cy, sunPx * 2.4, 0, 2 * Math.PI); ctx.fill();
+    ctx.fillStyle = C.sun; ctx.beginPath(); ctx.arc(cx, cy, sunPx, 0, 2 * Math.PI); ctx.fill();
+    if (soloBuco) {
+      var life = holeLife(t), hc = HOLE_LAM + OMEGA * t, hw = S.hw * life.A / 2 * DEG;
+      if (life.A > 0.02) {
+        ctx.strokeStyle = '#1a1a18'; ctx.lineWidth = 5; ctx.lineCap = 'butt';
+        ctx.beginPath(); ctx.arc(cx, cy, sunPx - 2.5, -hc - hw, -hc + hw, false); ctx.stroke();
+        ctx.lineCap = 'round';
+      }
+      var ph = document.getElementById('phase');
+      if (S.evo) ph.innerHTML = '<b>Buco coronale: ' + life.fase + '</b>' +
+        (life.rot ? '<br>rotazione ' + life.rot + ' di ' + S.life + ' · larghezza ' + Math.round(S.hw * life.A) + '°' : '');
+    }
+    for (i = 0; i < N_LINES; i++) {
+      lam = (i + 0.5) * 2 * Math.PI / N_LINES;
+      var fphi = lam + OMEGA * t, fp = P((sunPx - 2.5) / sc, fphi);
+      ctx.fillStyle = S.pol ? polColor(polOfLam(lam, fphi)) : (buco ? '#ffffff' : C['text-primary']);
+      ctx.beginPath(); ctx.arc(fp[0], fp[1], (S.trk && Math.abs(lam - TRACK_LAMBDA) < 1e-6) ? 2.6 : 1.5, 0, 2 * Math.PI); ctx.fill();
+    }
+    ctx.fillStyle = C.earth;
+    ctx.beginPath(); ctx.arc(footE[0], footE[1], 2.8, 0, 2 * Math.PI); ctx.fill();
+
+    /* letture */
+    var age = t - tauE;
+    document.getElementById('clock').innerHTML = 'Giorno ' + Math.floor(S.t) + '<br>' + dateStr(S.t);
+    document.getElementById('r-psi').textContent = fmt(Math.abs(psi) / DEG, 0) + '°';
+    if (buco) {
+      document.getElementById('r-trans-k').textContent = 'Vento solare alla Terra';
+      document.getElementById('r-trans').innerHTML = fmt(AUdToKms(vAt(1, phiE)), 0) + ' km/s<small>partito dal Sole ' + fmt(age, 1) + ' giorni fa</small>';
+    } else {
+      document.getElementById('r-trans-k').textContent = 'Tempo di viaggio del vento fino alla Terra';
+      document.getElementById('r-trans').textContent = fmt(age, 1) + ' giorni';
+    }
+    document.getElementById('r-foot').textContent = fmt(OMEGA * age / DEG, 0) + '° a ovest';
+    var rp = document.getElementById('r-pol');
+    if (S.pol) {
+      var sE = polOfLam(lamE, phiE), above = latEcl(phiE) > hcsLat(lamE);
+      rp.innerHTML = (sE > 0 ? 'lontano dal Sole' : 'verso il Sole') + '<small>Terra ' + (above ? 'sopra' : 'sotto') + ' la gonna</small>';
+      rp.style.color = polColor(sE); rp.style.fontSize = '';
+    } else {
+      rp.textContent = 'attiva le polarità'; rp.style.color = C['text-secondary']; rp.style.fontSize = '13px';
+    }
+
+    if (S.sc === 'cme') document.getElementById('phase').innerHTML = cmeStatus();
+    if (S.pol) drawSide(phiE);
+    if (buco) drawGraph();
+  }
+
+  function cmeStatus() {
+    var n = S.cmes.length;
+    if (!n) return '<b>Nessuna CME in viaggio</b><br>premi «Lancia una CME»';
+    var c = S.cmes[n - 1], age = H.simT - c.t0, head = '<b>CME n. ' + n + ' (' + c.vk + ' km/s)</b><br>';
+    if (c.arr) return head + 'arrivata alla Terra dopo ' + fmt(c.arr.dt, 1) + ' giorni<br>a ' + fmt(c.arr.v, 0) + ' km/s';
+    if (c.missed) return head + 'non ha colpito la Terra';
+    return head + 'in viaggio da ' + fmt(Math.max(0, age), 1) + ' giorni';
+  }
+
+  function dateStr(t) {
+    var d = ((Math.floor(t) % 365) + 365) % 365, m = 0;
+    while (d >= MLEN[m]) { d -= MLEN[m]; m++; }
+    return (d + 1) + ' ' + MESI[m];
+  }
+
+  /* ---------- sezione laterale lungo la direzione Sole–Terra ---------- */
+  function drawSide(phiE) {
+    var c = ctx2, w = W2, h = H2;
+    var mL = 46, mR = 16, mT = 24, mB = 26;
+    var pw = w - mL - mR, phh = h - mT - mB;
+    var rMax = Math.min(S.R, 1.5);
+    var latMax = Math.min(90, Math.max(20, S.tilt + 12));
+    var X = function (r) { return mL + r / rMax * pw; };
+    var Y = function (lat) { return mT + (latMax - lat / DEG) / (2 * latMax) * phh; };
+    var pN = S.flip ? -1 : 1;
+    c.clearRect(0, 0, w, h);
+
+    var n = 200, pts = [];
+    for (var i = 0; i <= n; i++) {
+      var r = rMax * i / n, tau = tauAt(Math.max(r, 1e-4), phiE);
+      var lat = hcsLat(phiE - OMEGA * tau);
+      pts.push([X(r), Y(Math.max(-latMax * DEG, Math.min(latMax * DEG, lat)))]);
+    }
+    c.beginPath(); c.moveTo(X(0), mT);
+    pts.forEach(function (p) { c.lineTo(p[0], p[1]); });
+    c.lineTo(X(rMax), mT); c.closePath();
+    c.fillStyle = rgba(pN > 0 ? RGB.blue : RGB.coral, 0.18); c.fill();
+    c.beginPath(); c.moveTo(X(0), mT + phh);
+    pts.forEach(function (p) { c.lineTo(p[0], p[1]); });
+    c.lineTo(X(rMax), mT + phh); c.closePath();
+    c.fillStyle = rgba(pN > 0 ? RGB.coral : RGB.blue, 0.18); c.fill();
+    c.beginPath(); pts.forEach(function (p, k) { k ? c.lineTo(p[0], p[1]) : c.moveTo(p[0], p[1]); });
+    c.strokeStyle = C['text-primary']; c.lineWidth = 2; c.stroke();
+
+    c.font = '11px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+    c.fillStyle = C['text-secondary']; c.strokeStyle = C.border; c.lineWidth = 1;
+    c.textAlign = 'right';
+    var step = latMax > 45 ? 30 : 10;
+    for (var L = -Math.floor(latMax / step) * step; L <= latMax; L += step) {
+      c.beginPath(); c.moveTo(mL, Y(L * DEG)); c.lineTo(mL + pw, Y(L * DEG)); c.stroke();
+      c.fillText((L > 0 ? '+' : '') + L + '°', mL - 6, Y(L * DEG) + 4);
+    }
+    c.textAlign = 'center';
+    for (var A = 0.5; A <= rMax + 1e-6; A += 0.5) { if (X(A) + 22 <= w) c.fillText(fmt(A, 1) + ' UA', X(A), h - 8); }
+    c.save(); c.translate(12, mT + phh / 2); c.rotate(-Math.PI / 2);
+    c.fillText('latitudine eliografica', 0, 0); c.restore();
+
+    c.fillStyle = C.sun; c.beginPath(); c.arc(mL, Y(0), 7, -Math.PI / 2, Math.PI / 2); c.fill();
+
+    var latE = latEcl(phiE);
+    c.setLineDash([4, 4]); c.strokeStyle = C.earth; c.lineWidth = 1.2;
+    c.beginPath(); c.moveTo(mL, Y(latE)); c.lineTo(mL + pw, Y(latE)); c.stroke(); c.setLineDash([]);
+    c.fillStyle = C.earth; c.beginPath(); c.arc(X(1), Y(latE), 6, 0, 2 * Math.PI); c.fill();
+    c.strokeStyle = C.bg; c.lineWidth = 1.5; c.stroke();
+
+    c.textAlign = 'left'; c.font = '600 11px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+    c.fillStyle = pN > 0 ? C.blue : C.coral;
+    c.fillText('Sopra la gonna: ' + (pN > 0 ? 'campo lontano dal Sole' : 'campo verso il Sole'), mL + 6, mT - 10);
+    c.fillStyle = pN > 0 ? C.coral : C.blue;
+    c.fillText('Sotto la gonna: ' + (pN > 0 ? 'campo verso il Sole' : 'campo lontano dal Sole'), mL + 6, mT + phh - 6);
+    c.fillStyle = C['text-primary']; c.font = '11px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+    c.fillText('Terra (' + (latE >= 0 ? '+' : '') + fmt(latE / DEG, 1) + '°)', X(1) + 9, Y(latE) - 7);
+  }
+
+  /* ---------- grafico: velocità e densità del vento misurate alla Terra ---------- */
+  function drawGraph() {
+    var c = ctx3, w = W3, h = H3, hist = H.hist;
+    var mL = 46, mR = 40, mT = 22, mB = 26, pw = w - mL - mR, phh = h - mT - mB;
+    var cmeSc = S.sc === 'cme', GW = cmeSc ? 15 : (S.evo ? 240 : 60);
+    var t1 = H.simT, t0 = t1 - GW;
+    var vMin = 250, vMax = cmeSc ? 1450 : 850, dMax = 6;
+    var X = function (t) { return mL + (t - t0) / GW * pw; };
+    var Yv = function (v) { return mT + (1 - (Math.min(v, vMax) - vMin) / (vMax - vMin)) * phh; };
+    var Yd = function (d) { return mT + (1 - Math.min(d, dMax) / dMax) * phh; };
+    c.clearRect(0, 0, w, h);
+
+    c.font = '11px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+    c.strokeStyle = C.border; c.lineWidth = 1; c.fillStyle = C['text-secondary'];
+    c.textAlign = 'right';
+    for (var v = 300; v <= vMax - 50; v += 100) {
+      c.beginPath(); c.moveTo(mL, Yv(v)); c.lineTo(mL + pw, Yv(v)); c.stroke();
+      if (v % 200 === 0 || v === 300) c.fillText(v, mL - 6, Yv(v) + 4);
+    }
+    c.textAlign = 'left';
+    for (var dd = 0; dd <= dMax; dd += 2) c.fillText(dd + '×', mL + pw + 6, Yd(dd) + 4);
+    c.textAlign = 'center';
+    var stp = cmeSc ? 5 : (S.evo ? (w < 500 ? 120 : 60) : (w < 500 ? 20 : 10));
+    for (var ago = GW - stp; ago >= 0; ago -= stp) {
+      var tt = t1 - ago;
+      c.fillText(ago ? ago + ' giorni fa' : 'oggi', X(tt), h - 8);
+    }
+    if (cmeSc) {
+      // passaggio del materiale della CME e istanti di lancio
+      c.fillStyle = 'rgba(155,89,208,0.18)';
+      for (var qi = 1; qi < hist.length; qi++) if (hist[qi].c && hist[qi].t > t0) c.fillRect(X(hist[qi - 1].t), mT, X(hist[qi].t) - X(hist[qi - 1].t) + 0.5, phh);
+      var lastLbl = -1e9;
+      S.cmes.forEach(function (cm) {
+        if (cm.t0 < t0) return;
+        var lx = X(cm.t0), showLbl = lx - lastLbl > 44;
+        if (showLbl) lastLbl = lx;
+        c.strokeStyle = '#9b59d0'; c.setLineDash([2, 3]); c.lineWidth = 1.2;
+        c.beginPath(); c.moveTo(X(cm.t0), mT); c.lineTo(X(cm.t0), mT + phh); c.stroke(); c.setLineDash([]);
+        c.fillStyle = '#9b59d0'; c.textAlign = 'left'; if (showLbl) c.fillText('lancio', lx + 3, mT + 11);
+      });
+    }
+    if (!cmeSc && S.evo && hist.length && hist[0].t > t0 + 1) {
+      var xb = X(hist[0].t);
+      c.strokeStyle = C.border; c.beginPath(); c.moveTo(xb, mT); c.lineTo(xb, mT + phh); c.stroke();
+      c.fillStyle = C['text-secondary']; c.textAlign = 'right';
+      if (xb - mL > 150) {
+        c.fillText('inizio della simulazione:', xb - 8, mT + phh / 2 - 4);
+        c.fillText('nasce il buco coronale \u2192', xb - 8, mT + phh / 2 + 10);
+      }
+    }
+
+    // densità (tratteggio)
+    c.setLineDash([3, 3]); c.strokeStyle = C['text-secondary']; c.lineWidth = 1.3;
+    c.beginPath();
+    var started = false;
+    hist.forEach(function (s) { if (s.t < t0) return; var x = X(s.t), y = Yd(s.d); if (!started) { c.moveTo(x, y); started = true; } else c.lineTo(x, y); });
+    c.stroke(); c.setLineDash([]);
+    // velocità colorata con la stessa scala dello sfondo
+    c.lineWidth = 2.6; c.lineCap = 'round';
+    for (var i = 1; i < hist.length; i++) {
+      if (hist[i - 1].t < t0) continue;
+      c.strokeStyle = rgba(vColor(hist[i].v), 1);
+      c.beginPath(); c.moveTo(X(hist[i - 1].t), Yv(hist[i - 1].v)); c.lineTo(X(hist[i].t), Yv(hist[i].v)); c.stroke();
+    }
+
+    c.textAlign = 'left'; c.font = '600 11px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+    c.fillStyle = C['text-primary'];
+    c.fillText('Velocità alla Terra (km/s)', mL, 14);
+    c.textAlign = 'right'; c.font = '11px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+    c.fillStyle = C['text-secondary'];
+    c.fillText(w < 500 ? '- - densità' : '- - densità rispetto al vento lento', w - 6, 14);
+  }
+
+  /* ---------- ciclo ---------- */
+  var last = null;
+  function frame(ts) {
+    if (last === null) last = ts;
+    var dts = Math.min(0.1, (ts - last) / 1000); last = ts;
+    if (S.playing) S.t += dts * S.rate;
+    draw();
+    requestAnimationFrame(frame);
+  }
+
+  /* ---------- controlli ---------- */
+  function bind(id, key, out, f) {
+    var el = document.getElementById(id), o = document.getElementById(out);
+    function up() { S[key] = parseFloat(el.value); o.textContent = f(S[key]); }
+    el.addEventListener('input', up); up();
+    return function (val) { el.value = val; up(); };
+  }
+  bind('vw', 'vkms', 'vw-out', function (x) { return x + ' km/s'; });
+  bind('zoom', 'R', 'zoom-out', function (x) { return fmt(x, 1) + ' UA'; });
+  document.getElementById('zoom').addEventListener('change', function () { if (isSim() && S.R * 2.15 > H.dom) holeInit(); });
+  bind('spd', 'rate', 'spd-out', function (x) { return fmt(x, x % 1 ? 1 : 0) + ' giorni/s'; });
+  bind('vslow', 'vslow', 'vslow-out', function (x) { return x + ' km/s'; });
+  bind('vfast', 'vfast', 'vfast-out', function (x) { return x + ' km/s'; });
+  bind('hw', 'hw', 'hw-out', function (x) { return x + '°'; });
+  bind('life', 'life', 'life-out', function (x) { return x + ' rotazioni'; });
+  bind('cvel', 'cv', 'cvel-out', function (x) { return x + ' km/s'; });
+  bind('cw', 'cw', 'cw-out', function (x) { return x + '°'; });
+  bind('cdir', 'cdir', 'cdir-out', function (x) { return x === 0 ? 'verso la Terra' : Math.abs(x) + '° ' + (x > 0 ? 'ovest' : 'est'); });
+  document.getElementById('launch').addEventListener('click', function () {
+    if (S.sc !== 'cme') return;
+    S.cmes.push({ t0: H.simT, phi: phiEarth(H.simT) + S.cdir * DEG, v: S.cv, vk: S.cv, w: S.cw * DEG, arr: null, missed: false });
+    if (!S.playing) document.getElementById('play').click();
+  });
+  var te = document.getElementById('t-evo');
+  function applyEvo() {
+    S.evo = te.checked; document.body.classList.toggle('evo', S.evo);
+    document.getElementById('gcap-days').textContent = S.evo ? 'negli ultimi 8 mesi' : 'negli ultimi 60 giorni';
+  }
+  te.addEventListener('change', function () { applyEvo(); if (S.sc === 'buco') holeInit(); });
+  applyEvo();
+  var setTilt = bind('tilt', 'tilt', 'tilt-out', function (x) { return x + '°'; });
+  var setFolds = bind('folds', 'folds', 'folds-out', function (x) { return x + ' (' + (2 * x) + ' settori)'; });
+
+  var tf = document.getElementById('t-flip');
+  tf.addEventListener('change', function () { S.flip = tf.checked; });
+
+  var faseBtns = document.querySelectorAll('#fasi button');
+  function setFase(name) {
+    var f = FASI[name];
+    faseBtns.forEach(function (b) { b.classList.toggle('active', b.dataset.fase === name); });
+    setTilt(f.tilt); setFolds(f.folds);
+    tf.checked = f.flip; S.flip = f.flip;
+    document.getElementById('fase-note').textContent = f.note;
+  }
+  faseBtns.forEach(function (b) { b.addEventListener('click', function () { setFase(b.dataset.fase); }); });
+  setFase('minimo');
+
+  var scBtns = document.querySelectorAll('.scenari button');
+  function setScenario(name) {
+    S.sc = name;
+    scBtns.forEach(function (b) {
+      var on = b.dataset.sc === name;
+      b.classList.toggle('active', on); b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+    document.body.classList.toggle('buco', name === 'buco');
+    document.body.classList.toggle('cme', name === 'cme');
+    document.body.classList.toggle('sim', name !== 'quieto');
+    var vwRow = document.getElementById('vw').closest('.row'), cbox = document.querySelector('.cmebox'), ctl = document.querySelector('.controls');
+    if (name === 'cme') cbox.insertBefore(vwRow, cbox.firstChild); else if (vwRow.parentNode !== ctl) ctl.insertBefore(vwRow, ctl.firstChild);
+    document.getElementById('vw-label').textContent = name === 'cme' ? 'Velocità del vento di fondo' : 'Velocità del vento solare';
+    document.getElementById('gcap-days').textContent = name === 'cme' ? 'negli ultimi 15 giorni' : (S.evo ? 'negli ultimi 8 mesi' : 'negli ultimi 60 giorni');
+    resize();
+    S.cmes = [];
+    if (name !== 'quieto') holeInit();
+  }
+  scBtns.forEach(function (b) { b.addEventListener('click', function () { if (!b.disabled) setScenario(b.dataset.sc); }); });
+
+  var play = document.getElementById('play');
+  play.addEventListener('click', function () {
+    S.playing = !S.playing;
+    play.innerHTML = S.playing ? '&#10074;&#10074;' : '&#9654;';
+  });
+  document.getElementById('reset').addEventListener('click', function () { S.t = 0; S.cmes = []; if (isSim()) holeInit(); });
+  var tp = document.getElementById('t-pol');
+  tp.addEventListener('change', function () {
+    S.pol = tp.checked; document.body.classList.toggle('polarita', S.pol); resize();
+  });
+  var tt = document.getElementById('t-trk');
+  tt.addEventListener('change', function () { S.trk = tt.checked; });
+
+  var qs = /[?&]scenario=(buco|cme)/.exec(location.search);
+  if (qs) setScenario(qs[1]);
+  requestAnimationFrame(frame);
+})();
+</script>
+<style id="cc-copyright">
+.cc-badge{display:inline-block;vertical-align:middle;margin:0 0 0 .5em;padding:2px 8px;border:1px solid currentColor;border-radius:999px;font:400 11.5px/1.35 -apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;letter-spacing:0;text-transform:none;white-space:normal;max-width:100%;box-sizing:border-box;opacity:.8;color:inherit;text-shadow:none;pointer-events:auto}
+.cc-n,.cc-badge a{white-space:nowrap}
+.cc-badge.cc-doc{text-decoration:none;opacity:1;font-weight:600;margin-left:.4em}
+.cc-badge a{color:inherit;text-decoration:underline;text-underline-offset:2px}
+.cc-badge.cc-fixed{position:fixed;top:10px;right:10px;margin:0;z-index:2147483000;background:rgba(10,10,18,.62);color:#f2efe6;border-color:rgba(242,239,230,.45);opacity:1;backdrop-filter:blur(4px)}
+@media (max-width:520px){.cc-badge{font-size:11px;padding:2px 7px}}
+</style>
+<script src="spirale_parker_scheda.js"></script>
+<script src="scheda.js"></script>
+</body>
+</html>
