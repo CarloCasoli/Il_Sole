@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<!--
+  © 2026 Carlo Casoli — "Il Sole: Osservazione e Fisica"
+  Licenza CC BY-NC-ND 4.0: https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it
+  Vietati l'uso commerciale e la distribuzione di versioni modificate senza autorizzazione scritta dell'autore.
+-->
+<html lang="it"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Il ciclo di Dungey: il vento solare e la magnetosfera</title>
+<style>
+:root{box-sizing:border-box}
+*,*:before,*:after{box-sizing:inherit}
+html,body{height:100%;margin:0;background:#05070d;color:#e9e6dd;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;overflow:hidden}
+#c{position:absolute;inset:0;width:100%;height:100%;touch-action:none;display:block}
+#top{position:absolute;left:12px;top:calc(8px + env(safe-area-inset-top,0px));right:220px;pointer-events:none}
+#top h1{margin:0;font-size:19px;font-weight:650;line-height:1.3;pointer-events:auto}
+#top .sub{font-size:12.5px;color:#a9a497;margin-top:2px}
+#cap{position:absolute;left:12px;top:calc(64px + env(safe-area-inset-top,0px));width:min(430px,calc(100vw - 230px));background:rgba(8,10,18,.78);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:9px 12px 10px;font-size:13.5px;line-height:1.48;backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}
+#cap b.t{display:block;font-size:14.5px;color:#fff;margin-bottom:3px}
+#cap .ref{display:block;margin-top:5px;font-size:11.5px;color:#9c978a}
+#cap.hid{display:none}
+#cap b.t{cursor:pointer}
+#cap .tg{display:none;float:right;font-weight:400;color:#9c978a;font-size:12px}
+#cap.mini .body{display:none}
+#side{position:absolute;right:10px;top:calc(46px + env(safe-area-inset-top,0px));width:196px;background:rgba(8,10,18,.78);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:8px;font-size:11.5px;color:#bdb8aa}
+#side canvas{display:block;width:180px;height:262px}
+.leg{display:grid;grid-template-columns:1fr 1fr;gap:3px 8px;margin-top:6px}
+.leg span{display:flex;align-items:center;gap:5px;white-space:nowrap}
+.leg i{display:inline-block;width:14px;height:3px;border-radius:2px}
+#ui{position:absolute;left:10px;right:10px;bottom:calc(10px + env(safe-area-inset-bottom,0px));display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;background:rgba(8,10,18,.82);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:8px 10px}
+.grp{display:flex;gap:4px;align-items:center;flex-wrap:wrap}
+.sep{width:1px;height:24px;background:rgba(255,255,255,.15)}
+button{font:600 13px/1.2 -apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;background:#2a2f3d;color:#eee;border:1px solid rgba(255,255,255,.14);padding:7px 10px;border-radius:7px;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+button.on{background:#e2703a;border-color:#e2703a;color:#fff}
+button.acc{background:#e2703a;border-color:#e2703a;color:#fff}
+button:disabled{opacity:.4}
+#cx{display:none}body.bzN #cx{display:inline-block}#cx.on{background:#6b4fb3;border-color:#6b4fb3}
+body.bzN #nt{display:none}#nt.on{background:#2f8f5b;border-color:#2f8f5b}
+body.ntime #side canvas{height:330px}
+@media (max-width:760px){body.ntime #side canvas{height:170px!important}}
+#ph{font-size:12.5px;color:#cfc9bb;min-width:62px;text-align:center}
+.sl{display:flex;flex-direction:column;font-size:11.5px;color:#bdb8aa;min-width:128px}
+.sl input{width:128px;margin:2px 0 0}
+.sl b{color:#fff;font-weight:600}
+#ro{font-size:12px;color:#d9d4c6;line-height:1.45;min-width:200px}
+#ro .warn{color:#ffb35c;font-weight:600}
+#ro .sub{color:#ff7a7a;font-weight:700}
+#door{position:absolute;left:50%;top:calc(46px + env(safe-area-inset-top,0px));transform:translateX(-50%);padding:5px 12px;border-radius:999px;font-size:13px;font-weight:650;white-space:nowrap;border:1px solid rgba(255,255,255,.2);background:rgba(8,10,18,.8);pointer-events:none}
+#door.op{color:#ffb35c;border-color:#ffb35c88}#door.gr{color:#6ee7a0;border-color:#6ee7a088}#door.cl{color:#8fd0ff;border-color:#8fd0ff88}#door.ss{color:#ff7a7a;border-color:#ff7a7a}
+.lb{position:absolute;left:0;top:0;font-size:12px;pointer-events:none;text-shadow:0 0 4px #000,0 0 2px #000;white-space:nowrap;will-change:transform}
+.lb.big{font-size:13px;font-weight:650}
+/* licenza e scheda */
+.cc-badge{display:inline-block;vertical-align:middle;margin:0 0 0 .5em;padding:2px 8px;border:1px solid currentColor;border-radius:999px;font:400 11.5px/1.35 -apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;letter-spacing:0;text-transform:none;white-space:normal;max-width:100%;box-sizing:border-box;opacity:.8;color:inherit;text-shadow:none;pointer-events:auto}
+.cc-n,.cc-badge a{white-space:nowrap}
+.cc-badge.cc-doc{text-decoration:none;opacity:1;font-weight:600;margin-left:.4em}
+.cc-badge a{color:inherit;text-decoration:underline;text-underline-offset:2px}
+@media (max-width:760px){
+  #top{right:10px}
+  #side{width:112px!important}#side canvas{width:102px!important;height:149px!important}
+  #top h1{font-size:16px}
+  #top .sub{display:none}
+  #cap{top:auto;bottom:calc(var(--uih,120px) + 18px + env(safe-area-inset-bottom,0px));left:8px;right:8px;width:auto;font-size:12.5px;padding:7px 10px;max-height:28vh;overflow:auto}
+  #cap .tg{display:inline}
+  #side{top:calc(58px + env(safe-area-inset-top,0px));right:6px;width:128px;padding:5px}
+  #side canvas{width:118px;height:172px}
+  #door{top:calc(40px + env(safe-area-inset-top,0px));left:8px;transform:none;font-size:11px;white-space:normal;max-width:calc(100vw - 140px);padding:3px 9px}
+  .leg{display:none}
+  button{padding:7px 8px;font-size:12.5px}
+  .sep{display:none}
+  .sl{min-width:104px}.sl input{width:104px}
+  #ro{min-width:0;font-size:11.5px}
+  .lb{font-size:11px}.lb.opt{display:none}
+}
+@media (max-width:520px){.cc-badge{font-size:11px;padding:2px 7px}.cc-n{display:none}}
+</style></head><body>
+<canvas id="c"></canvas>
+<div id="top"><h1>Il ciclo di Dungey<span class="cc-badge"><span class="cc-n">© 2026 Carlo Casoli ·</span> <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it" target="_blank" rel="license noopener">CC BY-NC-ND 4.0</a></span> <a class="cc-badge cc-doc" href="#scheda" data-scheda>📖 Scheda</a></h1>
+<div class="sub">Il vento solare e la magnetosfera terrestre · sezione mezzogiorno–mezzanotte · distanze in raggi terrestri (R⊕)</div></div>
+<div id="cap"></div>
+<div id="door"></div>
+<div id="side"><canvas id="pc" width="360" height="524"></canvas>
+<div class="leg"><span><i style="background:#5fb3ff"></i>chiusa</span><span><i style="background:#6ee7a0"></i>aperta</span><span><i style="background:#ffd34d"></i>del vento</span><span><i style="background:#fff;box-shadow:0 0 4px #fff"></i>seguita</span></div></div>
+<div id="ui">
+  <div class="grp"><button id="bS" class="on">Bz sud</button><button id="bN">Bz nord</button></div>
+  <div class="sep"></div>
+  <div class="grp"><button id="pv" aria-label="Fase precedente">◀</button><span id="ph">Fase 0/8</span><button id="nx" class="acc" aria-label="Fase successiva">Avanti ▶</button><button id="pl">Tutto il ciclo</button><button id="rs">↺</button><button id="cx">Sopra la cuspide</button><button id="nt">Nel tempo</button></div>
+  <div class="sep"></div>
+  <div class="grp"><button id="v3" class="on">3D</button><button id="vs">Sezione</button></div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+'use strict';
+/* =====================================================================
+   Coordinate: piano mezzogiorno–mezzanotte (x verso il Sole, z verso Nord),
+   unità = raggio terrestre. In Three.js: (−x, z, y) con y verso il tramonto.
+   ===================================================================== */
+const clamp=(v,a,b)=>v<a?a:v>b?b:v, lerp=(a,b,t)=>a+(b-a)*t;
+const sst=(e0,e1,x)=>{const t=clamp((x-e0)/(e1-e0),0,1);return t*t*(3-2*t)};
+const ease=t=>{t=clamp(t,0,1);return t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2};
+const win=(t,a,b)=>clamp((t-a)/(b-a),0,1);
+const PI=Math.PI;
+
+/* ---------- Magnetopausa di Shue et al. (1998) ---------- */
+function shue(Bz,Dp){return{r0:(10.22+1.29*Math.tanh(0.184*(Bz+8.14)))*Math.pow(Dp,-1/6.6),al:(0.58-0.007*Bz)*(1+0.024*Math.log(Dp))}}
+
+/* ---------- Modello del campo: funzione di flusso A(x,z); le linee di campo sono le curve A = costante ----------
+   Bz sud : dipolo + campo del vento antiparallelo (linea X sul lato giorno a r0) + coda con lobi (linea X a 25 R⊕)
+   Bz nord: dipolo + campo del vento parallelo (magnetosfera chiusa, punti neutri sopra le cuspidi)          */
+const M={r0:9.8,al:.62,w:1,d:1.5,rxn:25,s:5,x0:-95,dx:.25,n:0,R:null,BL:null};
+function Gz(z){const a=Math.abs(z),d=M.d;return a+d*Math.log1p(Math.exp(-2*a/d))-d*Math.LN2}
+function buildModel(r0,al,w){
+  M.r0=r0;M.al=al;M.w=w;
+  M.kd=1/(2*r0*r0*r0);M.g=(M.s*M.s+M.rxn*M.rxn)/(2*M.rxn**3);M.kN=1/(r0*r0*r0);M.kNn=M.kN/6;
+  M.Axd=1.5/r0;M.Axn=1/M.rxn+M.g*Math.log(1+M.rxn*M.rxn/(M.s*M.s));
+  const T=[];for(let i=0;i<=600;i++){const th=i/600*3.125,r=r0*Math.pow(2/(1+Math.cos(th)),al);T.push([r*Math.cos(th),r*Math.sin(th)])}
+  M.mp=T;
+  M.n=Math.round((r0+1-M.x0)/M.dx)+1;M.R=new Float32Array(M.n);M.BL=new Float32Array(M.n);
+  let j=0;
+  for(let i=0;i<M.n;i++){const x=M.x0+i*M.dx;M.R[i]=rmpRaw(x)}
+  for(let i=0;i<M.n;i++){const x=M.x0+i*M.dx,xc=Math.min(x,-.5),Rc=rmpAt(xc),r2=xc*xc+Rc*Rc;
+    const num=xc*xc/(r2*Math.sqrt(r2))+M.g*Math.log(1+xc*xc/(M.s*M.s));M.BL[i]=num/Gz(Rc)}
+}
+function rmpRaw(x){const T=M.mp;if(x>=T[0][0])return 0;for(let i=1;i<T.length;i++){if(T[i][0]<=x){const a=T[i-1],b=T[i],f=(x-a[0])/(b[0]-a[0]);return a[1]+(b[1]-a[1])*f}}return T[T.length-1][1]}
+function tab(arr,x){let f=(x-M.x0)/M.dx;if(f<=0)return arr[0];if(f>=M.n-1)return arr[M.n-1];const i=f|0;f-=i;return arr[i]+(arr[i+1]-arr[i])*f}
+function rmpAt(x){return x>=M.r0?0:tab(M.R,x)}
+function A(x,z){
+  const r2=x*x+z*z;let a=x*x/(r2*Math.sqrt(r2));
+  if(x>0)a+=(M.w*M.kd-(1-M.w)*M.kN)*x*x;
+  else{a+=M.g*Math.log(1+x*x/(M.s*M.s))}
+  if(x<2){const T=sst(2,-12,x);if(T>0)a-=T*tab(M.BL,x)*Gz(z)}
+  return a}
+function grad(x,z){const h=1e-3*(1+.03*Math.hypot(x,z));return[(A(x+h,z)-A(x-h,z))/(2*h),(A(x,z+h)-A(x,z-h))/(2*h)]}
+
+/* ---------- Tracciamento delle linee (curve di livello) ---------- */
+const XMIN=-86,XMAX=31,ZMAX=46;
+function trace(a,x,z,dir,maxS){
+  const pts=[[x,z]],sx=x,sz=z;let end='max';
+  for(let i=0;i<maxS;i++){
+    const r=Math.hypot(x,z),ds=clamp(.03*r,.02,.7);
+    let[gx,gz]=grad(x,z),gn=Math.hypot(gx,gz)||1e-12;
+    const mx=x-gz/gn*dir*ds*.5,mz=z+gx/gn*dir*ds*.5;
+    [gx,gz]=grad(mx,mz);gn=Math.hypot(gx,gz)||1e-12;
+    x+=-gz/gn*dir*ds;z+=gx/gn*dir*ds;
+    const f=A(x,z)-a;[gx,gz]=grad(x,z);const g2=gx*gx+gz*gz;
+    if(g2>1e-16){let cx=f*gx/g2,cz=f*gz/g2;const cn=Math.hypot(cx,cz);if(cn>ds*.5){cx*=ds*.5/cn;cz*=ds*.5/cn}x-=cx;z-=cz}
+    if(x*x+z*z<1){const rr=Math.hypot(x,z);pts.push([x/rr,z/rr]);end='earth';break}
+    pts.push([x,z]);
+    if(x<XMIN||x>XMAX||Math.abs(z)>ZMAX){end='out';break}
+    if(i>40&&Math.hypot(x-sx,z-sz)<ds*1.2){end='loop';break}
+  }
+  return{pts,end}}
+function traceFrom(a,p,out){
+  if(!p)return null;const[x,z]=p;const[gx,gz]=grad(x,z);let dir=1;
+  if(out&&(-gz*x+gx*z)<0)dir=-1;
+  const f=trace(a,x,z,dir,3500);let pts=f.pts,ends=['start',f.end];
+  if(f.end!=='loop'){const b=trace(a,x,z,-dir,3500);pts=b.pts.reverse().concat(f.pts.slice(1));ends=[b.end,f.end]}
+  const ne=ends.filter(e=>e==='earth').length;
+  return{pts,earth:ne}}
+function bis(f,a,b){let fa=f(a),fb=f(b);if(fa*fb>0)return null;for(let i=0;i<46;i++){const m=(a+b)/2,fm=f(m);if(fa*fm<=0){b=m;fb=fm}else{a=m;fa=fm}}return(a+b)/2}
+const QR={nd:[.002,PI/2-.002],nn:[PI/2+.002,PI-.002],sd:[-PI/2+.002,-.002],sn:[-PI+.002,-PI/2-.002]};
+function foot(a,q){const r=QR[q],ph=bis(p=>A(Math.cos(p),Math.sin(p))-a,r[0],r[1]);return ph==null?null:[Math.cos(ph),Math.sin(ph)]}
+function eqRoot(a,x1,x2){const x=bis(x=>A(x,0)-a,x1,x2);return x==null?null:[x,0]}
+function edgeRoot(a,xe,s){const R=rmpAt(xe)+.5,z=bis(z=>A(xe,z)-a,R,ZMAX-1);return z==null?null:[xe,s*z]}
+function lineFoot(a,q){return traceFrom(a,foot(a,q),true)}
+function resample(pts,N){const L=[0];for(let i=1;i<pts.length;i++)L.push(L[i-1]+Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]));
+  const tot=L[L.length-1]||1,out=[];let j=1;for(let k=0;k<N;k++){const s=tot*k/(N-1);while(j<pts.length-1&&L[j]<s)j++;const f=(s-L[j-1])/((L[j]-L[j-1])||1);out.push([lerp(pts[j-1][0],pts[j][0],f),lerp(pts[j-1][1],pts[j][1],f)])}return out}
+function blend(p,q,w){return p.map((a,i)=>[lerp(a[0],q[i][0],w),lerp(a[1],q[i][1],w)])}
+
+/* ---------- Three.js ---------- */
+const cv=document.getElementById('c');
+const R=new THREE.WebGLRenderer({canvas:cv,antialias:true});
+R.setPixelRatio(Math.min(devicePixelRatio,2));R.setClearColor(0x05070d);
+const S=new THREE.Scene(),cam=new THREE.PerspectiveCamera(30,1,.1,2000);
+const ctl=new THREE.OrbitControls(cam,cv);ctl.enableDamping=true;ctl.dampingFactor=.12;ctl.zoomSpeed=.8;
+let userCam=false;ctl.addEventListener('start',()=>{userCam=true});
+const V3=(x,z,az=0)=>new THREE.Vector3(-x*Math.cos(az),z,x*Math.sin(az));
+S.add(new THREE.AmbientLight(0xffffff,.14));const sun=new THREE.DirectionalLight(0xffffff,1.15);sun.position.set(-100,0,0);S.add(sun);
+
+// stelle
+{const g=new THREE.BufferGeometry(),p=[];for(let i=0;i<900;i++){const u=Math.random()*2-1,t=Math.random()*2*PI,r=900;p.push(r*Math.sqrt(1-u*u)*Math.cos(t),r*u,r*Math.sqrt(1-u*u)*Math.sin(t))}
+g.setAttribute('position',new THREE.Float32BufferAttribute(p,3));S.add(new THREE.Points(g,new THREE.PointsMaterial({color:0x8890a8,size:1.2,sizeAttenuation:false})))}
+
+// Terra
+function earthTex(){const c=document.createElement('canvas');c.width=512;c.height=256;const x=c.getContext('2d');
+  x.fillStyle='#1c4f8c';x.fillRect(0,0,512,256);let s=7;const rnd=()=>(s=(s*16807)%2147483647)/2147483647;
+  for(let i=0;i<70;i++){const cx=rnd()*512,cy=40+rnd()*176,rr=8+rnd()*28;x.fillStyle=rnd()<.6?'#3c7a45':'#8a7a4c';x.beginPath();x.ellipse(cx,cy,rr*1.6,rr,rnd()*3,0,7);x.fill()}
+  x.fillStyle='#eef4f8';x.fillRect(0,0,512,22);x.fillRect(0,236,512,20);return new THREE.CanvasTexture(c)}
+const earth=new THREE.Mesh(new THREE.SphereGeometry(1,48,32),new THREE.MeshPhongMaterial({map:earthTex(),shininess:8}));S.add(earth);
+
+// texture di bagliore
+function glowTex(){const c=document.createElement('canvas');c.width=c.height=128;const x=c.getContext('2d'),g=x.createRadialGradient(64,64,0,64,64,64);
+  g.addColorStop(0,'rgba(255,255,255,1)');g.addColorStop(.2,'rgba(255,240,190,.85)');g.addColorStop(.5,'rgba(255,190,90,.25)');g.addColorStop(1,'rgba(255,150,40,0)');x.fillStyle=g;x.fillRect(0,0,128,128);return new THREE.CanvasTexture(c)}
+const GT=glowTex();
+function mkSprite(col){const s=new THREE.Sprite(new THREE.SpriteMaterial({map:GT,color:col,blending:THREE.AdditiveBlending,transparent:true,depthWrite:false,depthTest:false}));s.visible=false;S.add(s);return s}
+const fl=[mkSprite(0xffffff),mkSprite(0xffffff),mkSprite(0xffffff)];   // lampi nei punti X
+const sheet=mkSprite(0xffe9a8);                                        // foglio di corrente
+
+// superfici: magnetopausa e onda d'urto (metà verso l'alba, per non coprire il piano)
+const surf=new THREE.Group();S.add(surf);
+function lathe(prof,col,op){const nb=36,g=new THREE.BufferGeometry(),pos=[],idx=[];
+  prof.forEach(([x,rho])=>{for(let j=0;j<=nb;j++){const b=PI/2+PI*j/nb;pos.push(-x,rho*Math.cos(b),rho*Math.sin(b))}});
+  for(let i=0;i<prof.length-1;i++)for(let j=0;j<nb;j++){const a=i*(nb+1)+j,b=a+nb+1;idx.push(a,b,a+1,b,b+1,a+1)}
+  g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));g.setIndex(idx);g.computeVertexNormals();
+  return new THREE.Mesh(g,new THREE.MeshBasicMaterial({color:col,transparent:true,opacity:op,side:THREE.DoubleSide,depthWrite:false}))}
+function outline(prof,col,op){const g=new THREE.Group();[1,-1].forEach(s=>{const pts=prof.map(([x,r])=>V3(x,s*r));g.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),new THREE.LineBasicMaterial({color:col,transparent:true,opacity:op})))});return g}
+let mpProf=[],bsProf=[];
+function buildSurfaces(){
+  surf.children.slice().forEach(o=>{surf.remove(o);o.traverse(c=>{if(c.geometry)c.geometry.dispose();if(c.material)c.material.dispose()})});
+  mpProf=[];for(const[x,r]of M.mp){if(x<XMIN)break;mpProf.push([x,r])}
+  bsProf=[];const b0=1.3*M.r0,e=.92;for(let i=0;i<=300;i++){const th=i/300*2.6,r=b0*(1+e)/(1+e*Math.cos(th)),x=r*Math.cos(th);if(x<XMIN)break;bsProf.push([x,r*Math.sin(th)])}
+  surf.userData.mpS=lathe(mpProf,0xb98cff,.075);surf.userData.bsS=lathe(bsProf,0xff9f5a,.04);
+  surf.add(surf.userData.mpS,surf.userData.bsS,outline(mpProf,0xc9a2ff,.75),outline(bsProf,0xffa766,.45));
+  // bagliore dei lobi: la sua intensità segue il campo magnetico nei lobi
+  surf.userData.lobes=[1,-1].map(sg=>{const sh=new THREE.Shape(),xs=[];for(let x=-14;x>=XMIN;x-=1)xs.push(x);
+    sh.moveTo(4,sg*2.5);xs.forEach(x=>sh.lineTo(-x,sg*1.6));xs.slice().reverse().forEach(x=>sh.lineTo(-x,sg*rmpAt(x)*.96));sh.lineTo(4,sg*2.5);
+    const m=new THREE.Mesh(new THREE.ShapeGeometry(sh),new THREE.MeshBasicMaterial({color:0x37e08a,transparent:true,opacity:0,side:THREE.DoubleSide,depthWrite:false,blending:THREE.AdditiveBlending}));surf.add(m);return m});
+  setViewVis()}
+
+// plasma sheet
+const psheet=new THREE.Mesh(new THREE.BoxGeometry(78,1,30),new THREE.MeshBasicMaterial({color:0xff9a55,transparent:true,opacity:.1,depthWrite:false,blending:THREE.AdditiveBlending}));
+psheet.position.set(47,0,0);S.add(psheet);
+// plasmoide
+const plasmoid=new THREE.Mesh(new THREE.SphereGeometry(1,24,16),new THREE.MeshBasicMaterial({color:0xffa060,transparent:true,opacity:0,depthWrite:false,blending:THREE.AdditiveBlending}));
+plasmoid.scale.set(7,1.8,6);plasmoid.visible=false;S.add(plasmoid);
+
+// particelle del vento solare
+const NPW=1400,pw=[],pwG=new THREE.BufferGeometry(),pwP=new Float32Array(NPW*3);
+for(let i=0;i<NPW;i++)pw.push({x:XMIN+Math.random()*(XMAX+4-XMIN),b:Math.sqrt(Math.random())*44,beta:Math.random()*2*PI,v:.8+Math.random()*.4});
+pwG.setAttribute('position',new THREE.BufferAttribute(pwP,3));
+const pwPts=new THREE.Points(pwG,new THREE.PointsMaterial({color:0xffb070,size:2.2,sizeAttenuation:false,transparent:true,opacity:.55,depthWrite:false}));S.add(pwPts);
+function bsAt(x){for(let i=1;i<bsProf.length;i++)if(bsProf[i][0]<=x){const a=bsProf[i-1],b=bsProf[i],f=(x-a[0])/(b[0]-a[0]);return a[1]+(b[1]-a[1])*f}return x>(bsProf[0]||[0])[0]?0:1e9}
+function stepWind(dt,spd){for(let i=0;i<NPW;i++){const q=pw[i];const Rb=rmpAt(q.x)*1.06,inSh=q.b<bsAt(q.x)&&q.x<1.3*M.r0+.5;
+  q.x-=dt*spd*q.v*(inSh?.55:1);if(q.x<XMIN-2){q.x=XMAX+2+Math.random()*3;q.b=Math.sqrt(Math.random())*44}
+  const rho=Math.sqrt(q.b*q.b+Rb*Rb);pwP[i*3]=-q.x;pwP[i*3+1]=rho*Math.sin(q.beta);pwP[i*3+2]=rho*Math.cos(q.beta)}pwG.attributes.position.needsUpdate=true}
+
+// getti di plasma
+const NJ=500,jets=[],jG=new THREE.BufferGeometry(),jP=new Float32Array(NJ*3),jC=new Float32Array(NJ*3);
+jG.setAttribute('position',new THREE.BufferAttribute(jP,3));jG.setAttribute('color',new THREE.BufferAttribute(jC,3));
+S.add(new THREE.Points(jG,new THREE.PointsMaterial({size:4,sizeAttenuation:false,vertexColors:true,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false})));
+function spawnJet(kind,n){for(let k=0;k<n&&jets.length<NJ;k++)jets.push({kind,s:0,sp:.35+Math.random()*.35,sg:Math.random()<.5?1:-1,o:(Math.random()-.5),az:(Math.random()-.5)*.5})}
+function mpPoint(th,fac){const r=M.r0*Math.pow(2/(1+Math.cos(th)),M.al)*fac;return[r*Math.cos(th),r*Math.sin(th)]}
+function stepJets(dt){for(let i=jets.length-1;i>=0;i--){const j=jets[i];j.s+=dt*j.sp;if(j.s>=1)jets.splice(i,1)}
+  for(let i=0;i<NJ;i++){if(i>=jets.length){jP[i*3]=0;jP[i*3+1]=-9999;jP[i*3+2]=0;continue}const j=jets[i];let x,z,c;
+    if(j.kind==='day'){const p=mpPoint(j.s*1.9,.97+.04*j.o);x=p[0];z=j.sg*p[1];c=[1,.85,.45]}
+    else if(j.kind==='cusp'){const p=mpPoint(.75+.25*j.o,.92);const f=j.s;x=lerp(p[0],Math.cos(1.25)*1.05,f);z=j.sg*lerp(p[1],Math.sin(1.25)*1.05,f);c=[.6,1,.7]}
+    else if(j.kind==='earthward'){x=lerp(-24,-9,j.s);z=j.o*1.2*(1-j.s);c=[1,.75,.4]}
+    else{x=-25-j.s*30;z=j.o*1.5;c=[1,.6,.3]}
+    const v=V3(x,z,j.az);jP[i*3]=v.x;jP[i*3+1]=v.y;jP[i*3+2]=v.z;const a=Math.sin(PI*j.s);jC[i*3]=c[0]*a;jC[i*3+1]=c[1]*a;jC[i*3+2]=c[2]*a}
+  jG.attributes.position.needsUpdate=true;jG.attributes.color.needsUpdate=true}
+
+/* ---------- particelle che scorrono lungo le linee di campo ---------- */
+const NLP=320,lp=[],lpG=new THREE.BufferGeometry(),lpP=new Float32Array(NLP*3),lpC=new Float32Array(NLP*3),lpAcc=[];
+lpG.setAttribute('position',new THREE.BufferAttribute(lpP,3));lpG.setAttribute('color',new THREE.BufferAttribute(lpC,3));
+{const c=document.createElement('canvas');c.width=c.height=64;const x=c.getContext('2d'),g=x.createRadialGradient(32,32,0,32,32,32);g.addColorStop(0,'rgba(255,255,255,1)');g.addColorStop(.55,'rgba(255,255,255,1)');g.addColorStop(.75,'rgba(255,255,255,.35)');g.addColorStop(1,'rgba(255,255,255,0)');x.fillStyle=g;x.fillRect(0,0,64,64);
+ const m=new THREE.Points(lpG,new THREE.PointsMaterial({size:innerWidth>760?8:6,map:new THREE.CanvasTexture(c),sizeAttenuation:false,vertexColors:true,transparent:true,depthWrite:false,depthTest:false}));m.renderOrder=10;m.frustumCulled=false;S.add(m)}
+function stepLP(dt,st){const SS=st.streams||[];
+  SS.forEach((q,i)=>{lpAcc[i]=(lpAcc[i]||0)+q.rate*dt;while(lpAcc[i]>=1){lpAcc[i]-=1;if(lp.length<NLP)lp.push({line:q.line,u0:q.u0,u1:q.u1,p:0,sp:1/q.dur,col:q.col})}});
+  if(!SS.length)lpAcc.length=0;
+  for(let i=lp.length-1;i>=0;i--){lp[i].p+=dt*lp[i].sp;if(lp[i].p>=1)lp.splice(i,1)}
+  const cache={},get=k=>{if(k in cache)return cache[k];const l=st.lines.find(x=>x&&x.kind===k&&x.pts);return cache[k]=l?{r:resample(l.pts,200),az:l.az||0}:null};
+  for(let i=0;i<NLP;i++){const q=lp[i],L=q&&get(q.line);if(!L){lpP[i*3+1]=-9999;continue}
+    const u=clamp(lerp(q.u0,q.u1,q.p),0,1)*199,k=Math.min(198,Math.floor(u)),f=u-k,a=L.r[k],b=L.r[k+1],v=V3(lerp(a[0],b[0],f),lerp(a[1],b[1],f),L.az);
+    lpP[i*3]=v.x;lpP[i*3+1]=v.y;lpP[i*3+2]=v.z;const br=Math.min(1,Math.sin(PI*q.p)*2+.45);lpC[i*3]=q.col[0]*br;lpC[i*3+1]=q.col[1]*br;lpC[i*3+2]=q.col[2]*br}
+  lpG.attributes.position.needsUpdate=true;lpG.attributes.color.needsUpdate=true}
+const R200=pts=>resample(pts,200);
+const uNear=(pts,q)=>nearestIdx(R200(pts),q)/199;
+const uX=(pts,xc)=>{const r=R200(pts);for(let i=0;i<200;i++)if(r[i][0]<xc)return i/199;return 1};
+const uApex=pts=>{const r=R200(pts);let b=0;r.forEach((q,i)=>{if(q[0]<r[b][0])b=i});return b/199};
+const heroOf=o=>o.lines.find(l=>l.kind==='hero'),twinOf=o=>o.lines.find(l=>l.kind==='twin');
+const CSH=[1,.55,.15],CEL=[.2,1,.45];   // plasma del vento (arancio), elettroni dell'aurora (verde-azzurro)
+
+/* ---------- linee di sfondo ---------- */
+const COL={closed:0x5fb3ff,open:0x6ee7a0,imf:0xffd34d};
+const BSTOP=[[0,new THREE.Color(0x37e08a)],[.5,new THREE.Color(0x3fd0ff)],[1,new THREE.Color(0xff4fb8)]];
+function colB(B){const x=clamp((B-20)/20,0,1);for(let i=1;i<BSTOP.length;i++)if(x<=BSTOP[i][0]){const a=BSTOP[i-1],b=BSTOP[i];return a[1].clone().lerp(b[1],(x-a[0])/(b[0]-a[0]))}return BSTOP[BSTOP.length-1][1].clone()}
+function lobeB(phi){const R=M.Rref||rmpAt(-20);return phi*1e9/(PI*(R*6.371e6)**2/2)*1e9}
+const bgPlane=new THREE.Group(),bgDeco=new THREE.Group();S.add(bgPlane,bgDeco);
+function addLine(grp,pts,col,op,az=0,rotX=0){const v=pts.map(p=>{const q=V3(p[0],p[1],az);if(rotX){const y=q.y,z=q.z;q.y=y*Math.cos(rotX)-z*Math.sin(rotX);q.z=y*Math.sin(rotX)+z*Math.cos(rotX)}return q});
+  grp.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(v),new THREE.LineBasicMaterial({color:col,transparent:true,opacity:op})))}
+const coneG=new THREE.ConeGeometry(.42,1.3,10);
+function addCone(grp,p,dir,col){const m=new THREE.Mesh(coneG,new THREE.MeshBasicMaterial({color:col}));m.position.copy(V3(p[0],p[1]));
+  m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),V3(dir[0],dir[1]).normalize());grp.add(m)}
+function ptNear(pts,fn){let best=null,bv=1e9;for(const p of pts){const v=fn(p);if(v<bv){bv=v;best=p}}return best}
+function tangentAt(pts,p){const i=pts.indexOf(p),a=pts[Math.max(0,i-2)],b=pts[Math.min(pts.length-1,i+2)];return[b[0]-a[0],b[1]-a[1]]}
+function clearGrp(g){g.children.slice().forEach(o=>{g.remove(o);if(o.geometry&&o.geometry!==coneG)o.geometry.dispose();if(o.material)o.material.dispose()})}
+function nightBg(){const Axn=M.Axn;const L=(a,seed,col,op,deco)=>{const l=traceFrom(a,seed,true);if(!l||l.pts.length<3)return null;addLine(bgPlane,l.pts,col,op);if(deco)deco(l);return l};
+  const LT=(a,seed,col,op,deco)=>{const l=traceFrom(a,seed,true);if(!l||l.pts.length<3)return null;const c=new THREE.CatmullRomCurve3(resample(l.pts,140).map(p=>V3(p[0],p[1])));
+    const m=new THREE.Mesh(new THREE.TubeGeometry(c,280,M.lobeR||.12,6,false),new THREE.MeshBasicMaterial({color:COL.open,transparent:true,opacity:.9}));bgPlane.add(m);lobeMeshes.push(m);if(deco)deco(l);return l};
+    (M.lobeF||[.06,.2,.38,.56,.74,.9]).forEach((f,fi)=>{const a=Axn*f;['nn','sn'].forEach(q=>(M.lobeTube?LT:L)(a,foot(a,q),COL.open,.5,l=>{
+      [-.75,-.4,.4,.75].forEach(rx=>addLine(bgDeco,l.pts.filter(p=>p[0]<-1.5||Math.abs(p[1])>.0),COL.open,.14,0,rx));
+      if(fi===2){const p=ptNear(l.pts,q=>Math.abs(q[0]+52));if(p)addCone(bgPlane,p,[q==='nn'?1:-1,0],COL.open)}}))});
+    [.006,.02,.05,.1,.2,.42].forEach(d=>L(Axn+d,foot(Axn+d,'nn'),COL.closed,.55,l=>{[-.55,-.28,.28,.55].forEach(az=>addLine(bgDeco,l.pts,COL.closed,.16,az))}));
+    [.008,.025,.045].forEach(d=>L(Axn+d,eqRoot(Axn+d,XMIN+.5,-M.rxn-.3),COL.imf,.4));
+    if(M.w>=.5)[-.02,-.06,-.12,-.2].forEach(a=>{L(a,edgeRoot(a,XMIN+.6,1),COL.imf,.32);L(a,edgeRoot(a,XMIN+.6,-1),COL.imf,.32)});
+}
+const lobeMeshes=[];
+function buildBackground(){lobeMeshes.length=0;
+  clearGrp(bgPlane);clearGrp(bgDeco);const south=M.w>=.5;
+  const L=(a,seed,col,op,deco)=>{const l=traceFrom(a,seed,true);if(!l||l.pts.length<3)return null;addLine(bgPlane,l.pts,col,op);if(deco)deco(l);return l};
+  if(south){
+    const Axd=M.Axd,Axn=M.Axn;
+    [.012,.04,.09,.17,.3,.55].forEach((d,i)=>L(Axd+d,foot(Axd+d,'nd'),COL.closed,.55,l=>{
+      [-.6,-.3,.3,.6].forEach(az=>addLine(bgDeco,l.pts,COL.closed,.16,az));
+      if(i===0){const p=ptNear(l.pts,q=>Math.abs(q[1])+(q[0]<0?99:0));if(p)addCone(bgPlane,p,[0,1],COL.closed)}}));
+    [.012,.05,.12,.22,.34].forEach(d=>L(Axd+d,eqRoot(Axd+d,M.r0+.05,XMAX-.5),COL.imf,.5,l=>{const p=ptNear(l.pts,q=>Math.abs(q[1]-24));if(p&&Math.abs(p[1]-24)<3)addCone(bgPlane,p,[0,-1],COL.imf)}));
+    [.3,.65].forEach(f=>{L(Axd*f,foot(Axd*f,'nd'),COL.open,.45);L(Axd*f,foot(Axd*f,'sd'),COL.open,.45)});
+    nightBg();
+  }else{
+    [.01,.04,.09,.16,.27,.45].forEach((a,i)=>L(a,foot(a,'nd'),COL.closed,.55,l=>{[-.6,-.3,.3,.6].forEach(az=>addLine(bgDeco,l.pts,COL.closed,.16,az));
+      if(i===0){const p=ptNear(l.pts,q=>Math.abs(q[1])+(q[0]<0?99:0));if(p)addCone(bgPlane,p,[0,1],COL.closed)}}));
+    nightBg();
+  }
+  setViewVis()}
+
+/* ---------- linee in primo piano (la linea seguita) ---------- */
+const fg=new THREE.Group();S.add(fg);
+const FGC={hero:0xffffff,twin:0xd6ffe4,imf:0xffe27a,flow:0x5fb3ff,path:0x8fd0ff};
+function drawFG(lines){clearGrp(fg);const rad=clamp(cam.position.distanceTo(ctl.target)*.0021,.05,.5);
+  for(const l of lines){if(!l||((!l.pts||l.pts.length<3)&&!l.v3))continue;const op=l.op==null?1:l.op;if(op<.02)continue;
+    const pts=l.v3?l.v3:resample(l.pts,Math.min(260,Math.max(40,l.pts.length))).map(p=>V3(p[0],p[1],l.az||0));
+    const curve=new THREE.CatmullRomCurve3(pts);const seg=pts.length*2;
+    const r=l.kind==='hero'&&!l.thin?rad:l.kind==='flow'||l.kind==='path'?rad*.38:rad*.6,c=FGC[l.kind];
+    fg.add(new THREE.Mesh(new THREE.TubeGeometry(curve,seg,r,6,false),new THREE.MeshBasicMaterial({color:c,transparent:true,opacity:op})));
+    if(l.kind==='hero'&&!l.thin)fg.add(new THREE.Mesh(new THREE.TubeGeometry(curve,seg,r*3.2,6,false),new THREE.MeshBasicMaterial({color:c,transparent:true,opacity:.14*op,depthWrite:false,blending:THREE.AdditiveBlending})))}}
+
+
+/* ---------- frecce, cartellini, aurore ---------- */
+const arrowPool=[],UPV=new THREE.Vector3(0,1,0);
+for(let i=0;i<9;i++){const g=new THREE.Group(),m=new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,depthTest:false,depthWrite:false});
+  const sh=new THREE.Mesh(new THREE.CylinderGeometry(1,1,1,10),m),hd=new THREE.Mesh(new THREE.ConeGeometry(1,1,14),m);sh.renderOrder=hd.renderOrder=9;
+  g.add(sh,hd);g.userData={sh,hd,m};g.visible=false;S.add(g);arrowPool.push(g)}
+function setArrow(g,o,d,L,rad,col,op=1){const{sh,hd,m}=g.userData;if(L<.05){g.visible=false;return}const hl=Math.min(L*.45,rad*5.5);
+  sh.scale.set(rad,Math.max(L-hl,.001),rad);sh.position.set(0,(L-hl)/2,0);hd.scale.set(rad*2.6,hl,rad*2.6);hd.position.set(0,L-hl/2,0);
+  g.position.copy(o);g.quaternion.setFromUnitVectors(UPV,d.clone().normalize());m.color.set(col);m.opacity=op;g.visible=true}
+const AR=(x,z,dx,dz,L,col)=>({o:V3(x,z),d:V3(dx,dz),L,col});
+function nearestIdx(pts,q){let b=0,bv=1e9;pts.forEach((p,i)=>{const v=(p[0]-q[0])**2+(p[1]-q[1])**2;if(v<bv){bv=v;b=i}});return b}
+function orientUp(pts){return pts[0][1]>pts[pts.length-1][1]?pts.slice().reverse():pts}
+// ovale aurorale: cortina luminosa (verde in basso, rossa in alto)
+const aurMat=new THREE.MeshBasicMaterial({vertexColors:true,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide});
+const aurN=new THREE.Mesh(new THREE.BufferGeometry(),aurMat),aurS=new THREE.Mesh(new THREE.BufferGeometry(),aurMat);S.add(aurN,aurS);
+let ovKey='',ovMlt=[];
+function ribbon(c,south){const n=120,pos=[],col=[],idx=[];ovMlt=[];
+  for(let i=0;i<=n;i++){const m=i/n*2*PI;let ml=0;
+    for(const cc of[c-2.6,c+2.6]){const px=cc*Math.sin(m),py=cc*Math.cos(m)+3,cr=Math.hypot(px,py)*PI/180,lat=PI/2-cr;ml=Math.atan2(px,py);const phi=ml+PI;
+      const X=Math.cos(lat)*Math.cos(phi),Y=Math.cos(lat)*Math.sin(phi),Z=Math.sin(lat)*(south?-1:1),h=1.015;pos.push(-X*h,Z*h,Y*h);col.push(0,0,0)}ovMlt.push(ml)}
+  for(let i=0;i<n;i++){const a=2*i;idx.push(a,a+2,a+1,a+1,a+2,a+3)}
+  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));g.setAttribute('color',new THREE.Float32BufferAttribute(col,3));g.setIndex(idx);return g}
+function setOval(colat,st){const k=colat.toFixed(1);if(k!==ovKey){ovKey=k;aurN.geometry.dispose();aurS.geometry.dispose();aurN.geometry=ribbon(colat,false);aurS.geometry=ribbon(colat,true)}
+  for(const mesh of[aurN,aurS]){const c=mesh.geometry.attributes.color.array;
+    for(let i=0;i<ovMlt.length;i++){const ml=ovMlt[i],night=Math.exp(-((ml/1.0)**2)),day=Math.exp(-(((Math.abs(ml)-PI)/.45)**2));
+      const I=.22+st.nightA*2.6*night+st.dayA*2.2*day;c[i*6]=.25*I;c[i*6+1]=1*I;c[i*6+2]=.45*I;c[i*6+3]=.5*I;c[i*6+4]=.5*I;c[i*6+5]=.35*I}
+    mesh.geometry.attributes.color.needsUpdate=true}}
+const cuspSpot=mkSprite(0x8dffb0);
+const press=mkSprite(0xc58cff);
+// cartellini dinamici
+const tagPool=[];for(let i=0;i<6;i++){const e=document.createElement('div');e.className='lb big';e.style.display='none';document.body.appendChild(e);tagPool.push({e,vis:false,txt:'',col:''})}
+let curTags=[];
+
+/* =====================================================================
+   Le fasi del modo guidato
+   ===================================================================== */
+const SOUTH=[
+ {t:'Bz sud: il campo del vento è opposto a quello terrestre',d:'Il vento solare (punti arancioni) arriva da sinistra, rallenta all’onda d’urto e scivola attorno alla magnetopausa. Il campo trasportato dal vento (giallo) punta verso <b>Sud</b>; quello terrestre sul lato giorno (azzurro) punta verso <b>Nord</b>. Le frecce vicino all’onda d’urto scompongono il campo del vento: la parte grigia, lungo la spirale di Parker, dipende dal settore della gonna e non apre la magnetosfera; conta solo la parte Nord–Sud, <b>Bz</b>. Seguiamo una linea chiusa del campo terrestre (bianca). Premi <b>Avanti</b>.',r:'Approfondimento 11.1',dur:0,cam:'wide'},
+ {t:'1 · Il vento porta la sua linea verso la Terra',d:'La linea gialla è congelata nel plasma e viaggia con il vento. Intanto anche la linea bianca, chiusa, si sposta verso l’esterno: è il flusso di ritorno del ciclo, che riporta le linee chiuse sul lato giorno.',r:'Approfondimento 11.1 – teorema di Alfvén',dur:4.5,cam:'day'},
+ {t:'2 · Le due “U” affacciate',d:'La linea del vento si piega a U attorno alla magnetosfera; quella terrestre è una U rivolta verso il Sole. Le loro basi, di verso opposto, vengono schiacciate l’una contro l’altra: nello strato sottile fra le due il campo cambia verso in poco spazio e scorre una corrente intensa (legge di Ampère).',r:'Approfondimento 11.1 – punto 1',dur:4.5,cam:'day'},
+ {t:'3 · Riconnessione sul lato giorno ed effetto fionda',d:'Il congelamento si rompe, il campo si annulla nel <b>punto X</b> e le linee si ricollegano: nascono due linee <b>aperte</b>, con un piede sulla Terra e l’altro nel vento. Piegate a gomito, scattano come una fionda: getti di plasma verso Nord e verso Sud lungo la magnetopausa; il plasma del vento (puntini arancioni) scende lungo le nuove linee fino alle cuspidi e accende l’aurora diurna.',r:'Approfondimento 11.1 – punti 2 e 3',dur:7,cam:'day',cam2:'earth',camAt:.5},
+ {t:'4 · Trascinata sopra il polo',d:'Il vento trascina verso la coda la parte esterna della linea. Il suo piede attraversa la calotta polare dal lato giorno al lato notte: guardalo nel riquadro del polo.',r:'Approfondimento 11.1 – punto 4',dur:6,cam:'mid'},
+ {t:'5 · Il flusso si accumula nella coda',d:'La linea si distende nel lobo nord, la sua gemella nel lobo sud. Il flusso aperto si accumula: i lobi premono sulla plasma sheet, che si assottiglia. I lobi sono quasi vuoti: a muoversi è soprattutto la linea; un po’ di plasma del vento (pochi puntini arancioni) entra lungo di essa e scende verso la plasma sheet. L’indicatore del flusso sale verso la soglia.',r:'Approfondimento 11.1 – punto 4',dur:5.5,cam:'wide'},
+ {t:'6 · Riconnessione nella coda',d:'A circa 25 R⊕ (linea X vicina alla Terra) le linee dei due lobi, di verso opposto, si toccano e si ricollegano. La parte esterna, ormai staccata dalla Terra, se ne va con il vento: è il <b>plasmoide</b>.',r:'Approfondimento 11.1 – modello NENL',dur:4.5,cam:'wide'},
+ {t:'7 · Dipolarizzazione e substorm',d:'La nuova linea chiusa, piegata a gomito, scatta verso la Terra e torna quasi dipolare. Il getto di plasma viene frenato a circa 10 R⊕ e la corrente devia lungo le linee verso la ionosfera notturna (cuneo di corrente). Gli elettroni accelerati (puntini verdi) corrono lungo la linea verso i due poli e, quando arrivano, l’ovale aurorale si accende di colpo (<b>breakup</b>).',r:'Approfondimento 11.1 – dipolarizzazione',dur:7.5,cam:'mid',cam2:'earthN',camAt:.38},
+ {t:'8 · Ritorno sul lato giorno',d:'Vista dall’alto, dalla parte della notte. Le linee chiuse della coda tornano verso il lato giorno scorrendo attorno alla Terra sui due fianchi, quello del tramonto e quello dell’alba (frecce azzurre sul piano dell’equatore). Non gira una linea sola: si muove un intero nastro di linee, che cambiano forma mentre passano (allungate di notte, schiacciate di giorno). È lo stesso flusso a due celle del riquadro del polo. Il ciclo ricomincia. Nella realtà il piede impiega alcune ore ad attraversare la calotta e un giro completo dura spesso 8 ore o più.',r:'Riquadro del polo: le due celle di convezione',dur:9,cam:'top'},
+ {t:'Nel tempo: la coda si carica, poi si scarica',d:'Finché Bz resta verso Sud la riconnessione sul lato giorno <b>continua</b>: ogni lampo apre una nuova linea, che passa sopra il polo e si aggiunge ai lobi. Più linee nei lobi vuol dire un campo più intenso: le linee si infittiscono, diventano più spesse e cambiano colore dal verde all’azzurro e poi al fucsia, B sale; la coda si gonfia, la plasma sheet si assottiglia fino a una lama e la calotta polare si allarga (fase di crescita, 30–60 minuti). Poi la coda cede: la riconnessione notturna parte di colpo e svuota i lobi in pochi minuti (substorm). Infine il ciclo ricomincia: con Bz verso Sud per ore, i substorm si ripetono ogni 2–4 ore.',r:'Tempi indicativi; l’orologio è accelerato. Colore delle linee dei lobi: intensità di B (scala nel riquadro)',dur:36,cam:'wide'}];
+const NORTH=[
+ {t:'Bz nord: il campo del vento e quello terrestre hanno lo stesso verso',d:'Il campo trasportato dal vento (giallo) punta verso <b>Nord</b>, come quello terrestre sul lato giorno (azzurro): guarda le due frecce davanti alla Terra. Due campi con lo stesso verso non si annullano e non si ricollegano: si comportano come due calamite accostate per lo stesso polo. Premi <b>Avanti</b>.',r:'Approfondimento 11.1 – il caso parallelo',dur:0,cam:'day'},
+ {t:'1 · Si respingono e scivolano via',d:'Le linee del vento arrivano una dopo l’altra, si piegano attorno alla magnetosfera <b>senza toccarla</b>, scivolano sui fianchi e se ne vanno; intanto ne arrivano altre. Davanti al naso passano più fitte: lì il campo e la pressione magnetica B²/2μ₀ crescono (zona viola) e tengono separati i due campi (frecce bianche). La magnetosfera non si sposta: la sua grandezza dipende dalla pressione del vento, non dal verso di Bz (con Bz verso Nord è anzi un po’ più grande).',r:'Approfondimento 11.1 – il caso parallelo',dur:15,cam:'day',cam2:'mid',camAt:.45},
+ {t:'2 · La coda si scarica lentamente',d:'Senza riconnessione sul lato giorno nella coda non arriva flusso nuovo. Quello che c’era si richiude piano, nel giro di ore: le linee dei lobi diminuiscono e tornano verdi (B cala), la coda si sgonfia, la calotta polare si restringe, la plasma sheet si ispessisce e si riempie di plasma più freddo. Niente substorm: è la “porta chiusa” del libro. Un effetto debole sopra i poli: pulsante <b>Sopra la cuspide</b>.',r:'Approfondimento 11.1 – il caso parallelo · tempi accelerati',dur:14,cam:'tail'},
+ {t:'Per approfondire: sopra la cuspide',d:'Sopra la cuspide il campo terrestre del lobo punta verso la Terra (freccia verde), quello del vento verso Nord (freccia gialla): solo qui i versi sono opposti, e avviene una riconnessione <b>debole</b>. La linea del vento si aggancia al polo (linea bianca); il resto se ne va lungo la coda. La coda non si carica: si accende solo una piccola macchia aurorale vicino al polo, sul lato giorno.',r:'Riconnessione dei lobi: non è descritta nel libro (vedi la scheda)',dur:9,cam:'cusp',cam2:'mid',camAt:.62}];
+
+// stato del riquadro del polo e degli effetti
+const FX={phi:.45,cap:null,dayA:0,nightA:0,cuspA:0,foot:null,trail:[],flash:[],sheet:0,ps:1.6,plasmoid:-1,south:true};
+function colDay(fp){const lm=Math.atan2(Math.abs(fp[1]),Math.abs(fp[0])),lb=Math.acos(Math.sqrt(M.Axd));return(PI/2-lm)/(PI/2-lb)*(capColat(FX.phi)-3)}
+function colNight(fp){const lm=Math.atan2(Math.abs(fp[1]),Math.abs(fp[0])),lb=Math.acos(Math.sqrt(M.Axn));return(PI/2-lm)/(PI/2-lb)*(capColat(FX.phi)+3)}
+
+function stateSouth(p,t){
+  const o={lines:[],fl:[],foot:null,phi:.45,dayA:0,nightA:0,cuspA:0,sheet:0,ps:1.6,plasmoid:-1,jets:[],arrows:[],tags:[],press:0,streams:[]};
+  const Axd=M.Axd,Axn=M.Axn,eT=ease(t);
+  const dayPair=a=>{const h=lineFoot(a,'nd');o.lines.push({...h,kind:'hero'});o.foot={col:colDay(h.pts[0]),mlt:12};return h};
+  if(p<=2){const a=p===0?Axd+.03:p===1?lerp(Axd+.03,Axd+.012,eT):lerp(Axd+.02,Axd+.0004,eT);
+    dayPair(a);const y=traceFrom(a,eqRoot(a,M.r0+.02,XMAX-.4),true);if(y)o.lines.push({...y,kind:'imf'});
+    if(p===2)o.sheet=eT;o.phi=.45;
+    o.arrows.push(AR(M.r0+2.8,-2.6,0,-1,3.2,0xffd34d),AR(M.r0-2.6,-6,0,1,3.2,0x5fb3ff));o.tags.push({v:V3(M.r0+.1,-7.6),t:p===2?'versi opposti: si avvicinano':'versi opposti',c:'#ffffff'})}
+  else if(p===3){const a=lerp(Axd-.0004,Axd*.75,eT);dayPair(a);o.lines.push({...lineFoot(a,'sd'),kind:'twin'});
+    const f=win(t,0,.35);o.fl.push({x:M.r0,z:0,k:Math.sin(PI*f)*1.0});o.sheet=1-win(t,0,.2);
+    if(t>.04&&t<.75)o.jets.push(['day',3]);if(t>.3&&t<.9)o.jets.push(['cusp',1]);
+    o.dayA=Math.sin(PI*win(t,.25,1));o.phi=lerp(.45,.52,eT);
+    if(t>.12&&t<.85){const h=heroOf(o),w2=twinOf(o);o.streams.push({line:'hero',u0:uNear(h.pts,[M.r0,0]),u1:.005,rate:16,dur:1.4,col:CSH},{line:'twin',u0:uNear(w2.pts,[M.r0,0]),u1:.005,rate:16,dur:1.4,col:CSH})}}
+  else if(p===4){o.phi=lerp(.52,.7,eT);
+    if(t<.55){const a=lerp(Axd*.75,.004,ease(t/.55));dayPair(a);o.lines.push({...lineFoot(a,'sd'),kind:'twin'})}
+    else if(t<.8){const w=ease((t-.55)/.25),N=180;
+      const hd=lineFoot(.004,'nd'),hn=lineFoot(.004,'nn'),sd=lineFoot(.004,'sd'),sn=lineFoot(.004,'sn');
+      o.lines.push({pts:blend(resample(hd.pts,N),resample(hn.pts,N),w),kind:'hero'},{pts:blend(resample(sd.pts,N),resample(sn.pts,N),w),kind:'twin'});
+      o.foot={col:lerp(colDay(hd.pts[0]),0,w)+lerp(0,colNight(hn.pts[0]),w),mlt:w<.5?12:24}}
+    else{const a=lerp(.004,.02,ease((t-.8)/.2));const h=lineFoot(a,'nn'),sn=lineFoot(a,'sn');o.lines.push({...h,kind:'hero'},{...sn,kind:'twin'});o.foot={col:colNight(h.pts[0]),mlt:24};
+      o.streams.push({line:'hero',u0:uX(h.pts,-5),u1:uX(h.pts,-48),rate:3,dur:4.5,col:CSH},{line:'twin',u0:uX(sn.pts,-5),u1:uX(sn.pts,-48),rate:3,dur:4.5,col:CSH})}}
+  else if(p===5){const a=lerp(.02,Axn-.0015,eT);const h=lineFoot(a,'nn');o.lines.push({...h,kind:'hero'},{...lineFoot(a,'sn'),kind:'twin'});
+    o.foot={col:colNight(h.pts[0]),mlt:24};o.phi=lerp(.7,.92,eT);o.ps=lerp(1.6,.55,eT);const sn=twinOf(o);
+    o.streams.push({line:'hero',u0:uX(h.pts,-5),u1:uX(h.pts,-48),rate:3,dur:4.5,col:CSH},{line:'twin',u0:uX(sn.pts,-5),u1:uX(sn.pts,-48),rate:3,dur:4.5,col:CSH})}
+  else if(p===6){const a=lerp(Axn-.0015,Axn+.004,ease(t));const h=lineFoot(a,'nn');o.lines.push({...h,kind:'hero'});o.foot={col:colNight(h.pts[0]),mlt:24};
+    if(a<Axn)o.lines.push({...lineFoot(a,'sn'),kind:'twin'});else{const y=traceFrom(a,eqRoot(a,XMIN+.3,-M.rxn-.05),true);if(y)o.lines.push({...y,kind:'imf'})}
+    const f=win(t,.3,.75);o.fl.push({x:-M.rxn,z:0,k:Math.sin(PI*f)});o.phi=lerp(.92,.84,eT);o.ps=.55;
+    if(t>.45){o.plasmoid=win(t,.45,1)*.25}if(t>.45)o.jets.push(['tailward',2])}
+  else if(p===7){const a=lerp(Axn+.004,Axn+.05,eT);const h=lineFoot(a,'nn');o.lines.push({...h,kind:'hero'});o.foot={col:colNight(h.pts[0]),mlt:24};
+    const y=traceFrom(a,eqRoot(a,XMIN+.3,-M.rxn-.05),true);if(y)o.lines.push({...y,kind:'imf',op:1-t});
+    o.plasmoid=.25+.75*t;if(t<.55)o.jets.push(['earthward',4]);o.nightA=Math.min(1,win(t,.27,.5)*1.2)*(1-.35*win(t,.8,1));o.phi=lerp(.84,.5,eT);o.ps=lerp(.55,1.6,eT);
+    if(t>.12&&t<.72){const ua=uApex(h.pts);o.streams.push({line:'hero',u0:ua,u1:.004,rate:13,dur:1.1,col:CEL},{line:'hero',u0:ua,u1:.996,rate:13,dur:1.1,col:CEL})}}
+  else if(p===8){const N=200,hn=resample(lineFoot(Axn+.05,'nn').pts,N).map(q=>[-q[0],q[1]]),hd=resample(lineFoot(Axd+.03,'nd').pts,N);
+    const rN=Math.max(...hn.map(q=>q[0])),rD=Math.max(...hd.map(q=>q[0]));
+    const Rf=f=>lerp(rN,rD,f)+1.6*Math.sin(PI*f);                      // percorso a ferro di cavallo: più largo sui fianchi
+    const loop=f=>{const b=blend(hn,hd,f),ap=Math.max(...b.map(q=>q[0])),k=(Rf(f)-1)/(ap-1);return b.map(q=>{const r=Math.hypot(q[0],q[1]),s=(1+(r-1)*k)/r;return[q[0]*s,q[1]*s]})};
+    for(const sg of[1,-1])for(let k=0;k<3;k++){if(sg===1&&k===0)continue;const f=(t+k/3)%1;o.lines.push({pts:loop(f),kind:'flow',az:sg*PI*(1-f),op:.5*Math.min(1,f/.15,(1-f)/.15)})}
+    const w=eT;o.lines.push({pts:loop(w),kind:'hero',az:PI*(1-w)});
+    for(const sg of[1,-1]){const v3=[];for(let i=0;i<=48;i++){const f=i/48,r=Rf(f),a=sg*PI*(1-f);v3.push(new THREE.Vector3(-r*Math.cos(a),0,r*Math.sin(a)))}
+      o.lines.push({v3,kind:'path',op:.6});const r=Rf(.5);o.arrows.push({o:new THREE.Vector3(1.2,0,sg*r),d:new THREE.Vector3(-1,0,0),L:2.6,col:0x8fd0ff})}
+    const r5=Rf(.5);o.tags.push({v:new THREE.Vector3(0,-1.5,r5+3),t:'fianco del tramonto',c:'#8fd0ff'},{v:new THREE.Vector3(0,-1.5,-r5-3),t:'fianco dell’alba',c:'#8fd0ff'},{v:new THREE.Vector3(-rD-4,0,0),t:'← verso il Sole',c:'#ffd27a'});
+    o.foot={col:lerp(colNight([-hn[0][0],hn[0][1]]),colDay(hd[0]),w),mlt:24-12*w};o.phi=lerp(.5,.45,eT);o.nightA=.65*(1-win(t,0,.6))}
+  return o}
+
+/* ---- linee del vento con Bz nord, disegnate a mano: si fermano a distanza (gap) dalla magnetopausa ---- */
+const SP=x=>x>30?x:Math.log1p(Math.exp(x));
+function surfX(az,gap){const T=M.mp;let best=-1e9;for(let i=1;i<T.length;i++){const a=T[i-1],b=T[i];if(Math.atan2(a[1],a[0])>1.8)break;
+  const ra=Math.hypot(a[0],a[1]),rb=Math.hypot(b[0],b[1]),za=a[1]*(1+gap/ra),zb=b[1]*(1+gap/rb);
+  if((za-az)*(zb-az)<=0&&za!==zb){const f=(az-za)/(zb-za);best=Math.max(best,lerp(a[0]*(1+gap/ra),b[0]*(1+gap/rb),f))}}return best}
+function drape(xw,gap){const out=[];for(let i=0;i<=120;i++){const z=-42+84*i/120,xs=surfX(Math.abs(z),gap);out.push([xs<-1e8?xw:xs+1.2*SP((xw-xs)/1.2),z])}return out}
+const NG=i=>2.4+i*1.25;
+function northFlow(T,o){const r0=M.r0;for(let k=0;k<22;k++){const tau=(T-1.5*k)/6.5;if(tau<0||tau>1)continue;const g=NG(0)+(k%3)*.75,hero=k===0;
+    if(tau<.45){o.lines.push({pts:drape(lerp(28,r0-4,ease(tau/.45)),g),kind:'imf',op:hero?1:.6,thin:!hero})}
+    else{const w=ease(win(tau,.45,.7)),xw=lerp(r0-4,-78,ease(win(tau,.5,1)));o.lines.push({v3:slide(drape(r0-4,g),xw,k%3,w),kind:'imf',op:(hero?1:.6)*(1-win(tau,.85,1)),thin:!hero});
+      if(hero&&tau<.9)o.tags.push({v:new THREE.Vector3(-xw,20,(rmpAt(Math.min(xw,r0-.01))+4)*w),t:'scivola sul fianco',c:'#ffe27a'})}}}                       // distanza di ogni linea dalla magnetopausa (R⊕)
+function slide(d,xw,i,w){const Yo=(rmpAt(Math.min(xw,M.r0-.01))+4+2*i)*w;return d.map((q,k)=>new THREE.Vector3(-lerp(q[0],xw,w),lerp(q[1],-42+84*k/(d.length-1),w),Yo))}
+/* ---- "Nel tempo": molte riconnessioni diurne, accumulo nei lobi, substorm, recupero ---- */
+const EV=[.02,.085,.15,.215,.28,.345,.41,.475].map((t0,k)=>({t0,az:[0,.45,-.35,.2,-.5,.3,-.15,.55][k]})).concat([.86,.925].map((t0,k)=>({t0,az:[.25,-.3][k],rec:1})));
+const EVL=.12,DPHI=.065;
+function phiTime(t){let g=.4,r=0;for(const e of EV){const a=clamp((t-e.t0)/EVL*1.4,0,1),d=DPHI*ease(a);if(e.rec)r+=d;else g+=d}return g-.47*ease(win(t,.6,.84))+r}
+function stateTime(t){
+  const o={lines:[],fl:[],foot:null,phi:phiTime(t),dayA:0,nightA:0,cuspA:0,sheet:0,ps:1.6,plasmoid:-1,jets:[],arrows:[],tags:[],press:0,streams:[]};
+  for(const e of EV){const a=(t-e.t0)/EVL;if(a<0||a>=1)continue;let q;
+    if(a<.3)q=stateSouth(3,a/.3);else if(a<.6)q=stateSouth(4,(a-.3)/.3);else q=stateSouth(5,(a-.6)/.4);
+    const op=1-win(a,.8,1);q.lines.forEach(l=>{if(l.kind==='imf')return;o.lines.push({...l,az:e.az,thin:true,op:(l.op==null?1:l.op)*op})});
+    q.fl.forEach(f=>o.fl.push({...f,az:e.az}));o.dayA=Math.max(o.dayA,q.dayA*.8)}
+  if(t>=.55&&t<.63){const q=stateSouth(6,win(t,.55,.63));o.lines.push(...q.lines);o.fl.push(...q.fl);o.plasmoid=q.plasmoid;q.jets.forEach(j=>o.jets.push(j))}
+  else if(t>=.63&&t<.86){const q=stateSouth(7,win(t,.63,.86));o.lines.push(...q.lines);o.plasmoid=q.plasmoid;o.nightA=q.nightA;o.streams=q.streams;q.jets.forEach(j=>o.jets.push(j))}
+  o.ps=clamp(lerp(2.2,.28,(o.phi-.4)/.52),.28,2.4);o.lobe=o.phi;
+  const m=Math.round(t*150),st=t<.55?['gr','crescita: la coda si carica']:t<.63?['ss','inizio del substorm']:t<.84?['ss','espansione: la coda si scarica']:['gr','recupero: si ricomincia'];
+  o.door=[st[0],'Nel tempo · '+m+' min · '+st[1]];
+  const B=lobeB(o.phi);o.tags.push({v:V3(-64,rmpAt(-64)*.8),t:'B nei lobi ≈ '+Math.round(B)+' nT',c:'#6ee7a0'});
+  return o}
+function stateNorth(p,t){
+  const o={lines:[],fl:[],foot:null,phi:.4,dayA:0,nightA:0,cuspA:0,sheet:0,ps:1.6,plasmoid:-1,jets:[],arrows:[],tags:[],press:0};const eT=ease(t),r0=M.r0;
+  const hero=(sq,op)=>{const h=lineFoot(.09,'nd');o.lines.push({pts:h.pts,kind:'hero',op});o.foot={col:colDay(h.pts[0])*.9,mlt:12}};
+  const cmp=k=>{o.arrows.push(AR(r0+NG(0)+1.2,-6,0,1,3.2,0xffd34d),AR(r0-2.6,-6,0,1,3.2,0x5fb3ff));if(k)o.tags.push({v:V3(r0+.6,-8),t:k,c:'#ffffff'})};
+  const gapArrows=k=>{if(k<.02)return;o.arrows.push(AR(r0+NG(0)*.55,3,1,0,2.6*k,0xffffff),AR(r0-.6,3,-1,0,2.6*k,0xffffff))};
+  if(p===0){[0,1,2].forEach(i=>o.lines.push({pts:drape(28+6*i,NG(0)+i*.75),kind:'imf',op:i?.55:1,thin:!!i}));hero(0);cmp('stesso verso');o.phi=.62}
+  else if(p===1){northFlow(t*15,o);o.press=win(t,.1,.4);hero(0);cmp(t>.25?'stesso verso: si respingono':'stesso verso');gapArrows(win(t,.25,.5));
+    if(t>.25)o.tags.push({v:V3(r0+NG(0)*.5,7.5),t:'pressione magnetica',c:'#d9b8ff'});o.phi=.62;o.lobe=.62}
+  else if(p===2){northFlow(15+t*14,o);o.press=1;hero(0);gapArrows(.8);o.phi=lerp(.62,.36,eT);o.lobe=o.phi;o.ps=lerp(1.6,2.9,eT);
+    o.door=['cl','Bz verso Nord · la coda si scarica lentamente (in ore)'];if(t>.15)o.tags.push({v:V3(-30,1),t:'plasma sheet più spessa',c:'#ffb070'})}
+  else if(p===3){hero(.85,.35);o.press=.6;
+    const Pc=mpPoint(1.72,1),imf=drape(Pc[0]+.4,NG(0)),lobe=lineFoot(.006,'nn').pts;
+    // punto di contatto: coppia di punti più vicini sopra il polo
+    let bi=0,bl=0,bd=1e9;for(let i=0;i<imf.length;i++){const q=imf[i];if(Math.hypot(q[0]-Pc[0],q[1]-Pc[1])>7)continue;for(let j=0;j<lobe.length;j+=2){const d=(q[0]-lobe[j][0])**2+(q[1]-lobe[j][1])**2;if(d<bd){bd=d;bi=i;bl=j}}}
+    const P=[(imf[bi][0]+lobe[bl][0])/2,(imf[bi][1]+lobe[bl][1])/2];
+    const pull=(pts,c,k)=>pts.map((q,j)=>{const g=Math.exp(-(((j-c)/14)**2))*k;return[q[0]+(P[0]-pts[c][0])*g,q[1]+(P[1]-pts[c][1])*g]});
+    o.arrows.push(AR(P[0]+2.4,P[1]-1.2,0,1,2.4,0xffd34d),AR(P[0]-2.6,P[1]-1.2,.5,-1,2.4,0x6ee7a0));
+    if(t<.45)o.tags.push({v:V3(P[0],P[1]+5),t:'versi opposti: riconnessione debole',c:'#ffffff'});
+    const touch=ease(win(t,.08,.36));o.fl.push({x:P[0],z:P[1],k:Math.sin(PI*win(t,.34,.6))*.55});
+    if(t<.45){o.lines.push({pts:pull(imf,bi,touch),kind:'imf'},{pts:pull(lobe,bl,touch),kind:'twin'})}
+    else{const a=pull(imf,bi,1),b=pull(lobe,bl,1);
+      const n1=b.slice(0,bl+1).concat(a.slice(bi)),n2=a.slice(0,bi+1).concat(b.slice(bl));
+      const w=ease(win(t,.45,.75));const sm=resample(n1,160);
+      o.lines.push({pts:blend(sm,sm.map((q,k)=>[q[0]*(1-.25*w),q[1]]),w),kind:'hero'});
+      const w2=ease(win(t,.55,1));o.lines.push({v3:resample(n2,240).map(q=>new THREE.Vector3(-(q[0]-55*w2),q[1],16*w2)),kind:'imf',op:1-.5*w2});
+      o.tags.push({v:V3(P[0]-1,P[1]+4),t:'si aggancia al polo',c:'#ffffff'});o.foot={col:4,mlt:12}}
+    o.cuspA=Math.sin(PI*win(t,.4,1))}
+  return o}
+
+/* =====================================================================
+   Riquadro del polo e indicatore del flusso (canvas 2D)
+   ===================================================================== */
+const pc=document.getElementById('pc'),px=pc.getContext('2d');
+function capColat(phi){return 90-Math.asin(clamp(1-phi/15.3,0,1))*180/PI}
+function drawPolar(st){
+  const W=360,cx=180,cy=165,Rr=132,k=Rr/30;px.clearRect(0,0,W,pc.height);
+  px.fillStyle='rgba(20,28,48,.9)';px.beginPath();px.arc(cx,cy,Rr,0,7);px.fill();
+  px.strokeStyle='rgba(255,255,255,.18)';px.lineWidth=1.2;[10,20].forEach(c=>{px.beginPath();px.arc(cx,cy,c*k,0,7);px.stroke()});
+  px.beginPath();px.moveTo(cx,cy-Rr);px.lineTo(cx,cy+Rr);px.moveTo(cx-Rr,cy);px.lineTo(cx+Rr,cy);px.stroke();
+  const capC=capColat(st.phi),off=3*k;
+  // celle di convezione
+  if(st.south){px.strokeStyle='rgba(160,200,255,.28)';px.lineWidth=2;
+    for(const s of[-1,1]){px.beginPath();px.ellipse(cx+s*capC*.55*k,cy+off*.3,capC*.55*k,capC*.95*k,0,0,7);px.stroke();
+      const ax=cx+s*capC*.55*k,ay=cy+off*.3;arrow(ax-s*capC*.55*k,ay-capC*.2*k,0,1);arrow(ax+s*capC*.55*k,ay+capC*.2*k,0,-1)}}
+  // ovale aurorale
+  const ovA=.25+.75*st.nightA;
+  px.save();px.translate(cx,cy+off);
+  const gN=px.createRadialGradient(0,0,(capC-.5)*k,0,0,(capC+5)*k);
+  px.lineWidth=5*k;px.strokeStyle=`rgba(90,255,150,${.22+.15*st.dayA})`;px.beginPath();px.arc(0,0,(capC+2)*k,0,7);px.stroke();
+  if(st.nightA>.01){px.lineWidth=(5+6*st.nightA)*k;px.strokeStyle=`rgba(120,255,170,${.75*st.nightA})`;px.beginPath();px.arc(0,0,(capC+2.5+1.5*st.nightA)*k,PI*.18,PI*.82);px.stroke()}
+  px.restore();
+  // confine della calotta
+  px.setLineDash([5,5]);px.strokeStyle='rgba(255,255,255,.55)';px.lineWidth=1.5;px.beginPath();px.arc(cx,cy+off,capC*k,0,7);px.stroke();px.setLineDash([]);
+  // aurore della cuspide
+  const spot=(col,a,r)=>{if(a<.02)return;const g=px.createRadialGradient(cx,cy-col*k,0,cx,cy-col*k,r*k);g.addColorStop(0,`rgba(140,255,180,${a})`);g.addColorStop(1,'rgba(140,255,180,0)');px.fillStyle=g;px.beginPath();px.arc(cx,cy-col*k,r*k,0,7);px.fill()};
+  spot(capC-2,st.dayA,5);spot(7,st.cuspA,4);
+  // piede della linea seguita
+  if(st.foot){const a=(st.foot.mlt-12)/24*2*PI,c=Math.min(st.foot.col,29.5);const fx=cx-Math.sin(a)*c*k,fy=cy-Math.cos(a)*c*k;
+    st.trail.push([fx,fy]);if(st.trail.length>140)st.trail.shift();
+    px.strokeStyle='rgba(255,255,255,.55)';px.lineWidth=2;px.beginPath();st.trail.forEach((q,i)=>i?px.lineTo(q[0],q[1]):px.moveTo(q[0],q[1]));px.stroke();
+    px.fillStyle='#fff';px.shadowColor='#fff';px.shadowBlur=10;px.beginPath();px.arc(fx,fy,6,0,7);px.fill();px.shadowBlur=0}
+  // etichette
+  px.fillStyle='#d8d2c4';px.font='600 19px -apple-system,system-ui,sans-serif';px.textAlign='center';
+  px.fillText('12 · Sole',cx,cy-Rr-8);px.fillText('24',cx,cy+Rr+20);px.textAlign='left';px.fillText('18',cx-Rr-2,cy-6);px.textAlign='right';px.fillText('06',cx+Rr+2,cy-6);
+  px.textAlign='center';px.font='17px -apple-system,system-ui,sans-serif';px.fillStyle='#a9a497';px.fillText('Polo Nord visto dall’alto',cx,cy+Rr+44);
+  // indicatore del flusso aperto
+  const y0=376,bw=300,bx=30,mx=1.2,f=clamp(st.phi/mx,0,1),th=.9/mx;
+  px.fillStyle='#d8d2c4';px.font='600 18px -apple-system,system-ui,sans-serif';px.textAlign='left';px.fillText('Flusso aperto (lobi)',bx,y0);
+  px.textAlign='right';px.fillText(st.phi.toFixed(2).replace('.',',')+' GWb',bx+bw,y0);
+  px.fillStyle='rgba(255,255,255,.1)';px.fillRect(bx,y0+12,bw,22);
+  px.fillStyle=f>=th?'#ff8a4c':'#6ee7a0';px.fillRect(bx,y0+12,bw*f,22);
+  px.strokeStyle='#ffcf7a';px.lineWidth=2.5;px.beginPath();px.moveTo(bx+bw*th,y0+6);px.lineTo(bx+bw*th,y0+40);px.stroke();
+  px.fillStyle='#a9a497';px.font='16px -apple-system,system-ui,sans-serif';px.textAlign='left';px.fillText('soglia indicativa del substorm',bx,y0+60);
+  px.fillText('calotta polare: oltre '+Math.round(90-capC)+'° di latitudine',bx,y0+84);
+  if(st.lobe!=null){const yb=482,Bv=lobeB(st.lobe),g=px.createLinearGradient(bx,0,bx+bw,0);BSTOP.forEach(q=>g.addColorStop(q[0],'#'+q[1].getHexString()));
+    px.fillStyle=g;px.fillRect(bx,yb,bw,12);const mx=bx+bw*clamp((Bv-20)/20,0,1);px.fillStyle='#fff';px.beginPath();px.moveTo(mx,yb-2);px.lineTo(mx-6,yb-11);px.lineTo(mx+6,yb-11);px.fill();
+    px.fillStyle='#d8d2c4';px.font='15px -apple-system,system-ui,sans-serif';px.textAlign='left';px.fillText('B nei lobi: 20 nT',bx,yb+30);px.textAlign='right';px.fillText('40 nT',bx+bw,yb+30);px.textAlign='center';px.font='600 16px -apple-system,system-ui,sans-serif';px.fillText(Math.round(Bv)+' nT',mx,yb-14)}
+  if(st.time&&st.hist){const gy=552,gh=92,X=t=>bx+bw*t,Y=f=>gy+gh-(f-.3)/.75*gh;
+    px.fillStyle='#d8d2c4';px.font='600 18px -apple-system,system-ui,sans-serif';px.textAlign='left';px.fillText('Flusso nei lobi nel tempo',bx,gy-6);
+    px.fillStyle='rgba(255,255,255,.07)';px.fillRect(bx,gy,bw,gh);px.strokeStyle='#ffcf7a';px.setLineDash([4,4]);px.lineWidth=1.5;px.beginPath();px.moveTo(bx,Y(.9));px.lineTo(bx+bw,Y(.9));px.stroke();px.setLineDash([]);
+    px.strokeStyle='#6ee7a0';px.lineWidth=3;px.beginPath();st.hist.forEach((q,i)=>i?px.lineTo(X(q[0]),Y(q[1])):px.moveTo(X(q[0]),Y(q[1])));px.stroke();
+    px.fillStyle='#a9a497';px.font='15px -apple-system,system-ui,sans-serif';px.fillText('0 min',bx,gy+gh+18);px.textAlign='right';px.fillText('150 min',bx+bw,gy+gh+18)}
+}
+function arrow(x,y,dx,dy){px.save();px.fillStyle='rgba(160,200,255,.5)';px.translate(x,y);px.rotate(Math.atan2(dy,dx));px.beginPath();px.moveTo(7,0);px.lineTo(-5,5);px.lineTo(-5,-5);px.fill();px.restore()}
+
+/* =====================================================================
+   Etichette 3D
+   ===================================================================== */
+const labels=[];
+function lab(txt,col,fn,cls=''){const e=document.createElement('div');e.className='lb '+cls;e.style.color=col;e.textContent=txt;document.body.appendChild(e);const o={e,fn,vis:true};labels.push(o);return o}
+lab('☀ dal Sole','#ffd27a',()=>V3(XMAX-2,-3),'big');
+lab('Onda d’urto','#ffa766',()=>{const p=bsProf[Math.floor(bsProf.length*.18)]||[0,0];return V3(p[0],p[1]+1.5)},'opt');
+lab('Magnetopausa','#c9a2ff',()=>{const p=mpProf[Math.floor(mpProf.length*.42)]||[0,0];return V3(p[0],p[1]+1.2)});
+lab('Lobo nord','#6ee7a0',()=>V3(-48,11),'opt');
+lab('Lobo sud','#6ee7a0',()=>V3(-48,-12),'opt');
+lab('Plasma sheet','#ffb070',()=>V3(-66,1.2),'opt');
+const lbX=lab('Punto X','#ffffff',()=>FX.xlab||V3(0,999),'big');
+const lbSub=lab('','#ffcf7a',()=>FX.sublab||V3(0,999),'big');
+const tmpV=new THREE.Vector3();
+let doorTxt='';
+function setDoor(st){let c,t;if(st.door){c=st.door[0];t=st.door[1]}else if(ST.bz==='S'){c='op';t='Bz verso Sud → la “porta” è aperta'}else{c='cl';t='Bz verso Nord → la “porta” è chiusa'}
+  if(t!==doorTxt){doorTxt=t;$('door').textContent=t;$('door').className=c}}
+let rects=[],rectT=0;
+function inRect(x,y){for(const r of rects)if(x>r.left-8&&x<r.right+8&&y>r.top-8&&y<r.bottom+8)return true;return false}
+function placeLabels(){const w=innerWidth,h=innerHeight,now=performance.now();
+  if(now-rectT>400){rectT=now;measureUI();rects=['cap','side','ui','top'].map(id=>$(id).getBoundingClientRect()).filter(r=>r.width>0)}
+  for(const o of labels){const p=o.fn();tmpV.copy(p).project(cam);const sx=(tmpV.x+1)/2*w,sy=(1-tmpV.y)/2*h;
+  const on=Math.abs(p.y)<900&&tmpV.z<1&&Math.abs(tmpV.x)<1.05&&Math.abs(tmpV.y)<1.05&&!inRect(sx,sy);
+  if(on!==o.vis){o.vis=on;o.e.style.display=on?'':'none'}
+  if(on)o.e.style.transform=`translate(${sx.toFixed(1)}px,${sy.toFixed(1)}px) translate(-50%,-50%)`}
+  tagPool.forEach((o,i)=>{const g=curTags[i];let on=false,sx=0,sy=0;
+    if(g){tmpV.copy(g.v).project(cam);sx=(tmpV.x+1)/2*w;sy=(1-tmpV.y)/2*h;on=tmpV.z<1&&Math.abs(tmpV.x)<1&&Math.abs(tmpV.y)<1&&!inRect(sx,sy)}
+    if(on!==o.vis){o.vis=on;o.e.style.display=on?'':'none'}
+    if(on){if(o.txt!==g.t){o.txt=g.t;o.e.textContent=g.t}if(o.col!==g.c){o.col=g.c;o.e.style.color=g.c;o.e.style.fontSize=g.sm?'11.5px':''}
+      o.e.style.transform=`translate(${sx.toFixed(1)}px,${sy.toFixed(1)}px) translate(-50%,-50%)`}})}
+
+/* =====================================================================
+   Camera
+   ===================================================================== */
+const CAMS={day:[3,17],near:[-2,13],mid:[-14,34],wide:[-27,62],cusp:[-7,21,null,14],tail:[-36,42],top:[-1,13,[.5,.72,.48],0,true],earth:[.5,4.6,[-.5,.6,.63]],earthN:[-.6,4.6,[.62,.55,.56]]};
+let view='3d',camKey='wide';
+function camGoal(){const C=CAMS[camKey],cx=C[0],hw=C[1],asp=innerWidth/innerHeight,tn=Math.tan(15*PI/180);
+  const sideUI=innerWidth>760?1.12:(asp<1?.78:1),D=Math.max(hw*sideUI/(tn*asp),hw*.62/tn)*1.04;const tgt=new THREE.Vector3(-cx,(C[3]||0)+(innerWidth>760?0:-hw*(asp<1?.32:.12)),0);
+  const dir=(view==='3d'||C[4])?(C[2]&&C[2].length?new THREE.Vector3(...C[2]):new THREE.Vector3(-.42,.38,.82)).normalize():new THREE.Vector3(0,0,1);
+  return{pos:tgt.clone().add(dir.multiplyScalar(D)),tgt}}
+function setViewVis(){const sec=view==='sec';bgDeco.visible=!sec;if(surf.userData.mpS){surf.userData.mpS.visible=!sec;surf.userData.bsS.visible=!sec}
+  ctl.enableRotate=!sec;pwPts.material.opacity=sec?.35:.55}
+
+/* =====================================================================
+   Stato dell'animazione e comandi
+   ===================================================================== */
+const ST={bz:'S',p:0,t:1,play:false,auto:false};
+const $=id=>document.getElementById(id);
+function phases(){return ST.bz==='S'?SOUTH:NORTH}
+let lastCap='';
+function setCaption(){const P=phases()[ST.p],k=ST.bz+ST.p;if(k===lastCap)return;lastCap=k;
+  const cond=ST.bz==='S'?'Condizioni: vento solare lento e tranquillo (450 km/s, 5 particelle/cm³), Bz = −5 nT':'Condizioni: vento solare lento e tranquillo (450 km/s, 5 particelle/cm³), Bz = +5 nT';
+  $('cap').innerHTML=`<b class="t">${P.t}<span class="tg"></span></b><span class="body">${P.d}<span class="ref">${P.r}<br>${cond}</span></span>`;tgCap();
+  $('ph').textContent=ST.bz==='N'&&ST.p===3?'Approfondimento':ST.bz==='S'&&ST.p===9?'Nel tempo':'Fase '+ST.p+'/'+(ST.bz==='N'?2:8);setBtn('cx',ST.bz==='N'&&ST.p===3);setBtn('nt',ST.bz==='S'&&ST.p===9);
+  const nt=ST.bz==='S'&&ST.p===9;if(document.body.classList.contains('ntime')!==nt){document.body.classList.toggle('ntime',nt);pc.height=nt?660:(FX.lobe!=null?524:524)}}
+function tgCap(){const t=$('cap').querySelector('.tg');if(t)t.textContent=$('cap').classList.contains('mini')?'▸ apri':'▾ chiudi'}
+$('cap').addEventListener('click',e=>{if(e.target.closest('b.t')&&innerWidth<=760){$('cap').classList.toggle('mini');tgCap()}});
+function setBtn(id,on){const e=$(id);if(e.classList.contains('on')!==on){e.classList.toggle('on',on);e.setAttribute('aria-pressed',on?'true':'false')}}
+function setPlayBtn(){const want=ST.auto?'Ferma':'Tutto il ciclo';if($('pl').textContent!==want)$('pl').textContent=want;setBtn('pl',ST.auto)}
+function goPhase(p,play=true){const P=phases();ST.p=(p+P.length)%P.length;if(p>=P.length)ST.p=1;ST.t=P[ST.p].dur?0:1;ST.play=play&&!!P[ST.p].dur;
+  camKey=P[ST.p].cam;userCam=false;lp.length=0;FX.hist=[];if(M.lobeF||M.lobeTube||M.phiB!=null){M.lobeF=null;M.lobeN=0;M.lobeTube=false;if(M.phiB!=null){M.phiB=null;buildModel(M.base.r0,M.base.al,M.w);buildSurfaces()}buildBackground()}if(ST.p<=1)FX.trail.length=0;setCaption()}
+function guidedModel(){M.lobeF=null;M.lobeTube=false;M.lobeN=0;M.phiB=null;const s=ST.bz==='S'?shue(-5,2):shue(5,2);M.base=s;buildModel(s.r0,s.al,ST.bz==='S'?1:0);M.Rref=rmpAt(-10);buildSurfaces();buildBackground()}
+function advance(){if((ST.bz==='N'&&ST.p>=2)||(ST.bz==='S'&&ST.p>=8))goPhase(1);else goPhase(ST.p+1)}
+$('nx').onclick=advance;
+$('cx').onclick=()=>{ST.auto=false;setPlayBtn();goPhase(3)};
+$('nt').onclick=()=>{ST.auto=false;setPlayBtn();goPhase(9)};
+$('pv').onclick=()=>goPhase(Math.max(0,ST.p-1));
+$('rs').onclick=()=>{ST.auto=false;setPlayBtn();goPhase(0,false)};
+$('pl').onclick=()=>{ST.auto=!ST.auto;setPlayBtn();if(ST.auto&&(ST.p===0||!ST.play))goPhase(ST.p===0?1:ST.p)};
+$('bS').onclick=()=>{if(ST.bz==='S')return;ST.bz='S';document.body.classList.remove('bzN');setBtn('bS',true);setBtn('bN',false);ST.auto=false;setPlayBtn();guidedModel();goPhase(0,false)};
+$('bN').onclick=()=>{if(ST.bz==='N')return;ST.bz='N';document.body.classList.add('bzN');setBtn('bS',false);setBtn('bN',true);ST.auto=false;setPlayBtn();guidedModel();goPhase(0,false)};
+$('v3').onclick=()=>{view='3d';setBtn('v3',true);setBtn('vs',false);userCam=false;setViewVis()};
+$('vs').onclick=()=>{view='sec';setBtn('v3',false);setBtn('vs',true);userCam=false;setViewVis()};
+
+
+/* =====================================================================
+   Ciclo principale
+   ===================================================================== */
+function resize(){R.setSize(innerWidth,innerHeight,false);cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix();measureUI()}
+let uihLast=0;function measureUI(){const h=$('ui').offsetHeight;if(h!==uihLast){uihLast=h;document.documentElement.style.setProperty('--uih',h+'px')}}
+addEventListener('resize',resize);
+let tPrev=performance.now();
+function frame(now){
+  const dt=Math.min(.05,(now-tPrev)/1000);tPrev=now;
+  let st;
+  {const P=phases()[ST.p];
+    if(ST.play){ST.t+=dt/P.dur;if(ST.t>=1){ST.t=1;ST.play=false;if(ST.auto)advance()}}
+    {const Q=phases()[ST.p],ck=(Q.cam2&&ST.t>=Q.camAt)?Q.cam2:Q.cam;if(ck!==camKey)camKey=ck}
+    st=ST.bz==='S'?(ST.p===9?stateTime(ST.t):stateSouth(ST.p,ST.t)):stateNorth(ST.p,ST.t);
+    if(st.lobe!=null){let reb=false;
+      if(M.phiB==null||Math.abs(st.lobe-M.phiB)>.035){M.phiB=st.lobe;buildModel(M.base.r0,M.base.al*(.86+.32*clamp((st.lobe-.3)/.6,0,1.3)),M.w);buildSurfaces();reb=true}
+      const n=clamp(Math.round(2+8*(st.lobe-.3)/.65),2,10),Bn=lobeB(st.lobe),rr=+(.07+.2*clamp((Bn-18)/22,0,1)).toFixed(2);
+      if(reb||n!==M.lobeN||!M.lobeTube||rr!==M.lobeR){M.lobeN=n;M.lobeTube=true;M.lobeR=rr;M.lobeF=[];for(let i=0;i<n;i++)M.lobeF.push((i+.6)/n*.95);buildBackground()}
+      const c=colB(Bn);lobeMeshes.forEach(m=>m.material.color.copy(c))}
+    if(ST.bz==='S'&&ST.p===9){
+      const h=FX.hist||(FX.hist=[]);if(!h.length||ST.t-h[h.length-1][0]>.004||ST.t<h[h.length-1][0]){if(h.length&&ST.t<h[h.length-1][0])h.length=0;h.push([ST.t,st.phi])}}st.jets.forEach(j=>spawnJet(j[0],j[1]));stepWind(dt,9)}
+  // effetti
+  drawFG(st.lines);stepLP(dt,st);
+  FX.xlab=null;fl.forEach(s=>s.visible=false);
+  st.fl.forEach((f,i)=>{if(i>2||f.k<.02)return;const s=fl[i];s.visible=true;s.position.copy(V3(f.x,f.z,f.az||0));const sc=(2+7*f.k)*clamp(cam.position.distanceTo(ctl.target)/60,.5,2.5);s.scale.set(sc,sc,1);s.material.opacity=f.k;if(f.k>.25)FX.xlab=V3(f.x,f.z+(f.z>=0?2.2:-2.2))});
+  {const want=M.w>.5?'Punto X':'Punto neutro';if(lbX.e.textContent!==want)lbX.e.textContent=want}
+  sheet.visible=st.sheet>.02;if(sheet.visible){sheet.position.copy(V3(M.r0,0));sheet.scale.set(1.3,6+4*st.sheet,1);sheet.material.opacity=.25+.6*st.sheet}
+  psheet.visible=true;psheet.scale.y=st.ps*1.4;psheet.material.opacity=clamp(.07+.1*(1.6-st.ps),.05,.25);
+  if(st.plasmoid>=0){plasmoid.visible=true;const x=-M.rxn-6-st.plasmoid*60;plasmoid.position.copy(V3(x,0));plasmoid.material.opacity=.35*(1-st.plasmoid)}else plasmoid.visible=false;
+  FX.sublab=st.nightA>.5?V3(-10,-4):null;if(lbSub.e.textContent!==(st.nightA>.5?'substorm: breakup':''))lbSub.e.textContent=st.nightA>.5?'substorm: breakup':'';
+  stepJets(dt);
+  const cc=capColat(st.phi);setOval(cc+2,st);
+  // frecce di confronto e vettore del campo del vento
+  const cd=cam.position.distanceTo(ctl.target),rad=clamp(cd*.0032,.04,.45);arrowPool.forEach(g=>g.visible=false);curTags=(st.tags||[]).slice();
+  (st.arrows||[]).slice(0,6).forEach((a,i)=>setArrow(arrowPool[i],a.o,a.d,a.L,rad,a.col));
+  {const bz=ST.bz==='S'?-5:5,u=clamp(cd*.042,1.1,8),o=V3(1.3*M.r0+5,-u*2.4);
+    const sp=new THREE.Vector3(.707,0,.707).multiplyScalar(u),bv=new THREE.Vector3(0,u*bz/5,0),tot=sp.clone().add(bv);
+    setArrow(arrowPool[6],o,sp,sp.length(),rad*.9,0xa8a8a8);setArrow(arrowPool[7],o,bv.lengthSq()>1e-6?bv:UPV,bv.length(),rad*.9,0xffd34d);setArrow(arrowPool[8],o,tot,tot.length(),rad*.6,0xffffff,.75);
+    curTags.push({v:o.clone().add(sp.clone().multiplyScalar(1.25)),t:'Bx, By (spirale): non apre',c:'#c8c8c8',sm:1});
+    if(Math.abs(bz)>.5)curTags.push({v:o.clone().add(bv.clone().multiplyScalar(1.3)),t:bz<0?'Bz (Sud): apre':'Bz (Nord): chiude',c:'#ffd34d',sm:1})}
+  press.visible=st.press>.02;if(press.visible){press.position.copy(V3(M.r0+1.1,0));press.scale.set(4.5,14+10*st.press,1);press.material.opacity=.9*st.press}
+  cuspSpot.visible=st.cuspA>.02;if(cuspSpot.visible){const la=83*PI/180;cuspSpot.position.copy(V3(Math.cos(la)*1.04,Math.sin(la)*1.04));cuspSpot.scale.set(.7,.7,1);cuspSpot.material.opacity=st.cuspA}
+  setDoor(st);
+  FX.phi=st.phi;FX.dayA=st.dayA;FX.nightA=st.nightA;FX.cuspA=st.cuspA;FX.foot=st.foot;FX.south=M.w>.5;FX.time=ST.bz==='S'&&ST.p===9;drawPolar(FX);
+  if(surf.userData.lobes){const op=st.lobe!=null?clamp((lobeB(st.lobe)-14)/26,0,1)*.32:0,c=st.lobe!=null?colB(lobeB(st.lobe)):null;surf.userData.lobes.forEach(m=>{m.material.opacity=op;if(c)m.material.color.copy(c)})}
+  FX.lobe=st.lobe;
+  // camera
+  if(!userCam){const g=camGoal(),k=clamp(dt*2.2,0,1);cam.position.lerp(g.pos,k);ctl.target.lerp(g.tgt,k)}
+  ctl.update();earth.rotation.y+=dt*.05;R.render(S,cam);placeLabels();
+  requestAnimationFrame(frame)}
+
+guidedModel();resize();goPhase(0,false);
+{const g=camGoal();cam.position.copy(g.pos);ctl.target.copy(g.tgt)}
+requestAnimationFrame(frame);
+</script>
+<script src="ciclo_dungey_scheda.js"></script>
+<script src="scheda.js"></script>
+</body></html>
