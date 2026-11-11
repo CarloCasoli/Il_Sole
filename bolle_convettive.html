@@ -8,7 +8,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Zona Convettiva – Settore Radiale</title>
+<title data-en="Convection Zone – Radial Sector">Zona Convettiva – Settore Radiale</title>
 <style>
  :root{--bg:#05070d;--text:#e8ecf5;--muted:#8b95ac;--panel:#0d1220;--panel2:#141b30;--line:#232c47;--accent:#ffb347;--accent2:#ff6b35;}
  @media (prefers-color-scheme: light){ :root:not([data-theme="dark"]){--bg:#eef1f8;--text:#11141c;--muted:#5b6478;--panel:#ffffff;--panel2:#e6eaf4;--line:#cfd6e6;} }
@@ -39,6 +39,8 @@
  .layer{background:var(--panel2);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:6px;}
  .layer .name{font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px;}
  hr{border:none;border-top:1px solid var(--line);margin:0;}
+ .tools{margin:6px 0 8px;display:flex;flex-wrap:wrap;gap:6px}
+ .tools .cc-badge{margin-left:0}
  @media (max-width:640px){ #panel{width:100%;} }
 </style>
 </head>
@@ -50,29 +52,33 @@
  </div>
  <div id="panel">
   <div>
-   <h1>☀ Celle convettive<span class="cc-badge"><span class="cc-n">© 2026 Carlo Casoli ·</span> <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it" target="_blank" rel="license noopener">CC BY-NC-ND 4.0</a></span></h1>
-   <p class="sub">Settore di 90° dal centro alla superficie. Modifica il numero di strati e i parametri di ciascuno.</p>
+   <h1><span data-en="☀ Convective cells">☀ Celle convettive</span><span class="cc-badge"><span class="cc-n">© 2026 Carlo Casoli ·</span> <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it" target="_blank" rel="license noopener">CC BY-NC-ND 4.0</a></span></h1>
+   <div class="tools"><a class="cc-badge cc-doc" href="#scheda" data-scheda data-en="📖 Animation description">📖 Scheda dell'animazione</a> <span data-lang-switch></span></div>
+   <p class="sub" data-en="90° sector from the center to the surface. Change the number of layers and the parameters of each.">Settore di 90° dal centro alla superficie. Modifica il numero di strati e i parametri di ciascuno.</p>
   </div>
   <div class="btns">
-   <button id="toggleBtn">⏸ Pausa</button>
-   <button id="resetBtn">↺ Ripristina</button>
+   <button id="toggleBtn" data-en="⏸ Pause">⏸ Pausa</button>
+   <button id="resetBtn" data-en="↺ Reset">↺ Ripristina</button>
   </div>
   <hr>
   <div class="ctrl">
-   <label>Numero di strati convettivi <b id="nVal"></b></label>
+   <label><span data-en="Number of convective layers">Numero di strati convettivi</span> <b id="nVal"></b></label>
    <input id="nLayers" type="range" min="1" max="4" step="1" value="4">
   </div>
   <div class="ctrl">
-   <label>Velocità globale <b id="gVal"></b></label>
+   <label><span data-en="Global speed">Velocità globale</span> <b id="gVal"></b></label>
    <input id="gSpeed" type="range" min="0.1" max="3" step="0.1" value="1">
   </div>
-  <label class="chk"><input type="checkbox" id="showTraj" checked> Mostra traiettorie delle celle</label>
+  <label class="chk"><input type="checkbox" id="showTraj" checked> <span data-en="Show cell trajectories">Mostra traiettorie delle celle</span></label>
   <hr>
   <div id="layerCtrls" style="display:flex;flex-direction:column;gap:10px;"></div>
  </div>
 </div>
+<script src="lingua.js"></script>
 <script>
 (function(){
+/* lingua: T(it,en) viene da lingua.js; se il file manca la pagina resta in italiano */
+const T=window.T||(it=>it);
 const canvas=document.getElementById('c');
 const ctx=canvas.getContext('2d');
 const bgc=document.getElementById('bgcv');
@@ -103,10 +109,10 @@ const PRESETS={
  4:[{cells:4, speed:0.04,size:22},{cells:8, speed:0.06,size:15},{cells:16,speed:0.08,size:9},{cells:32,speed:0.10,size:5}]
 };
 const NAMES={
- 1:['Zona convettiva'],
- 2:['Strato interno','Strato esterno'],
- 3:['Strato interno','Strato intermedio','Strato esterno'],
- 4:['Celle giganti','Supergranulazione','Mesogranulazione','Granulazione']
+ 1:[T('Zona convettiva','Convection zone')],
+ 2:[T('Strato interno','Inner layer'),T('Strato esterno','Outer layer')],
+ 3:[T('Strato interno','Inner layer'),T('Strato intermedio','Middle layer'),T('Strato esterno','Outer layer')],
+ 4:[T('Celle giganti','Giant cells'),T('Supergranulazione','Supergranulation'),T('Mesogranulazione','Mesogranulation'),T('Granulazione','Granulation')]
 };
 const COLORS={
  1:['#ffa64d'],
@@ -132,8 +138,8 @@ let gSpeed=1;
 let showTraj=true;
 
 function buildZones(){
- const nucleo={key:'nucleo',rIn:0,rOut:0.10,label:'Nucleo',color:'#fff2c0'};
- const rad={key:'rad',rIn:0.10,rOut:CONV_IN,label:'Zona radiativa',color:'#ffb454'};
+ const nucleo={key:'nucleo',rIn:0,rOut:0.10,label:T('Nucleo','Core'),color:'#fff2c0'};
+ const rad={key:'rad',rIn:0.10,rOut:CONV_IN,label:T('Zona radiativa','Radiative zone'),color:'#ffb454'};
  zones=[nucleo,rad];
  // spessori decrescenti verso la superficie (rapporto 0.75 tra strati successivi)
  const w=[];for(let i=0;i<N;i++)w.push(Math.pow(0.75,i));
@@ -260,7 +266,7 @@ function drawStatic(){
  }
  labelAt((zones[0].rIn+zones[0].rOut)/2, zones[0].label);
  labelAt((zones[1].rIn+zones[1].rOut)/2, zones[1].label);
- labelAt((CONV_IN+CONV_OUT)/2, 'Zona convettiva');
+ labelAt((CONV_IN+CONV_OUT)/2, T('Zona convettiva','Convection zone'));
 
  bctx.textAlign='left';
  bctx.lineCap='round';
@@ -286,8 +292,11 @@ function frame(now){
    const dashOff=-phase[li];
    const step=SWEEP/z.cells;
    const rMid=(z.rIn+z.rOut)/2;
-   const radius=z.size*1.05*DPR;
-   const lw=Math.max(z.size*0.26*DPR,2*DPR);
+   // su schermi piccoli (telefono) i vortici si rimpiccioliscono in proporzione al settore, così non si sovrappongono;
+   // quando il settore ha un raggio di almeno 700 px (computer) k vale 1 e il disegno è quello di sempre
+   const k=Math.min(1,R/(700*DPR));
+   const radius=z.size*1.05*DPR*k;
+   const lw=Math.max(z.size*0.26*k,2*Math.max(k,0.5))*DPR;
    for(let j=0;j<z.cells;j++){
     const aL=A0+j*step, aR=A0+(j+1)*step, aC=aL+step/2;
     const aLeftSub=(aL+aC)/2, aRightSub=(aC+aR)/2;
@@ -310,7 +319,7 @@ function buildLegend(){
  legend.innerHTML='';
  zones.forEach(z=>{
   const s=document.createElement('span'); s.className='item';
-  s.innerHTML=`<span class="dot" style="background:${z.color}"></span>${z.label}${z.cells?` (${z.cells} celle)`:''}`;
+  s.innerHTML=`<span class="dot" style="background:${z.color}"></span>${z.label}${z.cells?` (${z.cells}${T(' celle',' cells')})`:''}`;
   legend.appendChild(s);
  });
 }
@@ -324,15 +333,15 @@ function buildLayerControls(){
   const p=params[i];
   const div=document.createElement('div'); div.className='layer';
   const cellsCtrl = i===0
-   ? `<div class="ctrl"><label>Numero di celle (strato più profondo) <b data-v="cells">${p.cells}</b></label>
+   ? `<div class="ctrl"><label>${T('Numero di celle (strato più profondo)','Number of cells (deepest layer)')} <b data-v="cells">${p.cells}</b></label>
     <input type="range" data-k="cells" min="1" max="${maxCells0()}" step="1" value="${p.cells}"></div>`
-   : `<div class="ctrl"><label>Numero di celle (derivato) <b data-v="cells">${p.cells}</b></label></div>`;
+   : `<div class="ctrl"><label>${T('Numero di celle (derivato)','Number of cells (derived)')} <b data-v="cells">${p.cells}</b></label></div>`;
   div.innerHTML=`
    <div class="name"><span class="dot" style="background:${COLORS[N][i]}"></span>${i+1}. ${NAMES[N][i]}</div>
    ${cellsCtrl}
-   <div class="ctrl"><label>Velocità del flusso <b data-v="speed">${p.speed.toFixed(2)}</b></label>
+   <div class="ctrl"><label>${T('Velocità del flusso','Flow speed')} <b data-v="speed">${p.speed.toFixed(2)}</b></label>
     <input type="range" data-k="speed" min="0.01" max="0.3" step="0.01" value="${p.speed}"></div>
-   <div class="ctrl"><label>Dimensione dei vortici <b data-v="size">${p.size}</b></label>
+   <div class="ctrl"><label>${T('Dimensione dei vortici','Vortex size')} <b data-v="size">${p.size}</b></label>
     <input type="range" data-k="size" min="2" max="30" step="1" value="${p.size}"></div>`;
   div.querySelectorAll('input').forEach(inp=>{
    inp.addEventListener('input',()=>{
@@ -371,7 +380,7 @@ document.getElementById('showTraj').addEventListener('change',e=>{
 });
 document.getElementById('toggleBtn').addEventListener('click',()=>{
  running=!running;
- document.getElementById('toggleBtn').textContent = running? '⏸ Pausa' : '▶ Avvia';
+ document.getElementById('toggleBtn').textContent = running? T('⏸ Pausa','⏸ Pause') : T('▶ Avvia','▶ Start');
 });
 document.getElementById('resetBtn').addEventListener('click',()=>{
  N=4; gSpeed=1; showTraj=true;
@@ -395,8 +404,13 @@ requestAnimationFrame(frame);
 .cc-badge{display:inline-block;vertical-align:middle;margin:0 0 0 .5em;padding:2px 8px;border:1px solid currentColor;border-radius:999px;font:400 11.5px/1.35 -apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;letter-spacing:0;text-transform:none;white-space:normal;max-width:100%;box-sizing:border-box;opacity:.8;color:inherit;text-shadow:none;pointer-events:auto}
 .cc-n,.cc-badge a{white-space:nowrap}
 .cc-badge a{color:inherit;text-decoration:underline;text-underline-offset:2px}
+.cc-badge.cc-doc{text-decoration:none;opacity:1;font-weight:600;margin-left:.4em}
+.cc-badge.lang-sw{opacity:1;margin-left:.4em}.cc-badge.lang-sw a{cursor:pointer}
 .cc-badge.cc-fixed{position:fixed;top:10px;right:10px;margin:0;z-index:2147483000;background:rgba(10,10,18,.62);color:#f2efe6;border-color:rgba(242,239,230,.45);opacity:1;backdrop-filter:blur(4px)}
 @media (max-width:520px){.cc-badge{font-size:11px;padding:2px 7px}}
 </style>
+<script src="bolle_convettive_scheda.js"></script>
+<script src="bolle_convettive_scheda_en.js"></script>
+<script src="scheda.js"></script>
 </body>
 </html>
