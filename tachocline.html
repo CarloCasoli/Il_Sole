@@ -8,7 +8,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>La Tachocline – Passaggio tra due regimi di rotazione</title>
+<title data-en="The Tachocline – Transition between two rotation regimes">La Tachocline – Passaggio tra due regimi di rotazione</title>
 <style>
  :root{--bg:#05070d;--text:#e8ecf5;--muted:#8b95ac;--panel:#0d1220;--panel2:#141b30;--line:#232c47;--accent:#ffb347;--accent2:#ff6b35;}
  @media (prefers-color-scheme: light){ :root:not([data-theme="dark"]){--bg:#eef1f8;--text:#11141c;--muted:#5b6478;--panel:#ffffff;--panel2:#e6eaf4;--line:#cfd6e6;} }
@@ -48,7 +48,18 @@
  .links{font-size:12px;color:var(--muted);line-height:1.6;}
  .links a{color:var(--accent);text-decoration:none;}
  .links a:hover{text-decoration:underline;}
- @media (max-width:640px){ #panel{width:100%;} }
+ .tools{margin:6px 0 8px;display:flex;flex-wrap:wrap;gap:6px}
+ .tools .cc-badge{margin-left:0}
+ /* telefono in verticale: disegno alto (sezione sopra, vista dal polo sotto), poi subito il pannello dei comandi,
+    quindi legenda, grafico e didascalia */
+ @media (max-width:640px){
+  #panel{width:100%;order:2;}
+  .left{display:contents;}
+  .stage{order:1;aspect-ratio:480/970;}
+  .legend{order:3;}
+  .stage.g{order:4;aspect-ratio:480/300;}
+  .cap{order:5;margin:0;}
+ }
 </style>
 </head>
 <body>
@@ -56,60 +67,64 @@
  <div class="left">
   <div class="stage"><canvas id="c"></canvas></div>
   <div class="legend">
-   <span class="item"><span class="dot" style="background:#ffd166"></span>plasma sopra la tachocline (0,80 R☉)</span>
-   <span class="item"><span class="dot" style="background:#7fd4ff"></span>plasma sotto la tachocline (0,60 R☉)</span>
-   <span class="item"><span class="dot" style="background:var(--muted)"></span>fascia chiara: tachocline</span>
+   <span class="item"><span class="dot" style="background:#ffd166"></span><span data-en="plasma above the tachocline (0.80 R☉)">plasma sopra la tachocline (0,80 R☉)</span></span>
+   <span class="item"><span class="dot" style="background:#7fd4ff"></span><span data-en="plasma below the tachocline (0.60 R☉)">plasma sotto la tachocline (0,60 R☉)</span></span>
+   <span class="item"><span class="dot" style="background:var(--muted)"></span><span data-en="light band: tachocline">fascia chiara: tachocline</span></span>
   </div>
   <div class="stage g"><canvas id="g"></canvas></div>
-  <p class="cap">Velocità angolare in funzione della profondità per diverse latitudini: nella zona convettiva le curve sono separate, sotto la tachocline convergono in un unico valore. È il profilo ricavato dalle inversioni eliosismiche (Cap. 10), qui descritto con una legge di rotazione semplificata.</p>
+  <p class="cap" data-en="Angular velocity as a function of depth for different latitudes: in the convection zone the curves are separate, below the tachocline they converge to a single value. This is the profile derived from helioseismic inversions (Ch. 10), described here with a simplified rotation law.">Velocità angolare in funzione della profondità per diverse latitudini: nella zona convettiva le curve sono separate, sotto la tachocline convergono in un unico valore. È il profilo ricavato dalle inversioni eliosismiche (Cap. 10), qui descritto con una legge di rotazione semplificata.</p>
  </div>
 
  <div id="panel">
   <div>
-   <h1>☀ La Tachocline<span class="cc-badge"><span class="cc-n">© 2026 Carlo Casoli ·</span> <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it" target="_blank" rel="license noopener">CC BY-NC-ND 4.0</a></span></h1>
-   <p class="sub">Sottile regione di transizione a circa 0,70 R☉ in cui il Sole passa dalla rotazione quasi rigida della zona radiativa alla rotazione differenziale della zona convettiva. Non è sede di convezione: ciò che la distingue è il forte gradiente di velocità tra strati adiacenti (<i>shear</i>).</p>
+   <h1><span data-en="☀ The Tachocline">☀ La Tachocline</span><span class="cc-badge"><span class="cc-n">© 2026 Carlo Casoli ·</span> <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it" target="_blank" rel="license noopener">CC BY-NC-ND 4.0</a></span></h1>
+   <div class="tools"><a class="cc-badge cc-doc" href="#scheda" data-scheda data-en="📖 Animation description">📖 Scheda dell'animazione</a> <span data-lang-switch></span></div>
+   <p class="sub" data-en="Thin transition region at about 0.70 R☉ where the Sun passes from the almost rigid rotation of the radiative zone to the differential rotation of the convection zone. It is not a site of convection: what distinguishes it is the strong velocity gradient between adjacent layers (&lt;i&gt;shear&lt;/i&gt;).">Sottile regione di transizione a circa 0,70 R☉ in cui il Sole passa dalla rotazione quasi rigida della zona radiativa alla rotazione differenziale della zona convettiva. Non è sede di convezione: ciò che la distingue è il forte gradiente di velocità tra strati adiacenti (<i>shear</i>).</p>
   </div>
   <div class="btns">
-   <button id="toggleBtn">⏸ Pausa</button>
-   <button id="resetBtn">↺ Ripristina</button>
+   <button id="toggleBtn" data-en="⏸ Pause">⏸ Pausa</button>
+   <button id="resetBtn" data-en="↺ Reset">↺ Ripristina</button>
   </div>
   <hr>
   <div class="ctrl">
-   <label>Latitudine <b id="latVal">15°</b></label>
+   <label><span data-en="Latitude">Latitudine</span> <b id="latVal">15°</b></label>
    <input id="lat" type="range" min="0" max="80" step="1" value="15">
   </div>
   <div class="ctrl">
-   <label>Velocità <b id="velVal">×1,0</b></label>
+   <label><span data-en="Speed">Velocità</span> <b id="velVal">×1,0</b></label>
    <input id="vel" type="range" min="0" max="100" step="1" value="50">
   </div>
-  <label class="chk"><input type="checkbox" id="corot"> Riferimento solidale con la zona radiativa: l'interno si ferma e resta visibile solo lo scorrimento</label>
+  <label class="chk"><input type="checkbox" id="corot"> <span data-en="Frame co-rotating with the radiative zone: the interior stops and only the slip remains visible">Riferimento solidale con la zona radiativa: l'interno si ferma e resta visibile solo lo scorrimento</span></label>
   <hr>
   <div class="layer">
-   <div class="name"><span class="dot" style="background:#ffd166"></span>Zona convettiva</div>
-   <div class="val">Rotazione differenziale: ~25 giorni all'equatore, ~34 ai poli.<br>A questa latitudine: <b id="pSopra">–</b></div>
+   <div class="name"><span class="dot" style="background:#ffd166"></span><span data-en="Convection zone">Zona convettiva</span></div>
+   <div class="val" data-en="Differential rotation: ~25 days at the equator, ~34 at the poles.&lt;br&gt;At this latitude: &lt;b id=&quot;pSopra&quot;&gt;–&lt;/b&gt;">Rotazione differenziale: ~25 giorni all'equatore, ~34 ai poli.<br>A questa latitudine: <b id="pSopra">–</b></div>
   </div>
   <div class="layer">
    <div class="name"><span class="dot" style="background:var(--muted)"></span>Tachocline</div>
-   <div class="val">r ≈ 0,70 R☉ · spessore: pochi % di R☉<br>T ≈ 2×10⁶ K · ρ ≈ 0,2 g/cm³<br>Stato termodinamico simile alla zona radiativa</div>
+   <div class="val" data-en="r ≈ 0.70 R☉ · thickness: a few % of R☉&lt;br&gt;T ≈ 2×10⁶ K · ρ ≈ 0.2 g/cm³&lt;br&gt;Thermodynamic state similar to the radiative zone">r ≈ 0,70 R☉ · spessore: pochi % di R☉<br>T ≈ 2×10⁶ K · ρ ≈ 0,2 g/cm³<br>Stato termodinamico simile alla zona radiativa</div>
   </div>
   <div class="layer">
-   <div class="name"><span class="dot" style="background:#7fd4ff"></span>Zona radiativa</div>
-   <div class="val">Rotazione quasi rigida, tenuta insieme dal campo magnetico interno.<br>Periodo: <b id="pSotto">–</b></div>
+   <div class="name"><span class="dot" style="background:#7fd4ff"></span><span data-en="Radiative zone">Zona radiativa</span></div>
+   <div class="val" data-en="Almost rigid rotation, held together by the internal magnetic field.&lt;br&gt;Period: &lt;b id=&quot;pSotto&quot;&gt;–&lt;/b&gt;">Rotazione quasi rigida, tenuta insieme dal campo magnetico interno.<br>Periodo: <b id="pSotto">–</b></div>
   </div>
   <div class="layer">
-   <div class="name">Scorrimento a questa latitudine</div>
+   <div class="name"><span data-en="Slip at this latitude">Scorrimento a questa latitudine</span></div>
    <div id="verdict">–</div>
-   <div class="val">Tempo trascorso: <b id="tVal">0</b> giorni</div>
+   <div class="val" data-en="Elapsed time: &lt;b id=&quot;tVal&quot;&gt;0&lt;/b&gt; days">Tempo trascorso: <b id="tVal">0</b> giorni</div>
   </div>
   <hr>
-  <div class="links">Lo shear stira e avvolge le linee di campo: la storia prosegue nel Cap. 5 con
+  <div class="links" data-en="The shear stretches and winds up the field lines: the story continues in Ch. 5 with &lt;a href=&quot;effetto_omega_rotazione_differenziale.html&quot;&gt;Omega effect&lt;/a&gt;, &lt;a href=&quot;galleggiamento_tubo.html&quot;&gt;Buoyancy of flux tubes&lt;/a&gt; and &lt;a href=&quot;dinamo_risalita_omega.html&quot;&gt;From the dynamo to the sunspot&lt;/a&gt;.">Lo shear stira e avvolge le linee di campo: la storia prosegue nel Cap. 5 con
    <a href="effetto_omega_rotazione_differenziale.html">Effetto omega</a>,
    <a href="galleggiamento_tubo.html">Galleggiamento dei tubi di flusso</a> e
    <a href="dinamo_risalita_omega.html">Dalla dinamo alla macchia</a>.</div>
  </div>
 </div>
 
+<script src="lingua.js"></script>
 <script>
+/* lingua: TR(it,en) è la funzione T di lingua.js (qui T è già il nome di una variabile); se il file manca la pagina resta in italiano */
+const TR=window.T||(it=>it),EN=window.LANG==='en';
 /* ---------- Fisica (modello semplificato) ---------- */
 const OMEGA_RAD = 430;                         // nHz: rotazione rigida della zona radiativa (~27 giorni)
 const K = 2 * Math.PI * 1e-9 * 86400;          // radianti per (nHz * giorno)
@@ -122,7 +137,7 @@ function omega(r,latDeg){                      // transizione nella tachocline (
   return OMEGA_RAD+(omegaCZ(latDeg)-OMEGA_RAD)*f;
 }
 const periodo=om=>1e9/om/86400;
-const fmt=(v,d=1)=>v.toFixed(d).replace('.',',');
+const fmt=(v,d=1)=>EN?v.toFixed(d):v.toFixed(d).replace('.',',');
 
 /* ---------- Mappa colori: blu = rotazione lenta, rosso = veloce ---------- */
 const STOP=[[0,[49,54,149]],[0.25,[116,173,209]],[0.5,[255,255,191]],[0.75,[244,109,67]],[1,[165,0,38]]];
@@ -141,8 +156,12 @@ const $=id=>document.getElementById(id);
 const V=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
 const DPR=Math.min(window.devicePixelRatio||1,2);
 function prepara(c,w,h){c.width=w*DPR;c.height=h*DPR;const x=c.getContext('2d');x.setTransform(DPR,0,0,DPR,0,0);return x;}
-const W=900,H=480;
-const ctx=prepara($('c'),W,H), gctx=prepara($('g'),900,250);
+/* Disposizione. Schermo largo: sezione meridiana e vista dal polo affiancate (900×480). Telefono in verticale: una sopra
+   l'altra (480×970), così le scritte restano leggibili; anche il grafico diventa più stretto e alto (480×300). */
+const MQ=matchMedia('(max-width:640px)');
+let TALL,W,H,GW,GH,ctx,gctx;
+function imposta(){TALL=MQ.matches;W=TALL?480:900;H=TALL?970:480;GW=TALL?480:900;GH=TALL?300:250;ctx=prepara($('c'),W,H);gctx=prepara($('g'),GW,GH);}
+imposta();
 const COL_SOPRA='#ffd166',COL_SOTTO='#7fd4ff';
 
 function testo(t,x,y,o={}){
@@ -178,6 +197,7 @@ function disegna(){
   ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
 
   // sezione meridiana
+  ctx.save();if(TALL)ctx.translate(40,0);
   const cx=60,cy=248;
   ctx.drawImage(mappa,cx,cy-205,205,410);
   ctx.strokeStyle='rgba(255,255,255,0.85)';ctx.lineWidth=1.2;
@@ -193,14 +213,14 @@ function disegna(){
   [[0.6,COL_SOTTO],[0.8,COL_SOPRA]].forEach(([r,c])=>{
     ctx.fillStyle=c;ctx.beginPath();ctx.arc(cx+200*r*Math.cos(a),cy-200*r*Math.sin(a),5,0,2*Math.PI);ctx.fill();
   });
-  testo('Sezione meridiana',150,24,{bold:true,align:'center'});
-  testo('asse',cx+4,cy-208,{size:11,col:V('--muted')});
-  testo('Zona',cx+12,cy+50,{size:12,col:'#222'});
-  testo('radiativa',cx+12,cy+64,{size:12,col:'#222'});
+  testo(TR('Sezione meridiana','Meridional cross-section'),150,24,{bold:true,align:'center'});
+  testo(TR('asse','axis'),cx+4,cy-208,{size:11,col:V('--muted')});
+  testo(TR('Zona','Radiative'),cx+12,cy+50,{size:12,col:'#222'});
+  testo(TR('radiativa','zone'),cx+12,cy+64,{size:12,col:'#222'});
   testo('Tachocline',cx+100,cy+118,{size:12,col:'#fff',onMap:true});
   ctx.strokeStyle=V('--muted');ctx.lineWidth=1;
   ctx.beginPath();ctx.moveTo(cx+90,cy+168);ctx.lineTo(cx+90,cy+212);ctx.stroke();
-  testo('Zona convettiva',cx+90,cy+226,{size:12,align:'center'});
+  testo(TR('Zona convettiva','Convection zone'),cx+90,cy+226,{size:12,align:'center'});
 
   // barra colori (periodo di rotazione)
   const bx=292,by0=60,by1=420,ov=om=>by1-(om-OM_MIN)/(OM_MAX-OM_MIN)*(by1-by0);
@@ -211,12 +231,13 @@ function disegna(){
   [25,27,29,31,33,35].forEach(P=>{
     const y=ov(1e9/(P*86400));
     ctx.fillStyle=V('--muted');ctx.fillRect(bx+14,y,4,1);
-    testo(P+' g',bx+22,y+4,{size:11});
+    testo(P+TR(' g',' d'),bx+22,y+4,{size:11});
   });
-  testo('Periodo',bx+7,40,{size:11,align:'center',col:V('--muted')});
-  testo('di rotazione',bx+7,52,{size:11,align:'center',col:V('--muted')});
+  testo(TR('Periodo','Rotation'),bx+7,40,{size:11,align:'center',col:V('--muted')});
+  testo(TR('di rotazione','period'),bx+7,52,{size:11,align:'center',col:V('--muted')});
 
   // vista dal polo nord
+  ctx.restore();ctx.save();if(TALL)ctx.translate(-400,490);
   const cConv=colore(omega(0.85,lat)),cRad=colore(OMEGA_RAD);
   ctx.fillStyle=`rgba(${cConv},0.6)`;ctx.beginPath();ctx.arc(PX,PY,pr(0.9),0,2*Math.PI);ctx.fill();
   ctx.fillStyle=bg;ctx.beginPath();ctx.arc(PX,PY,pr(0.7),0,2*Math.PI);ctx.fill();
@@ -226,8 +247,8 @@ function disegna(){
   ctx.fillStyle=bg;ctx.beginPath();ctx.arc(PX,PY,pr(0.5),0,2*Math.PI);ctx.fill();
   ctx.strokeStyle=V('--line');ctx.lineWidth=1;
   ctx.beginPath();ctx.arc(PX,PY,pr(0.5),0,2*Math.PI);ctx.stroke();
-  testo('interno',PX,PY-4,{size:11,align:'center',col:V('--muted')});
-  testo('non mostrato',PX,PY+10,{size:11,align:'center',col:V('--muted')});
+  testo(TR('interno','interior'),PX,PY-4,{size:11,align:'center',col:V('--muted')});
+  testo(TR('non mostrato','not shown'),PX,PY+10,{size:11,align:'center',col:V('--muted')});
 
   const ref=corot?OMEGA_RAD:0;
   for(let s=0;s<12;s++){
@@ -247,24 +268,26 @@ function disegna(){
       ctx.arc(PX+pr(r)*Math.cos(an),PY-pr(r)*Math.sin(an),s===0?6:3.5,0,2*Math.PI);ctx.fill();
     });
   }
-  testo(`Vista dal polo nord · latitudine ${lat}°`,PX,24,{bold:true,align:'center'});
-  testo(corot?'riferimento solidale con la zona radiativa':'riferimento inerziale',PX,474,{size:12,align:'center',col:V('--muted')});
+  testo(TR(`Vista dal polo nord · latitudine ${lat}°`,`View from the north pole · latitude ${lat}°`),PX,24,{bold:true,align:'center'});
+  testo(corot?TR('riferimento solidale con la zona radiativa','frame co-rotating with the radiative zone'):TR('riferimento inerziale','inertial frame'),PX,474,{size:12,align:'center',col:V('--muted')});
+
+  ctx.restore();
 
   // pannello
   const oS=omega(0.8,lat),oI=omega(0.6,lat),d=oS-oI;
-  $('pSopra').textContent=fmt(periodo(oS))+' giorni';
-  $('pSotto').textContent=fmt(periodo(oI))+' giorni';
+  $('pSopra').textContent=fmt(periodo(oS))+TR(' giorni',' days');
+  $('pSotto').textContent=fmt(periodo(oI))+TR(' giorni',' days');
   $('tVal').textContent=Math.round(t);
   $('verdict').innerHTML = d>3
-    ? 'Sopra la tachocline il plasma ruota <b>più in fretta</b>: è in anticipo rispetto alla zona radiativa.'
+    ? TR('Sopra la tachocline il plasma ruota <b>più in fretta</b>: è in anticipo rispetto alla zona radiativa.','Above the tachocline the plasma rotates <b>faster</b>: it runs ahead of the radiative zone.')
     : d<-3
-    ? 'Sopra la tachocline il plasma ruota <b>più lentamente</b>: resta indietro rispetto alla zona radiativa.'
-    : 'A questa latitudine (circa 37° nel modello) <b>lo scorrimento è quasi nullo</b>.';
+    ? TR('Sopra la tachocline il plasma ruota <b>più lentamente</b>: resta indietro rispetto alla zona radiativa.','Above the tachocline the plasma rotates <b>more slowly</b>: it lags behind the radiative zone.')
+    : TR('A questa latitudine (circa 37° nel modello) <b>lo scorrimento è quasi nullo</b>.','At this latitude (about 37° in the model) <b>the slip is almost zero</b>.');
 }
 
 /* ---------- Grafico Ω(r) ---------- */
 function grafico(){
-  const g=gctx,GW=900,GH=250,L=92,R=110,T=20,Bm=42;
+  const g=gctx,L=TALL?88:92,R=TALL?52:110,T=20,Bm=42;
   const X=r=>L+(r-0.4)/0.6*(GW-L-R),Y=o=>T+(470-o)/150*(GH-T-Bm);
   const txt=V('--text'),mut=V('--muted'),line=V('--line');
   g.fillStyle=V('--panel');g.fillRect(0,0,GW,GH);
@@ -273,11 +296,11 @@ function grafico(){
   g.fillStyle=V('--accent');g.textAlign='center';g.fillText('tachocline',X(0.70),T+13);
   for(let o=330;o<=460;o+=30){
     g.strokeStyle=line;g.lineWidth=1;g.beginPath();g.moveTo(L,Y(o));g.lineTo(GW-R,Y(o));g.stroke();
-    g.fillStyle=mut;g.textAlign='right';g.fillText(`${o} (${fmt(periodo(o))} g)`,L-6,Y(o)+4);
+    g.fillStyle=mut;g.textAlign='right';g.fillText(`${o} (${fmt(periodo(o))}${TR(' g',' d')})`,L-6,Y(o)+4);
   }
   g.strokeStyle=mut;g.beginPath();g.moveTo(L,T);g.lineTo(L,GH-Bm);g.lineTo(GW-R,GH-Bm);g.stroke();
   for(let i=0;i<=6;i++){const r=0.4+i*0.1;g.fillStyle=mut;g.textAlign='center';g.fillText(fmt(r,1),X(r),GH-Bm+16);g.fillRect(X(r),GH-Bm,1,4);}
-  g.fillText('raggio (r / R☉)',(L+GW-R)/2,GH-6);
+  g.fillText(TR('raggio (r / R☉)','radius (r / R☉)'),(L+GW-R)/2,GH-6);
   g.save();g.translate(14,(T+GH-Bm)/2);g.rotate(-Math.PI/2);g.textAlign='center';g.fillText('Ω (nHz)',0,0);g.restore();
   const curva=(la,col,w)=>{g.strokeStyle=col;g.lineWidth=w;g.beginPath();
     for(let i=0;i<=200;i++){const r=0.4+i*0.003,y=Y(omega(r,la));i===0?g.moveTo(X(r),y):g.lineTo(X(r),y);}g.stroke();};
@@ -289,17 +312,18 @@ function grafico(){
   g.fillStyle=V('--accent2');g.font='600 12px -apple-system,Segoe UI,Roboto,sans-serif';g.textAlign='left';
   g.fillText(`φ = ${lat}°`,X(1.0)+6,Y(omegaCZ(lat))+4);
   g.font='12px -apple-system,Segoe UI,Roboto,sans-serif';g.fillStyle=txt;
-  g.fillText('zona radiativa: rotazione quasi rigida',X(0.42),Y(OMEGA_RAD)-8);
+  g.fillText(TR('zona radiativa: rotazione quasi rigida','radiative zone: almost rigid rotation'),X(0.42),Y(OMEGA_RAD)-8);
 }
 
 /* ---------- Controlli ---------- */
-function setPlay(v){inPlay=v;$('toggleBtn').textContent=v?'⏸ Pausa':'▶ Avvia';}
+function setPlay(v){inPlay=v;$('toggleBtn').textContent=v?TR('⏸ Pausa','⏸ Pause'):TR('▶ Avvia','▶ Start');}
 $('toggleBtn').onclick=()=>setPlay(!inPlay);
 $('resetBtn').onclick=()=>{t=0;setPlay(false);};   // riporta i raggi allineati e resta fermo
 $('vel').oninput=e=>{mult=Math.pow(2,(e.target.value-50)/25);$('velVal').textContent='×'+fmt(mult);};
 $('lat').oninput=e=>{lat=+e.target.value;$('latVal').textContent=lat+'°';grafico();};
 $('corot').onchange=e=>{corot=e.target.checked;};
 matchMedia('(prefers-color-scheme: light)').addEventListener('change',grafico);
+MQ.addEventListener('change',()=>{imposta();grafico();});   // rotazione del telefono o finestra ridimensionata
 
 /* ---------- Ciclo ---------- */
 let ultimo=performance.now();
@@ -309,6 +333,7 @@ function ciclo(ora){
   disegna();
   requestAnimationFrame(ciclo);
 }
+$('velVal').textContent='×'+fmt(mult);   // separatore decimale nella lingua scelta
 grafico();
 requestAnimationFrame(ciclo);
 </script>
@@ -316,8 +341,13 @@ requestAnimationFrame(ciclo);
 .cc-badge{display:inline-block;vertical-align:middle;margin:0 0 0 .5em;padding:2px 8px;border:1px solid currentColor;border-radius:999px;font:400 11.5px/1.35 -apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;letter-spacing:0;text-transform:none;white-space:normal;max-width:100%;box-sizing:border-box;opacity:.8;color:inherit;text-shadow:none;pointer-events:auto}
 .cc-n,.cc-badge a{white-space:nowrap}
 .cc-badge a{color:inherit;text-decoration:underline;text-underline-offset:2px}
+.cc-badge.cc-doc{text-decoration:none;opacity:1;font-weight:600;margin-left:.4em}
+.cc-badge.lang-sw{opacity:1;margin-left:.4em}.cc-badge.lang-sw a{cursor:pointer}
 .cc-badge.cc-fixed{position:fixed;top:10px;right:10px;margin:0;z-index:2147483000;background:rgba(10,10,18,.62);color:#f2efe6;border-color:rgba(242,239,230,.45);opacity:1;backdrop-filter:blur(4px)}
 @media (max-width:520px){.cc-badge{font-size:11px;padding:2px 7px}}
 </style>
+<script src="tachocline_scheda.js"></script>
+<script src="tachocline_scheda_en.js"></script>
+<script src="scheda.js"></script>
 </body>
 </html>
