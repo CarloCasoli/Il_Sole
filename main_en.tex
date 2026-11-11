@@ -1,0 +1,383 @@
+% ============================================================
+% ENGLISH EDITION (excerpt) - main_en.tex
+% Same preamble as main.tex; only the language, the fixed words
+% of the macros and the list of chapters change.
+% The Italian files are NOT modified.
+% ============================================================
+% --- PUNTO 1: Classe per stampa fronte-retro corretta ---
+\documentclass[10pt,openright,twoside]{extbook}
+
+% --- LINGUA E CODIFICA ---
+\usepackage[english]{babel}
+
+% --- PUNTO 2: Geometria impostata per la rilegatura fisica ---
+\usepackage{geometry}
+\geometry{
+    paperwidth=210mm, 
+    paperheight=296mm, 
+    top=20mm, 
+    bottom=17mm, 
+    %inner=30mm,
+    inner=25mm,
+    outer=15mm,         
+    %bindingoffset=8mm,  % Questo sposta il margine interno %di 8mm verso il centro
+    headsep=7mm,        
+    footskip=10mm
+}
+\raggedbottom
+
+% --- CONFIGURAZIONE TESTATINE E NUMERAZIONE (Stile alternato leggero) ---
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{} % Pulisce tutti i campi di default
+
+% Pagine PARI (Sinistra): Numero a sinistra, Capitolo a destra (in corsivo normale)
+\fancyhead[EL]{\thepage} 
+\fancyhead[ER]{\itshape\nouppercase{\leftmark}} 
+
+% Pagine DISPARI (Destra): Paragrafo a sinistra (in corsivo normale), Numero a destra
+\fancyhead[OL]{\itshape\nouppercase{\rightmark}} 
+\fancyhead[OR]{\thepage} 
+
+% Rimuove la linea orizzontale sotto la testatina
+\renewcommand{\headrulewidth}{0pt} 
+
+% Stile PLAIN: pulito, senza numero di pagina
+\fancypagestyle{plain}{%
+  \fancyhf{}%
+  \renewcommand{\headrulewidth}{0pt}%
+  \renewcommand{\footrulewidth}{0pt}%
+}
+
+% Formattazione pulita senza costrizioni in maiuscolo
+\renewcommand{\chaptermark}[1]{\markboth{Chapter \thechapter\ -- #1}{}}
+\renewcommand{\sectionmark}[1]{\markright{\thesection\ -- #1}}
+
+% --- IL MOTORE DEI FONT (Configurazione pulita e nativa) ---
+\usepackage{fontspec}
+\usepackage{unicode-math}
+
+%\setmainfont{Times New Roman}[
+%  BoldFont       = {* Bold},
+% ItalicFont     = {* Italic},
+%  BoldItalicFont = {* Bold Italic}
+%]
+\setmainfont{TeX Gyre Termes}[
+  BoldFont       = {TeX Gyre Termes Bold},
+  ItalicFont     = {TeX Gyre Termes Italic},
+  BoldItalicFont = {TeX Gyre Termes Bold Italic}
+]
+\setmathfont{TeX Gyre Termes Math} % Si adatta da solo all'11pt della classe
+
+% --- PACCHETTI STRUTTURALI BASE ---
+\usepackage{bm}
+\usepackage{amsmath}
+\usepackage{array}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage[table]{xcolor}
+\usepackage[dvipsnames]{xcolor}
+\usepackage[many]{tcolorbox}
+\usepackage{enumitem}
+\usepackage{placeins}
+\usepackage{pagecolor} % Gestisce lo sfondo della copertina
+\usepackage{qrcode}
+\usepackage{ragged2e}
+\usepackage[hyphens]{url} % Opzione hyphens gestita direttamente qui (addio triangolo arancione!)
+\usepackage{float}
+\usepackage{tabularx}
+\usepackage{multirow}
+\usepackage{longtable}
+\usepackage{rotating}
+\usepackage{tikz}
+\usetikzlibrary{shadings}
+\usetikzlibrary{arrows.meta}
+\usetikzlibrary{positioning}
+\usetikzlibrary{arrows.meta, calc}
+%\usepackage[printonlyused,withpage]{acronym}
+\usepackage{acronym}
+\usepackage{xurl}
+\usepackage{subcaption}
+\usepackage{pgfplots}
+\usepgfplotslibrary{groupplots}
+\pgfplotsset{compat=1.18} % Imposta la compatibilità standard per i grafici
+
+% --- Colore di copertina e STILE PARAGRAFI (Allineamento pulito a sinistra) ---
+\definecolor{azzurroCopertina}{RGB}{16, 110, 153}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+%
+%**********************************************
+% Definizione ambiente revisione con data
+% 11/08/2026 : Prof. Mucciarelli
+%**********************************************
+%
+% English edition: the revision environments are kept (the chapters use them)
+% but without the coloured bar.
+\newtcolorbox{rev 11/08/2026}{
+  blanker,
+  breakable
+}
+%
+%**********************************************
+% Definizione ambiente revisione con data
+% 18/09/2026 : Prof.Bonafede
+%**********************************************
+%
+\newtcolorbox{rev 18/09/2026}{
+  blanker,
+  breakable
+}
+%
+%**********************************************
+% Marcatura modifiche in corso di revisione
+% Revisione: barrato = da eliminare, grassetto = da aggiungere
+% Versione finale: sostituire le due definizioni con
+%   \newcommand{\cancella}[1]{\ignorespaces}
+%   \newcommand{\aggiungi}[1]{#1}
+%**********************************************
+%
+\usepackage[normalem]{ulem}
+% Revisione
+%\newcommand{\cancella}[1]{\sout{#1}}
+%\newcommand{\aggiungi}[1]{\textbf{#1}}
+%\newenvironment{aggiunta}{\bfseries}{}
+
+% Versione finale pulita
+\newcommand{\cancella}[1]{\ignorespaces}
+\newcommand{\aggiungi}[1]{#1}
+\newenvironment{aggiunta}{}{}
+%
+%
+% --- LE TUE MACRO ESSENZIALI (Per evitare crash nel capitolo) ---
+\newcommand{\richiamo}[1]{\texttt{See $\bullet$ IN-DEPTH SECTION $\rightarrow$} (\textnormal{#1})}
+\newcommand{\ritorno}[1]{\texttt{$\Leftarrow$ }(\textnormal{#1})}
+
+\newcommand{\fotocarlo}[3]{%
+    \par\noindent 
+    \begin{center} 
+        \includegraphics[width=1.0\textwidth]{#1}\\[0.5cm]
+        \framebox[\textwidth][c]{%
+            \parbox[c][1.1cm][c]{0.88\textwidth}{%
+                \raggedright
+                {\Large\itshape #2}\par
+                \vspace{2pt}
+%                {\large \href{#3}{Versione digitale: clicca qui per alta risoluzione}}\par
+            }%
+            \vline
+            \parbox[c][1.1cm][c]{0.10\textwidth}{%
+                \centering
+                \qrcode[height=1.0cm]{\string#3}%
+            }%
+        }% 
+    \end{center}
+    \par\vspace{0.2cm} 
+}
+
+\newcommand{\fotocarloridotta}[4]{%
+    \par\noindent 
+    \begin{center} 
+        % #1 = scala (es. 0.8)
+        % #2 = percorso file
+        % #3 = didascalia
+        % #4 = link Astrobin
+        \includegraphics[width=#1\textwidth]{#2}\\[0.5cm]
+        \framebox[#1\textwidth][c]{%
+            \parbox[c][1.1cm][c]{\dimexpr#1\textwidth - 1.6cm\relax}{%
+                \raggedright
+                \fontsize{10}{12}\selectfont\itshape #3\par
+                %\fontsize{11}{13.2}\selectfont\itshape #3\par
+                \vspace{2pt}
+                % \href{#4}{Versione digitale: clicca qui per alta risoluzione}\par
+            }%
+            \vline
+            \parbox[c][1.1cm][c]{1.4cm}{%
+                \centering
+                \qrcode[height=1.0cm]{\string#4}%
+            }%
+        }% 
+    \end{center}
+    \par\vspace{0.2cm} 
+}
+
+\usepackage{siunitx}
+\newcommand{\AlphaCromosferico}{\ensuremath{\alpha}}
+\DeclareSIUnit\lightyear{ly}
+\DeclareSIUnit\astronomicalunit{AU}
+\DeclareSIUnit\parsec{pc}
+\sisetup{exponent-product = \cdot, output-decimal-marker = {.}}
+
+% --- GESTIONE DEI TITOLI RIPROPORZIONATI (14 - 12 - 10.5) ---
+\usepackage{titlesec}
+% Configurazione Capitolo (Nero, 14pt, Grassetto)
+\titleformat{\chapter}[hang]
+  {\normalfont\fontsize{14}{18}\selectfont\bfseries}
+  {Chapter \thechapter}
+  {0.6em}
+  {}
+\titlespacing*{\chapter}{0pt}{-15pt}{15pt}
+
+% Configurazione Sezione (Nera, 12pt, Grassetto)
+\titleformat{\section}
+  {\normalfont\fontsize{12}{15}\selectfont\bfseries}
+  {\thesection}
+  {0.6em}
+  {}
+\titlespacing*{\section}{0pt}{12pt}{6pt}
+
+% Configurazione Sotto-sezione (Nera, 10.5pt, Grassetto)
+\titleformat{\subsection}[hang]
+  {\normalfont\fontsize{10.5}{13}\selectfont\bfseries}
+  {}
+  {0pt}
+  {}
+\titlespacing*{\subsection}{0pt}{10pt}{4pt}
+
+% ============================================================
+% ROUTINE APPROFONDIMENTI FLUIDI (Senza salto pagina)
+% ============================================================
+\newcounter{approf}[chapter] % Si azzera automaticamente a ogni nuovo capitolo
+\newcommand{\approfondimento}[2]{%
+  \par\vspace{0.5cm}% 
+  \refstepcounter{approf}%
+  \markright{In-depth section \thechapter.\arabic{approf} -- #1}% Aggiorna la testatina
+  \section*{In-depth section \thechapter.\arabic{approf} -- #1}%
+  \phantomsection
+  \label{#2}%
+  \addcontentsline{toc}{section}{In-depth section \thechapter.\arabic{approf} -- #1}%
+}
+% ============================================================
+% 1. ROUTINE VIDEO JHEDIOVIEWER / ASTROBIN (.mov)
+% ============================================================
+\newcounter{astrobinCount}[chapter]
+\newcommand{\astrobinQR}[2]{%
+  \stepcounter{astrobinCount}%
+  \noindent
+  \begin{tabular}{@{} m{\dimexpr\textwidth-1.8cm\relax} @{\hspace{0.4cm}} m{1.4cm} @{}}
+    \small \textbf{Video \thechapter.\arabic{astrobinCount} : #1} 
+  & 
+    \qrcode[height=1.2cm]{#2} 
+  \end{tabular}\par\vspace{0.6em}%
+}
+\newcommand{\richiamoVideo}[1]{See $\bullet$ ASTROBIN VIDEO $\rightarrow$ (#1)}
+
+% ============================================================
+% 2. ROUTINE SCRIPT JAVASCRIPT / GITHUB (.html)
+% ============================================================
+\newcounter{githubCount}[chapter]
+\newcommand{\githubQR}[2]{%
+  \stepcounter{githubCount}%
+  \markright{Script \thechapter.\arabic{githubCount} -- #1}%
+  \noindent
+  \begin{tabular}{@{} m{\dimexpr\textwidth-1.8cm\relax} @{\hspace{0.4cm}} m{1.4cm} @{}}
+    \normalsize \textbf{Script \thechapter.\arabic{githubCount} : #1}
+  & 
+    \qrcode[height=1.2cm]{#2?lang=en} % English edition: the animation opens in English
+  \end{tabular}\par\vspace{0.6em}%
+}
+\newcommand{\richiamoScript}[1]{ $\bullet$ SCRIPT  $\rightarrow$ (#1)}
+% ============================================================
+% GESTIONE DELLE BIBLIOGRAFIE FLUIDE (Zero salti pagina)
+% ============================================================
+\usepackage{etoolbox}
+\patchcmd{\thebibliography}{\clearpage}{}{}{}
+\patchcmd{\thebibliography}{\cleardoublepage}{}{}{}
+\patchcmd{\thebibliography}{\chapter*}{\section*}{}{}
+\patchcmd{\thebibliography}{\list}{\hbadness=10000\list}{}{}
+%============================================================
+% CONFIGURAZIONE INDICE ANALITICO A 3 COLONNE (SINTASSI CORRETTA)
+% ============================================================
+\usepackage{imakeidx}
+\makeindex[
+  columns=2, 
+  title=Index, 
+  intoc=true, 
+  options={-s stile_indice.ist}
+]
+
+%*******************************************
+% INDICE solo per chapter e section
+%*******************************************
+\setcounter{tocdepth}{1} % 0=Solo Capitoli, 1=Capitoli e Sezioni
+
+% Carica hyperref una sola volta con tutte le opzioni necessarie
+\usepackage[hidelinks, hyperindex=true]{hyperref}
+
+% Definizione del comando \Ha sicuro per testo, sezioni, indici e PDF
+\usepackage{xspace}
+\newcommand{\Ha}{\texorpdfstring{$\mathrm{H}\hspace{-0.07em}\alpha$}{H-alpha}\xspace}
+% ************************************************************
+% INIZIO DOCUMENTO
+% ************************************************************
+\begin{document}
+
+% Diagnostica opzionale per verificare il font nel log
+\typeout{FONT ATTUALMENTE USATO: \fontname\font}
+
+% --- FRONT MATTER (same order as main_it.tex, without the revisions) ---
+\frontmatter
+
+% 1. Cover
+\include{copertina_en}
+\cleardoublepage
+
+\pagestyle{empty}
+
+% 2. Title page (front and back)
+\include{frontespizio_en}
+\cleardoublepage
+
+% 2b. Translation note (English excerpt only)
+\include{nota_traduzione_en}
+\cleardoublepage
+
+% 3. Dedication
+\include{dedica_en}
+\cleardoublepage
+
+% 4. Acknowledgements
+\include{ringraziamenti_en}
+\cleardoublepage
+
+% 5. Preface
+\include{premessa_en}
+\cleardoublepage
+
+% 6. How to read this book (the revisions page is not included)
+\include{come_usare_en}
+\cleardoublepage
+
+% 7. Contents
+\pagestyle{empty}
+\renewcommand{\contentsname}{Contents}
+\tableofcontents
+\cleardoublepage
+
+% --- MAIN MATTER ---
+\mainmatter
+\pagestyle{fancy}
+
+% Chapters keep the numbers of the complete book.
+\setcounter{chapter}{0}
+\include{capitolo1_en}
+\setcounter{chapter}{3}
+\include{capitolo4_en}
+%\setcounter{chapter}{4}
+%\include{capitolo5_en}
+%\setcounter{chapter}{13}
+%\include{capitolo14_en}
+
+% --- BACK MATTER ---
+\backmatter
+\include{acronimi_en}
+\printindex
+
+% --- Back cover ---
+\cleardoublepage
+\pagestyle{empty}
+\hbox{}
+\newpage
+\input{quarta_en}
+
+\end{document}
