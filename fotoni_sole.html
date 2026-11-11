@@ -7,7 +7,8 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8">
-<title>Il viaggio dei fotoni nel Sole</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title data-en="The journey of photons in the Sun">Il viaggio dei fotoni nel Sole</title>
 <style>
 :root{
   --bg:#05070d; --panel:#0d1220; --panel2:#141b30; --text:#e8ecf5; --muted:#8b93ab;
@@ -40,6 +41,19 @@ input[type=range]{width:100%;accent-color:var(--accent);}
 .stats div{display:flex;justify-content:space-between;color:var(--muted);}
 .stats div b{color:var(--accent);font-weight:600;}
 hr{border:none;border-top:1px solid var(--line);margin:2px 0;}
+.tools{margin:6px 0 8px;display:flex;flex-wrap:wrap;gap:6px}
+.tools .cc-badge{margin-left:0}
+/* telefono in verticale: il Sole sopra (quadrato), il pannello dei comandi sotto, scorrevole */
+@media (max-width:700px) and (orientation:portrait){
+  #app{flex-direction:column;height:100vh;height:100dvh;}
+  #stage{flex:none;height:min(100vw,52vh);}
+  #panel{width:auto;flex:1;min-height:0;border-left:none;border-top:1px solid var(--line);padding:14px 16px;gap:14px;}
+}
+/* telefono in orizzontale: pannello più stretto, tutta l'altezza disponibile */
+@media (max-height:500px) and (orientation:landscape){
+  #app{height:100vh;height:100dvh;}
+  #panel{width:250px;padding:12px 14px;gap:12px;}
+}
 </style>
 </head>
 <body>
@@ -47,59 +61,70 @@ hr{border:none;border-top:1px solid var(--line);margin:2px 0;}
   <div id="stage"><canvas id="cv"></canvas></div>
   <div id="panel">
     <div>
-      <h1>☀ Cammino casuale del fotone<span class="cc-badge"><span class="cc-n">© 2026 Carlo Casoli ·</span> <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it" target="_blank" rel="license noopener">CC BY-NC-ND 4.0</a></span></h1>
-      <p class="sub">Dal nucleo alla superficie: miliardi di urti compressi in una passeggiata visiva.</p>
+      <h1><span data-en="☀ Random walk of the photon">☀ Cammino casuale del fotone</span><span class="cc-badge"><span class="cc-n">© 2026 Carlo Casoli ·</span> <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it" target="_blank" rel="license noopener">CC BY-NC-ND 4.0</a></span></h1>
+      <div class="tools"><a class="cc-badge cc-doc" href="#scheda" data-scheda data-en="📖 Animation description">📖 Scheda dell'animazione</a> <span data-lang-switch></span></div>
+      <p class="sub" data-en="From the core to the surface: billions of collisions compressed into a visual walk.">Dal nucleo alla superficie: miliardi di urti compressi in una passeggiata visiva.</p>
     </div>
-    <button id="toggleBtn">▶ Avvia</button>
-    <button id="resetBtn">↺ Azzera scena</button>
+    <button id="toggleBtn" data-en="▶ Start">▶ Avvia</button>
+    <button id="resetBtn" data-en="↺ Clear scene">↺ Azzera scena</button>
     <hr>
     <div class="ctrl">
-      <label>Frequenza generazione <b id="freqVal"></b></label>
+      <label><span data-en="Generation rate">Frequenza generazione</span> <b id="freqVal"></b></label>
       <input id="freq" type="range" min="0.2" max="20" step="0.2" value="3">
     </div>
     <div class="ctrl">
-      <label>Velocità simulazione <b id="speedVal"></b></label>
+      <label><span data-en="Simulation speed">Velocità simulazione</span> <b id="speedVal"></b></label>
       <input id="speed" type="range" min="1" max="60" step="1" value="8">
     </div>
     <div class="ctrl">
-      <label>Durata tratto (anni simulati)</label>
+      <label data-en="Step duration (simulated years)">Durata tratto (anni simulati)</label>
       <div class="two">
         <div><input id="durMin" type="range" min="1" max="5000" step="1" value="200"><span id="durMinVal" style="font-size:11px;color:var(--muted)"></span></div>
         <div><input id="durMax" type="range" min="1" max="5000" step="1" value="1500"><span id="durMaxVal" style="font-size:11px;color:var(--muted)"></span></div>
       </div>
-      <label style="justify-content:flex-start;gap:6px;color:var(--muted);font-size:11px;">min ↔ max per singolo urto (solo statistica)</label>
+      <label style="justify-content:flex-start;gap:6px;color:var(--muted);font-size:11px;" data-en="min ↔ max per single collision (statistics only)">min ↔ max per singolo urto (solo statistica)</label>
     </div>
     <div class="ctrl">
-      <label>Lunghezza tratto (pixel)</label>
+      <label data-en="Step length (pixels)">Lunghezza tratto (pixel)</label>
       <div class="two">
         <div><input id="pxMin" type="range" min="0.1" max="15" step="0.1" value="0.6"><span id="pxMinVal" style="font-size:11px;color:var(--muted)"></span></div>
         <div><input id="pxMax" type="range" min="0.1" max="15" step="0.1" value="2"><span id="pxMaxVal" style="font-size:11px;color:var(--muted)"></span></div>
       </div>
-      <label style="justify-content:flex-start;gap:6px;color:var(--muted);font-size:11px;">più piccolo = più urti per uscire, bozzolo più lento</label>
+      <label style="justify-content:flex-start;gap:6px;color:var(--muted);font-size:11px;" data-en="smaller = more collisions to get out, slower cocoon">più piccolo = più urti per uscire, bozzolo più lento</label>
     </div>
     <div class="ctrl">
-      <label>Velocità zona convettiva <b id="convVal"></b></label>
+      <label><span data-en="Convection zone speed">Velocità zona convettiva</span> <b id="convVal"></b></label>
       <input id="convMult" type="range" min="2" max="50" step="1" value="10">
-      <label style="justify-content:flex-start;gap:6px;color:var(--muted);font-size:11px;">moltiplicatore del passo oltre il confine interno</label>
+      <label style="justify-content:flex-start;gap:6px;color:var(--muted);font-size:11px;" data-en="step multiplier beyond the inner boundary">moltiplicatore del passo oltre il confine interno</label>
     </div>
     <div class="ctrl">
-      <label>Fotoni massimi contemporanei <b id="maxVal"></b></label>
+      <label><span data-en="Maximum simultaneous photons">Fotoni massimi contemporanei</span> <b id="maxVal"></b></label>
       <input id="maxActive" type="range" min="100" max="6000" step="100" value="3000">
     </div>
     <hr>
     <div class="stats">
-      <div>Fotoni attivi<b id="sActive">0</b></div>
-      <div>Fotoni usciti<b id="sExited">0</b></div>
-      <div>Tempo sim. medio<b id="sTime">–</b></div>
-      <div>Passi/frame (throttling)<b id="sThrottle">100%</b></div>
+      <div><span data-en="Active photons">Fotoni attivi</span><b id="sActive">0</b></div>
+      <div><span data-en="Escaped photons">Fotoni usciti</span><b id="sExited">0</b></div>
+      <div><span data-en="Mean sim. time">Tempo sim. medio</span><b id="sTime">–</b></div>
+      <div><span data-en="Steps/frame (throttling)">Passi/frame (throttling)</span><b id="sThrottle">100%</b></div>
     </div>
   </div>
 </div>
+<script src="lingua.js"></script>
 <script>
+/* lingua: T(it,en) viene da lingua.js; se il file manca la pagina resta in italiano */
+const T=window.T||(it=>it),LOC=window.LANG==='en'?'en-US':'it-IT';
 const cv=document.getElementById('cv'), ctx=cv.getContext('2d');
 const stage=document.getElementById('stage');
-function resize(){cv.width=stage.clientWidth;cv.height=stage.clientHeight;drawBase();}
-window.addEventListener('resize',resize);
+function resize(){
+  const w=stage.clientWidth,h=stage.clientHeight;
+  if(w===cv.width&&h===cv.height&&R)return;            // dimensioni invariate: la scena resta com'è
+  const ocx=cx,ocy=cy,oR=R;
+  cv.width=w;cv.height=h;drawBase();
+  // dopo una rotazione del telefono o un ridimensionamento i fotoni in viaggio seguono il nuovo disegno del Sole
+  if(oR)photons.forEach(p=>{const k=R/oR;p.x=cx+(p.x-ocx)*k;p.y=cy+(p.y-ocy)*k;p.stopDist*=k;});
+}
+window.addEventListener('resize',resize);window.addEventListener('orientationchange',()=>setTimeout(resize,350));
 
 let R, innerR, core, cx, cy;
 function drawBase(){
@@ -211,7 +236,7 @@ function loop(t){
 
   document.getElementById('sActive').textContent=photons.length;
   document.getElementById('sExited').textContent=exitedCount;
-  document.getElementById('sTime').textContent = exitedCount? Math.round(exitedTimeSum/exitedCount).toLocaleString('it-IT')+' anni' : '–';
+  document.getElementById('sTime').textContent = exitedCount? Math.round(exitedTimeSum/exitedCount).toLocaleString(LOC)+T(' anni',' years') : '–';
   document.getElementById('sThrottle').textContent = Math.round(perfScale*100)+'%';
 
   requestAnimationFrame(loop);
@@ -232,7 +257,7 @@ syncLabels();
 
 document.getElementById('toggleBtn').addEventListener('click',()=>{
   running=!running; lastT=0;
-  document.getElementById('toggleBtn').textContent = running? '⏸ Pausa' : '▶ Avvia';
+  document.getElementById('toggleBtn').textContent = running? T('⏸ Pausa','⏸ Pause') : T('▶ Avvia','▶ Start');
 });
 document.getElementById('resetBtn').addEventListener('click',()=>{
   photons=[]; exitedCount=0; exitedTimeSum=0; spawnAcc=0;
@@ -249,8 +274,13 @@ requestAnimationFrame(loop);
 .cc-badge{display:inline-block;vertical-align:middle;margin:0 0 0 .5em;padding:2px 8px;border:1px solid currentColor;border-radius:999px;font:400 11.5px/1.35 -apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;letter-spacing:0;text-transform:none;white-space:normal;max-width:100%;box-sizing:border-box;opacity:.8;color:inherit;text-shadow:none;pointer-events:auto}
 .cc-n,.cc-badge a{white-space:nowrap}
 .cc-badge a{color:inherit;text-decoration:underline;text-underline-offset:2px}
+.cc-badge.cc-doc{text-decoration:none;opacity:1;font-weight:600;margin-left:.4em}
+.cc-badge.lang-sw{opacity:1;margin-left:.4em}.cc-badge.lang-sw a{cursor:pointer}
 .cc-badge.cc-fixed{position:fixed;top:10px;right:10px;margin:0;z-index:2147483000;background:rgba(10,10,18,.62);color:#f2efe6;border-color:rgba(242,239,230,.45);opacity:1;backdrop-filter:blur(4px)}
 @media (max-width:520px){.cc-badge{font-size:11px;padding:2px 7px}}
 </style>
+<script src="fotoni_sole_scheda.js"></script>
+<script src="fotoni_sole_scheda_en.js"></script>
+<script src="scheda.js"></script>
 </body>
 </html>
