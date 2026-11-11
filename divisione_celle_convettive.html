@@ -5,7 +5,7 @@
   Vietati l'uso commerciale e la distribuzione di versioni modificate senza autorizzazione scritta dell'autore.
 -->
 <html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
-<title>Cella convettiva che si divide</title>
+<title data-en="A convective cell that splits">Cella convettiva che si divide</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;1,400;1,500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
@@ -79,70 +79,103 @@ input[type=range]{width:100%;accent-color:var(--acc);margin:0}
 .note{font-size:12px;color:var(--dim);margin:0;border-top:1px solid var(--line);padding-top:12px}
 kbd{font:500 11px var(--ui);border:1px solid var(--line);border-radius:3px;padding:1px 4px;color:var(--mut)}
 @media (prefers-reduced-motion:reduce){.lbl{transition:none}}
+.tools{margin:8px 0 2px;display:flex;flex-wrap:wrap;gap:6px}
+.tools .cc-badge{margin-left:0}
+/* telefono in verticale: scena 3D sopra, pannello dei comandi sotto (scorrevole); il riquadro delle fasi diventa una
+   fascia in alto sulla scena, con il titolo e la frase della fase in corso */
+@media (max-width:700px) and (orientation:portrait){
+  html,body{height:100%}
+  .app{height:100vh;height:100dvh;grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,60%) minmax(0,1fr)}
+  .hud{top:0;left:0;right:0;bottom:auto;width:auto;height:150px;overflow-y:auto;justify-content:flex-start;gap:5px;padding:8px 12px;border-right:none;border-bottom:1px solid var(--line)}
+  .gens{flex-direction:row;flex-wrap:wrap;align-items:center;gap:4px}
+  .chip{font-size:10px;padding:3px 6px}
+  .steps,.vel{display:none}
+  #phT{font-size:17px}
+  #phD{font-size:11.5px;line-height:1.35}
+  .tl{left:8px;right:8px;bottom:8px;gap:8px;padding:8px 10px}
+  #time{min-width:74px;font-size:11px}
+  .lbl{font-size:10.5px}
+  .panel{border-left:none;border-top:1px solid var(--line);padding:14px 16px 22px;gap:16px}
+  .panel h1{font-size:19px}
+}
+/* telefono in orizzontale: riquadro e pannello più stretti */
+@media (max-height:500px) and (orientation:landscape){
+  .app{height:100vh;height:100dvh;grid-template-columns:minmax(0,1fr) 250px}
+  .hud{width:180px;bottom:64px;padding:8px 10px;gap:7px}
+  .steps,.vel{display:none}
+  #phT{font-size:16px}
+  #phD{font-size:11.5px;line-height:1.35}
+  .tl{left:8px;right:8px;bottom:8px;padding:6px 10px}
+  .lbl{font-size:10.5px}
+  .panel{padding:12px 14px 18px;gap:14px}
+  .panel h1{font-size:18px}
+}
 </style>
 
 <div class="app">
   <div class="stage" id="stage">
     <div id="labels"></div>
     <div class="hud">
-      <div class="gens"><b>Livello</b><span class="chip" id="g0">1 · cella madre</span><span class="chip" id="g1">2 · figlie</span><span class="chip" id="g2">3 · granuli</span></div>
-      <div class="steps" id="steps"><span>Risalita</span><span>Allargamento</span><span>Instabilità</span><span id="lastStep">Divisione del flusso</span></div>
+      <div class="gens"><b data-en="Level">Livello</b><span class="chip" id="g0" data-en="1 · parent cell">1 · cella madre</span><span class="chip" id="g1" data-en="2 · daughters">2 · figlie</span><span class="chip" id="g2" data-en="3 · granules">3 · granuli</span></div>
+      <div class="steps" id="steps"><span data-en="Rise">Risalita</span><span data-en="Widening">Allargamento</span><span data-en="Instability">Instabilità</span><span id="lastStep" data-en="Flow splitting">Divisione del flusso</span></div>
       <h2 id="phT">Risalita rapida</h2>
       <p id="phD"></p>
-      <div class="vel"><span>Velocità di risalita</span><span id="velTxt">alta</span><div class="vbar"><div id="velBar"></div></div></div>
+      <div class="vel"><span data-en="Rise speed">Velocità di risalita</span><span id="velTxt">alta</span><div class="vbar"><div id="velBar"></div></div></div>
     </div>
     <div class="tl">
-      <button id="play" class="pri" aria-label="Pausa">Pausa</button>
-      <div class="track"><div class="ticks" id="ticks"></div><input type="range" id="tl" min="0" max="1000" value="0" aria-label="Tempo dell'animazione"></div>
+      <button id="play" class="pri" aria-label="Pausa" data-en-aria="Pause" data-en="Pause">Pausa</button>
+      <div class="track"><div class="ticks" id="ticks"></div><input type="range" id="tl" min="0" max="1000" value="0" aria-label="Tempo dell'animazione" data-en-aria="Animation time"></div>
       <span id="time">0 s</span>
     </div>
   </div>
 
   <aside class="panel">
     <div>
-      <h1>Una cella convettiva che si divide<span class="cc-badge"><span class="cc-n">© 2026 Carlo Casoli ·</span> <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it" target="_blank" rel="license noopener">CC BY-NC-ND 4.0</a></span></h1>
-      <p class="lead">Una grande bolla di gas caldo sale e rallenta. In cima si allarga, diventa orizzontale e piega i bordi verso il basso. Poi il bordo si instabilizza, corsie di gas freddo scendono dalla sommità e dividono il grande flusso in flussi più piccoli. Solo allora questi crescono come nuove celle. In ogni cella la maggior parte del gas ricircola sul posto: solo una piccola parte sale al livello successivo, mentre il gas raffreddato in superficie scende in getti stretti fino alla base. Gli strati sono sempre più sottili salendo verso la superficie.</p>
+      <h1><span data-en="A convective cell that splits">Una cella convettiva che si divide</span><span class="cc-badge"><span class="cc-n">© 2026 Carlo Casoli ·</span> <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it" target="_blank" rel="license noopener">CC BY-NC-ND 4.0</a></span></h1>
+      <div class="tools"><a class="cc-badge cc-doc" href="#scheda" data-scheda data-en="📖 Animation description">📖 Scheda dell'animazione</a> <span data-lang-switch></span></div>
+      <p class="lead" data-en="A large bubble of hot gas rises and slows down. At the top it widens, becomes horizontal and turns its edges downwards. Then the edge becomes unstable, lanes of cool gas sink from the top and divide the large flow into smaller flows. Only then do these grow as new cells. In each cell most of the gas recirculates in place: only a small part rises to the next level, while the gas cooled at the surface sinks in narrow plumes down to the base. The layers are thinner and thinner going up towards the surface.">Una grande bolla di gas caldo sale e rallenta. In cima si allarga, diventa orizzontale e piega i bordi verso il basso. Poi il bordo si instabilizza, corsie di gas freddo scendono dalla sommità e dividono il grande flusso in flussi più piccoli. Solo allora questi crescono come nuove celle. In ogni cella la maggior parte del gas ricircola sul posto: solo una piccola parte sale al livello successivo, mentre il gas raffreddato in superficie scende in getti stretti fino alla base. Gli strati sono sempre più sottili salendo verso la superficie.</p>
     </div>
 
     <div class="grp">
-      <h2>Riproduzione</h2>
-      <div class="row"><button id="restart">Ricomincia</button><button id="variant">Nuova variante</button></div>
-      <button id="dl" hidden>Scarica il file .html</button>
+      <h2 data-en="Playback">Riproduzione</h2>
+      <div class="row"><button id="restart" data-en="Restart">Ricomincia</button><button id="variant" data-en="New variant">Nuova variante</button></div>
+      <button id="dl" hidden data-en="Download the .html file">Scarica il file .html</button>
       <p class="hint" id="dlMsg" hidden></p>
-      <label class="sl" for="speed">Velocità animazione <output id="speedO">1,0×</output><input type="range" id="speed" min="0.25" max="3" step="0.05" value="1"></label>
+      <label class="sl" for="speed"><span data-en="Animation speed">Velocità animazione</span> <output id="speedO">1,0×</output><input type="range" id="speed" min="0.25" max="3" step="0.05" value="1"></label>
     </div>
 
     <div class="grp">
-      <h2>Divisione</h2>
-      <label class="sl" for="nkids">Flussi principali nella prima divisione <output id="nkidsO">5 (1 al centro + 4)</output><input type="range" id="nkids" min="4" max="7" step="1" value="5"></label>
-      <label class="sl" for="irr">Irregolarità della forma <output id="irrO">100%</output><input type="range" id="irr" min="0" max="2" step="0.05" value="1"></label>
+      <h2 data-en="Splitting">Divisione</h2>
+      <label class="sl" for="nkids"><span data-en="Main flows in the first splitting">Flussi principali nella prima divisione</span> <output id="nkidsO">5 (1 al centro + 4)</output><input type="range" id="nkids" min="4" max="7" step="1" value="5"></label>
+      <label class="sl" for="irr"><span data-en="Shape irregularity">Irregolarità della forma</span> <output id="irrO">100%</output><input type="range" id="irr" min="0" max="2" step="0.05" value="1"></label>
     </div>
 
     <div class="grp">
-      <h2>Rappresentazione</h2>
-      <label class="ck"><input type="checkbox" id="cShell" checked>Guscio della cella</label>
-      <label class="sl" for="op">Opacità del guscio <output id="opO">100%</output><input type="range" id="op" min="0.2" max="1.8" step="0.05" value="1"></label>
-      <label class="ck"><input type="checkbox" id="cPart" checked>Particelle del gas</label>
-      <label class="ck"><input type="checkbox" id="cHi">Evidenzia il gas che cambia livello</label>
-      <label class="ck"><input type="checkbox" id="cLbl" checked>Etichette</label>
-      <label class="ck"><input type="checkbox" id="cRot">Rotazione automatica</label>
+      <h2 data-en="Display">Rappresentazione</h2>
+      <label class="ck"><input type="checkbox" id="cShell" checked><span data-en="Cell shell">Guscio della cella</span></label>
+      <label class="sl" for="op"><span data-en="Shell opacity">Opacità del guscio</span> <output id="opO">100%</output><input type="range" id="op" min="0.2" max="1.8" step="0.05" value="1"></label>
+      <label class="ck"><input type="checkbox" id="cPart" checked><span data-en="Gas particles">Particelle del gas</span></label>
+      <label class="ck"><input type="checkbox" id="cHi"><span data-en="Highlight gas changing level">Evidenzia il gas che cambia livello</span></label>
+      <label class="ck"><input type="checkbox" id="cLbl" checked><span data-en="Labels">Etichette</span></label>
+      <label class="ck"><input type="checkbox" id="cRot"><span data-en="Auto-rotation">Rotazione automatica</span></label>
     </div>
 
     <div class="grp">
-      <h2>Vista</h2>
-      <div class="row"><button data-view="obl" class="sel">Obliqua</button><button data-view="side">Laterale</button><button data-view="top">Dall'alto</button></div>
-      <p class="hint">Trascina per ruotare, rotella per lo zoom, tasto destro per spostare. <kbd>Spazio</kbd> pausa.</p>
+      <h2 data-en="View">Vista</h2>
+      <div class="row"><button data-view="obl" class="sel" data-en="Oblique">Obliqua</button><button data-view="side" data-en="Side">Laterale</button><button data-view="top" data-en="Top">Dall'alto</button></div>
+      <p class="hint" data-en="Drag to rotate, scroll wheel to zoom, right button to pan. &lt;kbd&gt;Space&lt;/kbd&gt; pauses.">Trascina per ruotare, rotella per lo zoom, tasto destro per spostare. <kbd>Spazio</kbd> pausa.</p>
     </div>
 
     <div class="grp">
-      <h2>Temperatura del gas</h2>
-      <div><div class="scale"></div><div class="scale-l"><span>più freddo, sprofonda</span><span>più caldo, sale</span></div></div>
+      <h2 data-en="Gas temperature">Temperatura del gas</h2>
+      <div><div class="scale"></div><div class="scale-l"><span data-en="cooler, sinks">più freddo, sprofonda</span><span data-en="hotter, rises">più caldo, sale</span></div></div>
     </div>
 
-    <p class="note">Schema qualitativo: dimensioni, profondità e tempi non sono in scala. Nel Sole le celle giganti misurano oltre 100&nbsp;Mm, i supergranuli circa 30&nbsp;Mm, i granuli circa 1&nbsp;Mm.</p>
+    <p class="note" data-en="Qualitative sketch: sizes, depths and times are not to scale. In the Sun giant cells measure over 100&amp;nbsp;Mm, supergranules about 30&amp;nbsp;Mm, granules about 1&amp;nbsp;Mm.">Schema qualitativo: dimensioni, profondità e tempi non sono in scala. Nel Sole le celle giganti misurano oltre 100&nbsp;Mm, i supergranuli circa 30&nbsp;Mm, i granuli circa 1&nbsp;Mm.</p>
   </aside>
 </div>
 
+<script src="lingua.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/controls/OrbitControls.js"></script>
 <script>
@@ -152,7 +185,12 @@ kbd{font:500 11px var(--ui);border:1px solid var(--line);border-radius:3px;paddi
 const SRC=(function(){const d=document.documentElement.cloneNode(true);
   d.querySelectorAll('script').forEach(sc=>{const src=sc.getAttribute('src')||'';if(src?!/three@/.test(src):!/buildTree/.test(sc.textContent))sc.remove();});
   d.querySelectorAll('base,meta[http-equiv]').forEach(e=>e.remove());
+  d.querySelectorAll('[data-scheda],[data-lang-switch]').forEach(e=>e.remove());   // nel file scaricato non ci sono scheda e selettore di lingua
   return '<!doctype html>\n'+d.outerHTML;})();
+// lingua: scelta da lingua.js (?lang=en); nel file scaricato, che non ha lingua.js, vale quella in cui era aperta la pagina
+const EN=window.LANG?window.LANG==='en':document.documentElement.lang==='en';
+const TR=(it,en)=>EN?en:it;   // TR e non T: in questo file T è il tempo dell'animazione
+const DEC=s=>EN?s:s.replace('.',',');   // separatore decimale
 
 // ---------------- parametri ----------------
 const RES=[[96,60],[56,40],[24,16]];     // risoluzione del guscio per livello: azimut, profilo
@@ -536,17 +574,17 @@ function updateParticles(sts){
 const lblBox=document.getElementById('labels');
 function mkLbl(text,cls){const el=document.createElement('div');el.className='lbl '+(cls||'');el.innerHTML='<i></i><span></span>';el.lastChild.textContent=text;lblBox.appendChild(el);return el;}
 const L={
-  up:mkLbl('Risalita calda al centro','hot'),
-  over:mkLbl('In cima il flusso diventa orizzontale e piega in basso'),
-  down:mkLbl('Discesa fredda ai bordi','cold'),
-  wave:mkLbl('Il bordo ondeggia lateralmente'),
-  split:mkLbl('Il flusso si divide','hot'),
-  lane:mkLbl('Corsia fredda tra i nuovi flussi','cold'),
-  turn:mkLbl('Qui si rovescia la maggior parte del gas della cella madre'),
-  pass:mkLbl('Solo una piccola parte sale nelle figlie','hot'),
-  jet:mkLbl('Getti freddi dalla superficie scendono fino alla base','cold'),
-  l1:mkLbl('Livello 1','layer'),l2:mkLbl('Livello 2','layer'),l3:mkLbl('Livello 3','layer'),
-  surf:mkLbl('Fotosfera','layer')
+  up:mkLbl(TR('Risalita calda al centro','Hot rise at the center'),'hot'),
+  over:mkLbl(TR('In cima il flusso diventa orizzontale e piega in basso','At the top the flow becomes horizontal and turns downwards')),
+  down:mkLbl(TR('Discesa fredda ai bordi','Cool descent at the edges'),'cold'),
+  wave:mkLbl(TR('Il bordo ondeggia lateralmente','The edge wobbles sideways')),
+  split:mkLbl(TR('Il flusso si divide','The flow splits'),'hot'),
+  lane:mkLbl(TR('Corsia fredda tra i nuovi flussi','Cool lane between the new flows'),'cold'),
+  turn:mkLbl(TR('Qui si rovescia la maggior parte del gas della cella madre','Most of the gas of the parent cell overturns here')),
+  pass:mkLbl(TR('Solo una piccola parte sale nelle figlie','Only a small part rises into the daughters'),'hot'),
+  jet:mkLbl(TR('Getti freddi dalla superficie scendono fino alla base','Cold plumes from the surface sink down to the base'),'cold'),
+  l1:mkLbl(TR('Livello 1','Level 1'),'layer'),l2:mkLbl(TR('Livello 2','Level 2'),'layer'),l3:mkLbl(TR('Livello 3','Level 3'),'layer'),
+  surf:mkLbl(TR('Fotosfera','Photosphere'),'layer')
 };
 const V3=new THREE.Vector3();
 function place(el,x,y,z,alpha){
@@ -583,7 +621,7 @@ function updateLabels(sts){
 }
 
 // ---------------- testi ----------------
-const TXT=[
+const TXT_IT=[
   [['Risalita rapida','Una grande bolla di gas caldo, più leggera di quello che la circonda, sale veloce lungo il suo canale centrale.'],
    ['Frenata e allargamento','Il gas incontra strati sempre meno densi e rallenta. In cima si allarga, diventa orizzontale e ai bordi si piega verso il basso.'],
    ['Il bordo si instabilizza','Il bordo ondeggia lateralmente e le ondulazioni crescono: il flusso in cima non riesce più a restare unico.'],
@@ -600,25 +638,43 @@ const TXT=[
 const phT=document.getElementById('phT'),phD=document.getElementById('phD'),velBar=document.getElementById('velBar'),velTxt=document.getElementById('velTxt');
 const chips=[0,1,2].map(i=>document.getElementById('g'+i)),stepEls=[...document.querySelectorAll('#steps span')],lastStep=document.getElementById('lastStep');
 let lastKey='';
-const LIFE=[['Struttura completa','I tre livelli sono formati. Premi Avvia per vedere la vita dei granuli: in superficie nascono, si allargano e si spengono in pochi minuti, mentre sotto le celle grandi cambiano in giorni o settimane.'],
+const LIFE_IT=[['Struttura completa','I tre livelli sono formati. Premi Avvia per vedere la vita dei granuli: in superficie nascono, si allargano e si spengono in pochi minuti, mentre sotto le celle grandi cambiano in giorni o settimane.'],
   ['La vita dei granuli','I granuli vivono solo 5\u201310 minuti: nascono caldi, si allargano, si raffreddano e si spengono, e il loro posto è subito preso da nuovi granuli. Alcuni, più grandi, si spezzano in due o tre: sono i granuli esplosivi. Sotto, supergranuli e celle giganti cambiano in giorni o settimane.']];
+// testi in inglese (stessa struttura di TXT_IT e LIFE_IT)
+const TXT_EN=[
+  [['Rapid rise','A large bubble of hot gas, lighter than the gas around it, rises quickly along its central channel.'],
+   ['Slowing and widening','The gas meets less and less dense layers and slows down. At the top it widens, becomes horizontal and at the edges turns downwards.'],
+   ['The edge becomes unstable','The edge wobbles sideways and the undulations grow: the flow at the top can no longer remain single.'],
+   ['The flow splits','Lanes of cool gas sink from the top and separate the large flow into smaller flows: {n} main ones, one at the center and {m} around it, plus some minor ones that fill the gaps.']],
+  [['The daughter cells are born','Only now do the {n} separate flows rise on their own. The parent cell remains active: most of its gas overturns beneath the daughters, only a small part rises inside them.'],
+   ['The daughters widen','The layer is thinner than the previous one: the daughters slow down early, flatten and turn their edges downwards.'],
+   ['New instability','The edges of the daughter cells wobble in turn: their flow too is about to split.'],
+   ['Second splitting','The daughter cells split into the granules, flows all of similar size that cover the entire top without leaving voids.']],
+  [['Towards the surface','The smallest flows cross the last, very thin layer: they are the granules observed in the photosphere.'],
+   ['The granules flatten','At the surface the gas expands horizontally and radiates its heat into space.'],
+   ['Granules that fragment','The edge of the largest granules ripples, as in the exploding granules observed in the photosphere.'],
+   ['The complete structure','In each cell most of the gas recirculates in place and little passes to the level above. The gas cooled at the surface sinks in narrow plumes that merge and reach the base.']]
+];
+const LIFE_EN=[['Complete structure','The three levels are formed. Press Start to see the life of the granules: at the surface they are born, widen and fade in a few minutes, while below the large cells change over days or weeks.'],
+  ['The life of the granules','Granules live only 5–10 minutes: they are born hot, widen, cool and fade, and their place is immediately taken by new granules. Some larger ones break into two or three: these are the exploding granules. Below, supergranules and giant cells change over days or weeks.']];
+const TXT=EN?TXT_EN:TXT_IT,LIFE=EN?LIFE_EN:LIFE_IT;
 function updateHud(){
   if(T>=Tend){const li=T>Tend+.01?1:0,k='life'+li;
-    if(k!==lastKey){lastKey=k;phT.textContent=LIFE[li][0];phD.textContent=LIFE[li][1];lastStep.textContent='Vita dei granuli';
+    if(k!==lastKey){lastKey=k;phT.textContent=LIFE[li][0];phD.textContent=LIFE[li][1];lastStep.textContent=TR('Vita dei granuli','Life of the granules');
       chips.forEach((e,i)=>{e.classList.toggle('on',i===2);e.classList.toggle('done',i<2);});
       stepEls.forEach((e,i)=>{e.classList.toggle('on',i===3);e.classList.toggle('done',i<3);});}
-    velBar.style.width='2%';velTxt.textContent='quasi ferma';return;}
+    velBar.style.width='2%';velTxt.textContent=TR('quasi ferma','almost still');return;}
   let g=0;for(let i=1;i<3;i++){if(T>=rep[i-1].divEnd)g=i;}
   const c=rep[g],tau=T-c.birth-c.pre,[T1,T2,T3]=c.T;
   const ki=tau<T1?0:tau<T1+T2?1:tau<T1+T2+T3?2:3;
   const v=tau<0?0:Math.exp(-tau/c.tc)*(tau<T1+T2?1:0);
   const k=g+'-'+ki+'-'+N;
   if(k!==lastKey){lastKey=k;const t=TXT[g][ki];phT.textContent=t[0];phD.textContent=t[1].replace(/\{n\}/g,N).replace(/\{m\}/g,N-1);
-    lastStep.textContent=g===2?'Struttura completa':'Divisione del flusso';
+    lastStep.textContent=g===2?TR('Struttura completa','Complete structure'):TR('Divisione del flusso','Flow splitting');
     chips.forEach((e,i)=>{e.classList.toggle('on',i===g);e.classList.toggle('done',i<g);});
     stepEls.forEach((e,i)=>{e.classList.toggle('on',i===ki);e.classList.toggle('done',i<ki);});}
   velBar.style.width=(Math.max(v,.02)*100).toFixed(1)+'%';
-  velTxt.textContent=v>.55?'alta':v>.25?'media':v>.06?'bassa':'quasi ferma';
+  velTxt.textContent=v>.55?TR('alta','high'):v>.25?TR('media','medium'):v>.06?TR('bassa','low'):TR('quasi ferma','almost still');
 }
 
 // ---------------- ricostruzione ----------------
@@ -642,7 +698,11 @@ const VIEWS={obl:[[14,9.5,14],[0,4.2,0]],side:[[22,4.6,.01],[0,4.4,0]],top:[[.01
 function setView(k){const [p,t]=VIEWS[k];camAnim={t:0,p0:camera.position.clone(),t0:controls.target.clone(),p1:new THREE.Vector3(...p),t1:new THREE.Vector3(...t)};
   document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('sel',b.dataset.view===k));}
 function resize(){const w=stage.clientWidth,h=stage.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;
-  const hw=(document.querySelector('.hud')||{offsetWidth:0}).offsetWidth;camera.setViewOffset(w,h,-hw/2,0,w,h);camera.updateProjectionMatrix();
+  const hud=document.querySelector('.hud')||{offsetWidth:0,offsetHeight:0};
+  // il riquadro copre un lato della scena: la cella viene centrata nello spazio libero (a destra del riquadro,
+  // oppure sotto di esso quando sul telefono in verticale il riquadro occupa tutta la larghezza)
+  if(hud.offsetWidth>=w-2)camera.setViewOffset(w,h,0,-hud.offsetHeight/2,w,h);else camera.setViewOffset(w,h,-hud.offsetWidth/2,0,w,h);
+  camera.updateProjectionMatrix();
   ptMat.uniforms.uScale.value=h*renderer.getPixelRatio()/(2*Math.tan(camera.fov*Math.PI/360));}
 new ResizeObserver(resize).observe(stage);
 
@@ -660,18 +720,18 @@ function frame(now){
   renderer.render(scene,camera);
   updateLabels(sts);updateHud();
   if(!scrubbing)tl.value=Math.min(1000,Math.round(T/Tend*1000));
-  timeEl.textContent=T<Tend?`${T.toFixed(1).replace('.',',')} s / ${Math.round(Tend)} s`:T>Tend+.01?'vita dei granuli':'struttura completa';
+  timeEl.textContent=T<Tend?`${DEC(T.toFixed(1))} s / ${Math.round(Tend)} s`:T>Tend+.01?TR('vita dei granuli','life of the granules'):TR('struttura completa','complete structure');
   requestAnimationFrame(frame);
 }
 
 // ---------------- comandi ----------------
 const $=id=>document.getElementById(id),playBtn=$('play');
-function setPlay(p){playing=p;playBtn.textContent=p?'Pausa':'Avvia';playBtn.setAttribute('aria-label',p?'Pausa':'Avvia');}
+function setPlay(p){playing=p;const s=p?TR('Pausa','Pause'):TR('Avvia','Start');playBtn.textContent=s;playBtn.setAttribute('aria-label',s);}
 playBtn.onclick=()=>setPlay(!playing);
 $('restart').onclick=()=>{T=0;autoStopped=false;setPlay(true);};
 $('variant').onclick=()=>{seed=(seed*9301+49297)%233280;rebuild(true);};
-$('speed').oninput=e=>{speed=+e.target.value;$('speedO').textContent=speed.toFixed(1).replace('.',',')+'×';};
-$('nkids').oninput=e=>{N=+e.target.value;$('nkidsO').textContent=`${N} (1 al centro + ${N-1})`;rebuild(true);};
+$('speed').oninput=e=>{speed=+e.target.value;$('speedO').textContent=DEC(speed.toFixed(1))+'×';};
+$('nkids').oninput=e=>{N=+e.target.value;$('nkidsO').textContent=TR(`${N} (1 al centro + ${N-1})`,`${N} (1 at the center + ${N-1})`);rebuild(true);};
 $('irr').oninput=e=>{irr=+e.target.value;$('irrO').textContent=Math.round(irr*100)+'%';};
 $('op').oninput=e=>{shellOp=+e.target.value;$('opO').textContent=Math.round(shellOp*100)+'%';};
 $('cShell').onchange=e=>{showShell=e.target.checked;};
@@ -694,13 +754,14 @@ if(window.matchMedia('(prefers-reduced-motion: reduce)').matches)speed=.6;
   btn.hidden=false;
   btn.onclick=async()=>{
     msg.hidden=true;
-    try{await dlc.save({filename:'cella-convettiva.html',data:SRC});msg.textContent='File salvato: si apre con un doppio clic in qualsiasi browser (serve la connessione per caricare il motore 3D).';msg.hidden=false;}
+    try{await dlc.save({filename:'cella-convettiva.html',data:SRC});msg.textContent=TR('File salvato: si apre con un doppio clic in qualsiasi browser (serve la connessione per caricare il motore 3D).','File saved: it opens with a double click in any browser (a connection is needed to load the 3D engine).');msg.hidden=false;}
     catch(e){const c=e&&e.code;if(c==='declined')return;
-      if(c==='rate_limited'){msg.textContent='C’è già una richiesta di salvataggio aperta.';msg.hidden=false;return;}
+      if(c==='rate_limited'){msg.textContent=TR('C’è già una richiesta di salvataggio aperta.','A save request is already open.');msg.hidden=false;return;}
       btn.hidden=true;}
   };
 })();
 
+$('speedO').textContent=DEC(speed.toFixed(1))+'×';$('nkidsO').textContent=TR(`${N} (1 al centro + ${N-1})`,`${N} (1 at the center + ${N-1})`);   // valori iniziali nella lingua scelta
 rebuild(false);resize();requestAnimationFrame(frame);
 })();
 </script>
@@ -709,7 +770,12 @@ rebuild(false);resize();requestAnimationFrame(frame);
 .cc-badge{display:inline-block;vertical-align:middle;margin:0 0 0 .5em;padding:2px 8px;border:1px solid currentColor;border-radius:999px;font:400 11.5px/1.35 -apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;letter-spacing:0;text-transform:none;white-space:normal;max-width:100%;box-sizing:border-box;opacity:.8;color:inherit;text-shadow:none;pointer-events:auto}
 .cc-n,.cc-badge a{white-space:nowrap}
 .cc-badge a{color:inherit;text-decoration:underline;text-underline-offset:2px}
+.cc-badge.cc-doc{text-decoration:none;opacity:1;font-weight:600;margin-left:.4em}
+.cc-badge.lang-sw{opacity:1;margin-left:.4em}.cc-badge.lang-sw a{cursor:pointer}
 .cc-badge.cc-fixed{position:fixed;top:10px;right:10px;margin:0;z-index:2147483000;background:rgba(10,10,18,.62);color:#f2efe6;border-color:rgba(242,239,230,.45);opacity:1;backdrop-filter:blur(4px)}
 @media (max-width:520px){.cc-badge{font-size:11px;padding:2px 7px}}
 </style>
+<script src="divisione_celle_convettive_scheda.js"></script>
+<script src="divisione_celle_convettive_scheda_en.js"></script>
+<script src="scheda.js"></script>
 </body></html>
