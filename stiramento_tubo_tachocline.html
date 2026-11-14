@@ -5,7 +5,7 @@
   Vietati l'uso commerciale e la distribuzione di versioni modificate senza autorizzazione scritta dell'autore.
 -->
 <html lang="it"><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
-<title>Stiramento del tubo di flusso</title>
+<title data-en="Stretching of the flux tube">Stiramento del tubo di flusso</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,500&display=swap">
 <style>
@@ -78,116 +78,117 @@ body:not(.step1) #intro,body:not(.step1) .s1{display:none!important}
 .charts .card{min-width:0}
 .leg{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:12px;color:var(--muted)}
 .leg i{display:inline-block;width:14px;height:0;border-top:2px solid;vertical-align:middle;margin-right:4px}
+.cc-badge.lang-sw{opacity:1;margin-left:.4em}.cc-badge.lang-sw a{cursor:pointer}
 </style></head><body class="step1">
 
 <header>
-  <h1>Stiramento del tubo di flusso<span class="cc-badge"><span class="cc-n">© 2026 Carlo Casoli ·</span> <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it" target="_blank" rel="license noopener">CC BY-NC-ND 4.0</a></span> <a class="cc-badge cc-doc" href="#scheda" data-scheda>📖 Scheda dell'animazione</a></h1>
-  <a class="back" href="index.html">← Indice delle animazioni</a>
-  <p>Un solo tubo del campo poloidale corre lungo un meridiano, da polo a polo, sulla sfera della tachocline. La rotazione differenziale trascina avanti il tratto equatoriale e lascia indietro quelli vicini ai poli: il tubo si allunga, si avvolge attorno al Sole e il suo campo cresce, soprattutto alle medie latitudini.</p>
+  <h1><span data-en="Stretching of the flux tube">Stiramento del tubo di flusso</span><span class="cc-badge"><span class="cc-n">© 2026 Carlo Casoli ·</span> <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it" target="_blank" rel="license noopener">CC BY-NC-ND 4.0</a></span> <a class="cc-badge cc-doc" href="#scheda" data-scheda data-en="📖 Animation description">📖 Scheda dell'animazione</a> <span data-lang-switch></span></h1>
+  <a class="back" href="index.html" data-en="← Index of animations">← Indice delle animazioni</a>
+  <p data-en="A single poloidal field tube runs along a meridian, from pole to pole, on the tachocline sphere. Differential rotation drags the equatorial stretch forward and leaves the ones near the poles behind: the tube stretches, wraps around the Sun, and its field grows, especially at mid-latitudes.">Un solo tubo del campo poloidale corre lungo un meridiano, da polo a polo, sulla sfera della tachocline. La rotazione differenziale trascina avanti il tratto equatoriale e lascia indietro quelli vicini ai poli: il tubo si allunga, si avvolge attorno al Sole e il suo campo cresce, soprattutto alle medie latitudini.</p>
 </header>
 
 <main>
   <div class="left">
     <div class="tabs" role="tablist">
-      <button id="tab1" class="on" role="tab">1 · Spostamento e allungamento</button>
-      <button id="tab2" role="tab">2 · Il tubo sul Sole</button>
+      <button id="tab1" class="on" role="tab" data-en="1 · Shift and stretch">1 · Spostamento e allungamento</button>
+      <button id="tab2" role="tab" data-en="2 · The tube on the Sun">2 · Il tubo sul Sole</button>
       <span style="flex:1"></span>
-      <span style="display:flex;gap:6px;align-items:center;flex-wrap:wrap"><span style="font-size:13px;color:var(--muted)">Legge di rotazione</span>
-        <button id="lawB" class="on">del libro (2 termini)</button><button id="lawS">Snodgrass e Ulrich (3 termini)</button></span>
+      <span style="display:flex;gap:6px;align-items:center;flex-wrap:wrap"><span style="font-size:13px;color:var(--muted)" data-en="Rotation law">Legge di rotazione</span>
+        <button id="lawB" class="on" data-en="book's (2 terms)">del libro (2 termini)</button><button id="lawS" data-en="Snodgrass and Ulrich (3 terms)">Snodgrass e Ulrich (3 termini)</button></span>
     </div>
     <div id="intro">
       <div id="ibox"><canvas id="cI"></canvas></div>
       <div class="irow">
-        <button id="iPlay">Avvia</button>
-        <label for="iG" style="font-size:13px;color:var(--muted)">Giri dell'equatore sui poli</label>
+        <button id="iPlay" data-en="Start">Avvia</button>
+        <label for="iG" style="font-size:13px;color:var(--muted)" data-en="Turns of the equator over the poles">Giri dell'equatore sui poli</label>
         <input type="range" id="iG" min="0" max="3" step="any" value="0">
         <output id="iGv">0</output>
       </div>
       <p class="note" id="iLaw" style="margin:0"></p>
       <div class="card" style="min-height:5.2em"><h2 id="iT" style="font-family:var(--f-display);font-weight:500;font-size:19px;text-transform:none;letter-spacing:0;color:var(--ink)"></h2><p id="iP" style="margin:0;max-width:80ch"></p></div>
-      <div><button id="go3d" class="big">Vedi il tubo sul Sole →</button></div>
+      <div><button id="go3d" class="big" data-en="See the tube on the Sun →">Vedi il tubo sul Sole →</button></div>
     </div>
     <div id="stage"><div id="hud"></div></div>
     <div id="caption"><h2 id="capT"></h2><p id="capP"></p></div>
     <div class="charts">
       <div class="card">
-        <h2>Campo lungo il tubo</h2>
+        <h2 data-en="Field along the tube">Campo lungo il tubo</h2>
         <canvas id="cP" class="cv" height="170"></canvas>
       </div>
       <div class="card">
-        <h2>Spessore del tubo lungo il tubo</h2>
+        <h2 data-en="Tube thickness along the tube">Spessore del tubo lungo il tubo</h2>
         <canvas id="cW" class="cv" height="180"></canvas>
-        <div class="leg"><span><i style="border-color:var(--field)"></i>larghezza nel piano della sfera</span><span><i style="border-color:var(--muted);border-top-style:dashed"></i>spessore radiale (invariato)</span></div>
+        <div class="leg"><span><i style="border-color:var(--field)"></i><span data-en="width in the sphere's plane">larghezza nel piano della sfera</span></span><span><i style="border-color:var(--muted);border-top-style:dashed"></i><span data-en="radial thickness (unchanged)">spessore radiale (invariato)</span></span></div>
       </div>
       <div class="card">
-        <h2>Saturazione</h2>
+        <h2 data-en="Saturation">Saturazione</h2>
         <canvas id="cG" class="cv" height="170"></canvas>
-        <div class="leg"><span><i style="border-color:var(--trail)"></i>B a 35° con retroazione</span><span><i style="border-color:var(--muted);border-top-style:dashed"></i>senza retroazione</span></div>
+        <div class="leg"><span><i style="border-color:var(--trail)"></i><span data-en="B at 35° with feedback">B a 35° con retroazione</span></span><span><i style="border-color:var(--muted);border-top-style:dashed"></i><span data-en="without feedback">senza retroazione</span></span></div>
       </div>
     </div>
     <div class="note" id="note"></div>
   </div>
   <aside>
     <div class="card s1">
-      <h2>La regola</h2>
-      <p style="margin:0">Ogni tratto di tubo conserva il suo volume e il suo flusso magnetico. Se si allunga di N volte, la sua sezione si riduce di N volte e il suo campo cresce di N volte: <b>B = B₀ · L / L₀</b>. Conta l'allungamento del tratto, non quanto si sposta.</p>
+      <h2 data-en="The rule">La regola</h2>
+      <p style="margin:0" data-en="Every stretch of tube conserves its volume and its magnetic flux. If it stretches N times, its cross-section shrinks N times and its field grows N times: &lt;b&gt;B = B₀ · L / L₀&lt;/b&gt;. What counts is the stretch's elongation, not how far it moves.">Ogni tratto di tubo conserva il suo volume e il suo flusso magnetico. Se si allunga di N volte, la sua sezione si riduce di N volte e il suo campo cresce di N volte: <b>B = B₀ · L / L₀</b>. Conta l'allungamento del tratto, non quanto si sposta.</p>
       <dl>
-        <dt>Tratto 0°–10° (equatore)</dt><dd id="iS0">–</dd>
-        <dt>Tratto 30°–40°</dt><dd id="iS3">–</dd>
-        <dt>Tratto 80°–90° (polo)</dt><dd id="iS8">–</dd>
+        <dt data-en="Stretch 0°–10° (equator)">Tratto 0°–10° (equatore)</dt><dd id="iS0">–</dd>
+        <dt data-en="Stretch 30°–40°">Tratto 30°–40°</dt><dd id="iS3">–</dd>
+        <dt data-en="Stretch 80°–90° (pole)">Tratto 80°–90° (polo)</dt><dd id="iS8">–</dd>
       </dl>
-      <h2>Colore dei tratti</h2>
-      <p style="margin:0;font-size:13px">Valore del campo magnetico B</p>
+      <h2 data-en="Color of the stretches">Colore dei tratti</h2>
+      <p style="margin:0;font-size:13px" data-en="Value of the magnetic field B">Valore del campo magnetico B</p>
       <canvas id="cLI" class="cv" height="40"></canvas>
     </div>
     <div class="card s1">
-      <h2>B nel tempo, oltre la mappa</h2>
+      <h2 data-en="B over time, beyond the map">B nel tempo, oltre la mappa</h2>
       <canvas id="cBT" class="cv" height="200"></canvas>
-      <div class="leg"><span><i style="border-color:#D85A30"></i>tratto 30°–40°</span><span><i style="border-color:#378ADD"></i>tratto 0°–10°</span><span><i style="border-color:var(--muted)"></i>tratto 80°–90°</span></div>
-      <p class="note" style="margin:0">Tratteggio: oltre i 3 giri della mappa. Solo stiramento, senza il freno della tensione (la saturazione è nel passo 2).</p>
+      <div class="leg"><span><i style="border-color:#D85A30"></i><span data-en="stretch 30°–40°">tratto 30°–40°</span></span><span><i style="border-color:#378ADD"></i><span data-en="stretch 0°–10°">tratto 0°–10°</span></span><span><i style="border-color:var(--muted)"></i><span data-en="stretch 80°–90°">tratto 80°–90°</span></span></div>
+      <p class="note" style="margin:0" data-en="Dashed: beyond the map's 3 turns. Stretching only, without tension's brake (saturation is in step 2).">Tratteggio: oltre i 3 giri della mappa. Solo stiramento, senza il freno della tensione (la saturazione è nel passo 2).</p>
     </div>
     <div class="card s2">
       <div class="row">
-        <button id="play">Avvia</button>
-        <button id="reset">Ricomincia</button>
+        <button id="play" data-en="Start">Avvia</button>
+        <button id="reset" data-en="Restart">Ricomincia</button>
       </div>
-      <label class="sl"><span>Velocità <output id="Sv"></output></span>
+      <label class="sl"><span><span data-en="Speed">Velocità</span> <output id="Sv"></output></span>
         <input type="range" id="S" min="0" max="4" step="1" value="2"></label>
       <div class="seg">
-        <button id="mSch" class="on">Schema</button>
-        <button id="mReal">Valori reali</button>
+        <button id="mSch" class="on" data-en="Schematic">Schema</button>
+        <button id="mReal" data-en="Real values">Valori reali</button>
       </div>
       <div class="seg">
-        <button id="vWhole" class="on">Intero Sole</button>
-        <button id="vDet">Dettaglio a 35°</button>
+        <button id="vWhole" class="on" data-en="Whole Sun">Intero Sole</button>
+        <button id="vDet" data-en="Detail at 35°">Dettaglio a 35°</button>
       </div>
-      <label class="ck"><input type="checkbox" id="ckBox" checked> Elemento di plasma a 35°</label>
-      <label class="ck"><input type="checkbox" id="ckTr" checked> Traccianti nel plasma</label>
-      <label class="ck"><input type="checkbox" id="ckV" checked> Velocità del plasma</label>
-      <label class="ck"><input type="checkbox" id="ckF" checked> Forze di tensione</label>
+      <label class="ck"><input type="checkbox" id="ckBox" checked> <span data-en="Plasma element at 35°">Elemento di plasma a 35°</span></label>
+      <label class="ck"><input type="checkbox" id="ckTr" checked> <span data-en="Tracers in the plasma">Traccianti nel plasma</span></label>
+      <label class="ck"><input type="checkbox" id="ckV" checked> <span data-en="Plasma velocity">Velocità del plasma</span></label>
+      <label class="ck"><input type="checkbox" id="ckF" checked> <span data-en="Tension forces">Forze di tensione</span></label>
     </div>
     <div class="card s2">
-      <h2>Colore del tubo: quanto è cresciuto B</h2>
-      <p style="margin:0;font-size:13px">Valore del campo magnetico B</p>
+      <h2 data-en="Tube color: how much B has grown">Colore del tubo: quanto è cresciuto B</h2>
+      <p style="margin:0;font-size:13px" data-en="Value of the magnetic field B">Valore del campo magnetico B</p>
       <canvas id="cL" class="cv" height="46"></canvas>
     </div>
     <div class="card s2">
-      <h2>Sezione del tubo a quattro latitudini</h2>
+      <h2 data-en="Tube cross-section at four latitudes">Sezione del tubo a quattro latitudini</h2>
       <canvas id="cSec" class="cv" height="150"></canvas>
     </div>
     <div class="card s2">
-      <h2>Strumenti</h2>
+      <h2 data-en="Readouts">Strumenti</h2>
       <dl>
-        <dt>Tempo</dt><dd id="oT">–</dd>
-        <dt>Giri dell'equatore sui poli</dt><dd id="oG">–</dd>
-        <dt>Lunghezza del tubo L / L₀</dt><dd id="oL">–</dd>
-        <dt>A 35°: allungamento locale</dt><dd id="oF">–</dd>
-        <dt>&nbsp;· sezione A / A₀</dt><dd id="oA">–</dd>
-        <dt>&nbsp;· campo poloidale B<sub>θ</sub></dt><dd id="oBt">–</dd>
-        <dt>&nbsp;· campo toroidale B<sub>φ</sub></dt><dd id="oBp">–</dd>
-        <dt>&nbsp;· campo totale B</dt><dd id="oB">–</dd>
-        <dt>Energia magnetica / del taglio</dt><dd id="oE">–</dd>
-        <dt>Sforzo di tensione B<sub>θ</sub>·B<sub>φ</sub>/μ₀</dt><dd id="oS">–</dd>
+        <dt data-en="Time">Tempo</dt><dd id="oT">–</dd>
+        <dt data-en="Turns of the equator over the poles">Giri dell'equatore sui poli</dt><dd id="oG">–</dd>
+        <dt data-en="Tube length L / L₀">Lunghezza del tubo L / L₀</dt><dd id="oL">–</dd>
+        <dt data-en="At 35°: local stretch">A 35°: allungamento locale</dt><dd id="oF">–</dd>
+        <dt data-en="&nbsp;· cross-section A / A₀">&nbsp;· sezione A / A₀</dt><dd id="oA">–</dd>
+        <dt data-en="&nbsp;· poloidal field B&lt;sub&gt;θ&lt;/sub&gt;">&nbsp;· campo poloidale B<sub>θ</sub></dt><dd id="oBt">–</dd>
+        <dt data-en="&nbsp;· toroidal field B&lt;sub&gt;φ&lt;/sub&gt;">&nbsp;· campo toroidale B<sub>φ</sub></dt><dd id="oBp">–</dd>
+        <dt data-en="&nbsp;· total field B">&nbsp;· campo totale B</dt><dd id="oB">–</dd>
+        <dt data-en="Magnetic / shear energy">Energia magnetica / del taglio</dt><dd id="oE">–</dd>
+        <dt data-en="Tension stress B&lt;sub&gt;θ&lt;/sub&gt;·B&lt;sub&gt;φ&lt;/sub&gt;/μ₀">Sforzo di tensione B<sub>θ</sub>·B<sub>φ</sub>/μ₀</dt><dd id="oS">–</dd>
       </dl>
     </div>
   </aside>
@@ -195,8 +196,10 @@ body:not(.step1) #intro,body:not(.step1) .s1{display:none!important}
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="lingua.js"></script>
 <script>
 (function(){
+const TX=window.T||(it=>it),EN=window.LANG==='en',LOC=EN?'en-US':'it-IT';
 const $=id=>document.getElementById(id);
 const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
 const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
@@ -392,10 +395,10 @@ colorArrows();
 
 // ---------- etichette (testo semplice) ----------
 function mkLbl(cls,txt){const d=document.createElement('div');d.className='lbl '+cls;d.innerHTML=txt;stage.appendChild(d);return d;}
-const L={pn:mkLbl('c','Polo Nord'),ps:mkLbl('c','Polo Sud'),ax:mkLbl('c','asse di rotazione'),eq:mkLbl('','equatore'),
-  m35:mkLbl('','35°: stiramento massimo'),v:mkLbl('c','velocità rispetto ai poli'),g:mkLbl('','posizione iniziale'),
-  fe:mkLbl('f','tensione: frena l\'equatore'),fp:mkLbl('f','tensione: accelera le alte latitudini'),ph:mkLbl('c','fotosfera'),
-  tc:mkLbl('c','tachocline · 0,70 R☉')};
+const L={pn:mkLbl('c',TX('Polo Nord','North pole')),ps:mkLbl('c',TX('Polo Sud','South pole')),ax:mkLbl('c',TX('asse di rotazione','rotation axis')),eq:mkLbl('',TX('equatore','equator')),
+  m35:mkLbl('',TX('35°: stiramento massimo','35°: maximum stretch')),v:mkLbl('c',TX('velocità rispetto ai poli','velocity relative to the poles')),g:mkLbl('',TX('posizione iniziale','initial position')),
+  fe:mkLbl('f',TX('tensione: frena l\'equatore','tension: slows the equator')),fp:mkLbl('f',TX('tensione: accelera le alte latitudini','tension: speeds up high latitudes')),ph:mkLbl('c',TX('fotosfera','photosphere')),
+  tc:mkLbl('c',TX('tachocline · 0,70 R☉','tachocline · 0.70 R☉'))};
 const tv=new THREE.Vector3();
 function place(el,v,show=true){
   if(!show){el.style.display='none';return;}
@@ -427,7 +430,7 @@ function updateScene(){
   const det=st.view==='det';
   place(L.pn,new THREE.Vector3(0,RT+0.07,0));place(L.ps,new THREE.Vector3(0,-RT-0.07,0));
   place(L.ax,new THREE.Vector3(0,1.36,0),!det);
-  place(L.eq,sph(RT*1.02,0,0.95));L.m35.textContent=Math.round(LMAX/D)+'°: stiramento massimo';place(L.m35,sph(RT*1.02,LMAX,0.85));
+  place(L.eq,sph(RT*1.02,0,0.95));L.m35.textContent=Math.round(LMAX/D)+TX('°: stiramento massimo','°: maximum stretch');place(L.m35,sph(RT*1.02,LMAX,0.85));
   place(L.v,sph(RT*1.02,-0.78,VPH),st.vel);place(L.g,sph(RT*1.02,-22*D,0.03),S.turns>0.03);
   place(L.fe,sph(RT*1.03,15*D,Wrel(15*D)*tau-0.05),fArr[0].visible);
   place(L.fp,sph(RT*1.03,58*D,Wrel(58*D)*tau+0.05),fArr[2].visible);
@@ -447,13 +450,13 @@ function drawSec(S){
     if(w>=2){g.beginPath();g.ellipse(x,cy,w,r,0,0,7);g.fill();g.stroke();}
     else{g.fillStyle='#'+cmap(Math.log(f)/LOGF(),cc).getHexString();g.fillRect(Math.round(x)-1,cy-r,2,2*r);}
     g.font='12px '+css('--f-body');g.fillStyle=mu;g.fillText(name,x,cy+r+18);g.font='11px '+css('--f-data');g.fillStyle=ink;g.fillText('A/A₀='+fmtR(1/f),x,cy+r+33);
-    if(w<2){g.fillStyle=mu;g.font='11px '+css('--f-body');g.fillText('troppo sottile',x,cy+r+47);g.fillText('per la scala',x,cy+r+60);g.font='12px '+css('--f-body');}});
+    if(w<2){g.fillStyle=mu;g.font='11px '+css('--f-body');g.fillText(TX('troppo sottile','too thin'),x,cy+r+47);g.fillText(TX('per la scala','for the scale'),x,cy+r+60);g.font='12px '+css('--f-body');}});
 }
 function drawLegend(S){
   const [g,W,H]=fit($('cL'));const mu=css('--muted'),ink=css('--ink');const l=8,r=W-8,y=8,h=14,N=120;
   for(let i=0;i<N;i++){g.fillStyle='#'+cmap(i/(N-1),cc).getHexString();g.fillRect(l+(r-l)*i/N,y,(r-l)/N+1,h);}
   const now=Math.log(fOf(LMAX,S.tau))/LOGF();g.fillStyle=ink;g.beginPath();g.moveTo(l+(r-l)*now,y+h+1);g.lineTo(l+(r-l)*now-5,y+h+8);g.lineTo(l+(r-l)*now+5,y+h+8);g.fill();
-  g.font='11px '+css('--f-data');g.fillStyle=mu;g.textAlign='left';g.fillText('B = B₀ (non cresciuto)',l,H-2);g.textAlign='right';g.fillText('B = '+fmtR(FEND)+' B₀',r,H-2);
+  g.font='11px '+css('--f-data');g.fillStyle=mu;g.textAlign='left';g.fillText(TX('B = B₀ (non cresciuto)','B = B₀ (not grown)'),l,H-2);g.textAlign='right';g.fillText('B = '+fmtR(FEND)+' B₀',r,H-2);
 }
 function axes(g,l,r,t,b){g.strokeStyle=css('--line');g.lineWidth=1;g.beginPath();g.moveTo(l,t);g.lineTo(l,b);g.lineTo(r,b);g.stroke();}
 function drawProfile(S){
@@ -464,10 +467,10 @@ function drawProfile(S){
   axes(g,l,r,t,b);
   g.font='11px '+css('--f-data');g.fillStyle=mu;g.textAlign='center';
   {const m=Math.round(LMAX/D);for(const d of [-90,-m,0,m,90])g.fillText(d+'°',X(d*D),b+13);}
-  g.fillText('latitudine',(l+r)/2,H-2);
+  g.fillText(TX('latitudine','latitude'),(l+r)/2,H-2);
   g.textAlign='right';g.fillText('1',l-4,Y(1)+4);g.fillText(fmtR(FEND),l-4,Y(FEND)+4);
   g.strokeStyle=mu;g.globalAlpha=0.4;g.beginPath();g.moveTo(l,Y(FEND));g.lineTo(r,Y(FEND));g.stroke();g.globalAlpha=1;
-  g.textAlign='left';g.fillText('massimo alla fine',l+4,Y(FEND)-4);
+  g.textAlign='left';g.fillText(TX('massimo alla fine','maximum at the end'),l+4,Y(FEND)-4);
   g.save();g.translate(10,(t+b)/2);g.rotate(-Math.PI/2);g.textAlign='center';g.fillText('B / B₀',0,0);g.restore();
   g.strokeStyle=mu;g.setLineDash([2,3]);for(const d of [-LMAX,LMAX]){g.beginPath();g.moveTo(X(d),t);g.lineTo(X(d),b);g.stroke();}g.setLineDash([]);
   g.strokeStyle=hot;g.lineWidth=2;g.beginPath();
@@ -481,11 +484,11 @@ function drawWidth(S){
   axes(g,l,r,t,b);
   g.font='11px '+css('--f-data');g.fillStyle=mu;g.textAlign='right';
   for(let e=dmin;e<=0;e++){const v=Math.pow(10,e);g.globalAlpha=0.35;g.strokeStyle=mu;g.beginPath();g.moveTo(l,Y(v));g.lineTo(r,Y(v));g.stroke();g.globalAlpha=1;
-    g.textAlign='right';g.fillText(String(v).replace('.',','),l-4,Y(v)+4);
-    if(real){g.textAlign='left';const km=v*D0KM;g.fillText(Math.round(km).toLocaleString('it-IT')+' km',r+4,Y(v)+4);}}
+    g.textAlign='right';g.fillText(EN?String(v):String(v).replace('.',','),l-4,Y(v)+4);
+    if(real){g.textAlign='left';const km=v*D0KM;g.fillText(Math.round(km).toLocaleString(LOC)+' km',r+4,Y(v)+4);}}
   g.textAlign='center';{const m=Math.round(LMAX/D);for(const d of [-90,-m,0,m,90])g.fillText(d+'°',X(d*D),b+13);}
-  g.fillText('latitudine',(l+r)/2,H-2);
-  g.save();g.translate(9,(t+b)/2);g.rotate(-Math.PI/2);g.fillText('spessore relativo',0,0);g.restore();
+  g.fillText(TX('latitudine','latitude'),(l+r)/2,H-2);
+  g.save();g.translate(9,(t+b)/2);g.rotate(-Math.PI/2);g.fillText(TX('spessore relativo','relative thickness'),0,0);g.restore();
   g.strokeStyle=mu;g.setLineDash([2,3]);for(const d of [-LMAX,LMAX]){g.beginPath();g.moveTo(X(d),t);g.lineTo(X(d),b);g.stroke();}
   g.setLineDash([5,4]);g.beginPath();g.moveTo(l,Y(1));g.lineTo(r,Y(1));g.stroke();g.setLineDash([]);
   g.strokeStyle=fd;g.lineWidth=2;g.beginPath();
@@ -497,8 +500,8 @@ function drawG(S){
   const X=x=>l+(r-l)*x/TEND, Y=y=>b-(b-t)*clamp(y,0,ymax)/ymax;
   axes(g,l,r,t,b);
   g.font='11px '+css('--f-data');g.fillStyle=mu;g.textAlign='right';
-  for(const v of [0,ymax/2.3,ymax/1.15])g.fillText(v.toFixed(2).replace('.',','),l-4,Y(v)+4);
-  g.textAlign='center';g.fillText('tempo (giorni) → '+Math.round(TEND),(l+r)/2,H-8);
+  for(const v of [0,ymax/2.3,ymax/1.15])g.fillText(EN?v.toFixed(2):v.toFixed(2).replace('.',','),l-4,Y(v)+4);
+  g.textAlign='center';g.fillText(TX('tempo (giorni) → ','time (days) → ')+Math.round(TEND),(l+r)/2,H-8);
   g.save();g.translate(10,(t+b)/2);g.rotate(-Math.PI/2);g.fillText('B / B_eq',0,0);g.restore();
   if(ymax>=1){g.strokeStyle=ink;g.setLineDash([2,3]);g.beginPath();g.moveTo(l,Y(1));g.lineTo(r,Y(1));g.stroke();g.setLineDash([]);
     g.fillStyle=ink;g.textAlign='right';g.fillText('B_eq ≈ '+fmtG(BEQ),r-2,Y(1)-5);}
@@ -512,48 +515,48 @@ function drawG(S){
   const vf=B0()*fOf(LMAX,tm)/BEQ,vr=state(tm).Bmax/BEQ;
   if(vf-vr>0.1*ymax){const xx=X(tm);g.strokeStyle=ink;g.lineWidth=1;g.beginPath();g.moveTo(xx,Y(vf)+3);g.lineTo(xx,Y(vr)-3);g.stroke();
     g.beginPath();g.moveTo(xx-3,Y(vr)-7);g.lineTo(xx,Y(vr)-3);g.lineTo(xx+3,Y(vr)-7);g.stroke();
-    g.fillStyle=ink;g.textAlign='left';g.font='11px '+css('--f-body');g.fillText('freno della',xx+6,(Y(vf)+Y(vr))/2+2);g.fillText('tensione',xx+6,(Y(vf)+Y(vr))/2+15);}
+    g.fillStyle=ink;g.textAlign='left';g.font='11px '+css('--f-body');g.fillText(TX('freno della','tension\'s'),xx+6,(Y(vf)+Y(vr))/2+2);g.fillText(TX('tensione','brake'),xx+6,(Y(vf)+Y(vr))/2+15);}
 }
 
 // ---------- testi ----------
-const fmtR=x=>x>=100?Math.round(x).toLocaleString('it-IT'):x>=10?x.toFixed(1).replace('.',','):x>=0.1?x.toFixed(2).replace('.',','):x.toFixed(3).replace('.',',');
+const fmtR=x=>x>=100?Math.round(x).toLocaleString(LOC):x>=10?(EN?x.toFixed(1):x.toFixed(1).replace('.',',')):x>=0.1?(EN?x.toFixed(2):x.toFixed(2).replace('.',',')):(EN?x.toFixed(3):x.toFixed(3).replace('.',','));
 const sup=n=>String(n).split('').map(c=>'⁰¹²³⁴⁵⁶⁷⁸⁹'[+c]).join('');
-function fmtG(g){if(g<1e4)return Math.round(g).toLocaleString('it-IT')+' G';const e=Math.floor(Math.log10(g)),m=g/10**e;return m.toFixed(1).replace('.',',')+'·10'+sup(e)+' G';}
-function fmtPa(p){if(p<1e4)return Math.round(p).toLocaleString('it-IT')+' Pa';const e=Math.floor(Math.log10(p)),m=p/10**e;return m.toFixed(1).replace('.',',')+'·10'+sup(e)+' Pa';}
+function fmtG(g){if(g<1e4)return Math.round(g).toLocaleString(LOC)+' G';const e=Math.floor(Math.log10(g)),m=g/10**e;return (EN?m.toFixed(1):m.toFixed(1).replace('.',','))+'·10'+sup(e)+' G';}
+function fmtPa(p){if(p<1e4)return Math.round(p).toLocaleString(LOC)+' Pa';const e=Math.floor(Math.log10(p)),m=p/10**e;return (EN?m.toFixed(1):m.toFixed(1).replace('.',','))+'·10'+sup(e)+' Pa';}
 function texts(S){
   const real=mode==='real';
-  $('oT').textContent=S.t>=730?(S.t/365.25).toFixed(1).replace('.',',')+' anni':Math.round(S.t)+' giorni';
+  $('oT').textContent=S.t>=730?(EN?(S.t/365.25).toFixed(1):(S.t/365.25).toFixed(1).replace('.',','))+TX(' anni',' years'):Math.round(S.t)+TX(' giorni',' days');
   $('oG').textContent=fmtR(S.turns);$('oL').textContent=fmtR(S.L);$('oF').textContent=fmtR(S.f);$('oA').textContent=fmtR(S.A);
-  $('oBt').textContent=real?fmtG(S.Bt):'B₀ (costante)';$('oBp').textContent=real?fmtG(S.Bp):fmtR(S.Bp/B0())+' B₀';
+  $('oBt').textContent=real?fmtG(S.Bt):TX('B₀ (costante)','B₀ (constant)');$('oBp').textContent=real?fmtG(S.Bp):fmtR(S.Bp/B0())+' B₀';
   $('oB').textContent=real?fmtG(S.B):fmtR(S.B/B0())+' B₀';
-  $('oE').textContent=(S.E*100<1?(S.E*100).toFixed(3):(S.E*100).toFixed(1)).replace('.',',')+' %';
+  $('oE').textContent=(EN?(S.E*100<1?(S.E*100).toFixed(3):(S.E*100).toFixed(1)):(S.E*100<1?(S.E*100).toFixed(3):(S.E*100).toFixed(1)).replace('.',','))+' %';
   $('oS').textContent=real?fmtPa(S.stress):fmtR(S.Bp/B0())+' B₀²/μ₀';
-  $('hud').innerHTML='t = <b>'+$('oT').textContent+'</b> · giri = <b>'+fmtR(S.turns)+'</b> · B a 35° = <b>'+(real?fmtG(S.B):fmtR(S.B/B0())+' B₀')+'</b>';
+  $('hud').innerHTML='t = <b>'+$('oT').textContent+'</b> · '+TX('giri','turns')+' = <b>'+fmtR(S.turns)+'</b> · '+TX('B a 35° = ','B at 35° = ')+'<b>'+(real?fmtG(S.B):fmtR(S.B/B0())+' B₀')+'</b>';
   let T,P;
-  if(S.t===0){T='t = 0: un tubo poloidale da polo a polo';P='Il tubo corre lungo un meridiano sulla sfera della tachocline, dal polo sud al polo nord; i coni blu indicano il verso del campo. Le frecce grigie sono la velocità del plasma rispetto ai poli: massima all\'equatore, nulla ai poli. Premi Avvia.';}
-  else if(S.turns<0.15){T='L\'equatore va avanti';P='Il campo è congelato nel plasma: ogni tratto del tubo segue la latitudine in cui si trova. Il tratto equatoriale avanza verso est, quelli vicini ai poli restano quasi fermi. Ai poli il tubo non si sposta: resta ancorato lì.';}
-  else if(S.turns<0.9){T='Nasce il campo toroidale';P='Il tubo si inclina e acquista una componente est–ovest, B_φ. Nell\'emisfero nord è diretta contro il verso di rotazione, nell\'emisfero sud nel verso di rotazione. La componente nord–sud B_θ non cambia.';}
-  else if(S.E<0.45){T='Il tubo si avvolge attorno al Sole';P='A ogni giro guadagnato dall\'equatore (circa \'+Math.round(2*Math.PI/DO)+\' giorni) il tubo fa un giro in più attorno all\'asse. Si allunga soprattutto attorno ai \'+Math.round(LMAX/D)+\'° di latitudine, dove la velocità angolare cambia più rapidamente: lì il tubo diventa più sottile e il campo più intenso (colore verso il rosso). Esattamente all\'equatore il tubo viene solo trasportato, perché i tratti vicini corrono alla stessa velocità; ai poli resta fermo.';}
-  else if(S.E<0.85){T='La tensione si oppone allo shear';P='Le linee stirate tirano come elastici: la tensione frena le basse latitudini e accelera quelle alte (frecce rosse). La rotazione differenziale si attenua e la crescita di B rallenta.';}
-  else{T='Saturazione';P='L\'energia magnetica alle medie latitudini è diventata paragonabile all\'energia del moto di taglio: lo shear in latitudine da solo non può fare di più. Il campo si ferma attorno a B_eq ≈ '+fmtG(BEQ)+'.';}
-  if(real&&S.t>=TEND-0.5){T='Dopo mezzo ciclo';P='In circa 5,5 anni l\'equatore ha fatto '+Math.round(S.turns)+' giri sui poli e il tubo si è avvolto altrettante volte. A 35° il campo è passato da 100 G a circa '+fmtG(S.B)+'; all\'equatore e ai poli è quasi invariato. Per arrivare ai 10⁵ G delle macchie serve lo shear radiale della tachocline, più rapido, insieme ad altri meccanismi.';}
+  if(S.t===0){T=TX('t = 0: un tubo poloidale da polo a polo','t = 0: a poloidal tube from pole to pole');P=TX('Il tubo corre lungo un meridiano sulla sfera della tachocline, dal polo sud al polo nord; i coni blu indicano il verso del campo. Le frecce grigie sono la velocità del plasma rispetto ai poli: massima all\'equatore, nulla ai poli. Premi Avvia.','The tube runs along a meridian on the tachocline sphere, from the south pole to the north pole; the blue cones show the field\'s direction. The grey arrows are the plasma velocity relative to the poles: maximum at the equator, zero at the poles. Press Start.');}
+  else if(S.turns<0.15){T=TX('L\'equatore va avanti','The equator moves ahead');P=TX('Il campo è congelato nel plasma: ogni tratto del tubo segue la latitudine in cui si trova. Il tratto equatoriale avanza verso est, quelli vicini ai poli restano quasi fermi. Ai poli il tubo non si sposta: resta ancorato lì.','The field is frozen into the plasma: every stretch of the tube follows the latitude it is at. The equatorial stretch moves eastward, the ones near the poles stay almost still. At the poles the tube does not move: it stays anchored there.');}
+  else if(S.turns<0.9){T=TX('Nasce il campo toroidale','The toroidal field is born');P=TX('Il tubo si inclina e acquista una componente est–ovest, B_φ. Nell\'emisfero nord è diretta contro il verso di rotazione, nell\'emisfero sud nel verso di rotazione. La componente nord–sud B_θ non cambia.','The tube tilts and gains an east–west component, B_φ. In the northern hemisphere it points against the direction of rotation, in the southern hemisphere with it. The north–south component B_θ does not change.');}
+  else if(S.E<0.45){T=TX('Il tubo si avvolge attorno al Sole','The tube wraps around the Sun');P=TX('A ogni giro guadagnato dall\'equatore (circa ','For every turn gained by the equator (about ')+Math.round(2*Math.PI/DO)+TX(' giorni) il tubo fa un giro in più attorno all\'asse. Si allunga soprattutto attorno ai ',' days) the tube makes one more turn around the axis. It stretches mostly around ')+Math.round(LMAX/D)+TX('° di latitudine, dove la velocità angolare cambia più rapidamente: lì il tubo diventa più sottile e il campo più intenso (colore verso il rosso). Esattamente all\'equatore il tubo viene solo trasportato, perché i tratti vicini corrono alla stessa velocità; ai poli resta fermo.','° of latitude, where the angular velocity changes fastest: there the tube becomes thinner and the field stronger (color shifting toward red). Exactly at the equator the tube is only carried along, because nearby stretches move at the same speed; at the poles it stays still.');}
+  else if(S.E<0.85){T=TX('La tensione si oppone allo shear','Tension opposes the shear');P=TX('Le linee stirate tirano come elastici: la tensione frena le basse latitudini e accelera quelle alte (frecce rosse). La rotazione differenziale si attenua e la crescita di B rallenta.','The stretched lines pull like elastic bands: tension slows the low latitudes and speeds up the high ones (red arrows). Differential rotation weakens and B\'s growth slows.');}
+  else{T=TX('Saturazione','Saturation');P=TX('L\'energia magnetica alle medie latitudini è diventata paragonabile all\'energia del moto di taglio: lo shear in latitudine da solo non può fare di più. Il campo si ferma attorno a B_eq ≈ ','The magnetic energy at mid-latitudes has become comparable to the energy of the shearing motion: latitudinal shear alone can do no more. The field levels off around B_eq ≈ ')+fmtG(BEQ)+'.';}
+  if(real&&S.t>=TEND-0.5){T=TX('Dopo mezzo ciclo','After half a cycle');P=TX('In circa 5,5 anni l\'equatore ha fatto ','In about 5.5 years the equator has made ')+Math.round(S.turns)+TX(' giri sui poli e il tubo si è avvolto altrettante volte. A 35° il campo è passato da 100 G a circa ',' turns over the poles and the tube has wrapped around just as many times. At 35° the field has gone from 100 G to about ')+fmtG(S.B)+TX('; all\'equatore e ai poli è quasi invariato. Per arrivare ai 10⁵ G delle macchie serve lo shear radiale della tachocline, più rapido, insieme ad altri meccanismi.','; at the equator and the poles it is almost unchanged. Reaching the 10⁵ G of sunspots needs the tachocline\'s radial shear, which is faster, together with other mechanisms.');}
   $('capT').textContent=T;$('capP').textContent=P;
 }
 function lawText(){return law==='libro'
-  ?'Rotazione: legge del paragrafo 5.7, Ω(λ) = Ω_eq − (Ω_eq − Ω_pol)·sin²λ, con periodi di 25 giorni all\'equatore e 34 ai poli.'
-  :'Rotazione: legge di Snodgrass e Ulrich (1990), Ω(λ) = A + B·sin²λ + C·sin⁴λ con A = 14,71, B = −2,39, C = −1,78 gradi al giorno (periodi di 24,5 giorni all\'equatore e 34,2 ai poli), misurata con l\'effetto Doppler in fotosfera; alla base della zona convettiva l\'eliosismologia trova un profilo in latitudine simile.';}
+  ?TX('Rotazione: legge del paragrafo 5.7, Ω(λ) = Ω_eq − (Ω_eq − Ω_pol)·sin²λ, con periodi di 25 giorni all\'equatore e 34 ai poli.','Rotation: law from section 5.7, Ω(λ) = Ω_eq − (Ω_eq − Ω_pol)·sin²λ, with periods of 25 days at the equator and 34 at the poles.')
+  :TX('Rotazione: legge di Snodgrass e Ulrich (1990), Ω(λ) = A + B·sin²λ + C·sin⁴λ con A = 14,71, B = −2,39, C = −1,78 gradi al giorno (periodi di 24,5 giorni all\'equatore e 34,2 ai poli), misurata con l\'effetto Doppler in fotosfera; alla base della zona convettiva l\'eliosismologia trova un profilo in latitudine simile.','Rotation: Snodgrass and Ulrich\'s (1990) law, Ω(λ) = A + B·sin²λ + C·sin⁴λ with A = 14.71, B = −2.39, C = −1.78 degrees per day (periods of 24.5 days at the equator and 34.2 at the poles), measured with the Doppler effect in the photosphere; at the base of the convective zone helioseismology finds a similar latitudinal profile.');}
 function note(){
   $('note').innerHTML=(mode==='real'
-   ?'<b>Valori reali.</b> Campo poloidale iniziale B₀ = 100 G lungo tutto il tubo (un\'ipotesi: alla base della zona convettiva il campo non si misura). L\'animazione si ferma dopo 2000 giorni, circa mezzo ciclo. '
-   :'<b>Schema.</b> Campo iniziale amplificato (B₀ = B_eq/8 invece di 100 G) per rendere visibile la saturazione: arriva in meno di due giri. Rotazione e tempi sono quelli reali, non accelerati. Con i valori reali, partendo da 100 G, la saturazione arriverebbe solo dopo circa 30 anni, più di un ciclo. ')
-   +lawText()+' L\'equatore guadagna un giro sui poli ogni '+Math.round(2*Math.PI/DO)+' giorni. Tubo sulla sfera a 0,70 R☉; differenza di velocità tra equatore e poli ≈ '+Math.round(DV)+' m/s; densità ≈ 0,2 g/cm³. '
-   +'Solo lo shear in latitudine: lo shear radiale della tachocline, più intenso, non è rappresentato. Modello qualitativo: plasma incomprimibile, nessuna diffusione magnetica, retroazione semplificata (tutta la rotazione differenziale rallenta come 1 − (B_max/B_eq)²). Spessore del tubo arbitrario: contano solo i rapporti. Il tubo è appoggiato sulla sfera; nel Sole la linea di campo si richiude attraverso l\'interno.';
+   ?TX('<b>Valori reali.</b> Campo poloidale iniziale B₀ = 100 G lungo tutto il tubo (un\'ipotesi: alla base della zona convettiva il campo non si misura). L\'animazione si ferma dopo 2000 giorni, circa mezzo ciclo. ','<b>Real values.</b> Initial poloidal field B₀ = 100 G along the whole tube (a hypothesis: at the base of the convective zone the field is not measured). The animation stops after 2000 days, about half a cycle. ')
+   :TX('<b>Schema.</b> Campo iniziale amplificato (B₀ = B_eq/8 invece di 100 G) per rendere visibile la saturazione: arriva in meno di due giri. Rotazione e tempi sono quelli reali, non accelerati. Con i valori reali, partendo da 100 G, la saturazione arriverebbe solo dopo circa 30 anni, più di un ciclo. ','<b>Schematic.</b> Initial field amplified (B₀ = B_eq/8 instead of 100 G) to make saturation visible: it arrives in under two turns. Rotation and timing are the real ones, not sped up. With real values, starting from 100 G, saturation would only arrive after about 30 years, more than a cycle. '))
+   +lawText()+TX(' L\'equatore guadagna un giro sui poli ogni ',' The equator gains one turn over the poles every ')+Math.round(2*Math.PI/DO)+TX(' giorni. Tubo sulla sfera a 0,70 R☉; differenza di velocità tra equatore e poli ≈ ',' days. Tube on the sphere at 0.70 R☉; velocity difference between equator and poles ≈ ')+Math.round(DV)+TX(' m/s; densità ≈ 0,2 g/cm³. ',' m/s; density ≈ 0.2 g/cm³. ')
+   +TX('Solo lo shear in latitudine: lo shear radiale della tachocline, più intenso, non è rappresentato. Modello qualitativo: plasma incomprimibile, nessuna diffusione magnetica, retroazione semplificata (tutta la rotazione differenziale rallenta come 1 − (B_max/B_eq)²). Spessore del tubo arbitrario: contano solo i rapporti. Il tubo è appoggiato sulla sfera; nel Sole la linea di campo si richiude attraverso l\'interno.','Only the latitudinal shear: the tachocline\'s radial shear, which is stronger, is not represented. Qualitative model: incompressible plasma, no magnetic diffusion, simplified feedback (all differential rotation slows as 1 − (B_max/B_eq)²). Tube thickness is arbitrary: only the ratios matter. The tube rests on the sphere; in the Sun the field line closes through the interior.');
 }
 
 // ---------- ciclo ----------
 let last=null,needDraw=true;
 function loop(ts){
-  if(last!==null&&st.running){st.t+=(ts-last)/1000*speeds[st.speed]*TEND/DUR;if(st.t>=TEND){st.t=TEND;st.running=false;$('play').textContent='Avvia';}needDraw=true;}
+  if(last!==null&&st.running){st.t+=(ts-last)/1000*speeds[st.speed]*TEND/DUR;if(st.t>=TEND){st.t=TEND;st.running=false;$('play').textContent=TX('Avvia','Start');}needDraw=true;}
   last=ts;flyStep();controls.update();
   if(document.body.classList.contains('step1')){requestAnimationFrame(loop);return;}
   const S=updateScene();renderer.render(scene,camera);
@@ -564,9 +567,9 @@ function resize(){const w=stage.clientWidth,h=stage.clientHeight;if(!w||!h)retur
 new ResizeObserver(resize).observe(stage);
 
 // ---------- comandi ----------
-$('play').onclick=()=>{if(st.t>=TEND)st.t=0;st.running=!st.running;$('play').textContent=st.running?'Pausa':'Avvia';};
-$('reset').onclick=()=>{st.t=0;st.running=false;$('play').textContent='Avvia';lastTau=-1;needDraw=true;};
-function syncSpeed(){st.speed=+$('S').value;$('Sv').textContent=['×0,1','×0,25','×0,5','×1','×2'][st.speed];}
+$('play').onclick=()=>{if(st.t>=TEND)st.t=0;st.running=!st.running;$('play').textContent=st.running?TX('Pausa','Pause'):TX('Avvia','Start');};
+$('reset').onclick=()=>{st.t=0;st.running=false;$('play').textContent=TX('Avvia','Start');lastTau=-1;needDraw=true;};
+function syncSpeed(){st.speed=+$('S').value;$('Sv').textContent=(EN?['×0.1','×0.25','×0.5','×1','×2']:['×0,1','×0,25','×0,5','×1','×2'])[st.speed];}
 $('S').oninput=syncSpeed;
 function setMode(m){const f=TEND?st.t/TEND:0;mode=m;build();st.t=f*TEND;lastTau=-1;$('mSch').classList.toggle('on',m==='sch');$('mReal').classList.toggle('on',m==='real');note();needDraw=true;}
 $('mSch').onclick=()=>setMode('sch');$('mReal').onclick=()=>setMode('real');
@@ -599,9 +602,9 @@ function drawIntro(){
   x.font='12px '+css('--f-body');
   for(let la=-90;la<=90;la+=10){x.strokeStyle=ln;x.lineWidth=la===0?1.5:1;x.beginPath();x.moveTo(L,Y(la));x.lineTo(R,Y(la));x.stroke();
     x.fillStyle=mu;x.textAlign='right';x.fillText((la>0?la+'° N':la<0?(-la)+'° S':'0°'),L-6,Y(la)+4);}
-  x.textAlign='left';x.fillStyle=ink;x.fillText('polo nord',L+4,Y(90)-5);x.fillText('polo sud',L+4,Y(-90)+15);
-  x.fillText('equatore',L+8,Y(0)-6);
-  x.textAlign='center';x.fillStyle=mu;x.fillText('longitudine, nel verso di rotazione (est) →   ciò che esce a destra rientra da sinistra',(L+R)/2,H-8);
+  x.textAlign='left';x.fillStyle=ink;x.fillText(TX('polo nord','north pole'),L+4,Y(90)-5);x.fillText(TX('polo sud','south pole'),L+4,Y(-90)+15);
+  x.fillText(TX('equatore','equator'),L+8,Y(0)-6);
+  x.textAlign='center';x.fillStyle=mu;x.fillText(TX('longitudine, nel verso di rotazione (est) →   ciò che esce a destra rientra da sinistra','longitude, in the direction of rotation (east) →   what exits on the right re-enters on the left'),(L+R)/2,H-8);
   x.strokeStyle=ln;x.beginPath();x.moveTo(X(360),T);x.lineTo(X(360),B);x.stroke();
   // posizione iniziale e spostamenti delle perline
   x.setLineDash([4,4]);x.strokeStyle=mu;x.lineWidth=1;x.beginPath();x.moveTo(X(0),Y(-90));x.lineTo(X(0),Y(90));x.stroke();
@@ -612,23 +615,24 @@ function drawIntro(){
     x.strokeStyle=icol(st);x.lineWidth=5;x.lineCap='round';x.beginPath();
     let pw=null;for(let i=0;i<=240;i++){const l=a+(b-a)*i/240,ph=wrap(360*g*Wrel(l)/DO);(pw===null||Math.abs(ph-pw)>180)?x.moveTo(X(ph),Y(l/D)):x.lineTo(X(ph),Y(l/D));pw=ph;}x.stroke();
     const lm=(a+b)/2,pm=wrap(360*g*Wrel(lm)/DO);x.fillStyle=ink;x.textAlign='left';x.font='500 11px '+css('--f-data');
-    x.fillText('×'+st.toFixed(1).replace('.',','),X(pm)+9,Y(lm/D)+4);x.font='12px '+css('--f-body');}
+    x.fillText('×'+(EN?st.toFixed(1):st.toFixed(1).replace('.',',')),X(pm)+9,Y(lm/D)+4);x.font='12px '+css('--f-body');}
   for(let la=-90;la<=90;la+=10){const ph=wrap(360*g*Wrel(la*D)/DO);x.fillStyle=ink;
     for(const q of [ph,ph<6?ph+360:null,ph>354?ph-360:null])if(q!==null){x.beginPath();x.arc(X(q),Y(la),4,0,7);x.fill();}}
   // didascalia guidata e strumenti
-  $('iGv').textContent=g.toFixed(2).replace('.',',');
+  $('iGv').textContent=EN?g.toFixed(2):g.toFixed(2).replace('.',',');
   const s0=segStretch(0,10*D,g),s3=segStretch(30*D,40*D,g),s8=segStretch(80*D,90*D,g);
-  $('iS0').textContent='×'+s0.toFixed(2).replace('.',',');$('iS3').textContent='×'+s3.toFixed(2).replace('.',',');$('iS8').textContent='×'+s8.toFixed(2).replace('.',',');
+  const f2=x=>EN?x.toFixed(2):x.toFixed(2).replace('.',',');const f1=x=>EN?x.toFixed(1):x.toFixed(1).replace('.',',');
+  $('iS0').textContent='×'+f2(s0);$('iS3').textContent='×'+f2(s3);$('iS8').textContent='×'+f2(s8);
   let T1,P1;
-  if(g===0){T1='Un tubo segnato con perline';P1='Il tubo poloidale corre lungo un meridiano, dal polo sud al polo nord. Lo segniamo con una perlina ogni 10° di latitudine: le perline seguono il plasma. La mappa srotola la sfera: in verticale la latitudine, in orizzontale la longitudine. Premi Avvia o trascina il cursore.';}
-  else if(g<0.15){T1='Le perline si spostano';P1='La rotazione differenziale porta avanti le perline verso est: quella all\'equatore più di tutte, quelle vicine ai poli quasi per niente (frecce tratteggiate). Il tubo prende la forma di una freccia con la punta all\'equatore, come nella figura 5.3.';}
-  else if(g<0.35){T1='Chi si sposta di più non si allunga';P1='Guarda i due tratti accanto all\'equatore, tra 0° e 10° nord e sud: si spostano più di tutti, ma restano corti (×'+s0.toFixed(1).replace('.',',')+'). Le loro due perline viaggiano quasi appaiate, perché vicino all\'equatore la velocità cambia pochissimo con la latitudine.';}
-  else if(g<0.6){T1='Si allunga chi ha le perline a velocità diverse';P1='I tratti a metà strada, tra 20° e 50°, si spostano meno ma si allungano molto (×'+s3.toFixed(1).replace('.',',')+' tra 30° e 40°): la perlina più vicina all\'equatore corre più di quella sopra, e il tratto si tende come un elastico. Vicino ai poli nessuna perlina si muove.';}
-  else if(g<0.95){T1='Dove si allunga, B cresce';P1='Il campo di ogni tratto cresce quanto il suo allungamento: B = B₀·L/L₀. Per questo il colore va verso l\'arancione alle medie latitudini e resta blu all\'equatore e ai poli. L\'emisfero sud fa lo stesso, come in uno specchio. ';}
-  else{T1='Il tubo si avvolge attorno al Sole';P1='Oltre un giro il tubo esce a destra e rientra da sinistra: si sta avvolgendo attorno al Sole, come nella figura 5.4. A ogni giro i tratti alle medie latitudini si allungano ancora (×'+s3.toFixed(1).replace('.',',')+' tra 30° e 40°), mentre quelli all\'equatore e ai poli restano quasi intatti. Il grafico a destra mostra come continua la crescita fino a mezzo ciclo. Passa al Sole in 3D per vedere il tubo avvolgersi.';}
+  if(g===0){T1=TX('Un tubo segnato con perline','A tube marked with beads');P1=TX('Il tubo poloidale corre lungo un meridiano, dal polo sud al polo nord. Lo segniamo con una perlina ogni 10° di latitudine: le perline seguono il plasma. La mappa srotola la sfera: in verticale la latitudine, in orizzontale la longitudine. Premi Avvia o trascina il cursore.','The poloidal tube runs along a meridian, from the south pole to the north pole. We mark it with a bead every 10° of latitude: the beads follow the plasma. The map unrolls the sphere: latitude runs vertically, longitude horizontally. Press Start or drag the slider.');}
+  else if(g<0.15){T1=TX('Le perline si spostano','The beads move');P1=TX('La rotazione differenziale porta avanti le perline verso est: quella all\'equatore più di tutte, quelle vicine ai poli quasi per niente (frecce tratteggiate). Il tubo prende la forma di una freccia con la punta all\'equatore, come nella figura 5.3.','Differential rotation carries the beads eastward: the one at the equator more than any other, the ones near the poles almost not at all (dashed arrows). The tube takes the shape of an arrow with its tip at the equator, as in figure 5.3.');}
+  else if(g<0.35){T1=TX('Chi si sposta di più non si allunga','Moving more does not mean stretching more');P1=TX('Guarda i due tratti accanto all\'equatore, tra 0° e 10° nord e sud: si spostano più di tutti, ma restano corti (×','Look at the two stretches next to the equator, between 0° and 10° north and south: they move more than any other, but stay short (×')+f1(s0)+TX('). Le loro due perline viaggiano quasi appaiate, perché vicino all\'equatore la velocità cambia pochissimo con la latitudine.','). Their two beads travel almost side by side, because near the equator the velocity changes very little with latitude.');}
+  else if(g<0.6){T1=TX('Si allunga chi ha le perline a velocità diverse','Stretching happens where the beads move at different speeds');P1=TX('I tratti a metà strada, tra 20° e 50°, si spostano meno ma si allungano molto (×','The stretches halfway, between 20° and 50°, move less but stretch a great deal (×')+f1(s3)+TX(' tra 30° e 40°): la perlina più vicina all\'equatore corre più di quella sopra, e il tratto si tende come un elastico. Vicino ai poli nessuna perlina si muove.',' between 30° and 40°): the bead nearer the equator runs faster than the one above it, and the stretch tightens like an elastic band. Near the poles no bead moves.');}
+  else if(g<0.95){T1=TX('Dove si allunga, B cresce','Where it stretches, B grows');P1=TX('Il campo di ogni tratto cresce quanto il suo allungamento: B = B₀·L/L₀. Per questo il colore va verso l\'arancione alle medie latitudini e resta blu all\'equatore e ai poli. L\'emisfero sud fa lo stesso, come in uno specchio. ','Each stretch\'s field grows as much as its elongation: B = B₀·L/L₀. That is why the color shifts toward orange at mid-latitudes and stays blue at the equator and poles. The southern hemisphere does the same, as in a mirror. ');}
+  else{T1=TX('Il tubo si avvolge attorno al Sole','The tube wraps around the Sun');P1=TX('Oltre un giro il tubo esce a destra e rientra da sinistra: si sta avvolgendo attorno al Sole, come nella figura 5.4. A ogni giro i tratti alle medie latitudini si allungano ancora (×','Beyond one turn the tube exits on the right and re-enters on the left: it is wrapping around the Sun, as in figure 5.4. With every turn the stretches at mid-latitudes stretch further (×')+f1(s3)+TX(' tra 30° e 40°), mentre quelli all\'equatore e ai poli restano quasi intatti. Il grafico a destra mostra come continua la crescita fino a mezzo ciclo. Passa al Sole in 3D per vedere il tubo avvolgersi.',' between 30° and 40°), while those at the equator and poles stay almost intact. The chart on the right shows how the growth continues up to half a cycle. Switch to the Sun in 3D to see the tube wrap around.');}
   $('iT').textContent=T1;$('iP').textContent=P1;
   const [lg,LW]=fit($('cLI'));const N=100;for(let i=0;i<N;i++){lg.fillStyle='#'+cmap(i/(N-1),cc).getHexString();lg.fillRect(8+(LW-16)*i/N,4,(LW-16)/N+1,12);}
-  lg.font='11px '+css('--f-data');lg.fillStyle=css('--muted');lg.textAlign='left';lg.fillText('B = B₀',8,34);lg.textAlign='right';lg.fillText('B = '+ISMAX.toFixed(1).replace('.',',')+' B₀ (a '+GMAP+' giri)',LW-8,34);
+  lg.font='11px '+css('--f-data');lg.fillStyle=css('--muted');lg.textAlign='left';lg.fillText('B = B₀',8,34);lg.textAlign='right';lg.fillText('B = '+f1(ISMAX)+' B₀ ('+TX('a '+GMAP+' giri','at '+GMAP+' turns')+')',LW-8,34);
   drawBT(g);
 }
 function drawBT(g){
@@ -638,18 +642,18 @@ function drawBT(g){
   axes(x,l,r,t,b);x.font='11px '+css('--f-data');x.fillStyle=mu;
   for(const v of [1,10,100,1000]){if(Math.log10(v)>ymax)break;x.textAlign='right';x.fillText(String(v),l-4,Y(v)+4);
     x.globalAlpha=0.3;x.strokeStyle=mu;x.beginPath();x.moveTo(l,Y(v));x.lineTo(r,Y(v));x.stroke();x.globalAlpha=1;}
-  x.textAlign='center';x.fillText('0',X(0),b+13);x.fillText(String(GMAP),X(GMAP),b+13);x.fillText(Math.round(GT)+' giri',X(GT)-14,b+13);
-  x.fillText('mezzo ciclo ≈ 5,5 anni →',(X(GMAP)+r)/2,b+26);
+  x.textAlign='center';x.fillText('0',X(0),b+13);x.fillText(String(GMAP),X(GMAP),b+13);x.fillText(Math.round(GT)+TX(' giri',' turns'),X(GT)-14,b+13);
+  x.fillText(TX('mezzo ciclo ≈ 5,5 anni →','half a cycle ≈ 5.5 years →'),(X(GMAP)+r)/2,b+26);
   x.save();x.translate(9,(t+b)/2);x.rotate(-Math.PI/2);x.fillText('B / B₀',0,0);x.restore();
   x.setLineDash([2,3]);x.strokeStyle=mu;x.beginPath();x.moveTo(X(GMAP),t);x.lineTo(X(GMAP),b);x.stroke();x.setLineDash([]);
-  x.textAlign='left';x.fillText('fine mappa',X(GMAP)+3,t+9);
+  x.textAlign='left';x.fillText(TX('fine mappa','end of map'),X(GMAP)+3,t+9);
   [[30,'#D85A30'],[0,'#378ADD'],[80,mu]].forEach(([a,c])=>{
     for(const part of [0,1]){x.strokeStyle=c;x.lineWidth=2;x.setLineDash(part?[5,4]:[]);x.beginPath();
       const g0=part?GMAP:0,g1=part?GT:GMAP;for(let i=0;i<=80;i++){const gg=g0+(g1-g0)*i/80,v=segStretch(a*D,(a+10)*D,gg);i?x.lineTo(X(gg),Y(v)):x.moveTo(X(gg),Y(v));}x.stroke();}
     x.setLineDash([]);x.fillStyle=c;x.beginPath();x.arc(X(g),Y(segStretch(a*D,(a+10)*D,g)),3.5,0,7);x.fill();});
   const vEnd=segStretch(30*D,40*D,GT);x.fillStyle=ink;x.textAlign='right';x.fillText('×'+Math.round(vEnd),r,Y(vEnd)-6);
 }
-function setIPlay(){$('iPlay').textContent=iRun?'Pausa':'Avvia';}
+function setIPlay(){$('iPlay').textContent=iRun?TX('Pausa','Pause'):TX('Avvia','Start');}
 $('iPlay').onclick=()=>{if(iVal>=GMAP){iVal=0;iG.value=0;}iRun=!iRun;setIPlay();};
 iG.oninput=()=>{iRun=false;setIPlay();iVal=+iG.value;drawIntro();};
 function iLoop(ts){if(iRun&&iLast!==null){iVal+=(ts-iLast)/1000*0.06;if(iVal>=GMAP){iVal=GMAP;iRun=false;setIPlay();}iG.value=iVal;drawIntro();}iLast=ts;requestAnimationFrame(iLoop);}
@@ -657,7 +661,7 @@ new ResizeObserver(drawIntro).observe(cI);
 function setStep(n){document.body.classList.toggle('step1',n===1);$('tab1').classList.toggle('on',n===1);$('tab2').classList.toggle('on',n===2);
   if(n===2){iRun=false;setIPlay();resize();needDraw=true;}else drawIntro();}
 $('tab1').onclick=()=>setStep(1);$('tab2').onclick=()=>setStep(2);$('go3d').onclick=()=>{setStep(2);window.scrollTo({top:0,behavior:'smooth'});};
-function introLaw(){$('iLaw').innerHTML='<b>Modello.</b> '+lawText()+' Rispetto ai poli un punto a latitudine λ si sposta di φ = [Ω(λ) − Ω_pol]·t'+(law==='libro'?' = ΔΩ·t·cos²λ':'')+'; un tratto si allunga di L/L₀ = √(1 + (t·cosλ·dΩ/dλ)²), con il massimo a '+Math.round(LMAX/D)+'° di latitudine. La velocità angolare è simmetrica attorno all\'equatore, quindi lì la curva resta arrotondata con qualsiasi legge; con il passare del tempo la punta si affila. Questo passo mostra solo lo stiramento, senza il freno della tensione: la saturazione è nel passo 2.';}
+function introLaw(){$('iLaw').innerHTML=TX('<b>Modello.</b> ','<b>Model.</b> ')+lawText()+TX(' Rispetto ai poli un punto a latitudine λ si sposta di φ = [Ω(λ) − Ω_pol]·t',' Relative to the poles a point at latitude λ moves by φ = [Ω(λ) − Ω_pol]·t')+(law==='libro'?' = ΔΩ·t·cos²λ':'')+TX('; un tratto si allunga di L/L₀ = √(1 + (t·cosλ·dΩ/dλ)²), con il massimo a ','; a stretch elongates by L/L₀ = √(1 + (t·cosλ·dΩ/dλ)²), with the maximum at ')+Math.round(LMAX/D)+TX('° di latitudine. La velocità angolare è simmetrica attorno all\'equatore, quindi lì la curva resta arrotondata con qualsiasi legge; con il passare del tempo la punta si affila. Questo passo mostra solo lo stiramento, senza il freno della tensione: la saturazione è nel passo 2.','° of latitude. The angular velocity is symmetric around the equator, so the curve stays rounded there under any law; as time passes, the tip sharpens. This step shows only the stretching, without tension\'s brake: saturation is in step 2.');}
 function setLaw(l){const f=TEND?st.t/TEND:0;law=l;setLawConsts();makeMaxCircles();build();st.t=f*TEND;calcISMAX();lastTau=-1;needDraw=true;
   $('lawB').classList.toggle('on',l==='libro');$('lawS').classList.toggle('on',l==='su');note();introLaw();drawIntro();}
 $('lawB').onclick=()=>setLaw('libro');$('lawS').onclick=()=>setLaw('su');
@@ -675,5 +679,6 @@ requestAnimationFrame(loop);
 .cc-badge.cc-doc{text-decoration:none;opacity:1;font-weight:600;margin-left:.4em}
 </style>
 <script src="stiramento_tubo_tachocline_scheda.js"></script>
+<script src="stiramento_tubo_tachocline_scheda_en.js"></script>
 <script src="scheda.js"></script>
 </body></html>
