@@ -6,7 +6,7 @@
 -->
 <html lang="it"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Effetto Ω: come la rotazione avvolge il campo magnetico</title>
+<title data-en="The Ω effect: how rotation winds up the magnetic field">Effetto Ω: come la rotazione avvolge il campo magnetico</title>
 <style>
 :root{--bg:#fbf8f2;--fg:#231f1a;--mut:#6b6358;--card:#fff;--line:#ddd3c2;--acc:#d9531e;box-sizing:border-box}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15130f;--fg:#efe8dc;--mut:#a39a8b;--card:#211e18;--line:#3a352b;--acc:#ff8a4c}}
@@ -25,7 +25,7 @@ input[type=range]{flex:1;min-width:150px;accent-color:var(--acc)}
 .bar{height:10px;background:var(--line);border-radius:6px;overflow:hidden;flex:1;min-width:150px}.bar i{display:block;height:100%;width:0;background:var(--acc)}
 label{font-size:.85rem;color:var(--mut)}
 </style></head><body><main>
-<div class="grid"><div class="pane"><svg viewBox="0 0 600 600" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Linee di campo avvolte dalla rotazione differenziale">
+<div class="grid"><div class="pane"><svg viewBox="0 0 600 600" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Linee di campo avvolte dalla rotazione differenziale" data-en-aria="Field lines wound up by differential rotation">
 <defs>
 <linearGradient id="tubeR" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff9d78"/><stop offset=".42" stop-color="#e2572b"/><stop offset="1" stop-color="#8a2c11"/></linearGradient>
 <linearGradient id="tubeB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8fc3f2"/><stop offset=".42" stop-color="#2f78c4"/><stop offset="1" stop-color="#123a63"/></linearGradient>
@@ -37,32 +37,39 @@ label{font-size:.85rem;color:var(--mut)}
 <line x1="50" y1="300" x2="550" y2="300" stroke="#fff" stroke-width="2.5" stroke-dasharray="8 6"/>
 <g id="fl"></g>
 
-<text x="300" y="44" text-anchor="middle" font-size="12" fill="var(--fg)" opacity=".85">superficie</text>
-<text x="300" y="146" text-anchor="middle" font-size="12" fill="var(--fg)" opacity=".85">base zona convettiva (0,7 R)</text>
+<text x="300" y="44" text-anchor="middle" font-size="12" fill="var(--fg)" opacity=".85" data-en="surface">superficie</text>
+<text x="300" y="146" text-anchor="middle" font-size="12" fill="var(--fg)" opacity=".85" data-en="base of convective zone (0.7 R)">base zona convettiva (0,7 R)</text>
 <g stroke="var(--fg)" stroke-width="2.5" fill="var(--fg)" opacity=".75">
 <line x1="14" y1="300" x2="86" y2="300"/><path d="M86,300 l-8,-5 v10z"/>
 <line x1="24" y1="190" x2="68" y2="190"/><path d="M68,190 l-8,-5 v10z"/>
 <line x1="34" y1="100" x2="56" y2="100"/><path d="M56,100 l-8,-5 v10z"/></g>
-<text x="14" y="322" font-size="11" fill="var(--fg)">equatore: 25 giorni</text>
-<text x="14" y="128" font-size="11" fill="var(--fg)">poli: ~35 giorni</text>
-</svg></div><div class="pane"><svg viewBox="0 0 600 600" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Sezione interna: campo poloidale e campo toroidale">
+<text x="14" y="322" font-size="11" fill="var(--fg)" data-en="equator: 25 days">equatore: 25 giorni</text>
+<text x="14" y="128" font-size="11" fill="var(--fg)" data-en="poles: ~35 days">poli: ~35 giorni</text>
+</svg></div><div class="pane"><svg viewBox="0 0 600 600" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Sezione interna: campo poloidale e campo toroidale" data-en-aria="Internal section: poloidal field and toroidal field">
 <circle cx="300" cy="300" r="250" fill="#ffd93a" opacity=".6" stroke="#e0b400" stroke-width="2"/>
 <circle cx="300" cy="300" r="175" fill="none" stroke="#b0641a" stroke-dasharray="4 4"/>
 <line x1="300" y1="50" x2="300" y2="550" stroke="var(--mut)" stroke-dasharray="3 5" opacity=".6"/>
 <line x1="50" y1="300" x2="550" y2="300" stroke="#fff" stroke-width="2" stroke-dasharray="8 6"/>
 <g id="caps" fill="none" stroke-linecap="round"></g><g id="po"></g><g id="to"></g><g id="cv"></g>
-<text x="300" y="20" text-anchor="middle" fill="var(--mut)" font-size="13">Polo nord</text>
-<text x="300" y="592" text-anchor="middle" fill="var(--mut)" font-size="13">Polo sud</text>
+<text x="300" y="20" text-anchor="middle" fill="var(--mut)" font-size="13" data-en="North pole">Polo nord</text>
+<text x="300" y="592" text-anchor="middle" fill="var(--mut)" font-size="13" data-en="South pole">Polo sud</text>
 </svg></div></div>
 <div class="ctl">
-<div class="row"><button id="pp">Pausa</button><button id="dl" hidden>Scarica pagina (.html)</button><label style="flex:1;min-width:200px">Ciclo solare, 0-22 anni (due cicli) <input id="cy" type="range" min="0" max="2200" value="0" style="width:100%"></label>
+<div class="row"><button id="pp" data-en="Pause">Pausa</button><button id="dl" hidden data-en="Download page (.html)">Scarica pagina (.html)</button>
+<a class="cc-badge cc-doc" href="#scheda" data-scheda data-en="📖 Animation description">📖 Scheda dell'animazione</a> <span data-lang-switch></span>
+<label style="flex:1;min-width:200px"><span data-en="Solar cycle, 0-22 years (two cycles)">Ciclo solare, 0-22 anni (due cicli)</span> <input id="cy" type="range" min="0" max="2200" value="0" style="width:100%"></label>
 <span id="tm" style="font-size:.85rem;color:var(--mut);min-width:110px;text-align:right"></span></div>
-<div class="row"><label style="flex:1;min-width:200px">Avvolgimento del campo, in giorni (primi ~1,9 anni) <input id="sl" type="range" min="0" max="700" value="0" style="width:100%"></label>
-<label style="flex:1;min-width:200px;display:flex;gap:8px;align-items:center">Campo orizzontale (toroidale)<span class="bar"><i id="gi"></i></span></label></div>
+<div class="row"><label style="flex:1;min-width:200px"><span data-en="Winding of the field, in days (first ~1.9 years)">Avvolgimento del campo, in giorni (primi ~1,9 anni)</span> <input id="sl" type="range" min="0" max="700" value="0" style="width:100%"></label>
+<label style="flex:1;min-width:200px;display:flex;gap:8px;align-items:center"><span data-en="Horizontal field (toroidal)">Campo orizzontale (toroidale)</span><span class="bar"><i id="gi"></i></span></label></div>
 </div>
 <div id="t" hidden></div><div id="d" hidden></div>
 
+<script src="lingua.js"></script>
 <script data-own="1">
+/* lingua: T(it,en) viene da lingua.js; qui lo script usa già una variabile locale T (frazione di tempo),
+   quindi la funzione di traduzione si chiama TR (convenzione delle note di lavoro) */
+const TR=window.T||((it)=>it),EN=window.LANG==='en';
+const fmtY=x=>EN?x.toFixed(1):x.toFixed(1).replace('.',',');
 const POS='#e2572b',NEG='#2f78c4',cx=300,cy=300,R=250,MAXD=700,rad=x=>x*Math.PI/180,$=id=>document.getElementById(id);
 const dOm0=la=>{const s=Math.sin(rad(45*Math.tanh(Math.abs(la)/45)));return 1*s*s},DOM_MAX=dOm0(90),dOm=la=>DOM_MAX-dOm0(la); // velocità relativa al polo (fermo): 0 al polo, massima all'equatore, gradi/giorno
 const RT=175; // raggio della tachoclina (0,7 R)
@@ -159,27 +166,27 @@ function conv(){let o='';CV.forEach((p,k)=>{
   o+=wseg(p.slice(88,97),20,2.5);   // risalita all'equatore: si restringe
   for(let i=0;i<10;i++){const [x,y,j]=cvPos(k,(i/10+cvPhase(curYl))%1);o+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${j===0?8:j===2?6:4}" fill="${j===0?'#ff3b30':j===2?'#3fa9ff':'#6b6358'}" stroke="#fff" stroke-width="1.4"/>`}});
  $('cv').innerHTML=o}
-function text0(T){if(T<.12)return['Punto di partenza: campo verticale','Le linee di campo corrono lungo i meridiani, da un polo all\'altro. Il gas del Sole le trascina con sé (le "congela" al suo interno), quindi seguirle equivale a seguire il gas.'];
- if(T<.35)return['Le linee si inclinano','L\'equatore ruota in 25 giorni, i poli in circa 35. Il gas alle basse latitudini corre avanti e trascina la parte centrale di ogni linea, che si inclina e si allunga.'];
- if(T<.7)return['Le linee si avvolgono attorno al Sole','Ogni giro di differenza aggiunge un avvolgimento. Le linee si allungano e si affollano: il campo orizzontale (toroidale) cresce, all\'incirca in modo lineare con il tempo.'];
- return['Campo toroidale intenso','Ora le linee ai lati sono quasi parallele all\'equatore: il campo è toroidale, con frecce a sinistra nell\'emisfero nord (contro il verso di rotazione) e a destra in quello sud (nel verso di rotazione). All\'equatore resta una fascia neutra: il campo cambia segno tra i due emisferi e deve annullarsi. Il campo è molto più intenso di quello iniziale ed è massimo a medie latitudini, dove nascono le prime macchie del ciclo.']}
+function text0(T){if(T<.12)return[TR('Punto di partenza: campo verticale','Starting point: vertical field'),TR('Le linee di campo corrono lungo i meridiani, da un polo all\'altro. Il gas del Sole le trascina con sé (le "congela" al suo interno), quindi seguirle equivale a seguire il gas.','The field lines run along the meridians, from one pole to the other. The Sun\'s gas drags them along (it "freezes" them inside itself), so following them is the same as following the gas.')];
+ if(T<.35)return[TR('Le linee si inclinano','The lines tilt'),TR('L\'equatore ruota in 25 giorni, i poli in circa 35. Il gas alle basse latitudini corre avanti e trascina la parte centrale di ogni linea, che si inclina e si allunga.','The equator rotates in 25 days, the poles in about 35. The gas at low latitudes runs ahead and drags the central part of each line, which tilts and stretches.')];
+ if(T<.7)return[TR('Le linee si avvolgono attorno al Sole','The lines wind around the Sun'),TR('Ogni giro di differenza aggiunge un avvolgimento. Le linee si allungano e si affollano: il campo orizzontale (toroidale) cresce, all\'incirca in modo lineare con il tempo.','Each extra turn of difference adds one winding. The lines stretch and crowd together: the horizontal (toroidal) field grows, roughly linearly with time.')];
+ return[TR('Campo toroidale intenso','Intense toroidal field'),TR('Ora le linee ai lati sono quasi parallele all\'equatore: il campo è toroidale, con frecce a sinistra nell\'emisfero nord (contro il verso di rotazione) e a destra in quello sud (nel verso di rotazione). All\'equatore resta una fascia neutra: il campo cambia segno tra i due emisferi e deve annullarsi. Il campo è molto più intenso di quello iniziale ed è massimo a medie latitudini, dove nascono le prime macchie del ciclo.','Now the lines at the sides are nearly parallel to the equator: the field is toroidal, with arrows pointing left in the northern hemisphere (against the direction of rotation) and right in the southern one (in the direction of rotation). A neutral band remains at the equator: the field changes sign between the two hemispheres and must vanish there. The field is much more intense than the initial one and is strongest at middle latitudes, where the first spots of the cycle appear.')]}
 function text(T,Y){if(Y<1.9)return text0(T);
- if(Y>=9.5)return['Fine del ciclo: il campo dei poli è invertito','Il campo polare ha ormai il segno opposto a quello iniziale e il nuovo campo poloidale sta per essere riavvolto. A bassa latitudine emergono ancora le ultime coppie di questo ciclo, mentre a 35° iniziano quelle del successivo.'];
+ if(Y>=9.5)return[TR('Fine del ciclo: il campo dei poli è invertito','End of the cycle: the polar field is reversed'),TR('Il campo polare ha ormai il segno opposto a quello iniziale e il nuovo campo poloidale sta per essere riavvolto. A bassa latitudine emergono ancora le ultime coppie di questo ciclo, mentre a 35° iniziano quelle del successivo.','The polar field now has the opposite sign to the initial one, and the new poloidal field is about to be wound up again. At low latitude the last pairs of this cycle are still emerging, while at 35° those of the next one are beginning.')];
  let kp=-1;for(let i=0;i<6;i++)if(Y>=TB[i][2])kp=i;
- if(kp>=0&&Y-TB[kp][2]<1.4){if(kp===5)return['Fine del ciclo','Le ultime macchie emergono a circa 5° dall\'equatore. Il campo dei poli è stato ricostruito con segno invertito e il ciclo successivo ricomincia a latitudini medie.'];
-  return['Emerge una coppia, ne nasce una nuova più vicina all\'equatore','Il tubo buca la fotosfera e si sdoppia: le linee di campo disegnano per poco un Ω rosso tra le due macchie, che poi si allontanano. La leading (verso l\'equatore) si annulla con quella dell\'altro emisfero, la trailing si sfuma e sale verso il polo. Il campo dei poli cambia segno gradualmente, per la somma di tutte le trailing di questo tipo. Intanto alla base si forma un nuovo tubo, più grande e a latitudine minore ('+LT[kp+1]+'°).']}
+ if(kp>=0&&Y-TB[kp][2]<1.4){if(kp===5)return[TR('Fine del ciclo','End of the cycle'),TR('Le ultime macchie emergono a circa 5° dall\'equatore. Il campo dei poli è stato ricostruito con segno invertito e il ciclo successivo ricomincia a latitudini medie.','The last spots emerge at about 5° from the equator. The polar field has been rebuilt with reversed sign, and the next cycle starts again at middle latitudes.')];
+  return[TR('Emerge una coppia, ne nasce una nuova più vicina all\'equatore','A pair emerges, a new one is born closer to the equator'),TR('Il tubo buca la fotosfera e si sdoppia: le linee di campo disegnano per poco un Ω rosso tra le due macchie, che poi si allontanano. La leading (verso l\'equatore) si annulla con quella dell\'altro emisfero, la trailing si sfuma e sale verso il polo. Il campo dei poli cambia segno gradualmente, per la somma di tutte le trailing di questo tipo. Intanto alla base si forma un nuovo tubo, più grande e a latitudine minore (','The tube breaks through the photosphere and splits in two: the field lines briefly trace a red Ω between the two spots, which then move apart. The leading spot (towards the equator) cancels out with that of the other hemisphere, while the trailing spot fades and drifts towards the pole. The polar field changes sign gradually, from the sum of all trailing spots of this kind. Meanwhile a new tube forms at the base, larger and at a lower latitude (')+LT[kp+1]+'°).']}
  let k=0;for(let i=0;i<6;i++)if(Y>=TB[i][0])k=i;const [ta,tg,tr]=TB[k];
- if(Y<tg)return['Un tubo toroidale cresce a '+LT[k]+'°','Alla base della zona convettiva il campo avvolto si concentra in un tubo di flusso, che cresce di diametro. Il campo poloidale è ormai in gran parte convertito.'];
- return['Il tubo sale verso la superficie','Più leggero del gas intorno, il tubo risale la zona convettiva. Per la forza di Coriolis viene deviato verso il polo, quindi emerge a qualche grado in più di latitudine.']}
+ if(Y<tg)return[TR('Un tubo toroidale cresce a ','A toroidal tube grows at ')+LT[k]+'°',TR('Alla base della zona convettiva il campo avvolto si concentra in un tubo di flusso, che cresce di diametro. Il campo poloidale è ormai in gran parte convertito.','At the base of the convective zone the wound-up field concentrates into a flux tube, which grows in diameter. The poloidal field has by now largely been converted.')];
+ return[TR('Il tubo sale verso la superficie','The tube rises towards the surface'),TR('Più leggero del gas intorno, il tubo risale la zona convettiva. Per la forza di Coriolis viene deviato verso il polo, quindi emerge a qualche grado in più di latitudine.','Lighter than the surrounding gas, the tube rises through the convective zone. Because of the Coriolis force it is deflected towards the pole, so it emerges a few degrees higher in latitude.')]}
 function draw(Y){const c=Y>=11?1:0,Yl=Y-11*c;curYl=Yl;const D=Yl*365,T=Math.min(1,D/MAXD);front(D,Yl,c);section(Y,c,Yl);
  let av=0,av2=0,nn=0;for(let la=10;la<=85;la+=5){av+=oOld(la,Yl);av2+=oOld(la,Yl+11);nn++}$('gi').style.width=(Math.min(1,T*av/nn+(Yl<5?av2/nn:0))*100)+'%';
- $('tm').textContent='anno '+Y.toFixed(1)+' · ciclo '+(c+1);
- const [a,b]=text(T,Yl);$('t').textContent=(c?'2° ciclo, polarità invertite: ':'')+a;$('d').textContent=b+(Yl>=1.9&&Yl<2?' Intanto, a bassa latitudine, emergono ancora le ultime coppie del ciclo precedente: è la sovrapposizione tra due cicli.':'')}
+ $('tm').textContent=TR('anno ','year ')+fmtY(Y)+TR(' · ciclo ',' · cycle ')+(c+1);
+ const [a,b]=text(T,Yl);$('t').textContent=(c?TR('2° ciclo, polarità invertite: ','2nd cycle, reversed polarities: '):'')+a;$('d').textContent=b+(Yl>=1.9&&Yl<2?TR(' Intanto, a bassa latitudine, emergono ancora le ultime coppie del ciclo precedente: è la sovrapposizione tra due cicli.',' Meanwhile, at low latitude, the last pairs of the previous cycle are still emerging: this is the overlap between two cycles.'):'')}
 let Y=0,playing=true,last=performance.now(),hold=0;
 function setY(y){Y=y;$('cy').value=Math.round(y*100);$('sl').value=Math.round(Math.min(MAXD,(y-(y>=11?11:0))*365));draw(y)}
-$('sl').oninput=()=>{playing=false;$('pp').textContent='Riprendi';setY((Y>=11?11:0)+ +$('sl').value/365)};
-$('cy').oninput=()=>{playing=false;$('pp').textContent='Riprendi';setY($('cy').value/100)};
-$('pp').onclick=()=>{playing=!playing;$('pp').textContent=playing?'Pausa':'Riprendi'};
+$('sl').oninput=()=>{playing=false;$('pp').textContent=TR('Riprendi','Resume');setY((Y>=11?11:0)+ +$('sl').value/365)};
+$('cy').oninput=()=>{playing=false;$('pp').textContent=TR('Riprendi','Resume');setY($('cy').value/100)};
+$('pp').onclick=()=>{playing=!playing;$('pp').textContent=playing?TR('Pausa','Pause'):TR('Riprendi','Resume')};
 function tick(n){const dt=(n-last)/1000;last=n;conv();
  if(playing){if(Y>=22){hold+=dt;if(hold>2.5){hold=0;setY(0)}}else setY(Math.min(22,Y+dt*((Y%11)<1.9?0.135:0.23)))}
  requestAnimationFrame(tick)}
@@ -188,8 +195,8 @@ function snapshot(){const c=document.documentElement.cloneNode(true);c.querySele
 (async()=>{if(!(window.claude&&claude.use))return;const b=$('dl');let dl=null;try{dl=await claude.use('downloads')}catch(e){}
  b.hidden=false;
  b.onclick=async()=>{const t0=b.textContent;
-  if(!dl){b.textContent='Non disponibile in questa vista: scarica il file dalla chat';setTimeout(()=>b.textContent=t0,4000);return}
-  try{await dl.save({filename:'effetto_omega_rotazione_differenziale.html',data:snapshot()});b.textContent='Salvato'}catch(e){b.textContent=(e&&e.code==='declined')?t0:'Salvataggio non riuscito'}
+  if(!dl){b.textContent=TR('Non disponibile in questa vista: scarica il file dalla chat','Not available in this view: download the file from the chat');setTimeout(()=>b.textContent=t0,4000);return}
+  try{await dl.save({filename:'effetto_omega_rotazione_differenziale.html',data:snapshot()});b.textContent=TR('Salvato','Saved')}catch(e){b.textContent=(e&&e.code==='declined')?t0:TR('Salvataggio non riuscito','Save failed')}
   setTimeout(()=>b.textContent=t0,2500)}})();
 setY(0);requestAnimationFrame(tick);
 </script></main><span class="cc-badge cc-fixed"><span class="cc-n">© 2026 Carlo Casoli ·</span> <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it" target="_blank" rel="license noopener">CC BY-NC-ND 4.0</a></span>
@@ -197,7 +204,12 @@ setY(0);requestAnimationFrame(tick);
 .cc-badge{display:inline-block;vertical-align:middle;margin:0 0 0 .5em;padding:2px 8px;border:1px solid currentColor;border-radius:999px;font:400 11.5px/1.35 -apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;letter-spacing:0;text-transform:none;white-space:normal;max-width:100%;box-sizing:border-box;opacity:.8;color:inherit;text-shadow:none;pointer-events:auto}
 .cc-n,.cc-badge a{white-space:nowrap}
 .cc-badge a{color:inherit;text-decoration:underline;text-underline-offset:2px}
+.cc-badge.cc-doc{text-decoration:none;opacity:1;font-weight:600}
+.cc-badge.lang-sw{opacity:1}.cc-badge.lang-sw a{cursor:pointer}
 .cc-badge.cc-fixed{position:fixed;top:10px;right:10px;margin:0;z-index:2147483000;background:rgba(10,10,18,.62);color:#f2efe6;border-color:rgba(242,239,230,.45);opacity:1;backdrop-filter:blur(4px)}
 @media (max-width:520px){.cc-badge{font-size:11px;padding:2px 7px}}
 </style>
+<script src="effetto_omega_rotazione_differenziale_scheda.js"></script>
+<script src="effetto_omega_rotazione_differenziale_scheda_en.js"></script>
+<script src="scheda.js"></script>
 </body></html>
