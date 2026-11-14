@@ -4,8 +4,8 @@
   Licenza CC BY-NC-ND 4.0: https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it
   Vietati l'uso commerciale e la distribuzione di versioni modificate senza autorizzazione scritta dell'autore.
 -->
-<html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
-<title>Risalita del tubo di flusso</title>
+<html lang="it"><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title data-en="Rise of the flux tube">Risalita del tubo di flusso</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,500&display=swap">
@@ -59,11 +59,13 @@ section.notes div{min-width:0}
 section.notes h3{font-family:var(--f-display);font-weight:500;font-size:18px;margin:0 0 4px}
 section.notes p,section.notes li{color:var(--muted);margin:0 0 6px;max-width:65ch}
 section.notes ul{padding-left:18px;margin:0}
+.cc-badge.cc-doc{text-decoration:none;opacity:1;font-weight:600;margin-left:.4em}
+.cc-badge.lang-sw{opacity:1;margin-left:.4em}.cc-badge.lang-sw a{cursor:pointer}
 </style>
 
 <header>
-  <h1>Risalita del tubo di flusso<span class="cc-badge"><span class="cc-n">© 2026 Carlo Casoli ·</span> <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it" target="_blank" rel="license noopener">CC BY-NC-ND 4.0</a></span></h1>
-  <p>Un tratto del tubo toroidale si stacca dalla base della zona convettiva e sale verso la fotosfera, mentre il Sole ruota.</p>
+  <h1><span data-en="Rise of the flux tube">Risalita del tubo di flusso</span><span class="cc-badge"><span class="cc-n">© 2026 Carlo Casoli ·</span> <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it" target="_blank" rel="license noopener">CC BY-NC-ND 4.0</a></span> <a class="cc-badge cc-doc" href="#scheda" data-scheda data-en="📖 Animation description">📖 Scheda dell'animazione</a> <span data-lang-switch></span></h1>
+  <p data-en="A stretch of the toroidal tube detaches from the base of the convection zone and rises toward the photosphere, while the Sun rotates.">Un tratto del tubo toroidale si stacca dalla base della zona convettiva e sale verso la fotosfera, mentre il Sole ruota.</p>
 </header>
 
 <main>
@@ -74,51 +76,51 @@ section.notes ul{padding-left:18px;margin:0}
   <aside>
     <div class="card">
       <div class="row">
-        <button id="play">Avvia</button>
-        <button id="reset">Ricomincia</button>
+        <button id="play" data-en="Start">Avvia</button>
+        <button id="reset" data-en="Restart">Ricomincia</button>
       </div>
-      <label class="sl"><span>Intensità del campo nel tubo <output id="Bv"></output></span>
+      <label class="sl"><span><span data-en="Field intensity in the tube">Intensità del campo nel tubo</span> <output id="Bv"></output></span>
         <input type="range" id="B" min="2" max="15" step="0.5" value="10"></label>
-      <label class="sl"><span>Latitudine di partenza <output id="Lv"></output></span>
+      <label class="sl"><span><span data-en="Starting latitude">Latitudine di partenza</span> <output id="Lv"></output></span>
         <input type="range" id="L" min="10" max="35" step="1" value="20"></label>
-      <label class="sl"><span>Velocità <output id="Sv"></output></span>
+      <label class="sl"><span><span data-en="Speed">Velocità</span> <output id="Sv"></output></span>
         <input type="range" id="S" min="0" max="4" step="1" value="1"></label>
-      <label class="ck"><input type="checkbox" id="cor" checked> Forza di Coriolis</label>
-      <label class="ck"><input type="checkbox" id="dif" checked> Rotazione differenziale sul tubo</label>
-      <label class="ck"><input type="checkbox" id="trl" checked> Scia della cima dell'arco</label>
-      <label class="ck"><input type="checkbox" id="frg" checked> Disgregazione per convezione</label>
+      <label class="ck"><input type="checkbox" id="cor" checked> <span data-en="Coriolis force">Forza di Coriolis</span></label>
+      <label class="ck"><input type="checkbox" id="dif" checked> <span data-en="Differential rotation on the tube">Rotazione differenziale sul tubo</span></label>
+      <label class="ck"><input type="checkbox" id="trl" checked> <span data-en="Trail of the top of the loop">Scia della cima dell'arco</span></label>
+      <label class="ck"><input type="checkbox" id="frg" checked> <span data-en="Breakup by convection">Disgregazione per convezione</span></label>
     </div>
     <div class="card">
-      <h2>Punto di vista</h2>
+      <h2 data-en="Point of view">Punto di vista</h2>
       <div class="row">
-        <button id="fRot" class="on">Chi ruota col Sole</button>
-        <button id="fIn">Dallo spazio</button>
+        <button id="fRot" class="on" data-en="Co-rotating with the Sun">Chi ruota col Sole</button>
+        <button id="fIn" data-en="From space">Dallo spazio</button>
       </div>
       <div class="row">
-        <button id="cOb">Obliqua</button>
-        <button id="cPo">Dal polo Nord</button>
-        <button id="cFr">Di fronte</button>
+        <button id="cOb" data-en="Oblique">Obliqua</button>
+        <button id="cPo" data-en="From the North pole">Dal polo Nord</button>
+        <button id="cFr" data-en="Face on">Di fronte</button>
       </div>
     </div>
     <div class="card">
-      <h2>Cima dell'arco</h2>
+      <h2 data-en="Top of the loop">Cima dell'arco</h2>
       <dl>
-        <dt>Giorni trascorsi</dt><dd id="oT">0</dd>
-        <dt>Stato del tubo</dt><dd id="oS">compatto</dd>
-        <dt>Profondità</dt><dd id="oD">–</dd>
-        <dt>Latitudine</dt><dd id="oL">–</dd>
-        <dt>Spostamento verso Ovest</dt><dd id="oW">–</dd>
-        <dt>&nbsp;· per Coriolis</dt><dd id="oWc">–</dd>
-        <dt>&nbsp;· per rotazione differenziale</dt><dd id="oWd">–</dd>
+        <dt data-en="Days elapsed">Giorni trascorsi</dt><dd id="oT">0</dd>
+        <dt data-en="State of the tube">Stato del tubo</dt><dd id="oS" data-en="intact">compatto</dd>
+        <dt data-en="Depth">Profondità</dt><dd id="oD">–</dd>
+        <dt data-en="Latitude">Latitudine</dt><dd id="oL">–</dd>
+        <dt data-en="Westward displacement">Spostamento verso Ovest</dt><dd id="oW">–</dd>
+        <dt data-en="&nbsp;· from Coriolis">&nbsp;· per Coriolis</dt><dd id="oWc">–</dd>
+        <dt data-en="&nbsp;· from differential rotation">&nbsp;· per rotazione differenziale</dt><dd id="oWd">–</dd>
       </dl>
     </div>
     <div class="card">
-      <h2>Taglio lungo il meridiano</h2>
-      <canvas id="mer" width="600" height="600" aria-label="Sezione meridiana con percorso radiale, percorso parallelo all'asse e percorso reale della cima dell'arco"></canvas>
+      <h2 data-en="Cross-section along the meridian">Taglio lungo il meridiano</h2>
+      <canvas id="mer" width="600" height="600" aria-label="Sezione meridiana con percorso radiale, percorso parallelo all'asse e percorso reale della cima dell'arco" data-en-aria="Meridian section with the radial path, the path parallel to the axis, and the actual path of the top of the loop"></canvas>
       <div class="legend">
-        <span><i style="background:var(--ref)"></i>salita radiale</span>
-        <span><i style="background:var(--muted);opacity:.5"></i>parallela all'asse</span>
-        <span><i style="background:var(--trail)"></i>percorso reale</span>
+        <span><i style="background:var(--ref)"></i><span data-en="radial rise">salita radiale</span></span>
+        <span><i style="background:var(--muted);opacity:.5"></i><span data-en="parallel to the axis">parallela all'asse</span></span>
+        <span><i style="background:var(--trail)"></i><span data-en="actual path">percorso reale</span></span>
       </div>
     </div>
   </aside>
@@ -126,30 +128,33 @@ section.notes ul{padding-left:18px;margin:0}
 
 <section class="notes">
   <div>
-    <h3>Cosa guardare</h3>
+    <h3 data-en="What to look at">Cosa guardare</h3>
     <ul>
-      <li>Con <b>Coriolis spenta</b> la cima sale dritta: latitudine costante, nessuno spostamento.</li>
-      <li>Con <b>Coriolis accesa</b> la cima resta indietro verso Ovest (la ballerina che allarga le braccia) e piega verso il polo.</li>
-      <li>Con un <b>campo debole</b> la salita è lenta: Coriolis ha più tempo e il tubo sale quasi parallelo all'asse, verso latitudini alte. Nel Sole questo non si osserva: le macchie compaiono solo entro circa 35°–40°. È proprio l'argomento con cui si deduce che i tubi devono essere forti; un tubo debole verrebbe sfilacciato dalla convezione prima di arrivare in superficie. Con <b>Disgregazione per convezione</b> attiva l'animazione lo mostra; spegnendola si vede il percorso ipotetico che il tubo seguirebbe se restasse intero.</li>
-      <li>Con un <b>campo forte</b> la salita è rapida e quasi radiale: emerge vicino alla latitudine di partenza.</li>
-      <li>Solo quando la latitudine cambia entra in gioco la <b>rotazione differenziale</b>: con la salita radiale il suo contributo resta zero.</li>
-      <li>Il cerchio tratteggiato sulla superficie è la <b>latitudine di partenza</b>. In vista obliqua un punto che sale lungo il raggio sembra salire anche verso Nord: è un effetto della prospettiva. Fanno fede il cerchio, il numero della latitudine e il taglio lungo il meridiano.</li>
+      <li data-en="With &lt;b&gt;Coriolis off&lt;/b&gt; the top rises straight: constant latitude, no displacement.">Con <b>Coriolis spenta</b> la cima sale dritta: latitudine costante, nessuno spostamento.</li>
+      <li data-en="With &lt;b&gt;Coriolis on&lt;/b&gt; the top lags behind toward the West (the skater who spreads her arms) and bends toward the pole.">Con <b>Coriolis accesa</b> la cima resta indietro verso Ovest (la ballerina che allarga le braccia) e piega verso il polo.</li>
+      <li data-en="With a &lt;b&gt;weak field&lt;/b&gt; the rise is slow: Coriolis has more time and the tube rises almost parallel to the axis, toward high latitudes. This is not observed in the Sun: spots appear only within about 35°–40°. This is precisely the argument used to deduce that the tubes must be strong; a weak tube would be shredded by convection before reaching the surface. With &lt;b&gt;Breakup by convection&lt;/b&gt; turned on, the animation shows this; turning it off shows the hypothetical path the tube would follow if it stayed intact.">Con un <b>campo debole</b> la salita è lenta: Coriolis ha più tempo e il tubo sale quasi parallelo all'asse, verso latitudini alte. Nel Sole questo non si osserva: le macchie compaiono solo entro circa 35°–40°. È proprio l'argomento con cui si deduce che i tubi devono essere forti; un tubo debole verrebbe sfilacciato dalla convezione prima di arrivare in superficie. Con <b>Disgregazione per convezione</b> attiva l'animazione lo mostra; spegnendola si vede il percorso ipotetico che il tubo seguirebbe se restasse intero.</li>
+      <li data-en="With a &lt;b&gt;strong field&lt;/b&gt; the rise is fast and nearly radial: it emerges close to the starting latitude.">Con un <b>campo forte</b> la salita è rapida e quasi radiale: emerge vicino alla latitudine di partenza.</li>
+      <li data-en="Only when the latitude changes does &lt;b&gt;differential rotation&lt;/b&gt; come into play: with a radial rise its contribution stays zero.">Solo quando la latitudine cambia entra in gioco la <b>rotazione differenziale</b>: con la salita radiale il suo contributo resta zero.</li>
+      <li data-en="The dashed circle on the surface is the &lt;b&gt;starting latitude&lt;/b&gt;. In oblique view, a point rising along the radius seems to also rise northward: this is a perspective effect. The circle, the latitude number, and the meridian cross-section are what to trust.">Il cerchio tratteggiato sulla superficie è la <b>latitudine di partenza</b>. In vista obliqua un punto che sale lungo il raggio sembra salire anche verso Nord: è un effetto della prospettiva. Fanno fede il cerchio, il numero della latitudine e il taglio lungo il meridiano.</li>
     </ul>
   </div>
   <div>
-    <h3>Dallo spazio o da chi ruota col Sole</h3>
-    <p>Dallo spazio tutto gira e il piccolo ritardo del tubo si perde nella rotazione d'insieme. Ruotando insieme al Sole, alla velocità della latitudine di partenza, resta visibile solo ciò che cambia: il ritardo della cima e lo scorrimento delle file di punti sulla superficie, che segnano la rotazione differenziale.</p>
+    <h3 data-en="From space or co-rotating with the Sun">Dallo spazio o da chi ruota col Sole</h3>
+    <p data-en="From space, everything spins and the small lag of the tube gets lost in the overall rotation. Rotating together with the Sun, at the speed of the starting latitude, only what changes remains visible: the lag of the top and the drift of the rows of dots on the surface, which mark the differential rotation.">Dallo spazio tutto gira e il piccolo ritardo del tubo si perde nella rotazione d'insieme. Ruotando insieme al Sole, alla velocità della latitudine di partenza, resta visibile solo ciò che cambia: il ritardo della cima e lo scorrimento delle file di punti sulla superficie, che segnano la rotazione differenziale.</p>
   </div>
   <div>
-    <h3>Limiti del modello</h3>
-    <p>È uno schema qualitativo, non una simulazione magnetoidrodinamica. I percorsi riproducono l'andamento dei modelli a tubo sottile (Choudhuri e Gilman, 1987; Fan, 2009): tubi da circa 10⁵ gauss risalgono in poche settimane quasi radialmente, tubi più deboli vengono deviati verso il polo. Tempi, angoli e spessori sono semplificati; la tensione del tubo è rappresentata riducendo l'effetto della rotazione differenziale sulla cima. La disgregazione avviene quando il campo del tubo, che si indebolisce salendo, scende sotto quello dei moti convettivi intorno (campo di equipartizione); la soglia è scelta in modo che i tubi da circa 6×10⁴ gauss in su arrivino interi in superficie.</p>
+    <h3 data-en="Limits of the model">Limiti del modello</h3>
+    <p data-en="This is a qualitative scheme, not a magnetohydrodynamic simulation. The paths reproduce the trend of thin-tube models (Choudhuri and Gilman, 1987; Fan, 2009): tubes of about 10⁵ gauss rise in a few weeks almost radially, weaker tubes are deflected toward the pole. Times, angles and thicknesses are simplified; the tube's tension is represented by reducing the effect of differential rotation on the top. Breakup happens when the tube's field, which weakens as it rises, drops below that of the surrounding convective motions (equipartition field); the threshold is chosen so that tubes of about 6×10⁴ gauss and above arrive intact at the surface.">È uno schema qualitativo, non una simulazione magnetoidrodinamica. I percorsi riproducono l'andamento dei modelli a tubo sottile (Choudhuri e Gilman, 1987; Fan, 2009): tubi da circa 10⁵ gauss risalgono in poche settimane quasi radialmente, tubi più deboli vengono deviati verso il polo. Tempi, angoli e spessori sono semplificati; la tensione del tubo è rappresentata riducendo l'effetto della rotazione differenziale sulla cima. La disgregazione avviene quando il campo del tubo, che si indebolisce salendo, scende sotto quello dei moti convettivi intorno (campo di equipartizione); la soglia è scelta in modo che i tubi da circa 6×10⁴ gauss in su arrivino interi in superficie.</p>
   </div>
 </section>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="lingua.js"></script>
 <script>
 (function(){
+/* lingua: T(it,en) viene da lingua.js; se il file manca la pagina resta in italiano */
+const T=window.T||(it=>it),EN=window.LANG==='en',LOC=EN?'en-US':'it-IT';
 const D=Math.PI/180, R0=0.7, W=36*D, NSEG=240;
 const $=id=>document.getElementById(id);
 const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
@@ -270,7 +275,7 @@ function buildTrail(){
 
 // etichette HTML
 const labels=[['N',new THREE.Vector3(0,1.45,0)],['S',new THREE.Vector3(0,-1.45,0)]].map(([t,v])=>{const d=document.createElement('div');d.className='lbl';d.textContent=t;stage.appendChild(d);return {d,v};});
-const rotLbl=document.createElement('div');rotLbl.className='lbl';rotLbl.textContent='verso di rotazione (Est)';stage.appendChild(rotLbl);
+const rotLbl=document.createElement('div');rotLbl.className='lbl';rotLbl.textContent=T('verso di rotazione (Est)','direction of rotation (East)');stage.appendChild(rotLbl);
 const rotArrow=new THREE.ArrowHelper(new THREE.Vector3(0,0,-1),new THREE.Vector3(1.18,0,0.25),0.4,0x888888,0.07,0.05);scene.add(rotArrow);
 
 // ---------- camera ----------
@@ -296,8 +301,8 @@ function drawMer(a){
   mx.strokeStyle=muted;mx.beginPath();mx.arc(X(0),Y(0),sc,-Math.PI/2,0);mx.stroke();
   mx.beginPath();mx.moveTo(X(0),Y(-0.02));mx.lineTo(X(0),Y(1.08));mx.moveTo(X(0),Y(0));mx.lineTo(X(1.05),Y(0));mx.stroke();
   mx.fillStyle=muted;mx.font='26px "IBM Plex Mono", monospace';
-  mx.fillText('asse',X(0)+10,Y(1.0)+6);mx.fillText('equatore',X(0.62),Y(0)+34);
-  mx.fillText('zona',X(0.04),Y(0.3));mx.fillText('radiativa',X(0.04),Y(0.24));
+  mx.fillText(T('asse','axis'),X(0)+10,Y(1.0)+6);mx.fillText(T('equatore','equator'),X(0.62),Y(0)+34);
+  mx.fillText(T('zona','radiative'),X(0.04),Y(0.3));mx.fillText(T('radiativa','zone'),X(0.04),Y(0.24));
   const s0=R0*Math.cos(st.lat0), c0=Math.cos(st.lat0), s1=Math.sin(st.lat0);
   mx.setLineDash([12,9]);mx.strokeStyle=ref;mx.beginPath();mx.moveTo(X(R0*c0),Y(R0*s1));mx.lineTo(X(1.05*c0),Y(1.05*s1));mx.stroke();
   mx.globalAlpha=0.5;mx.strokeStyle=muted;mx.setLineDash([3,7]);mx.beginPath();mx.moveTo(X(s0),Y(R0*s1));mx.lineTo(X(s0),Y(Math.sqrt(1.05**2-s0*s0)));mx.stroke();mx.globalAlpha=1;mx.setLineDash([]);
@@ -309,7 +314,7 @@ function drawMer(a){
 // ---------- ciclo ----------
 let last=performance.now(), curApex=null;
 function u(){return Math.min(1,st.t/Trise());}
-function fmtDeg(x){return (x/D).toFixed(1).replace('.',',')+'°';}
+function fmtDeg(x){return EN?(x/D).toFixed(1)+'°':(x/D).toFixed(1).replace('.',',')+'°';}
 function update(dtDays,force){
   if(!(dtDays>0&&!st.done)&&!force) return;
   if(dtDays>0&&!st.done){
@@ -328,20 +333,20 @@ function update(dtDays,force){
 function readouts(){
   const a=curApex, uu=u();
   $('oT').textContent=Math.round(st.t);
-  $('oS').textContent=st.fragU===null?'compatto':frac()>=1?'disgregato':'si sfilaccia';
-  $('oD').textContent=a.r<1?Math.round((1-a.r)*696000/1000)*1000+' km':'in superficie';
+  $('oS').textContent=st.fragU===null?T('compatto','intact'):frac()>=1?T('disgregato','broken up'):T('si sfilaccia','fraying');
+  $('oD').textContent=a.r<1?Math.round((1-a.r)*696000/1000)*1000+' km':T('in superficie','at the surface');
   $('oL').textContent=fmtDeg(a.lat);
   const wc=-a.phiC, wd=-st.phiD;
   $('oW').textContent=fmtDeg(wc+wd);$('oWc').textContent=fmtDeg(wc);$('oWd').textContent=fmtDeg(wd);
-  $('hud').innerHTML='giorno <b>'+Math.round(st.t)+'</b> · campo <b>'+st.B.toString().replace('.',',')+'×10⁴ G</b>';
+  $('hud').innerHTML=T('giorno ','day ')+'<b>'+Math.round(st.t)+'</b> · '+T('campo ','field ')+'<b>'+(EN?st.B.toString():st.B.toString().replace('.',','))+'×10⁴ G</b>';
   let msg;
-  if(st.t===0) msg='Il tubo toroidale giace alla base della zona convettiva. Premi Avvia.';
-  else if(st.fragU!==null) msg=frac()>=1?'Il tubo si è disgregato a circa '+(Math.round(st.fragDepth/1000)*1000).toLocaleString('it-IT')+' km di profondità: il suo campo era più debole dei moti convettivi, che lo hanno fatto a pezzi. Nessuna macchia emerge.':'Il campo del tubo è ormai più debole dei moti convettivi intorno: i fili si separano e il tubo si sfilaccia.';
-  else if(st.emLat!==null&&st.cor&&st.B<6&&!st.frg) msg='Caso ipotetico: l\'arco arriverebbe a '+fmtDeg(st.emLat)+' (partenza: '+fmtDeg(st.lat0)+'), dove le macchie non si osservano mai. Nel Sole un tubo così debole verrebbe sfilacciato dalla convezione prima di emergere: per questo si deduce che i tubi alla base sono di circa 10⁵ gauss.';
-  else if(st.emLat!==null) msg='L\'arco è emerso a '+fmtDeg(st.emLat)+' di latitudine (partenza: '+fmtDeg(st.lat0)+'). Le due macchie segnano i punti in cui buca la fotosfera.';
-  else msg='Il tratto centrale del tubo sale per galleggiamento magnetico; i piedi restano ancorati alla base.';
+  if(st.t===0) msg=T('Il tubo toroidale giace alla base della zona convettiva. Premi Avvia.','The toroidal tube lies at the base of the convection zone. Press Start.');
+  else if(st.fragU!==null) msg=frac()>=1?T('Il tubo si è disgregato a circa ','The tube broke up at about ')+(Math.round(st.fragDepth/1000)*1000).toLocaleString(LOC)+T(' km di profondità: il suo campo era più debole dei moti convettivi, che lo hanno fatto a pezzi. Nessuna macchia emerge.',' km of depth: its field was weaker than the surrounding convective motions, which tore it apart. No spot emerges.'):T('Il campo del tubo è ormai più debole dei moti convettivi intorno: i fili si separano e il tubo si sfilaccia.',"The tube's field is now weaker than the surrounding convective motions: the strands separate and the tube frays.");
+  else if(st.emLat!==null&&st.cor&&st.B<6&&!st.frg) msg=T('Caso ipotetico: l\'arco arriverebbe a ','Hypothetical case: the loop would arrive at ')+fmtDeg(st.emLat)+T(' (partenza: ',' (starting point: ')+fmtDeg(st.lat0)+T('), dove le macchie non si osservano mai. Nel Sole un tubo così debole verrebbe sfilacciato dalla convezione prima di emergere: per questo si deduce che i tubi alla base sono di circa 10⁵ gauss.',"), where spots are never observed. In the Sun a tube this weak would be shredded by convection before emerging: this is why the tubes at the base are inferred to be about 10⁵ gauss.");
+  else if(st.emLat!==null) msg=T('L\'arco è emerso a ','The loop emerged at ')+fmtDeg(st.emLat)+T(' di latitudine (partenza: ',' latitude (starting point: ')+fmtDeg(st.lat0)+T('). Le due macchie segnano i punti in cui buca la fotosfera.','). The two spots mark the points where it pierces the photosphere.');
+  else msg=T('Il tratto centrale del tubo sale per galleggiamento magnetico; i piedi restano ancorati alla base.','The central stretch of the tube rises by magnetic buoyancy; the feet stay anchored at the base.');
   $('state').textContent=msg;
-  $('play').textContent=st.done?'Ripeti':st.running?'Pausa':(st.t>0?'Riprendi':'Avvia');
+  $('play').textContent=st.done?T('Ripeti','Repeat'):st.running?T('Pausa','Pause'):(st.t>0?T('Riprendi','Resume'):T('Avvia','Start'));
 }
 function placeTracers(){
   tracers.forEach(o=>{const dphi=(st.frame==='rot'?(Om(o.la)-Om(st.lat0)):Om(o.la))*st.t*D;o.m.position.copy(P(1.004,o.la,o.lo+dphi));});
@@ -360,9 +365,9 @@ function loop(now){
 
 function reset(){st.t=0;st.phiD=0;st.fragU=null;st.fragDepth=null;st.done=false;st.running=false;st.emLat=null;st.trailPts=[];st.trailPts._t=0;buildRef();update(0,true);}
 function syncOut(){
-  $('Bv').textContent=st.B.toString().replace('.',',')+'×10⁴ G';
+  $('Bv').textContent=(EN?st.B.toString():st.B.toString().replace('.',','))+'×10⁴ G';
   $('Lv').textContent=Math.round(st.lat0/D)+'°';
-  $('Sv').textContent=st.speed+' giorni/s';
+  $('Sv').textContent=st.speed+T(' giorni/s',' days/s');
 }
 $('play').onclick=()=>{if(st.done)reset();st.running=!st.running;readouts();};
 $('reset').onclick=reset;
@@ -392,4 +397,7 @@ st.frg=true;st.speed=speeds[1];syncOut();reset();requestAnimationFrame(loop);
 .cc-badge.cc-fixed{position:fixed;top:10px;right:10px;margin:0;z-index:2147483000;background:rgba(10,10,18,.62);color:#f2efe6;border-color:rgba(242,239,230,.45);opacity:1;backdrop-filter:blur(4px)}
 @media (max-width:520px){.cc-badge{font-size:11px;padding:2px 7px}}
 </style>
+<script src="risalita_tubo_flusso_scheda.js"></script>
+<script src="risalita_tubo_flusso_scheda_en.js"></script>
+<script src="scheda.js"></script>
 </body></html>
