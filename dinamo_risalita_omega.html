@@ -5,7 +5,7 @@
   Vietati l'uso commerciale e la distribuzione di versioni modificate senza autorizzazione scritta dell'autore.
 -->
 <html lang="it"><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
-<title>Dalla dinamo alla macchia</title>
+<title data-en="From the dynamo to the sunspot">Dalla dinamo alla macchia</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,500&display=swap">
 <style>
@@ -66,12 +66,13 @@ dt{color:var(--muted)} dd{margin:0;text-align:right;font-family:var(--f-data);fo
 .seg button{padding:6px 6px}
 .seg3{grid-template-columns:1fr 1fr 1fr}
 .seg3 button{line-height:1.25}
+.cc-badge.lang-sw{opacity:1;margin-left:.4em}.cc-badge.lang-sw a{cursor:pointer}
 </style></head><body>
 
 <header>
-  <h1>Dalla dinamo alla macchia<span class="cc-badge"><span class="cc-n">© 2026 Carlo Casoli ·</span> <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it" target="_blank" rel="license noopener">CC BY-NC-ND 4.0</a></span> <a class="cc-badge cc-doc" href="#scheda" data-scheda>📖 Scheda dell'animazione</a></h1>
-  <a class="back" href="index.html">← Indice delle animazioni</a>
-  <p>Un settore di 90° della zona convettiva, dalla tachocline alla fotosfera, a 20° di latitudine nord: la rotazione differenziale crea il grande tubo toroidale, un suo tratto si inarca a Ω e risale per 200.000 km fino a emergere.</p>
+  <h1><span data-en="From the dynamo to the sunspot">Dalla dinamo alla macchia</span><span class="cc-badge"><span class="cc-n">© 2026 Carlo Casoli ·</span> <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it" target="_blank" rel="license noopener">CC BY-NC-ND 4.0</a></span> <a class="cc-badge cc-doc" href="#scheda" data-scheda data-en="📖 Animation description">📖 Scheda dell'animazione</a> <span data-lang-switch></span></h1>
+  <a class="back" href="index.html" data-en="← Index of animations">← Indice delle animazioni</a>
+  <p data-en="A 90° sector of the convective zone, from the tachocline to the photosphere, at 20° north latitude: differential rotation creates the big toroidal tube, one of its stretches arches into an Ω and rises for 200,000 km until it emerges.">Un settore di 90° della zona convettiva, dalla tachocline alla fotosfera, a 20° di latitudine nord: la rotazione differenziale crea il grande tubo toroidale, un suo tratto si inarca a Ω e risale per 200.000 km fino a emergere.</p>
 </header>
 
 <main>
@@ -82,49 +83,49 @@ dt{color:var(--muted)} dd{margin:0;text-align:right;font-family:var(--f-data);fo
   <aside>
     <div class="card">
       <div class="row">
-        <button id="play">Avvia</button>
-        <button id="reset">Ricomincia</button>
-        <button id="prev" aria-label="Fase precedente">◂ Fase</button>
-        <button id="next" aria-label="Fase successiva">Fase ▸</button>
+        <button id="play" data-en="Start">Avvia</button>
+        <button id="reset" data-en="Restart">Ricomincia</button>
+        <button id="prev" aria-label="Fase precedente" data-en-aria="Previous phase" data-en="◂ Phase">◂ Fase</button>
+        <button id="next" aria-label="Fase successiva" data-en-aria="Next phase" data-en="Phase ▸">Fase ▸</button>
       </div>
       <div id="phases"></div>
-      <label class="sl"><span>Velocità <output id="Sv"></output></span>
+      <label class="sl"><span><span data-en="Speed">Velocità</span> <output id="Sv"></output></span>
         <input type="range" id="S" min="0" max="3" step="1" value="1"></label>
     </div>
     <div class="card">
-      <h2>Risalita</h2>
+      <h2 data-en="Rise">Risalita</h2>
       <div class="seg">
-        <button id="cOff" class="on">Salita radiale</button>
-        <button id="cOn">Con Coriolis</button>
+        <button id="cOff" class="on" data-en="Radial rise">Salita radiale</button>
+        <button id="cOn" data-en="With Coriolis">Con Coriolis</button>
       </div>
       <div class="seg seg3">
-        <button id="bS" class="on">Forte<br>10⁵ G</button>
-        <button id="bM">Medio<br>6×10⁴ G</button>
-        <button id="bW">Debole<br>3×10⁴ G</button>
+        <button id="bS" class="on" data-en="Strong&lt;br&gt;10⁵ G">Forte<br>10⁵ G</button>
+        <button id="bM" data-en="Medium&lt;br&gt;6×10⁴ G">Medio<br>6×10⁴ G</button>
+        <button id="bW" data-en="Weak&lt;br&gt;3×10⁴ G">Debole<br>3×10⁴ G</button>
       </div>
-      <label class="ck"><input type="checkbox" id="cv" checked> Moti convettivi</label>
-      <label class="ck"><input type="checkbox" id="dr" checked> Plasma che scivola lungo il tubo</label>
+      <label class="ck"><input type="checkbox" id="cv" checked> <span data-en="Convective motions">Moti convettivi</span></label>
+      <label class="ck"><input type="checkbox" id="dr" checked> <span data-en="Plasma sliding along the tube">Plasma che scivola lungo il tubo</span></label>
     </div>
     <div class="card">
-      <h2>Punto di vista</h2>
+      <h2 data-en="Point of view">Punto di vista</h2>
       <div class="row">
-        <button id="vOb">Obliqua</button>
-        <button id="vFr">Di fronte</button>
-        <button id="vTop">Dall'alto</button>
+        <button id="vOb" data-en="Oblique">Obliqua</button>
+        <button id="vFr" data-en="Facing">Di fronte</button>
+        <button id="vTop" data-en="From above">Dall'alto</button>
       </div>
     </div>
     <div class="card">
-      <h2>Strumenti</h2>
+      <h2 data-en="Readouts">Strumenti</h2>
       <dl>
-        <dt>Tempo</dt><dd id="oT">–</dd>
-        <dt>Campo nel tubo</dt><dd id="oB">–</dd>
-        <dt>Campo dei moti convettivi</dt><dd id="oE">–</dd>
-        <dt>Profondità della cima</dt><dd id="oD">–</dd>
-        <dt>Stato del tubo</dt><dd id="oS">–</dd>
-        <dt>Latitudine della cima</dt><dd id="oL">–</dd>
-        <dt>&nbsp;· spostamento verso il polo</dt><dd id="oP">–</dd>
-        <dt>&nbsp;· ritardo sulla rotazione</dt><dd id="oW">–</dd>
-        <dt>Inclinazione della coppia</dt><dd id="oJ">–</dd>
+        <dt data-en="Time">Tempo</dt><dd id="oT">–</dd>
+        <dt data-en="Field in the tube">Campo nel tubo</dt><dd id="oB">–</dd>
+        <dt data-en="Field of the convective motions">Campo dei moti convettivi</dt><dd id="oE">–</dd>
+        <dt data-en="Depth of the top">Profondità della cima</dt><dd id="oD">–</dd>
+        <dt data-en="State of the tube">Stato del tubo</dt><dd id="oS">–</dd>
+        <dt data-en="Latitude of the top">Latitudine della cima</dt><dd id="oL">–</dd>
+        <dt data-en="&nbsp;· shift toward the pole">&nbsp;· spostamento verso il polo</dt><dd id="oP">–</dd>
+        <dt data-en="&nbsp;· lag on the rotation">&nbsp;· ritardo sulla rotazione</dt><dd id="oW">–</dd>
+        <dt data-en="Tilt of the pair">Inclinazione della coppia</dt><dd id="oJ">–</dd>
       </dl>
     </div>
   </aside>
@@ -134,8 +135,10 @@ dt{color:var(--muted)} dd{margin:0;text-align:right;font-family:var(--f-data);fo
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="lingua.js"></script>
 <script>
 (function(){
+const TX=window.T||(it=>it),EN=window.LANG==='en',LOC=EN?'en-US':'it-IT';
 const $=id=>document.getElementById(id);
 const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
 const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
@@ -161,12 +164,12 @@ function warp(x,y,z,out){
 const W=(x,y,z)=>warp(x,y,z);
 
 const PH=[
-  {t:'Campo poloidale',d:3},
-  {t:'Rotazione differenziale',d:11},
-  {t:'Nasce il tubo toroidale',d:7},
-  {t:'Instabilità',d:6},
-  {t:'Risalita',d:13},
-  {t:'Emersione',d:8}
+  {t:TX('Campo poloidale','Poloidal field'),d:3},
+  {t:TX('Rotazione differenziale','Differential rotation'),d:11},
+  {t:TX('Nasce il tubo toroidale','The toroidal tube is born'),d:7},
+  {t:TX('Instabilità','Instability'),d:6},
+  {t:TX('Risalita','Rise'),d:13},
+  {t:TX('Emersione','Emergence'),d:8}
 ];
 const st={phase:0,p:0,running:false,done:false,cor:false,B:10,speed:1,conv:true,drain:true,clock:0};
 const speeds=[0.5,1,2,4];
@@ -184,7 +187,7 @@ const Btube=yf=>B0()*Math.pow(10,-2*Math.min(1,yf)**2);
 const hOfU=u=>hI+(Hs-hI)*Math.pow(u,1.3);
 const uOfH=h=>Math.pow(clamp((h-hI)/(Hs-hI),0,1),1/1.3);
 const uEnd=()=>weak()?uOfH(yOfR(rFrag()+0.0525)*Hs):1;
-const phTitle=i=>i===5&&weak()?'Ritorno alla tachocline':PH[i].t;
+const phTitle=i=>i===5&&weak()?TX('Ritorno alla tachocline','Return to the tachocline'):PH[i].t;
 const EXPN=0.477,rT=y=>y<=Hs?r0*Math.pow(10,EXPN*(Math.max(0,y)/Hs)**2):r0*Math.pow(10,EXPN)*(1+0.6*(y-Hs));
 const ZB=[-1.25,-1,-0.75,-0.5,-0.25,0,0.25,0.5];   // latitudini dei tubi toroidali (sale quello centrale)
 function durOf(i){if(i===4)return st.B>=10?13:st.B>=6?16:15;if(i===5&&weak())return 13;return PH[i].d;}
@@ -420,27 +423,27 @@ function stepConv(dt){
 // ---------- etichette ----------
 const lbls=[];
 function lbl(text,v,cls){const d=document.createElement('div');d.className='lbl'+(cls?' '+cls:'');d.textContent=text;stage.appendChild(d);const o={d,v:v.clone(),show:true};lbls.push(o);return o;}
-lbl('fotosfera',W(-L-0.1,Hs,Z),'r');
-lbl('zona convettiva',W(-L-0.1,Hs*0.55,Z),'r');
-lbl('tachocline',W(-L-0.1,0,Z),'r');
-lbl('zona radiativa',W(-L-0.1,-(RAD+TACH)/2,Z),'r');
+lbl(TX('fotosfera','photosphere'),W(-L-0.1,Hs,Z),'r');
+lbl(TX('zona convettiva','convective zone'),W(-L-0.1,Hs*0.55,Z),'r');
+lbl(TX('tachocline','tachocline'),W(-L-0.1,0,Z),'r');
+lbl(TX('zona radiativa','radiative zone'),W(-L-0.1,-(RAD+TACH)/2,Z),'r');
 lbl('0 km',W(L+0.1,Hs,Z),'l');
-lbl('100.000 km',W(L+0.1,Hs/2,Z),'l');
-lbl('200.000 km',W(L+0.1,0,Z),'l');
-lbl('verso di rotazione →',W(L*0.66,-RAD-0.18,Z+0.1),'');
-lbl('verso il polo',W(0,Hs+0.2,-ZP-0.1),'');
-lbl('verso l\'equatore',W(-L*0.25,-RAD-0.18,Z+0.1),'');
-lbl('↓ centro del Sole',W(0,-RAD-0.75,Z),'');
+lbl(TX('100.000 km','100,000 km'),W(L+0.1,Hs/2,Z),'l');
+lbl(TX('200.000 km','200,000 km'),W(L+0.1,0,Z),'l');
+lbl(TX('verso di rotazione →','direction of rotation →'),W(L*0.66,-RAD-0.18,Z+0.1),'');
+lbl(TX('verso il polo','toward the pole'),W(0,Hs+0.2,-ZP-0.1),'');
+lbl(TX('verso l\'equatore','toward the equator'),W(-L*0.25,-RAD-0.18,Z+0.1),'');
+lbl(TX('↓ centro del Sole','↓ center of the Sun'),W(0,-RAD-0.75,Z),'');
 const side=lbls.slice(0,7).concat(lbls.slice(10,11));
 const latL=[[0,'20° N'],[-ZE,'30° N'],[-ZP,'40° N']].map(([z,t])=>lbl(t,W(L+0.08,Hs+0.12,z),'l'));
-const lFast=lbl('ruota più veloce',W(-L+0.6,TACH+0.3,Z*0.75),'hi');
-const lSlow=lbl('ruota più lenta',W(-L+0.6,TACH+0.3,-ZE*0.75),'hi');
-const lB=lbl('campo B →',W(L-0.6,0.17,0.12),'hi');
-const lApex=lbl('sommità dell\'Ω',new THREE.Vector3(),'hi');
-const lDrain=lbl('il plasma scivola verso i piedi',new THREE.Vector3(),'hi');
+const lFast=lbl(TX('ruota più veloce','rotates faster'),W(-L+0.6,TACH+0.3,Z*0.75),'hi');
+const lSlow=lbl(TX('ruota più lenta','rotates slower'),W(-L+0.6,TACH+0.3,-ZE*0.75),'hi');
+const lB=lbl(TX('campo B →','field B →'),W(L-0.6,0.17,0.12),'hi');
+const lApex=lbl(TX('sommità dell\'Ω','top of the Ω'),new THREE.Vector3(),'hi');
+const lDrain=lbl(TX('il plasma scivola verso i piedi','plasma slides toward the feet'),new THREE.Vector3(),'hi');
 const refMat=new THREE.LineDashedMaterial({dashSize:0.06,gapSize:0.04,transparent:true,opacity:0.9});
 const refLine=new THREE.Line(new THREE.BufferGeometry().setFromPoints([W(0,0,0),W(0,Hs+0.7,0)]),refMat);refLine.computeLineDistances();refLine.visible=false;scene.add(refLine);
-const lRef=lbl('salita radiale',W(0.06,Hs+0.5,0),'l');
+const lRef=lbl(TX('salita radiale','radial rise'),W(0.06,Hs+0.5,0),'l');
 const NTR=80,trPos=new Float32Array(NTR*3),trGeo=new THREE.BufferGeometry();trGeo.setAttribute('position',new THREE.BufferAttribute(trPos,3));
 const trMat=new THREE.LineBasicMaterial({depthTest:false,transparent:true});
 refMat.color=new THREE.Color(css('--ink'));trMat.color=new THREE.Color(css('--trail'));
@@ -494,11 +497,11 @@ function buildStrands(m){
 
 // ---------- formattazione ----------
 const SUP={'0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹'};
-function fG(v){if(v<9950){const r=v<1000?Math.round(v/10)*10:Math.round(v/100)*100;return r.toLocaleString('it-IT')+' G';}
+function fG(v){if(v<9950){const r=v<1000?Math.round(v/10)*10:Math.round(v/100)*100;return r.toLocaleString(LOC)+' G';}
   let e=Math.floor(Math.log10(v)),mm=v/Math.pow(10,e);if(mm>=9.95){mm=1;e++;}
-  return mm.toFixed(1).replace('.',',')+'×10'+String(e).split('').map(c=>SUP[c]).join('')+' G';}
-const fKm=v=>(Math.round(v/1000)*1000).toLocaleString('it-IT')+' km';
-const fDeg=v=>v.toFixed(1).replace('.',',')+'°';
+  return (EN?mm.toFixed(1):mm.toFixed(1).replace('.',','))+'×10'+String(e).split('').map(c=>SUP[c]).join('')+' G';}
+const fKm=v=>(Math.round(v/1000)*1000).toLocaleString(LOC)+' km';
+const fDeg=v=>(EN?v.toFixed(1):v.toFixed(1).replace('.',','))+'°';
 
 // ---------- stato → scena ----------
 const tmpV=new THREE.Vector3();
@@ -545,48 +548,48 @@ function readouts(m){
   const ph=st.phase,p=st.p;let T='–',Bt='–',Be='–',Dp='–',Sx='–',J='–',hud='';
   const yf=m.h/Hs;
   if(ph<=2){
-    const yrs=ph===0?0:ph===1?3*p:3+p;T='anno '+yrs.toFixed(1).replace('.',',');
+    const yrs=ph===0?0:ph===1?3*p:3+p;T=TX('anno ','year ')+(EN?yrs.toFixed(1):yrs.toFixed(1).replace('.',','));
     const Bv=ph===0?100:ph===1?Math.pow(10,2+2*ease(p)):1e4*Math.pow(B0()/1e4,ease(p));
-    Bt=fG(Bv);Be=fG(Beq(0));Sx=ph===0?'poloidale':ph===1?'si avvolge':'toroidale';
-    hud='<b>'+T+'</b> · campo <b>'+Bt+'</b>';
+    Bt=fG(Bv);Be=fG(Beq(0));Sx=ph===0?TX('poloidale','poloidal'):ph===1?TX('si avvolge','wrapping'):TX('toroidale','toroidal');
+    hud='<b>'+T+'</b> · '+TX('campo','field')+' <b>'+Bt+'</b>';
   } else {
-    T=ph===3?'inizio':'giorno '+Math.round(m.day);
+    T=ph===3?TX('inizio','start'):TX('giorno ','day ')+Math.round(m.day);
     const yv=Math.min(1,yf);Bt=fG(Btube(yv));Be=fG(Beq(yv));
-    Dp=m.h>=Hs-0.004?'in superficie':fKm((Hs-m.h)*KM);
-    Sx=m.ret>=0?(m.ret<0.97?'disperso, scende':'di nuovo toroidale'):m.frac>=1?'disperso':m.frac>0?'si sfilaccia':ph===3?'si inarca':ph===5?'emerso':'compatto';
-    if(m.ret>=0){Bt=m.ret<0.97?'debole, disperso':'ricompattato';Be='–';Dp=fKm((Hs-m.h)*KM);}
+    Dp=m.h>=Hs-0.004?TX('in superficie','at the surface'):fKm((Hs-m.h)*KM);
+    Sx=m.ret>=0?(m.ret<0.97?TX('disperso, scende','dispersed, sinking'):TX('di nuovo toroidale','toroidal again')):m.frac>=1?TX('disperso','dispersed'):m.frac>0?TX('si sfilaccia','fraying'):ph===3?TX('si inarca','arching'):ph===5?TX('emerso','emerged'):TX('compatto','compact');
+    if(m.ret>=0){Bt=m.ret<0.97?TX('debole, disperso','weak, dispersed'):TX('ricompattato','recompacted');Be='–';Dp=fKm((Hs-m.h)*KM);}
     if(ph===5&&m.cross.length>=2){const o=m.cross.slice().sort((a,b)=>a.l.x-b.l.x);J=fDeg(Math.atan2(o[1].l.z-o[0].l.z,o[1].l.x-o[0].l.x)/D);}
-    hud=(ph===3?'<b>inizio dell\'instabilità</b>':'<b>'+T+'</b>')+' · campo alla cima <b>'+Bt+'</b>';
+    hud=(ph===3?'<b>'+TX('inizio dell\'instabilità','start of the instability')+'</b>':'<b>'+T+'</b>')+' · '+TX('campo alla cima','field at the top')+' <b>'+Bt+'</b>';
   }
   $('oT').textContent=T;$('oB').textContent=Bt;$('oE').textContent=Be;$('oD').textContent=Dp;$('oS').textContent=Sx;$('oJ').textContent=J;
   const sh=ph>=3;$('oL').textContent=sh?fDeg((LAT0+m.dLat)/D)+' N':'–';$('oP').textContent=sh?fDeg(m.dLat/D):'–';$('oW').textContent=sh?fDeg(-m.lag/D):'–';
   $('hud').innerHTML=hud;
   caption(m);
-  $('play').textContent=st.done?'Ripeti':st.running?'Pausa':(st.phase>0||st.p>0?'Riprendi':'Avvia');
+  $('play').textContent=st.done?TX('Ripeti','Repeat'):st.running?TX('Pausa','Pause'):(st.phase>0||st.p>0?TX('Riprendi','Resume'):TX('Avvia','Start'));
   [...$('phases').children].forEach((b,i)=>{b.classList.toggle('on',i===st.phase);const t='<i>'+(i+1)+'</i>'+phTitle(i);if(b.innerHTML!==t)b.innerHTML=t;});
 }
 
 function caption(m){
   const ph=st.phase;let t=(ph+1)+' · '+phTitle(ph),c='';
-  if(ph===0)c='Alla base della zona convettiva il campo lasciato dal ciclo precedente è poloidale: con il polo nord positivo, le linee corrono da sud a nord lungo i meridiani (è il ramo interno delle linee che escono dal polo nord e rientrano dal polo sud). È debole, dell\'ordine di 10² gauss.';
-  else if(ph===1)c='Il plasma verso l\'equatore ruota più in fretta di quello verso il polo (le frecce mostrano la differenza rispetto alla latitudine centrale). Il campo è «congelato» nel plasma: ogni linea viene trascinata e stirata nel verso della rotazione e finisce per avvolgersi attorno al Sole. Più si allunga, più il campo si intensifica: è l\'effetto Ω. Segui la linea evidenziata.';
-  else if(ph===2)c='Dopo alcuni anni di avvolgimento il campo è quasi tutto toroidale, parallelo all\'equatore, e si raccoglie in un grande tubo di flusso che corre lungo tutta la corona. Resta immagazzinato nella tachocline, sotto la zona convettiva, dove i moti turbolenti non riescono a portarlo via. Il campo arriva a circa '+fG(B0())+'.';
-  else if(ph===3)c='Nel tubo la pressione magnetica sostituisce parte della pressione del gas: dentro c\'è meno gas e il tubo è più leggero dell\'ambiente (galleggiamento magnetico). Un tratto si inarca, il plasma scivola lungo il tubo verso i lati, il tratto centrale si svuota e sale ancora di più: è l\'instabilità di Parker. Il resto del tubo rimane in basso.';
+  if(ph===0)c=TX('Alla base della zona convettiva il campo lasciato dal ciclo precedente è poloidale: con il polo nord positivo, le linee corrono da sud a nord lungo i meridiani (è il ramo interno delle linee che escono dal polo nord e rientrano dal polo sud). È debole, dell\'ordine di 10² gauss.','At the base of the convective zone the field left over from the previous cycle is poloidal: with the north pole positive, the lines run from south to north along the meridians (it is the inner branch of the lines that leave the north pole and re-enter at the south pole). It is weak, of order 10² gauss.');
+  else if(ph===1)c=TX('Il plasma verso l\'equatore ruota più in fretta di quello verso il polo (le frecce mostrano la differenza rispetto alla latitudine centrale). Il campo è «congelato» nel plasma: ogni linea viene trascinata e stirata nel verso della rotazione e finisce per avvolgersi attorno al Sole. Più si allunga, più il campo si intensifica: è l\'effetto Ω. Segui la linea evidenziata.','The plasma toward the equator rotates faster than the plasma toward the pole (the arrows show the difference relative to the central latitude). The field is "frozen" into the plasma: every line is dragged and stretched in the direction of rotation and ends up wrapping around the Sun. The more it stretches, the more the field intensifies: this is the Ω effect. Follow the highlighted line.');
+  else if(ph===2)c=TX('Dopo alcuni anni di avvolgimento il campo è quasi tutto toroidale, parallelo all\'equatore, e si raccoglie in un grande tubo di flusso che corre lungo tutta la corona. Resta immagazzinato nella tachocline, sotto la zona convettiva, dove i moti turbolenti non riescono a portarlo via. Il campo arriva a circa ','After some years of wrapping the field is almost entirely toroidal, parallel to the equator, and gathers into a big flux tube that runs along the whole sector shown. It stays stored in the tachocline, below the convective zone, where the turbulent motions cannot carry it away. The field reaches about ')+fG(B0())+'.';
+  else if(ph===3)c=TX('Nel tubo la pressione magnetica sostituisce parte della pressione del gas: dentro c\'è meno gas e il tubo è più leggero dell\'ambiente (galleggiamento magnetico). Un tratto si inarca, il plasma scivola lungo il tubo verso i lati, il tratto centrale si svuota e sale ancora di più: è l\'instabilità di Parker. Il resto del tubo rimane in basso.','In the tube the magnetic pressure replaces part of the gas pressure: inside there is less gas and the tube is lighter than its surroundings (magnetic buoyancy). One stretch arches up, the plasma slides along the tube toward the sides, the central stretch empties out and rises even more: this is the Parker instability. The rest of the tube stays down.');
   else if(ph===4){
-    if(m.frac>=1)c='Il tratto che risaliva si è disfatto a circa '+fKm((Hs-yfFrag()*Hs)*KM)+' di profondità: nessuna macchia emergerà. Ma il campo non sparisce: le linee di campo non possono interrompersi, quindi i fili restano collegati al tubo ai due lati e formano una matassa debole e aggrovigliata dentro la zona convettiva.';
-    else if(m.frac>0)c='Il campo del tubo è ormai più debole di quello dei moti convettivi intorno: i fili si separano e il tratto che risale si sfilaccia.';
-    else if(st.B>=6&&st.B<10)c='Un tubo da 6×10⁴ gauss galleggia meno di uno da 10⁵ e impiega circa 50 giorni a salire'+(st.cor?': Coriolis ha più tempo per agire e la cima si sposta verso il polo (linea rossa, confrontala con la salita radiale tratteggiata). La gamba che precede diventa più ripida e l\'arco si inclina.':'. Prova «Con Coriolis»: con una salita più lenta lo spostamento verso il polo diventa evidente.')+' Il suo campo resta appena più forte di quello dei moti convettivi: arriva intero.';
-    else if(weak())c='Un tubo da 3×10⁴ gauss galleggia meno e sale più lentamente'+(st.cor?'; Coriolis ha più tempo per agire e lo devia verso il polo.':'.')+' Confronta, negli strumenti, il campo nel tubo con quello dei moti convettivi.';
-    else c='La sommità dell\'Ω risale lungo il raggio per galleggiamento, attraverso circa 200.000 km di zona convettiva; i piedi restano ancorati al tubo toroidale nella tachocline. Salendo la pressione esterna cala: il tubo si allarga e il campo si indebolisce.'+(st.cor?' Con Coriolis la cima resta indietro rispetto alla rotazione e si sposta verso il polo (linea rossa, confrontala con la salita radiale tratteggiata); la gamba che precede diventa più ripida e l\'arco si inclina.':'');
+    if(m.frac>=1)c=TX('Il tratto che risaliva si è disfatto a circa ','The rising stretch has broken apart at about ')+fKm((Hs-yfFrag()*Hs)*KM)+TX(' di profondità: nessuna macchia emergerà. Ma il campo non sparisce: le linee di campo non possono interrompersi, quindi i fili restano collegati al tubo ai due lati e formano una matassa debole e aggrovigliata dentro la zona convettiva.',' of depth: no sunspot will emerge. But the field does not disappear: field lines cannot break off, so the strands stay connected to the tube on both sides and form a weak, tangled skein inside the convective zone.');
+    else if(m.frac>0)c=TX('Il campo del tubo è ormai più debole di quello dei moti convettivi intorno: i fili si separano e il tratto che risale si sfilaccia.','The tube\'s field is by now weaker than that of the convective motions around it: the strands separate and the rising stretch frays apart.');
+    else if(st.B>=6&&st.B<10)c=TX('Un tubo da 6×10⁴ gauss galleggia meno di uno da 10⁵ e impiega circa 50 giorni a salire','A 6×10⁴ gauss tube floats less than a 10⁵ one and takes about 50 days to rise')+(st.cor?TX(': Coriolis ha più tempo per agire e la cima si sposta verso il polo (linea rossa, confrontala con la salita radiale tratteggiata). La gamba che precede diventa più ripida e l\'arco si inclina.',': Coriolis has more time to act and the top shifts toward the pole (red line, compare it with the dashed radial rise). The leading leg becomes steeper and the arch tilts.'):TX('. Prova «Con Coriolis»: con una salita più lenta lo spostamento verso il polo diventa evidente.','. Try "With Coriolis": with a slower rise the shift toward the pole becomes evident.'))+TX(' Il suo campo resta appena più forte di quello dei moti convettivi: arriva intero.',' Its field stays just a bit stronger than that of the convective motions: it arrives whole.');
+    else if(weak())c=TX('Un tubo da 3×10⁴ gauss galleggia meno e sale più lentamente','A 3×10⁴ gauss tube floats less and rises more slowly')+(st.cor?TX('; Coriolis ha più tempo per agire e lo devia verso il polo.','; Coriolis has more time to act and deflects it toward the pole.'):'.')+TX(' Confronta, negli strumenti, il campo nel tubo con quello dei moti convettivi.',' Compare, in the readouts, the field in the tube with that of the convective motions.');
+    else c=TX('La sommità dell\'Ω risale lungo il raggio per galleggiamento, attraverso circa 200.000 km di zona convettiva; i piedi restano ancorati al tubo toroidale nella tachocline. Salendo la pressione esterna cala: il tubo si allarga e il campo si indebolisce.','The top of the Ω rises along the radius by buoyancy, through about 200,000 km of convective zone; the feet stay anchored to the toroidal tube in the tachocline. As it rises the outside pressure drops: the tube widens and the field weakens.')+(st.cor?TX(' Con Coriolis la cima resta indietro rispetto alla rotazione e si sposta verso il polo (linea rossa, confrontala con la salita radiale tratteggiata); la gamba che precede diventa più ripida e l\'arco si inclina.',' With Coriolis the top lags behind the rotation and shifts toward the pole (red line, compare it with the dashed radial rise); the leading leg becomes steeper and the arch tilts.'):'');
   }
   else if(ph===5&&weak()){
-    c=m.ret<0.97?'Il flusso disperso non resta lì. Dove la matassa avvicina linee di verso opposto, queste si riconnettono e si annullano a vicenda (i fili che svaniscono): quella parte di flusso è persa. Il resto viene trascinato in basso dalla convezione, le cui correnti discendenti sono strette e veloci (pompaggio turbolento), e torna verso la tachocline nel giro di mesi.':
-      'Il flusso rimasto si è ricompattato nella tachocline: il buco nel sistema toroidale si è richiuso e la rotazione differenziale tornerà a rinforzarlo. Un tubo troppo debole non produce una macchia, ma il suo flusso in buona parte torna alla dinamo. Che le macchie compaiano solo entro 35°–40° di latitudine indica che i tubi che emergono sono forti, attorno a 10⁵ gauss.';
+    c=m.ret<0.97?TX('Il flusso disperso non resta lì. Dove la matassa avvicina linee di verso opposto, queste si riconnettono e si annullano a vicenda (i fili che svaniscono): quella parte di flusso è persa. Il resto viene trascinato in basso dalla convezione, le cui correnti discendenti sono strette e veloci (pompaggio turbolento), e torna verso la tachocline nel giro di mesi.','The dispersed flux does not stay there. Where the skein brings lines of opposite direction close together, they reconnect and cancel each other out (the strands that vanish): that part of the flux is lost. The rest is dragged down by convection, whose downdrafts are narrow and fast (turbulent pumping), and returns toward the tachocline within months.'):
+      TX('Il flusso rimasto si è ricompattato nella tachocline: il buco nel sistema toroidale si è richiuso e la rotazione differenziale tornerà a rinforzarlo. Un tubo troppo debole non produce una macchia, ma il suo flusso in buona parte torna alla dinamo. Che le macchie compaiano solo entro 35°–40° di latitudine indica che i tubi che emergono sono forti, attorno a 10⁵ gauss.','The remaining flux has recompacted in the tachocline: the gap in the toroidal system has closed and differential rotation will go back to reinforcing it. A tube that is too weak does not produce a sunspot, but most of its flux returns to the dynamo. The fact that sunspots appear only within 35°–40° of latitude indicates that the tubes that emerge are strong, around 10⁵ gauss.');
   }
   else if(ph===5){
-    c='La sommità dell\'Ω buca la fotosfera: il tratto orizzontale che si vede emergere in superficie (capitolo 8) è la cima di un arco le cui gambe scendono lungo i raggi per 200.000 km fino alla tachocline. Dove le gambe attraversano la fotosfera nascono due macchie di polarità opposta; sopra, l\'arco prosegue nella corona.';
-    if(st.cor&&st.B<10)c+=' La cima è emersa a '+fDeg((LAT0+m.dLat)/D)+' N, '+fDeg(m.dLat/D)+' più vicino al polo della latitudine di partenza.';
-    c+=st.cor?' Con Coriolis la coppia è inclinata: la macchia che precede è più vicina all\'equatore (legge di Joy). Guarda dall\'alto.':' Senza Coriolis le macchie sono allineate lungo il parallelo; nel Sole invece sono inclinate (legge di Joy): prova «Con Coriolis».';
+    c=TX('La sommità dell\'Ω buca la fotosfera: il tratto orizzontale che si vede emergere in superficie (capitolo 8) è la cima di un arco le cui gambe scendono lungo i raggi per 200.000 km fino alla tachocline. Dove le gambe attraversano la fotosfera nascono due macchie di polarità opposta; sopra, l\'arco prosegue nella corona.','The top of the Ω breaks through the photosphere: the horizontal stretch seen emerging at the surface (chapter 8) is the top of an arch whose legs run down the radii for 200,000 km to the tachocline. Where the legs cross the photosphere two spots of opposite polarity are born; above, the arch continues into the corona.');
+    if(st.cor&&st.B<10)c+=TX(' La cima è emersa a ',' The top emerged at ')+fDeg((LAT0+m.dLat)/D)+TX(' N, ',' N, ')+fDeg(m.dLat/D)+TX(' più vicino al polo della latitudine di partenza.',' closer to the pole than the starting latitude.');
+    c+=st.cor?TX(' Con Coriolis la coppia è inclinata: la macchia che precede è più vicina all\'equatore (legge di Joy). Guarda dall\'alto.',' With Coriolis the pair is tilted: the leading spot is closer to the equator (Joy\'s law). Look from above.'):TX(' Senza Coriolis le macchie sono allineate lungo il parallelo; nel Sole invece sono inclinate (legge di Joy): prova «Con Coriolis».',' Without Coriolis the spots are aligned along the parallel; in the Sun, instead, they are tilted (Joy\'s law): try "With Coriolis".');
   }
   $('capT').textContent=t;$('capP').textContent=c;
 }
@@ -626,7 +629,7 @@ $('play').onclick=()=>{if(st.done){goPhase(0);st.running=true;}else st.running=!
 $('reset').onclick=()=>{goPhase(0,false);};
 $('prev').onclick=()=>goPhase(st.p>0.05?st.phase:st.phase-1);
 $('next').onclick=()=>goPhase(st.phase+1);
-function syncSpeed(){$('Sv').textContent=String(st.speed).replace('.',',')+'×';}
+function syncSpeed(){$('Sv').textContent=(EN?String(st.speed):String(st.speed).replace('.',','))+'×';}
 $('S').oninput=e=>{st.speed=speeds[+e.target.value];syncSpeed();};
 function restartRise(){if(st.phase>=3||st.done){goPhase(3,true);}}
 function setCor(v){st.cor=v;$('cOn').classList.toggle('on',v);$('cOff').classList.toggle('on',!v);restartRise();}
@@ -654,5 +657,6 @@ syncSpeed();requestAnimationFrame(loop);
 .cc-badge.cc-doc{text-decoration:none;opacity:1;font-weight:600;margin-left:.4em}
 </style>
 <script src="dinamo_risalita_omega_scheda.js"></script>
+<script src="dinamo_risalita_omega_scheda_en.js"></script>
 <script src="scheda.js"></script>
 </body></html>
