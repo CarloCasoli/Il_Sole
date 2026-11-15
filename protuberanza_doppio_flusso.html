@@ -114,9 +114,33 @@ const container = document.getElementById('scene');
 const scene = new THREE.Scene();
 
 const camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.1, 500);
-camera.position.set(0, -22, 10);
 camera.up.set(0,0,1);
-camera.lookAt(0,0,3);
+
+// La scena è larga (i due tubi si estendono fino a circa ±8.6 unità in orizzontale)
+// ma il campo visivo verticale della camera è fisso a 45°: su uno schermo stretto
+// e alto (telefono in verticale) il campo visivo ORIZZONTALE si restringe molto,
+// e la struttura risulterebbe quasi del tutto fuori inquadratura. Per evitarlo,
+// la camera si allontana lungo la propria direzione di vista quanto basta per
+// mantenere sempre visibile l'intera larghezza della scena, qualunque sia il
+// rapporto larghezza/altezza dello schermo; su schermi larghi (desktop/tablet)
+// la distanza resta quella originale.
+const lookTarget = new THREE.Vector3(0, 0, 3);
+const baseCamOffset = new THREE.Vector3(0, -22, 10).sub(lookTarget); // direzione e distanza originali
+const baseDir = baseCamOffset.clone().normalize();
+const baseDistance = baseCamOffset.length();
+const HALF_WIDTH_TO_FIT = 9.6; // metà larghezza della scena da mantenere sempre in vista
+
+function layoutCamera(){
+  camera.aspect = window.innerWidth/window.innerHeight;
+  const vFovRad = camera.fov * Math.PI/180;
+  const hFovRad = 2*Math.atan(Math.tan(vFovRad/2)*camera.aspect);
+  const requiredDistance = HALF_WIDTH_TO_FIT / Math.tan(hFovRad/2);
+  const distance = Math.max(baseDistance, requiredDistance);
+  camera.position.copy(lookTarget).addScaledVector(baseDir, distance);
+  camera.lookAt(lookTarget);
+  camera.updateProjectionMatrix();
+}
+layoutCamera();
 
 const renderer = new THREE.WebGLRenderer({antialias:true, alpha:false});
 renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
@@ -125,8 +149,7 @@ renderer.setClearColor(0x05070d, 1);
 container.appendChild(renderer.domElement);
 
 window.addEventListener('resize', ()=>{
-  camera.aspect = window.innerWidth/window.innerHeight;
-  camera.updateProjectionMatrix();
+  layoutCamera();
   renderer.setSize(window.innerWidth, window.innerHeight);
 });
 
