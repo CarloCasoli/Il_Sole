@@ -4,8 +4,8 @@
   Licenza CC BY-NC-ND 4.0: https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it
   Vietati l'uso commerciale e la distribuzione di versioni modificate senza autorizzazione scritta dell'autore.
 -->
-<html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
-<title>Emersione di un gruppo di macchie βγδ</title>
+<html lang="it"><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title data-en="Emergence of a βγδ sunspot group">Emersione di un gruppo di macchie βγδ</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -154,44 +154,46 @@ select {
 .seg input:checked + label { background: var(--sun); color: var(--sun-ink); }
 .seg input:focus-visible + label { outline: 2px solid var(--sun); outline-offset: -2px; }
 .fine { color: var(--muted); font-size: 12.5px; margin: 0; }
+.cc-badge.cc-doc{text-decoration:none;opacity:1;font-weight:600;margin-left:.4em}
+.cc-badge.lang-sw{opacity:1;margin-left:.4em}.cc-badge.lang-sw a{cursor:pointer}
 </style>
 
 <div class="shell">
-  <h1>Emersione di un gruppo di macchie βγδ<span class="cc-badge"><span class="cc-n">© 2026 Carlo Casoli ·</span> <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it" target="_blank" rel="license noopener">CC BY-NC-ND 4.0</a></span></h1>
-  <p class="lede">Sotto la fotosfera si trova un grande tronco di flusso magnetico, dalla cui parte alta si staccano cinque tubi. Emergono uno alla volta: il più grande, G, si solleva per primo come una bolla, gli altri lo seguono e, risalendo, si torcono fino a invertire o ruotare la polarità. Ne esce un gruppo βγδ. Trascina la scena per ruotarla, usa la rotellina per l'ingrandimento.</p>
+  <h1><span data-en="Emergence of a βγδ sunspot group">Emersione di un gruppo di macchie βγδ</span><span class="cc-badge"><span class="cc-n">© 2026 Carlo Casoli ·</span> <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it" target="_blank" rel="license noopener">CC BY-NC-ND 4.0</a></span> <a class="cc-badge cc-doc" href="#scheda" data-scheda data-en="📖 Animation description">📖 Scheda dell'animazione</a> <span data-lang-switch></span></h1>
+  <p class="lede" data-en="Below the photosphere lies a large trunk of magnetic flux, from whose upper part five tubes detach. They emerge one at a time: the largest, G, rises first like a bubble, the others follow and, as they rise, twist until they reverse or rotate their polarity. A βγδ group results. Drag the scene to rotate it, use the scroll wheel to zoom.">Sotto la fotosfera si trova un grande tronco di flusso magnetico, dalla cui parte alta si staccano cinque tubi. Emergono uno alla volta: il più grande, G, si solleva per primo come una bolla, gli altri lo seguono e, risalendo, si torcono fino a invertire o ruotare la polarità. Ne esce un gruppo βγδ. Trascina la scena per ruotarla, usa la rotellina per l'ingrandimento.</p>
 
   <div class="layout">
     <div class="main-col">
       <div class="view" id="view">
         <div class="labels" id="labels"></div>
-        <div class="hud" id="hud">schema dei piedi</div>
-        <div class="legend"><span><i style="background:var(--pos)"></i>polarità +</span><span><i style="background:var(--neg)"></i>polarità −</span><span>colore del tubo = coppia</span><span>1 unità ≈ 5 Mm</span></div>
+        <div class="hud" id="hud" data-en="foot diagram">schema dei piedi</div>
+        <div class="legend"><span><i style="background:var(--pos)"></i><span data-en="polarity +">polarità +</span></span><span><i style="background:var(--neg)"></i><span data-en="polarity −">polarità −</span></span><span data-en="tube color = pair">colore del tubo = coppia</span><span data-en="1 unit ≈ 5 Mm">1 unità ≈ 5 Mm</span></div>
       </div>
 
       <div class="controls">
-        <button class="btn primary" id="btnPlay" type="button">Avvia emersione</button>
-        <button class="btn" id="btnSchema" type="button">Schema 2D</button>
+        <button class="btn primary" id="btnPlay" type="button" data-en="Start emergence">Avvia emersione</button>
+        <button class="btn" id="btnSchema" type="button" data-en="2D diagram">Schema 2D</button>
         <div class="timeline">
-          <input type="range" id="tSlider" min="0" max="1450" value="0" aria-label="Tempo simulato">
-          <span class="readout" id="tOut">0,0 / 14,5 giorni</span>
+          <input type="range" id="tSlider" min="0" max="1450" value="0" aria-label="Tempo simulato" data-en-aria="Simulated time">
+          <span class="readout" id="tOut" data-en="0.0 / 14.5 days">0,0 / 14,5 giorni</span>
         </div>
-        <label class="cap" for="speed">Velocità</label>
+        <label class="cap" for="speed" data-en="Speed">Velocità</label>
         <select id="speed">
-          <option value="0.5">0,5×</option>
+          <option value="0.5" data-en="0.5×">0,5×</option>
           <option value="1" selected>1×</option>
           <option value="2">2×</option>
           <option value="4">4×</option>
         </select>
       </div>
       <div class="views">
-        <span class="cap">Vista</span>
-        <button class="btn" id="vTop" type="button" aria-pressed="true">Dall'alto</button>
-        <button class="btn" id="vObl" type="button" aria-pressed="false">Obliqua</button>
-        <button class="btn" id="vSide" type="button" aria-pressed="false">Di lato</button>
+        <span class="cap" data-en="View">Vista</span>
+        <button class="btn" id="vTop" type="button" aria-pressed="true" data-en="From above">Dall'alto</button>
+        <button class="btn" id="vObl" type="button" aria-pressed="false" data-en="Oblique">Obliqua</button>
+        <button class="btn" id="vSide" type="button" aria-pressed="false" data-en="From the side">Di lato</button>
       </div>
       <div class="views" id="soloBar">
-        <span class="cap">Emersione</span>
-        <button class="btn" type="button" data-solo="all" aria-pressed="true">Tutte</button>
+        <span class="cap" data-en="Emergence">Emersione</span>
+        <button class="btn" type="button" data-solo="all" aria-pressed="true" data-en="All">Tutte</button>
         <button class="btn" type="button" data-solo="G" aria-pressed="false">G</button>
         <button class="btn" type="button" data-solo="p1" aria-pressed="false">p1</button>
         <button class="btn" type="button" data-solo="p2" aria-pressed="false">p2</button>
@@ -202,41 +204,44 @@ select {
 
     <aside class="panel">
       <div>
-        <h2>Cosa succede</h2>
+        <h2 data-en="What's happening">Cosa succede</h2>
         <p id="status"></p>
       </div>
       <div>
-        <h2>Classe magnetica (indicativa)</h2>
+        <h2 data-en="Magnetic class (indicative)">Classe magnetica (indicativa)</h2>
         <div class="cls" id="cls">—</div>
         <p class="clsNote" id="clsNote"></p>
       </div>
       <div>
-        <h2>Tubi</h2>
+        <h2 data-en="Tubes">Tubi</h2>
         <ul class="pairs" id="pairs"></ul>
       </div>
       <div class="opts">
-        <h2>Visualizzazione</h2>
+        <h2 data-en="Display">Visualizzazione</h2>
         <div class="seg" role="radiogroup" aria-label="Modo di visualizzazione">
-          <input type="radio" name="mode" id="modeWhite" value="white" checked><label for="modeWhite">Luce bianca</label>
-          <input type="radio" name="mode" id="modeMag" value="mag"><label for="modeMag">Magnetogramma</label>
+          <input type="radio" name="mode" id="modeWhite" value="white" checked><label for="modeWhite" data-en="White light">Luce bianca</label>
+          <input type="radio" name="mode" id="modeMag" value="mag"><label for="modeMag" data-en="Magnetogram">Magnetogramma</label>
         </div>
-        <label><input type="checkbox" id="chkAuto" checked> Regia automatica della camera</label>
-        <label><input type="checkbox" id="chkDir" checked> Verso del campo (impulsi)</label>
-        <label><input type="checkbox" id="chkSgn" checked> Segni di polarità</label>
-        <label><input type="checkbox" id="chkRec"> Siti di possibile riconnessione</label>
-        <label><input type="checkbox" id="chkSch" checked> Schema dei piedi</label>
-        <label><input type="checkbox" id="chkFld" checked> Linee di campo</label>
-        <label><input type="checkbox" id="chkSub" checked> Zona convettiva e tronco</label>
+        <label><input type="checkbox" id="chkAuto" checked> <span data-en="Automatic camera direction">Regia automatica della camera</span></label>
+        <label><input type="checkbox" id="chkDir" checked> <span data-en="Field direction (pulses)">Verso del campo (impulsi)</span></label>
+        <label><input type="checkbox" id="chkSgn" checked> <span data-en="Polarity signs">Segni di polarità</span></label>
+        <label><input type="checkbox" id="chkRec"> <span data-en="Possible reconnection sites">Siti di possibile riconnessione</span></label>
+        <label><input type="checkbox" id="chkSch" checked> <span data-en="Foot diagram">Schema dei piedi</span></label>
+        <label><input type="checkbox" id="chkFld" checked> <span data-en="Field lines">Linee di campo</span></label>
+        <label><input type="checkbox" id="chkSub" checked> <span data-en="Convection zone and trunk">Zona convettiva e tronco</span></label>
       </div>
-      <p class="fine">Modello schematico: profondità, tempi, dimensioni e flussi sono indicativi e non vengono da una simulazione MHD. La classe magnetica è calcolata da una regola semplice sulle macchie visibili.</p>
+      <p class="fine" data-en="Schematic model: depths, times, sizes and fluxes are indicative and do not come from an MHD simulation. The magnetic class is computed from a simple rule based on the visible spots.">Modello schematico: profondità, tempi, dimensioni e flussi sono indicativi e non vengono da una simulazione MHD. La classe magnetica è calcolata da una regola semplice sulle macchie visibili.</p>
     </aside>
   </div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="lingua.js"></script>
 <script>
 (function () {
   'use strict';
+  /* lingua: TR(it,en) viene da lingua.js (qui si chiama TR perché T è già usato per THREE) */
+  var TR = window.T || function (it) { return it; }, EN = window.LANG === 'en', LOC = EN ? 'en-US' : 'it-IT';
   var T = THREE;
   var clamp = function (x, a, b) { return Math.min(b, Math.max(a, x)); };
   var ss = function (x) { x = clamp(x, 0, 1); return x * x * (3 - 2 * x); };
@@ -251,11 +256,11 @@ select {
      Hmax = quota finale dell'apice (unità: 1 ≈ 5 Mm); zi = quota di partenza, nella parte alta del tronco;
      tr = traslazione verso est durante la risalita (unità). */
   var PAIRS = [
-    { id: 'G',  note: 'grande · 8°',       c: [0, 0],        af: 8,   sep: 13,  rf: 1.75, Hmax: 8.0, zi: -4.8, tc: 1.3,  dur: 3.0, tr: 0,   flux: 4.0e21, col: '#ffd34d', rx: 8.6, ry: 3.6 },
-    { id: 'p1', note: 'normale · 14°',     c: [-3.0, 1.8],   af: 14,  sep: 4.2, rf: 0.85, Hmax: 3.2, zi: -5.4, tc: 4.8,  dur: 2.8, tr: 0,   flux: 3.0e20, col: '#2fd3c0', rx: 3.3, ry: 1.35 },
-    { id: 'p2', note: 'invertita · 170°',  c: [0.8, -1.9],   af: 170, sep: 4.6, rf: 0.9,  Hmax: 3.4, zi: -6.0, tc: 7.3,  dur: 3.2, tr: 0,   flux: 3.5e20, col: '#b18cff', rx: 3.5, ry: 1.35 },
-    { id: 'p3', note: 'a 90°',             c: [6.9, 3.2],    af: 90,  sep: 3.8, rf: 0.8,  Hmax: 3.0, zi: -5.8, tc: 10.1, dur: 2.6, tr: 0,   flux: 2.5e20, col: '#8be04a', rx: 3.1, ry: 1.3 },
-    { id: 'p4', note: 'invertita · 190°',  c: [-4.3, -2.4],  af: 190, sep: 3.2, rf: 0.8,  Hmax: 3.0, zi: -5.2, tc: 12.9, dur: 2.8, tr: 2.8, flux: 2.2e20, col: '#ff77b8', rx: 2.7, ry: 1.3 }
+    { id: 'G',  note: TR('grande · 8°','large · 8°'),       c: [0, 0],        af: 8,   sep: 13,  rf: 1.75, Hmax: 8.0, zi: -4.8, tc: 1.3,  dur: 3.0, tr: 0,   flux: 4.0e21, col: '#ffd34d', rx: 8.6, ry: 3.6 },
+    { id: 'p1', note: TR('normale · 14°','normal · 14°'),     c: [-3.0, 1.8],   af: 14,  sep: 4.2, rf: 0.85, Hmax: 3.2, zi: -5.4, tc: 4.8,  dur: 2.8, tr: 0,   flux: 3.0e20, col: '#2fd3c0', rx: 3.3, ry: 1.35 },
+    { id: 'p2', note: TR('invertita · 170°','inverted · 170°'),  c: [0.8, -1.9],   af: 170, sep: 4.6, rf: 0.9,  Hmax: 3.4, zi: -6.0, tc: 7.3,  dur: 3.2, tr: 0,   flux: 3.5e20, col: '#b18cff', rx: 3.5, ry: 1.35 },
+    { id: 'p3', note: TR('a 90°','at 90°'),             c: [6.9, 3.2],    af: 90,  sep: 3.8, rf: 0.8,  Hmax: 3.0, zi: -5.8, tc: 10.1, dur: 2.6, tr: 0,   flux: 2.5e20, col: '#8be04a', rx: 3.1, ry: 1.3 },
+    { id: 'p4', note: TR('invertita · 190°','inverted · 190°'),  c: [-4.3, -2.4],  af: 190, sep: 3.2, rf: 0.8,  Hmax: 3.0, zi: -5.2, tc: 12.9, dur: 2.8, tr: 2.8, flux: 2.2e20, col: '#ff77b8', rx: 2.7, ry: 1.3 }
   ];
   /* inversa della smoothstep: serve a far attraversare la fotosfera esattamente al giorno tc */
   function invSS(y) { var lo = 0, hi = 1; for (var i = 0; i < 50; i++) { var m = (lo + hi) / 2; if (ss(m) < y) lo = m; else hi = m; } return (lo + hi) / 2; }
@@ -281,7 +286,7 @@ select {
   try { renderer = new T.WebGLRenderer({ antialias: true }); }
   catch (e) {
     var m = document.createElement('div'); m.className = 'noGL';
-    m.textContent = 'Il browser non riesce ad avviare WebGL, quindi la scena 3D non può essere mostrata.';
+    m.textContent = TR('Il browser non riesce ad avviare WebGL, quindi la scena 3D non può essere mostrata.','The browser cannot start WebGL, so the 3D scene cannot be shown.');
     viewEl.appendChild(m); return;
   }
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
@@ -587,10 +592,10 @@ select {
       p.sLabels.push(addLabel(f === 0 ? '+' : '−', 'fsign', [0, 0, 0.1], -50, -55, 'fsign', p));
     });
   });
-  PAIRS.forEach(function (p) { if (p.trLabelPos) addLabel('≈ ' + Math.round(p.tr * UNIT_MM) + ' Mm verso est', 'env', p.trLabelPos, -50, -50, 'trl', p); });
-  addLabel('fotosfera', 'env', [-12.5, -4.5, 0], 0, -120, 'env', null);
-  addLabel('tronco', 'env', [-12.8, -4.5, -8.4], 0, -50, 'env', null);
-  addLabel('zona convettiva', 'env', [-12.5, -4.5, -13], 0, -50, 'env', null);
+  PAIRS.forEach(function (p) { if (p.trLabelPos) addLabel('≈ ' + Math.round(p.tr * UNIT_MM) + TR(' Mm verso est',' Mm eastward'), 'env', p.trLabelPos, -50, -50, 'trl', p); });
+  addLabel(TR('fotosfera','photosphere'), 'env', [-12.5, -4.5, 0], 0, -120, 'env', null);
+  addLabel(TR('tronco','trunk'), 'env', [-12.8, -4.5, -8.4], 0, -50, 'env', null);
+  addLabel(TR('zona convettiva','convection zone'), 'env', [-12.5, -4.5, -13], 0, -50, 'env', null);
 
   /* ---------- Camera ---------- */
   var VIEWS = {
@@ -649,7 +654,7 @@ select {
   function tStop() { return solo ? Math.min(T_END, solo.t0 + solo.dur) : T_END; }
   var $ = function (id) { return document.getElementById(id); };
   var btnPlay = $('btnPlay'), slider = $('tSlider'), tOut = $('tOut'), hud = $('hud'), statusEl = $('status'), clsEl = $('cls'), clsNote = $('clsNote');
-  var fmt = function (x, d) { return x.toFixed(d).replace('.', ',').replace('-', '−'); };
+  var fmt = function (x, d) { return EN ? x.toFixed(d).replace('-', '−') : x.toFixed(d).replace('.', ',').replace('-', '−'); };
   var SUP = { '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹' };
   function fmtFlux(v) {
     if (v < 1e18) return '0 Mx';
@@ -660,14 +665,14 @@ select {
   var pairsEl = $('pairs');
   PAIRS.forEach(function (p) {
     var li = document.createElement('li'); li.className = 'pair';
-    li.innerHTML = '<label for="chk-' + p.id + '"><input type="checkbox" id="chk-' + p.id + '" checked' + (p.id === 'G' ? ' disabled' : '') + '><span class="sw" style="background:' + p.col + '"></span><b>' + p.id + '</b><span class="note">' + p.note + '</span></label><span class="chip">profondo</span><span class="num">—</span>';
+    li.innerHTML = '<label for="chk-' + p.id + '"><input type="checkbox" id="chk-' + p.id + '" checked' + (p.id === 'G' ? ' disabled' : '') + '><span class="sw" style="background:' + p.col + '"></span><b>' + p.id + '</b><span class="note">' + p.note + '</span></label><span class="chip">' + TR('profondo','deep') + '</span><span class="num">—</span>';
     pairsEl.appendChild(li);
     p.chip = li.querySelector('.chip'); p.num = li.querySelector('.num');
     li.querySelector('input').addEventListener('change', function (e) { p.enabled = e.target.checked; dirty = true; });
   });
 
   function updateButtons() {
-    btnPlay.textContent = playing ? 'Pausa' : (t >= tStop() - 0.001 ? 'Ripeti' : (t <= tStart() + 0.001 ? 'Avvia emersione' : 'Riprendi'));
+    btnPlay.textContent = playing ? TR('Pausa','Pause') : (t >= tStop() - 0.001 ? TR('Ripeti','Repeat') : (t <= tStart() + 0.001 ? TR('Avvia emersione','Start emergence') : TR('Riprendi','Resume')));
   }
   btnPlay.addEventListener('click', function () {
     if (playing) { playing = false; }
@@ -713,8 +718,8 @@ select {
   /* Classe magnetica indicativa (Mount Wilson): β, βγ, βγδ. */
   function classify(S) {
     var G = S[0];
-    if (!S.some(function (x) { return on(x.pr) && x.F > 0.15; })) return { c: '—', n: 'Nessuna macchia ancora in fotosfera.' };
-    if (!on(G.pr)) return { c: '—', n: 'Classe non indicata: si sta osservando un solo tubo.' };
+    if (!S.some(function (x) { return on(x.pr) && x.F > 0.15; })) return { c: '—', n: TR('Nessuna macchia ancora in fotosfera.','No spot in the photosphere yet.') };
+    if (!on(G.pr)) return { c: '—', n: TR('Classe non indicata: si sta osservando un solo tubo.','Class not indicated: only a single tube is being observed.') };
     var smallVis = S.some(function (x, i) { return i > 0 && on(x.pr) && x.F > 0.15; });
     var spots = [];
     S.forEach(function (x, i) { x.pr.spots.forEach(function (sp) { if (on(x.pr) && sp.on && sp.F > 0.3) spots.push({ k: i, s: sp }); }); });
@@ -726,37 +731,37 @@ select {
         if (d < 0.8 * (A.s.rp + B.s.rp)) delta = true;
       }
     }
-    if (delta) return { c: 'βγδ', n: 'Umbre di polarità opposta dentro la stessa penombra: configurazione δ, la più eruttiva.' };
-    if (smallVis) return { c: 'βγ', n: 'Distribuzione irregolare delle polarità, senza una linea neutra semplice che le separi.' };
-    return { c: 'β', n: 'Bipolare semplice: una linea neutra separa le due polarità.' };
+    if (delta) return { c: 'βγδ', n: TR('Umbre di polarità opposta dentro la stessa penombra: configurazione δ, la più eruttiva.','Umbrae of opposite polarity inside the same penumbra: δ configuration, the most eruptive.') };
+    if (smallVis) return { c: 'βγ', n: TR('Distribuzione irregolare delle polarità, senza una linea neutra semplice che le separi.','Irregular distribution of the polarities, with no simple neutral line separating them.') };
+    return { c: 'β', n: TR('Bipolare semplice: una linea neutra separa le due polarità.','Simple bipolar: a neutral line separates the two polarities.') };
   }
 
   function statusText(S) {
     var G = S[0];
     if (t <= 0.001 && !playing) {
-      return 'Schema in fotosfera. I punti sono i piedi dove ogni tubo attraverserà la superficie, col colore del proprio tubo e un anello rosso (+) o blu (−). Una coppia grande (G) e quattro piccole: p1 normale, p2 e p4 invertite, p3 a 90°. Le ellissi tratteggiate racchiudono ogni coppia; la freccia indica la traslazione di p4 verso est. Premi «Avvia emersione», oppure uno dei pulsanti Emersione per un solo tubo.';
+      return TR('Schema in fotosfera. I punti sono i piedi dove ogni tubo attraverserà la superficie, col colore del proprio tubo e un anello rosso (+) o blu (−). Una coppia grande (G) e quattro piccole: p1 normale, p2 e p4 invertite, p3 a 90°. Le ellissi tratteggiate racchiudono ogni coppia; la freccia indica la traslazione di p4 verso est. Premi «Avvia emersione», oppure uno dei pulsanti Emersione per un solo tubo.','Diagram in the photosphere. The dots are the feet where each tube will cross the surface, in its own tube color with a red (+) or blue (−) ring. One large pair (G) and four small ones: p1 normal, p2 and p4 inverted, p3 at 90°. The dashed ellipses enclose each pair; the arrow indicates the eastward translation of p4. Press «Start emergence», or one of the Emergence buttons for a single tube.');
     }
     if (solo) {
-      var x = S[PAIRS.indexOf(solo)], id = solo.id, kind = solo.af < 30 ? 'normale, con la stessa orientazione di G' : solo.af > 120 ? 'invertita: i poli arrivano scambiati rispetto a G' : 'a 90°: i poli si dispongono in direzione nord–sud';
-      if (t < solo.t0) return 'Il tubo ' + id + ' è ancora nella parte alta del tronco.';
-      if (x.H <= 0) return 'Il tubo ' + id + ' si stacca dal tronco e risale verso la fotosfera; la cima è a ' + fmt(-x.H * UNIT_MM, 0) + ' Mm di profondità.' + (solo.tr ? ' Intanto trasla verso est.' : '');
-      if (x.F < 0.12) return 'L\'apice di ' + id + ' attraversa la fotosfera: compaiono due pori di polarità opposta, quasi a contatto.';
-      if (x.p < 1) return 'I piedi di ' + id + ' si allontanano e il flusso in superficie cresce; salendo il lobo si torce: ' + fmt(x.phiDeg, 0) + '° su ' + solo.af + '°.' + (x.F > 0.3 ? ' Con i pori più grandi compare la penombra.' : '');
-      return 'Emersione di ' + id + ' completata: è una coppia ' + kind + '.' + (solo.tr ? ' Durante la risalita si è spostata di circa ' + Math.round(solo.tr * UNIT_MM) + ' Mm verso est.' : '');
+      var x = S[PAIRS.indexOf(solo)], id = solo.id, kind = solo.af < 30 ? TR('una coppia normale, con la stessa orientazione di G','a normal pair, with the same orientation as G') : solo.af > 120 ? TR('una coppia invertita: i poli arrivano scambiati rispetto a G','an inverted pair: the poles arrive swapped relative to G') : TR('una coppia a 90°: i poli si dispongono in direzione nord–sud','a pair at 90°: the poles line up in the north–south direction');
+      if (t < solo.t0) return TR('Il tubo ','The tube ') + id + TR(' è ancora nella parte alta del tronco.',' is still in the upper part of the trunk.');
+      if (x.H <= 0) return TR('Il tubo ','The tube ') + id + TR(' si stacca dal tronco e risale verso la fotosfera; la cima è a ',' detaches from the trunk and rises toward the photosphere; the top is at ') + fmt(-x.H * UNIT_MM, 0) + TR(' Mm di profondità.',' Mm of depth.') + (solo.tr ? TR(' Intanto trasla verso est.',' Meanwhile it translates eastward.') : '');
+      if (x.F < 0.12) return TR('L\'apice di ','The apex of ') + id + TR(' attraversa la fotosfera: compaiono due pori di polarità opposta, quasi a contatto.',' crosses the photosphere: two pores of opposite polarity appear, almost touching.');
+      if (x.p < 1) return TR('I piedi di ','The feet of ') + id + TR(' si allontanano e il flusso in superficie cresce; salendo il lobo si torce: ',' move apart and the surface flux grows; as it rises the lobe twists: ') + fmt(x.phiDeg, 0) + '° ' + TR('su','out of') + ' ' + solo.af + '°.' + (x.F > 0.3 ? TR(' Con i pori più grandi compare la penombra.',' With the pores larger, the penumbra appears.') : '');
+      return TR('Emersione di ','Emergence of ') + id + TR(' completata: è ',' completed: it is ') + kind + '.' + (solo.tr ? TR(' Durante la risalita si è spostata di circa ',' During the rise it moved by about ') + Math.round(solo.tr * UNIT_MM) + TR(' Mm verso est.',' Mm eastward.') : '');
     }
     if (S.every(function (x) { return !on(x.pr) || x.p >= 1; })) {
-      return 'Gruppo maturo. I tubi hanno finito di ruotare e i piedi sono nelle posizioni dello schema. Le coppie invertite e quella a 90° portano polarità opposte accanto alle macchie di G.';
+      return TR('Gruppo maturo. I tubi hanno finito di ruotare e i piedi sono nelle posizioni dello schema. Le coppie invertite e quella a 90° portano polarità opposte accanto alle macchie di G.','Mature group. The tubes have finished rotating and the feet are in the positions shown in the diagram. The inverted pairs and the one at 90° carry opposite polarities next to the spots of G.');
     }
     var s;
-    if (G.H <= 0) s = 'Fase sotterranea. Nella parte alta del tronco i cinque tubi sono quasi orizzontali. G porta più flusso, quindi è più leggero e più galleggiante: si stacca per primo dalla cima del tronco e si inarca come una bolla.';
-    else if (G.F < 0.12) s = 'L\'apice di G attraversa la fotosfera: compaiono due pori di polarità opposta, quasi a contatto.';
-    else s = 'I piedi di G si allontanano e il flusso in superficie cresce; con i pori più grandi compare la penombra.';
+    if (G.H <= 0) s = TR('Fase sotterranea. Nella parte alta del tronco i cinque tubi sono quasi orizzontali. G porta più flusso, quindi è più leggero e più galleggiante: si stacca per primo dalla cima del tronco e si inarca come una bolla.','Underground phase. In the upper part of the trunk the five tubes are almost horizontal. G carries more flux, so it is lighter and more buoyant: it detaches first from the top of the trunk and arches up like a bubble.');
+    else if (G.F < 0.12) s = TR('L\'apice di G attraversa la fotosfera: compaiono due pori di polarità opposta, quasi a contatto.','The apex of G crosses the photosphere: two pores of opposite polarity appear, almost touching.');
+    else s = TR('I piedi di G si allontanano e il flusso in superficie cresce; con i pori più grandi compare la penombra.','The feet of G move apart and the surface flux grows; with the pores larger, the penumbra appears.');
     var sw = S.filter(function (x, i) { return i > 0 && on(x.pr) && x.p > 0 && x.H <= 0; }).map(function (x) { return x.pr.id; });
-    if (sw.length) s += ' Sotto la superficie risale ' + sw.join(', ') + '.';
+    if (sw.length) s += TR(' Sotto la superficie risale ',' Below the surface, rising: ') + sw.join(', ') + '.';
     var em = S.filter(function (x, i) { return i > 0 && on(x.pr) && x.H > 0 && x.p < 1; }).map(function (x) { return x.pr.id; });
-    if (em.length) s += ' In superficie stanno emergendo ' + em.join(', ') + '.';
-    var rot = S.filter(function (x, i) { return i > 0 && on(x.pr) && x.p > 0 && x.p < 1 && x.phiDeg > 5; }).map(function (x) { return x.pr.id + ' di ' + fmt(x.phiDeg, 0) + '°'; });
-    if (rot.length) s += ' Salendo si torcono: ' + rot.join(', ') + '.';
+    if (em.length) s += TR(' In superficie stanno emergendo ',' At the surface, emerging: ') + em.join(', ') + '.';
+    var rot = S.filter(function (x, i) { return i > 0 && on(x.pr) && x.p > 0 && x.p < 1 && x.phiDeg > 5; }).map(function (x) { return x.pr.id + ' ' + TR('di','by') + ' ' + fmt(x.phiDeg, 0) + '°'; });
+    if (rot.length) s += TR(' Salendo si torcono: ',' As they rise they twist: ') + rot.join(', ') + '.';
     return s;
   }
 
@@ -787,10 +792,11 @@ select {
         sp.umb.scale.set(du, du, 1); sp.pen.scale.set(dp, dp, 1); sp.pen.material.opacity = pf; sp.patch.scale.set(dpa, dpa, 1);
       });
 
-      var status = !p.enabled ? 'escluso' : !pon ? 'nascosto' : st.p === 0 ? 'profondo' : st.H <= 0 ? 'in risalita' : F < 0.97 ? 'emerge' : 'matura';
-      p.chip.textContent = status; p.chip.className = 'chip' + (status === 'in risalita' ? ' rise' : status === 'emerge' ? ' emerge' : status === 'matura' ? ' done' : '');
+      var statusKey = !p.enabled ? 'escluso' : !pon ? 'nascosto' : st.p === 0 ? 'profondo' : st.H <= 0 ? 'in risalita' : F < 0.97 ? 'emerge' : 'matura';
+      var statusLabels = { 'escluso': TR('escluso','excluded'), 'nascosto': TR('nascosto','hidden'), 'profondo': TR('profondo','deep'), 'in risalita': TR('in risalita','rising'), 'emerge': TR('emerge','emerging'), 'matura': TR('matura','mature') };
+      p.chip.textContent = statusLabels[statusKey]; p.chip.className = 'chip' + (statusKey === 'in risalita' ? ' rise' : statusKey === 'emerge' ? ' emerge' : statusKey === 'matura' ? ' done' : '');
       var sep = st.feet[0] && st.feet[1] ? Math.hypot(st.feet[0].x - st.feet[1].x, st.feet[0].y - st.feet[1].y) * UNIT_MM : 0;
-      p.num.textContent = pon ? ('apice ' + fmt(st.H * UNIT_MM, 0) + ' Mm · rot. ' + fmt(st.phiDeg, 0) + '° / ' + p.af + '° · d ' + fmt(sep, 0) + ' Mm · Φ ' + fmtFlux(p.flux * F)) : '—';
+      p.num.textContent = pon ? (TR('apice','apex') + ' ' + fmt(st.H * UNIT_MM, 0) + ' Mm · ' + TR('rot.','rot.') + ' ' + fmt(st.phiDeg, 0) + '° / ' + p.af + '° · d ' + fmt(sep, 0) + ' Mm · Φ ' + fmtFlux(p.flux * F)) : '—';
     });
     var txt = statusText(S);
     if (statusEl.textContent !== txt) statusEl.textContent = txt;
@@ -798,8 +804,8 @@ select {
     var cl = classify(S);
     if (clsEl.textContent !== cl.c) clsEl.textContent = cl.c;
     if (clsNote.textContent !== cl.n) clsNote.textContent = cl.n;
-    tOut.textContent = fmt(t, 1) + ' / ' + fmt(T_END, 1) + ' giorni';
-    hud.textContent = (t <= 0.001 ? 'schema dei piedi' : 'giorno ' + fmt(t, 1)) + (cl.c !== '—' ? '  ·  ' + cl.c : '');
+    tOut.textContent = fmt(t, 1) + ' / ' + fmt(T_END, 1) + TR(' giorni',' days');
+    hud.textContent = (t <= 0.001 ? TR('schema dei piedi','foot diagram') : TR('giorno ','day ') + fmt(t, 1)) + (cl.c !== '—' ? '  ·  ' + cl.c : '');
     box.visible = boxEdges.visible = ropeGroup.visible = showSub;
     planeMat.opacity = showSub ? 0.84 : 1;
   }
@@ -885,4 +891,7 @@ select {
 .cc-badge.cc-fixed{position:fixed;top:10px;right:10px;margin:0;z-index:2147483000;background:rgba(10,10,18,.62);color:#f2efe6;border-color:rgba(242,239,230,.45);opacity:1;backdrop-filter:blur(4px)}
 @media (max-width:520px){.cc-badge{font-size:11px;padding:2px 7px}}
 </style>
+<script src="emersione_macchie_scheda.js"></script>
+<script src="emersione_macchie_scheda_en.js"></script>
+<script src="scheda.js"></script>
 </body></html>
