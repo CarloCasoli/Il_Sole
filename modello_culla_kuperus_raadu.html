@@ -7,7 +7,7 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <title>Animazione 3D - Modello Kuperus-Raadu</title>
+    <title data-en="3D Animation: Kuperus–Raadu model (arcade of 5 arcs)">Animazione 3D: Modello Kuperus–Raadu (arcata di 5 archi)</title>
     <style>
         body {
             margin: 0;
@@ -30,13 +30,15 @@
     </style>
 </head>
 <body>
-    <div id="info">Animazione 3D: Modello Kuperus-Raadu (arcata di 5 archi) <span class="cc-badge"><span class="cc-n">© 2026 Carlo Casoli ·</span> <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it" target="_blank" rel="license noopener">CC BY-NC-ND 4.0</a></span> <button type="button" id="btnRicomincia" class="cc-restart" title="Riparte dall'inizio">↺ Ricomincia</button><br>
-    <small>Rotazione dei piedi &rarr; torsione elicoidale lungo ogni arco &rarr; canale originario che svanisce &rarr; cilindro di plasma depositato sul fondo dell'elica</small></div>
+    <div id="info"><span data-en="3D Animation: Kuperus–Raadu model (arcade of 5 arcs)">Animazione 3D: Modello Kuperus-Raadu (arcata di 5 archi)</span> <span class="cc-badge"><span class="cc-n">© 2026 Carlo Casoli ·</span> <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it" target="_blank" rel="license noopener">CC BY-NC-ND 4.0</a></span> <button type="button" id="btnRicomincia" class="cc-restart" title="Riparte dall'inizio" data-en="↺ Restart">↺ Ricomincia</button> <a class="cc-badge cc-doc" href="#scheda" data-scheda data-en="📖 Animation description">📖 Scheda dell'animazione</a> <span data-lang-switch></span><br>
+    <small data-en="Rotation of the footpoints &rarr; helical twist along each arc &rarr; the original channel fades away &rarr; cylinder of plasma deposited at the bottom of the helix">Rotazione dei piedi &rarr; torsione elicoidale lungo ogni arco &rarr; canale originario che svanisce &rarr; cilindro di plasma depositato sul fondo dell'elica</small></div>
 
+    <script src="lingua.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 
     <script>
+        const T=window.T||(it=>it);
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(0x050510);
 
@@ -97,7 +99,7 @@
         const pilLine = new THREE.Line(pilGeometry, pilMaterial);
         scene.add(pilLine);
 
-        const pilLabel = makeTextSprite('Linea neutra (PIL)', '#ff5555', 46);
+        const pilLabel = makeTextSprite(T('Linea neutra (PIL)','Neutral line (PIL)'), '#ff5555', 46);
         pilLabel.position.set(0, 0.4, 11.8);
         scene.add(pilLabel);
 
@@ -110,10 +112,10 @@
         negMarker.position.set(footX, 0.1, 0);
         scene.add(negMarker);
 
-        const posLabel = makeTextSprite('Polo Positivo (+)', '#ff6666', 46);
+        const posLabel = makeTextSprite(T('Polo Positivo (+)','Positive Pole (+)'), '#ff6666', 46);
         posLabel.position.set(-footX, -0.7, 0);
         scene.add(posLabel);
-        const negLabel = makeTextSprite('Polo Negativo (-)', '#66aaff', 46);
+        const negLabel = makeTextSprite(T('Polo Negativo (-)','Negative Pole (-)'), '#66aaff', 46);
         negLabel.position.set(footX, -0.7, 0);
         scene.add(negLabel);
 
@@ -240,7 +242,7 @@
         plasmaCylinder.rotation.x = Math.PI / 2; // asse del cilindro lungo z
         scene.add(plasmaCylinder);
 
-        const plasmaLabel = makeTextSprite('Plasma depositato', '#ffaa55', 42);
+        const plasmaLabel = makeTextSprite(T('Plasma depositato','Deposited plasma'), '#ffaa55', 42);
         plasmaLabel.visible = false;
         scene.add(plasmaLabel);
 
@@ -357,7 +359,12 @@
 .cc-n,.cc-badge a{white-space:nowrap}
 .cc-badge a{color:inherit;text-decoration:underline;text-underline-offset:2px}
 .cc-badge.cc-fixed{position:fixed;top:10px;right:10px;margin:0;z-index:2147483000;background:rgba(10,10,18,.62);color:#f2efe6;border-color:rgba(242,239,230,.45);opacity:1;backdrop-filter:blur(4px)}
+.cc-badge.cc-doc{text-decoration:none;opacity:1;font-weight:600;margin-left:.4em}
+.cc-badge.lang-sw{opacity:1;margin-left:.4em}.cc-badge.lang-sw a{cursor:pointer}
 @media (max-width:520px){.cc-badge{font-size:11px;padding:2px 7px}}
 </style>
+<script src="modello_culla_kuperus_raadu_scheda.js"></script>
+<script src="modello_culla_kuperus_raadu_scheda_en.js"></script>
+<script src="scheda.js"></script>
 </body>
 </html>

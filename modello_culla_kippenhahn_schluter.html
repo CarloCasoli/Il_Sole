@@ -7,7 +7,7 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <title>Animazione Formazione Culla e Condensazione - Modello KS</title>
+    <title data-en="3D Animation: Formation of the Dip and Condensation of the Filament — Kippenhahn–Schlüter model">Animazione 3D: Formazione della Culla e Condensazione del Filamento — modello Kippenhahn–Schlüter</title>
     <style>
         body { 
             margin: 0; 
@@ -29,8 +29,9 @@
     </style>
 </head>
 <body>
-    <div id="info">Animazione 3D: Formazione della Culla e Condensazione del Filamento <span class="cc-badge"><span class="cc-n">© 2026 Carlo Casoli ·</span> <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it" target="_blank" rel="license noopener">CC BY-NC-ND 4.0</a></span> <button type="button" id="btnRicomincia" class="cc-restart" title="Riparte dall'inizio">↺ Ricomincia</button><br><small>Il campo si deforma; il plasma si condensa nella culla formata</small></div>
-    
+    <div id="info"><span data-en="3D Animation: Formation of the Dip and Condensation of the Filament">Animazione 3D: Formazione della Culla e Condensazione del Filamento</span> <span class="cc-badge"><span class="cc-n">© 2026 Carlo Casoli ·</span> <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it" target="_blank" rel="license noopener">CC BY-NC-ND 4.0</a></span> <button type="button" id="btnRicomincia" class="cc-restart" title="Riparte dall'inizio" data-en="↺ Restart">↺ Ricomincia</button> <a class="cc-badge cc-doc" href="#scheda" data-scheda data-en="📖 Animation description">📖 Scheda dell'animazione</a> <span data-lang-switch></span><br><small data-en="The field deforms; the plasma condenses in the dip that forms">Il campo si deforma; il plasma si condensa nella culla formata</small></div>
+
+    <script src="lingua.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     
@@ -194,7 +195,12 @@
 .cc-n,.cc-badge a{white-space:nowrap}
 .cc-badge a{color:inherit;text-decoration:underline;text-underline-offset:2px}
 .cc-badge.cc-fixed{position:fixed;top:10px;right:10px;margin:0;z-index:2147483000;background:rgba(10,10,18,.62);color:#f2efe6;border-color:rgba(242,239,230,.45);opacity:1;backdrop-filter:blur(4px)}
+.cc-badge.cc-doc{text-decoration:none;opacity:1;font-weight:600;margin-left:.4em}
+.cc-badge.lang-sw{opacity:1;margin-left:.4em}.cc-badge.lang-sw a{cursor:pointer}
 @media (max-width:520px){.cc-badge{font-size:11px;padding:2px 7px}}
 </style>
+<script src="modello_culla_kippenhahn_schluter_scheda.js"></script>
+<script src="modello_culla_kippenhahn_schluter_scheda_en.js"></script>
+<script src="scheda.js"></script>
 </body>
 </html>

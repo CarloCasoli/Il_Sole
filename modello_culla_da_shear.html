@@ -7,7 +7,7 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <title>Animazione 3D - Shear, Riconnessione e Grande Elicoide</title>
+    <title data-en="3D Animation: Shear, Reconnection and the Great Helix Parallel to the PIL">Animazione 3D: Shear, Riconnessione e Grande Elicoide Parallelo alla PIL</title>
     <style>
         body {
             margin: 0;
@@ -30,13 +30,15 @@
     </style>
 </head>
 <body>
-    <div id="info">Animazione 3D: Shear, Riconnessione e Grande Elicoide Parallelo alla PIL <span class="cc-badge"><span class="cc-n">© 2026 Carlo Casoli ·</span> <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it" target="_blank" rel="license noopener">CC BY-NC-ND 4.0</a></span> <button type="button" id="btnRicomincia" class="cc-restart" title="Riparte dall'inizio">↺ Ricomincia</button><br>
-    <small>Archi a omega, fitti e cesoiati &rarr; toccandosi spariscono dal centro verso i lati &rarr; nasce il tubo elicoidale in alto, con plasma nella culla &rarr; restano piccoli archi in basso</small></div>
+    <div id="info"><span data-en="3D Animation: Shear, Reconnection and the Great Helix Parallel to the PIL">Animazione 3D: Shear, Riconnessione e Grande Elicoide Parallelo alla PIL</span> <span class="cc-badge"><span class="cc-n">© 2026 Carlo Casoli ·</span> <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it" target="_blank" rel="license noopener">CC BY-NC-ND 4.0</a></span> <button type="button" id="btnRicomincia" class="cc-restart" title="Riparte dall'inizio" data-en="↺ Restart">↺ Ricomincia</button> <a class="cc-badge cc-doc" href="#scheda" data-scheda data-en="📖 Animation description">📖 Scheda dell'animazione</a> <span data-lang-switch></span><br>
+    <small data-en="Dense, sheared omega-shaped arcs &rarr; touching, they vanish from the center toward the sides &rarr; a helical tube is born above, with plasma in the dip &rarr; small arcs remain below">Archi a omega, fitti e cesoiati &rarr; toccandosi spariscono dal centro verso i lati &rarr; nasce il tubo elicoidale in alto, con plasma nella culla &rarr; restano piccoli archi in basso</small></div>
 
+    <script src="lingua.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 
     <script>
+        const T=window.T||(it=>it);
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(0x050510);
 
@@ -145,15 +147,15 @@
         const pilMaterial = new THREE.LineBasicMaterial({ color: 0xff3333, linewidth: 4 });
         scene.add(new THREE.Line(pilGeometry, pilMaterial));
 
-        const pilLabel = makeTextSprite('Linea neutra (PIL)', '#ff5555', 46);
+        const pilLabel = makeTextSprite(T('Linea neutra (PIL)','Neutral line (PIL)'), '#ff5555', 46);
         pilLabel.position.set(0, 0.4, 87);
         scene.add(pilLabel);
 
         // ---------- Etichette di polarità ----------
-        const posLabel = makeTextSprite('Polo Positivo (+)', '#ff6666', 46);
+        const posLabel = makeTextSprite(T('Polo Positivo (+)','Positive Pole (+)'), '#ff6666', 46);
         posLabel.position.set(-footX, -1.6, 0);
         scene.add(posLabel);
-        const negLabel = makeTextSprite('Polo Negativo (-)', '#66aaff', 46);
+        const negLabel = makeTextSprite(T('Polo Negativo (-)','Negative Pole (-)'), '#66aaff', 46);
         negLabel.position.set(footX, -1.6, 0);
         scene.add(negLabel);
 
@@ -428,7 +430,12 @@
 .cc-n,.cc-badge a{white-space:nowrap}
 .cc-badge a{color:inherit;text-decoration:underline;text-underline-offset:2px}
 .cc-badge.cc-fixed{position:fixed;top:10px;right:10px;margin:0;z-index:2147483000;background:rgba(10,10,18,.62);color:#f2efe6;border-color:rgba(242,239,230,.45);opacity:1;backdrop-filter:blur(4px)}
+.cc-badge.cc-doc{text-decoration:none;opacity:1;font-weight:600;margin-left:.4em}
+.cc-badge.lang-sw{opacity:1;margin-left:.4em}.cc-badge.lang-sw a{cursor:pointer}
 @media (max-width:520px){.cc-badge{font-size:11px;padding:2px 7px}}
 </style>
+<script src="modello_culla_da_shear_scheda.js"></script>
+<script src="modello_culla_da_shear_scheda_en.js"></script>
+<script src="scheda.js"></script>
 </body>
 </html>

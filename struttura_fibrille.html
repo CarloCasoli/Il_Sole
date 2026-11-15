@@ -7,7 +7,7 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8">
-<title>Tubi di flusso magnetico — vista 3D</title>
+<title data-en="Structure and evolution of chromospheric fibrils — 3D view">Struttura ed evoluzione delle fibrille cromosferiche — vista 3D</title>
 <style>
   html, body { margin:0; padding:0; background:#f2e4c9; font-family: -apple-system, "Segoe UI", Arial, sans-serif; overflow:hidden; }
   #app { position:relative; width:100vw; height:100vh; }
@@ -88,121 +88,122 @@
 <body>
 <div id="app">
   <div id="mount"></div>
-  <div id="errbox">Impossibile caricare la libreria 3D (three.js) da rete in questo ambiente.<br>Prova ad aprire il file in un browser normale (Chrome, Safari, Firefox) invece che nel visualizzatore integrato.</div>
+  <div id="errbox" data-en="Unable to load the 3D library (three.js) from the network in this environment.<br>Try opening the file in a regular browser (Chrome, Safari, Firefox) instead of the built-in viewer.">Impossibile caricare la libreria 3D (three.js) da rete in questo ambiente.<br>Prova ad aprire il file in un browser normale (Chrome, Safari, Firefox) invece che nel visualizzatore integrato.</div>
   <div class="panel">
-    <button id="btn-top">Vista dall'alto</button>
-    <button id="btn-iso">Vista 3D</button>
-    <button id="btn-side">Vista laterale</button>
-    <button id="btn-granuli">Vista granuli</button>
-    <button id="btn-spin">Rotazione auto: off</button>
-    <button id="btn-help">? Aiuto</button>
+    <button id="btn-top" data-en="Top view">Vista dall'alto</button>
+    <button id="btn-iso" data-en="3D view">Vista 3D</button>
+    <button id="btn-side" data-en="Side view">Vista laterale</button>
+    <button id="btn-granuli" data-en="Granules view">Vista granuli</button>
+    <button id="btn-spin" data-en="Auto-rotation: off">Rotazione auto: off</button>
+    <button id="btn-help" data-en="? Help">? Aiuto</button>
+    <a class="cc-badge cc-doc" href="#scheda" data-scheda data-en="📖 Animation description">📖 Scheda dell'animazione</a> <span data-lang-switch></span>
     <span class="cc-badge"><span class="cc-n">© 2026 Carlo Casoli ·</span> <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it" target="_blank" rel="license noopener">CC BY-NC-ND 4.0</a></span>
   </div>
 
   <div id="fibrille-controls">
-    <h3 id="fc-toggle">Controlli fibrille <span class="fc-toggle-icon" id="fc-icon">▾</span></h3>
+    <h3 id="fc-toggle"><span data-en="Fibril controls">Controlli fibrille</span> <span class="fc-toggle-icon" id="fc-icon">▾</span></h3>
     <div class="fc-body" id="fc-body">
 
       <div class="fc-row" style="display:flex; gap:6px; margin-bottom:12px;">
-        <button id="btn-save-params" style="flex:1;">💾 Salva parametri</button>
-        <button id="btn-load-params" style="flex:1;">📂 Carica parametri</button>
+        <button id="btn-save-params" style="flex:1;" data-en="💾 Save parameters">💾 Salva parametri</button>
+        <button id="btn-load-params" style="flex:1;" data-en="📂 Load parameters">📂 Carica parametri</button>
         <input type="file" id="file-load-params" accept="application/json,.json" style="display:none;">
       </div>
       <div id="params-io-status" style="font-size:11px; color:#8a5a20; margin:-6px 0 10px 0; min-height:14px;"></div>
 
-      <div class="fc-group-title">Frequenza eventi</div>
+      <div class="fc-group-title" data-en="Event frequency">Frequenza eventi</div>
       <div class="fc-row">
-        <label>Intervallo di controllo <span class="fc-val" id="val-CHECK_INTERVAL_MS">150 ms</span></label>
+        <label><span data-en="Check interval">Intervallo di controllo</span> <span class="fc-val" id="val-CHECK_INTERVAL_MS">150 ms</span></label>
         <input type="range" id="sl-CHECK_INTERVAL_MS" min="10" max="1000" step="10" value="150">
       </div>
       <div class="fc-row">
-        <label>Probabilità di innesco <span class="fc-val" id="val-TRIGGER_PROBABILITY">0.90</span></label>
+        <label><span data-en="Trigger probability">Probabilità di innesco</span> <span class="fc-val" id="val-TRIGGER_PROBABILITY">0.90</span></label>
         <input type="range" id="sl-TRIGGER_PROBABILITY" min="0" max="1" step="0.01" value="0.9">
       </div>
 
-      <div class="fc-group-title">Durata tratto scuro</div>
+      <div class="fc-group-title" data-en="Duration of the dark stretch">Durata tratto scuro</div>
       <div class="fc-row">
-        <label>Durata minima <span class="fc-val" id="val-HOLD_MS_MIN">5000 ms</span></label>
+        <label><span data-en="Minimum duration">Durata minima</span> <span class="fc-val" id="val-HOLD_MS_MIN">5000 ms</span></label>
         <input type="range" id="sl-HOLD_MS_MIN" min="500" max="15000" step="100" value="5000">
       </div>
       <div class="fc-row">
-        <label>Durata massima <span class="fc-val" id="val-HOLD_MS_MAX">11000 ms</span></label>
+        <label><span data-en="Maximum duration">Durata massima</span> <span class="fc-val" id="val-HOLD_MS_MAX">11000 ms</span></label>
         <input type="range" id="sl-HOLD_MS_MAX" min="1000" max="20000" step="100" value="11000">
       </div>
       <div class="fc-row">
-        <label>Scorrimento in avanti <span class="fc-val" id="val-DRIFT_DISTANCE">0.12</span></label>
+        <label><span data-en="Forward drift">Scorrimento in avanti</span> <span class="fc-val" id="val-DRIFT_DISTANCE">0.12</span></label>
         <input type="range" id="sl-DRIFT_DISTANCE" min="0" max="0.4" step="0.01" value="0.12">
       </div>
 
-      <div class="fc-group-title">Dissolvenza</div>
+      <div class="fc-group-title" data-en="Fade">Dissolvenza</div>
       <div class="fc-row">
-        <label>Velocità fade chiaro/scuro <span class="fc-val" id="val-TRANSITION_MS">700 ms</span></label>
+        <label><span data-en="Light/dark fade speed">Velocità fade chiaro/scuro</span> <span class="fc-val" id="val-TRANSITION_MS">700 ms</span></label>
         <input type="range" id="sl-TRANSITION_MS" min="100" max="3000" step="50" value="700">
       </div>
 
-      <div class="fc-group-title">Estensione del tratto scuro</div>
+      <div class="fc-group-title" data-en="Extent of the dark stretch">Estensione del tratto scuro</div>
       <div class="fc-row">
-        <label>Lunghezza minima <span class="fc-val" id="val-SEGMENT_LEN_MIN">0.05</span></label>
+        <label><span data-en="Minimum length">Lunghezza minima</span> <span class="fc-val" id="val-SEGMENT_LEN_MIN">0.05</span></label>
         <input type="range" id="sl-SEGMENT_LEN_MIN" min="0.02" max="1" step="0.01" value="0.05">
       </div>
       <div class="fc-row">
-        <label>Lunghezza massima <span class="fc-val" id="val-SEGMENT_LEN_MAX">0.15</span></label>
+        <label><span data-en="Maximum length">Lunghezza massima</span> <span class="fc-val" id="val-SEGMENT_LEN_MAX">0.15</span></label>
         <input type="range" id="sl-SEGMENT_LEN_MAX" min="0.02" max="1" step="0.01" value="0.15">
       </div>
       <div class="fc-row">
-        <label>Sfumatura in avanti <span class="fc-val" id="val-SEGMENT_FEATHER">0.035</span></label>
+        <label><span data-en="Forward feather">Sfumatura in avanti</span> <span class="fc-val" id="val-SEGMENT_FEATHER">0.035</span></label>
         <input type="range" id="sl-SEGMENT_FEATHER" min="0.005" max="0.5" step="0.005" value="0.035">
       </div>
       <div class="fc-row">
-        <label>Sfumatura all'indietro (frazione) <span class="fc-val" id="val-BACKWARD_FEATHER_RATIO">0.25</span></label>
+        <label><span data-en="Backward feather (fraction)">Sfumatura all'indietro (frazione)</span> <span class="fc-val" id="val-BACKWARD_FEATHER_RATIO">0.25</span></label>
         <input type="range" id="sl-BACKWARD_FEATHER_RATIO" min="0.05" max="1" step="0.05" value="0.25">
       </div>
 
-      <div class="fc-group-title">Zona utile del percorso</div>
+      <div class="fc-group-title" data-en="Usable zone of the path">Zona utile del percorso</div>
       <div class="fc-row">
-        <label>Inizio minimo (t) <span class="fc-val" id="val-MIN_START_T">0.10</span></label>
+        <label><span data-en="Minimum start (t)">Inizio minimo (t)</span> <span class="fc-val" id="val-MIN_START_T">0.10</span></label>
         <input type="range" id="sl-MIN_START_T" min="0" max="0.5" step="0.01" value="0.10">
       </div>
       <div class="fc-row">
-        <label>Fine massima (t) <span class="fc-val" id="val-MAX_END_T">0.97</span></label>
+        <label><span data-en="Maximum end (t)">Fine massima (t)</span> <span class="fc-val" id="val-MAX_END_T">0.97</span></label>
         <input type="range" id="sl-MAX_END_T" min="0.5" max="1" step="0.01" value="0.97">
       </div>
 
-      <div class="fc-group-title">Granulo fotosferico</div>
+      <div class="fc-group-title" data-en="Photospheric granule">Granulo fotosferico</div>
       <div class="fc-row">
-        <label>Velocità chiusura granulo <span class="fc-val" id="val-GRANULE_SHRINK_MS">2800 ms</span></label>
+        <label><span data-en="Granule closing speed">Velocità chiusura granulo</span> <span class="fc-val" id="val-GRANULE_SHRINK_MS">2800 ms</span></label>
         <input type="range" id="sl-GRANULE_SHRINK_MS" min="200" max="5000" step="50" value="2800">
       </div>
       <div class="fc-row">
-        <label>Dimensione granulo <span class="fc-val" id="val-GRANULE_RADIUS">24</span></label>
+        <label><span data-en="Granule size">Dimensione granulo</span> <span class="fc-val" id="val-GRANULE_RADIUS">24</span></label>
         <input type="range" id="sl-GRANULE_RADIUS" min="2" max="34" step="0.5" value="24">
       </div>
       <div class="fc-row">
-        <label>Intensità chiusura <span class="fc-val" id="val-GRANULE_MIN_SCALE">0.12</span></label>
+        <label><span data-en="Closing intensity">Intensità chiusura</span> <span class="fc-val" id="val-GRANULE_MIN_SCALE">0.12</span></label>
         <input type="range" id="sl-GRANULE_MIN_SCALE" min="0.02" max="0.9" step="0.01" value="0.12">
       </div>
 
-      <div class="fc-group-title">Onda a zigzag</div>
+      <div class="fc-group-title" data-en="Zigzag wave">Onda a zigzag</div>
       <div class="fc-row">
-        <label>Velocità salita (altezza massima) <span class="fc-val" id="val-WAVE_DURATION_FULL_MS">3500 ms</span></label>
+        <label><span data-en="Rise speed (maximum height)">Velocità salita (altezza massima)</span> <span class="fc-val" id="val-WAVE_DURATION_FULL_MS">3500 ms</span></label>
         <input type="range" id="sl-WAVE_DURATION_FULL_MS" min="500" max="7000" step="100" value="3500">
       </div>
       <div class="fc-row">
-        <label>Spessore tubo <span class="fc-val" id="val-WAVE_TUBE_RADIUS">2.2</span></label>
+        <label><span data-en="Tube thickness">Spessore tubo</span> <span class="fc-val" id="val-WAVE_TUBE_RADIUS">2.2</span></label>
         <input type="range" id="sl-WAVE_TUBE_RADIUS" min="0.5" max="5" step="0.1" value="2.2">
       </div>
       <div class="fc-row">
-        <label>Zigzag alla base <span class="fc-val" id="val-WAVE_JITTER_AMP_BASE">1.5</span></label>
+        <label><span data-en="Zigzag at the base">Zigzag alla base</span> <span class="fc-val" id="val-WAVE_JITTER_AMP_BASE">1.5</span></label>
         <input type="range" id="sl-WAVE_JITTER_AMP_BASE" min="0" max="5" step="0.1" value="1.5">
       </div>
       <div class="fc-row">
-        <label>Zigzag in cima <span class="fc-val" id="val-WAVE_JITTER_AMP_GROWTH">6</span></label>
+        <label><span data-en="Zigzag at the top">Zigzag in cima</span> <span class="fc-val" id="val-WAVE_JITTER_AMP_GROWTH">6</span></label>
         <input type="range" id="sl-WAVE_JITTER_AMP_GROWTH" min="0" max="16" step="0.5" value="6">
       </div>
 
-      <div class="fc-group-title">Velocità generali</div>
+      <div class="fc-group-title" data-en="General speeds">Velocità generali</div>
       <div class="fc-row">
-        <label>Velocità frecce di flusso <span class="fc-val" id="val-FLOW_SPEED">0.00006</span></label>
+        <label><span data-en="Flow-arrow speed">Velocità frecce di flusso</span> <span class="fc-val" id="val-FLOW_SPEED">0.00006</span></label>
         <input type="range" id="sl-FLOW_SPEED" min="0.00001" max="0.0002" step="0.00001" value="0.00006">
       </div>
 
@@ -211,9 +212,9 @@
 
   <div id="help-overlay">
     <div id="help-panel">
-      <button id="btn-help-close">Chiudi ✕</button>
-      <h2>Come funziona il modello e cosa fa ogni parametro</h2>
-      <p class="help-intro">
+      <button id="btn-help-close" data-en="Close ✕">Chiudi ✕</button>
+      <h2 data-en="How the model works and what each parameter does">Come funziona il modello e cosa fa ogni parametro</h2>
+      <p class="help-intro" data-en="Each fibril (flux tube) is born &lt;strong&gt;light&lt;/strong&gt; from the circular active region, with the same plasma density as all the others. Along its path it can be struck, at a random point, by a magnetoacoustic wave that condenses its plasma over a stretch: that stretch becomes more opaque/dark until the wave dies out, then turns light again. The animation is now stopped: the values shown are the ones currently active in the &quot;Fibril controls&quot; panel; you can close this help and adjust them while the animation resumes.">
         Ogni fibrilla (tubo di flusso) nasce <strong>chiara</strong> dalla regione attiva
         circolare, con la stessa densita' di plasma di tutte le altre. Lungo il suo
         percorso puo' essere investita, in un punto casuale, da un'onda magnetoacustica
@@ -223,32 +224,32 @@
         fibrille"; puoi chiudere questo aiuto e regolarli mentre l'animazione riparte.
       </p>
 
-      <h4>Frequenza eventi</h4>
+      <h4 data-en="Event frequency">Frequenza eventi</h4>
       <dl>
-        <dt>Intervallo di controllo (CHECK_INTERVAL_MS)</dt>
-        <dd>Ogni quanti millisecondi viene rivalutata la possibilita' di far partire un
+        <dt data-en="Check interval (CHECK_INTERVAL_MS)">Intervallo di controllo (CHECK_INTERVAL_MS)</dt>
+        <dd data-en="How often, in milliseconds, the chance of starting a new dark stretch on a still-free fibril is re-evaluated. Lower value = more frequent checks = events closer together in time. Higher value = sparser events.">Ogni quanti millisecondi viene rivalutata la possibilita' di far partire un
         nuovo tratto scuro su una fibrilla ancora libera. Valore piu' basso = controlli
         piu' frequenti = eventi piu' ravvicinati nel tempo. Valore piu' alto = eventi
         piu' radi.</dd>
 
-        <dt>Probabilita' di innesco (TRIGGER_PROBABILITY)</dt>
-        <dd>Probabilita' (0-1) che un nuovo evento parta ad ogni controllo, su una
+        <dt data-en="Trigger probability (TRIGGER_PROBABILITY)">Probabilita' di innesco (TRIGGER_PROBABILITY)</dt>
+        <dd data-en="Probability (0-1) that a new event starts at each check, on a free fibril. Higher = more fibrils activate at the same time; lower = rarer events. On average a new event starts every (check interval / probability) milliseconds.">Probabilita' (0-1) che un nuovo evento parta ad ogni controllo, su una
         fibrilla libera. Piu' alta = piu' fibrille si attivano contemporaneamente; piu'
         bassa = eventi piu' rari. In media un nuovo evento parte ogni
         (intervallo di controllo / probabilita') millisecondi.</dd>
       </dl>
 
-      <h4>Durata del tratto scuro</h4>
+      <h4 data-en="Duration of the dark stretch">Durata del tratto scuro</h4>
       <dl>
-        <dt>Durata minima e massima (HOLD_MS_MIN / HOLD_MS_MAX)</dt>
-        <dd>Ad ogni evento la durata di permanenza scura viene scelta a caso fra questi
+        <dt data-en="Minimum and maximum duration (HOLD_MS_MIN / HOLD_MS_MAX)">Durata minima e massima (HOLD_MS_MIN / HOLD_MS_MAX)</dt>
+        <dd data-en="At each event the dark-hold duration is chosen at random between these two extremes (in milliseconds), before the stretch starts turning light again. Higher values = fibrils stay dark longer = an overall darker picture. Lower values = the dark color disappears faster = an overall lighter picture.">Ad ogni evento la durata di permanenza scura viene scelta a caso fra questi
         due estremi (in millisecondi), prima che il tratto inizi a tornare chiaro.
         Valori piu' alti = fibrille scure piu' a lungo = disegno complessivamente piu'
         scuro. Valori piu' bassi = il colore scuro sparisce piu' in fretta = disegno
         piu' chiaro.</dd>
 
-        <dt>Scorrimento in avanti (DRIFT_DISTANCE)</dt>
-        <dd>Una volta formato, il blocco scuro non resta fermo: scorre in avanti nello
+        <dt data-en="Forward drift (DRIFT_DISTANCE)">Scorrimento in avanti (DRIFT_DISTANCE)</dt>
+        <dd data-en="Once formed, the dark block does not stay still: it drifts forward in the same direction as the flow arrows, carried by the plasma, ALWAYS keeping the same fixed length (it never lengthens, it only moves). This value (as a 0-1 fraction of the tube's length) indicates how far it advances over the whole of its dark life. Value 0 = stays still; higher value = drifts further.">Una volta formato, il blocco scuro non resta fermo: scorre in avanti nello
         stesso verso delle frecce di flusso, trasportato dal plasma, mantenendo
         SEMPRE la stessa lunghezza fissa (non si allunga mai, si sposta soltanto).
         Questo valore (in frazione 0-1 della lunghezza del tubo) indica di quanto
@@ -256,33 +257,33 @@
         piu' alto = scorre di piu'.</dd>
       </dl>
 
-      <h4>Dissolvenza</h4>
+      <h4 data-en="Fade">Dissolvenza</h4>
       <dl>
-        <dt>Velocita' fade chiaro/scuro (TRANSITION_MS)</dt>
-        <dd>Durata in millisecondi della transizione graduale di colore, sia in entrata
+        <dt data-en="Light/dark fade speed (TRANSITION_MS)">Velocita' fade chiaro/scuro (TRANSITION_MS)</dt>
+        <dd data-en="Duration in milliseconds of the gradual color transition, both going in (light → dark) and coming out (dark → light). Lower value = snappier/faster change; higher value = slower, softer fade.">Durata in millisecondi della transizione graduale di colore, sia in entrata
         (schiarito → scuro) sia in uscita (scuro → schiarito). Valore piu' basso =
         cambio piu' scattante/veloce; valore piu' alto = dissolvenza piu' lenta e
         morbida.</dd>
       </dl>
 
-      <h4>Estensione del tratto scuro</h4>
+      <h4 data-en="Extent of the dark stretch">Estensione del tratto scuro</h4>
       <dl>
-        <dt>Lunghezza minima e massima (SEGMENT_LEN_MIN / SEGMENT_LEN_MAX)</dt>
-        <dd>Lunghezza del tratto che si scurisce ad ogni evento, espressa come frazione
+        <dt data-en="Minimum and maximum length (SEGMENT_LEN_MIN / SEGMENT_LEN_MAX)">Lunghezza minima e massima (SEGMENT_LEN_MIN / SEGMENT_LEN_MAX)</dt>
+        <dd data-en="Length of the stretch that darkens at each event, expressed as a fraction (0-1) of the tube's total length. It must stay a contained, localized packet, like a real condensation wave — not cover most of the tube. Once formed, it moves rigidly forward (see &quot;Forward drift&quot; below) always keeping the same length, instead of lengthening.">Lunghezza del tratto che si scurisce ad ogni evento, espressa come frazione
         (0-1) della lunghezza totale del tubo. Deve restare un pacchetto contenuto e
         localizzato, come una vera onda di addensamento — non coprire la maggior
         parte del tubo. Una volta formato, si sposta rigidamente in avanti (vedi
         "Scorrimento in avanti" qui sotto) restando sempre della stessa lunghezza,
         invece di allungarsi.</dd>
 
-        <dt>Sfumatura in avanti (SEGMENT_FEATHER)</dt>
-        <dd>Ampiezza (in frazione della lunghezza) della sfumatura sul bordo in avanti
+        <dt data-en="Forward feather (SEGMENT_FEATHER)">Sfumatura in avanti (SEGMENT_FEATHER)</dt>
+        <dd data-en="Width (as a fraction of the length) of the feathering on the forward edge of the dark stretch (in the direction of the flow), to avoid a sharp color cut. Lower value = sharper, more definite edge; higher value = a very soft, gradual edge.">Ampiezza (in frazione della lunghezza) della sfumatura sul bordo in avanti
         del tratto scuro (nel verso del flusso), per evitare un taglio netto di
         colore. Valore piu' basso = bordo piu' netto e deciso; valore piu' alto =
         bordo molto sfumato e graduale.</dd>
 
-        <dt>Sfumatura all'indietro (BACKWARD_FEATHER_RATIO)</dt>
-        <dd>Il plasma scorre in avanti, quindi l'addensamento si propaga soprattutto
+        <dt data-en="Backward feather (BACKWARD_FEATHER_RATIO)">Sfumatura all'indietro (BACKWARD_FEATHER_RATIO)</dt>
+        <dd data-en="The plasma flows forward, so the condensation spreads mostly in that direction: the feathering before the trigger point (against the flow direction) uses only this small FRACTION of the forward feathering — not an absolute value. For example 0.25 means it goes backward only a quarter as far as it goes forward. It can never cross past the tube's origin, whatever value is set.">Il plasma scorre in avanti, quindi l'addensamento si propaga soprattutto
         in quel verso: la sfumatura prima del punto di innesco (contro il verso del
         flusso) usa solo questa piccola FRAZIONE della sfumatura in avanti — non un
         valore assoluto. Ad esempio 0.25 significa che va indietro solo un quarto di
@@ -290,15 +291,15 @@
         tubo, qualunque valore venga impostato.</dd>
       </dl>
 
-      <h4>Zona utile del percorso</h4>
+      <h4 data-en="Usable zone of the path">Zona utile del percorso</h4>
       <dl>
-        <dt>Inizio minimo - t (MIN_START_T)</dt>
-        <dd>Punto piu' vicino alla regione attiva (t=0) in cui puo' comparire il
+        <dt data-en="Minimum start - t (MIN_START_T)">Inizio minimo - t (MIN_START_T)</dt>
+        <dd data-en="Point closest to the active region (t=0) where the granule can appear and a dark stretch can start: this guarantees the fibril always leaves the active region light, as the physical model requires.">Punto piu' vicino alla regione attiva (t=0) in cui puo' comparire il
         granulo e iniziare un tratto scuro: garantisce che la fibrilla esca sempre
         chiara dalla macchia, come richiesto dal modello fisico.</dd>
 
-        <dt>Fine massima - t (MAX_END_T)</dt>
-        <dd>Punto piu' lontano (verso t=1, l'estremo di atterraggio) in cui puo'
+        <dt data-en="Maximum end - t (MAX_END_T)">Fine massima - t (MAX_END_T)</dt>
+        <dd data-en="Furthest point (toward t=1, the landing end) where the granule can appear. The trigger point is chosen UNIFORMLY over the whole interval between MIN_START_T and MAX_END_T, with the same probability near the base, at mid-tube or near the end — if the chosen dark stretch is too long to fit entirely before MAX_END_T, it is simply truncated there. Narrowing the interval concentrates the granules toward the center of the path; widening it lets them appear almost anywhere along the tube.">Punto piu' lontano (verso t=1, l'estremo di atterraggio) in cui puo'
         comparire il granulo. Il punto di innesco e' scelto in modo UNIFORME su
         tutto l'intervallo fra MIN_START_T e MAX_END_T, con la stessa probabilita'
         vicino alla base, a meta' tubo o vicino alla fine — se il tratto scuro
@@ -308,8 +309,8 @@
         lungo il tubo.</dd>
       </dl>
 
-      <h4>Granulo fotosferico e onda a zigzag</h4>
-      <p class="help-intro" style="margin-bottom:8px;">
+      <h4 data-en="Photospheric granule and zigzag wave">Granulo fotosferico e onda a zigzag</h4>
+      <p class="help-intro" style="margin-bottom:8px;" data-en="At each event, BEFORE a fibril darkens, a granule appears on the photosphere: a yellow circle with a black border, positioned EXACTLY below the point on the tube where the color is about to start changing (same X,Z, but down at ground level). This is why the granules appear scattered across the whole space below, not clustered in one spot. The granule shrinks (its two radii shrink together); once it has almost vanished, it disappears completely and a thin zigzag tube (the actual wave) appears in its place, rising vertically and widening its own oscillation as it climbs, until it touches the tube: only there does the darkening of the plasma begin (phases &quot;active&quot; → &quot;in&quot;).">
         Ad ogni evento, PRIMA che una fibrilla scurisca, sulla fotosfera compare un
         granulo: un cerchio giallo con bordo nero, posizionato ESATTAMENTE sotto il
         punto del tubo in cui il colore comincera' a cambiare (stessa X,Z, ma in
@@ -322,50 +323,51 @@
         → "in").
       </p>
       <dl>
-        <dt>Velocita' chiusura granulo (GRANULE_SHRINK_MS)</dt>
-        <dd>Tempo (ms) impiegato dal granulo per chiudersi (restringersi) prima di
+        <dt data-en="Granule closing speed (GRANULE_SHRINK_MS)">Velocita' chiusura granulo (GRANULE_SHRINK_MS)</dt>
+        <dd data-en="Time (ms) taken by the granule to close (shrink) before vanishing and letting the wave appear. Lower value = faster, snappier closing; higher value = slower, more visible closing.">Tempo (ms) impiegato dal granulo per chiudersi (restringersi) prima di
         sparire e far comparire l'onda. Valore piu' basso = chiusura piu' rapida e
         scattante; valore piu' alto = chiusura piu' lenta e visibile.</dd>
 
-        <dt>Dimensione granulo (GRANULE_RADIUS)</dt>
-        <dd>Dimensione del granulo quando compare sulla fotosfera, prima di iniziare
+        <dt data-en="Granule size (GRANULE_RADIUS)">Dimensione granulo (GRANULE_RADIUS)</dt>
+        <dd data-en="Size of the granule when it appears on the photosphere, before it starts closing. Higher value = bigger, more visible granule.">Dimensione del granulo quando compare sulla fotosfera, prima di iniziare
         a chiudersi. Valore piu' alto = granulo piu' grande e visibile.</dd>
 
-        <dt>Intensita' chiusura (GRANULE_MIN_SCALE)</dt>
-        <dd>Dimensione minima raggiunta dal granulo durante la chiusura, come frazione
+        <dt data-en="Closing intensity (GRANULE_MIN_SCALE)">Intensita' chiusura (GRANULE_MIN_SCALE)</dt>
+        <dd data-en="Minimum size reached by the granule during closing, as a fraction (0-1) of its initial size. Lower value (close to 0) = the granule closes almost completely before vanishing; higher value = a larger portion stays visible until it disappears.">Dimensione minima raggiunta dal granulo durante la chiusura, come frazione
         (0-1) della sua dimensione iniziale. Valore piu' basso (vicino a 0) = il
         granulo si chiude quasi del tutto prima di sparire; valore piu' alto =
         rimane visibile una porzione maggiore fino alla scomparsa.</dd>
 
-        <dt>Velocita' salita - altezza massima (WAVE_DURATION_FULL_MS)</dt>
-        <dd>Tempo (ms) che l'onda impiegherebbe a salire dell'altezza massima
+        <dt data-en="Rise speed - maximum height (WAVE_DURATION_FULL_MS)">Velocita' salita - altezza massima (WAVE_DURATION_FULL_MS)</dt>
+        <dd data-en="Time (ms) the wave would take to rise the maximum height reachable on the tube. The actual rise time is proportional to the real height to be covered, so higher points on the tube light up later. Lower value = faster rise; higher value = slower, more visible rise.">Tempo (ms) che l'onda impiegherebbe a salire dell'altezza massima
         raggiungibile dal tubo. Il tempo reale di salita e' proporzionale all'altezza
         reale da percorrere, quindi i punti piu' alti sul tubo si accendono piu' tardi.
         Valore piu' basso = salita piu' veloce; valore piu' alto = salita piu' lenta e
         visibile.</dd>
 
-        <dt>Spessore tubo (WAVE_TUBE_RADIUS)</dt>
-        <dd>Quanto e' spesso il sottile tubo a zigzag che rappresenta l'onda.</dd>
+        <dt data-en="Tube thickness (WAVE_TUBE_RADIUS)">Spessore tubo (WAVE_TUBE_RADIUS)</dt>
+        <dd data-en="How thick the thin zigzag tube representing the wave is.">Quanto e' spesso il sottile tubo a zigzag che rappresenta l'onda.</dd>
 
-        <dt>Zigzag alla base / in cima (WAVE_JITTER_AMP_BASE / WAVE_JITTER_AMP_GROWTH)</dt>
-        <dd>Ampiezza dell'oscillazione a zigzag vicino al suolo, e di quanto cresce
+        <dt data-en="Zigzag at the base / at the top (WAVE_JITTER_AMP_BASE / WAVE_JITTER_AMP_GROWTH)">Zigzag alla base / in cima (WAVE_JITTER_AMP_BASE / WAVE_JITTER_AMP_GROWTH)</dt>
+        <dd data-en="Amplitude of the zigzag oscillation near the ground, and how much it grows rising toward the tube. Higher values make the wave look more &quot;jittery&quot; and visible, especially close to the tube.">Ampiezza dell'oscillazione a zigzag vicino al suolo, e di quanto cresce
         salendo verso il tubo. Valori piu' alti rendono l'onda piu' "nervosa" e
         visibile, soprattutto in prossimita' del tubo.</dd>
       </dl>
 
-      <h4>Velocità generali</h4>
+      <h4 data-en="General speeds">Velocità generali</h4>
       <dl>
-        <dt>Velocita' frecce di flusso (FLOW_SPEED)</dt>
-        <dd>Velocita' con cui le frecce che rappresentano il flusso di plasma scorrono
+        <dt data-en="Flow-arrow speed (FLOW_SPEED)">Velocita' frecce di flusso (FLOW_SPEED)</dt>
+        <dd data-en="Speed at which the arrows representing the plasma flow move along the tubes, from the base toward the landing end. Lower value = slower arrows; higher value = faster arrows.">Velocita' con cui le frecce che rappresentano il flusso di plasma scorrono
         lungo i tubi, dalla base verso l'atterraggio. Valore piu' basso = frecce piu'
         lente; valore piu' alto = frecce piu' veloci.</dd>
       </dl>
     </div>
   </div>
 
-  <div class="hint">Trascina per ruotare · rotellina per zoom · tasto destro per pan</div>
+  <div class="hint" data-en="Drag to rotate · scroll wheel to zoom · right button to pan">Trascina per ruotare · rotellina per zoom · tasto destro per pan</div>
 </div>
 
+<script src="lingua.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 <script>
@@ -530,13 +532,15 @@ window.addEventListener('load', function(){
     return;
   }
   try { init(); } catch(e){
+    var T0=window.T||(it=>it);
     document.getElementById('errbox').style.display = 'flex';
-    document.getElementById('errbox').innerHTML = 'Errore nella scena 3D: ' + e.message;
+    document.getElementById('errbox').innerHTML = T0('Errore nella scena 3D: ','Error in the 3D scene: ') + e.message;
     console.error(e);
   }
 });
 
 function init(){
+  var T=window.T||function(it){return it;};
   var mount = document.getElementById('mount');
   var width = mount.clientWidth;
   var height = mount.clientHeight;
@@ -1224,7 +1228,7 @@ function init(){
   var spinBtn = document.getElementById('btn-spin');
   spinBtn.addEventListener('click', function(){
     autoSpin = !autoSpin;
-    spinBtn.textContent = 'Rotazione auto: ' + (autoSpin ? 'on' : 'off');
+    spinBtn.textContent = T('Rotazione auto: ','Auto-rotation: ') + (autoSpin ? 'on' : 'off');
     spinBtn.classList.toggle('active', autoSpin);
   });
 
@@ -1308,6 +1312,7 @@ function init(){
 // frame, la modifica ha effetto immediato, senza bisogno di ricaricare la pagina.
 // =====================================================================================
 (function(){
+  var T=window.T||function(it){return it;};
   // { chiave in FIBRILLE_CONFIG : numero di decimali da mostrare nel valore, suffisso }
   var sliderDefs = [
     { key:'CHECK_INTERVAL_MS',   decimals:0, suffix:' ms' },
@@ -1404,16 +1409,16 @@ function init(){
           return writable.write(data).then(function(){ return writable.close(); });
         });
       }).then(function(){
-        showIoStatus('Parametri salvati.', false);
+        showIoStatus(T('Parametri salvati.','Parameters saved.'), false);
       }).catch(function(err){
         if (err && err.name === 'AbortError') return; // utente ha annullato la finestra
         // fallback silenzioso se la finestra di sistema non e' utilizzabile
-        try { downloadFallbackSave(data, filename); showIoStatus('Parametri salvati (download).', false); }
-        catch(e){ showIoStatus('Errore nel salvataggio.', true); }
+        try { downloadFallbackSave(data, filename); showIoStatus(T('Parametri salvati (download).','Parameters saved (download).'), false); }
+        catch(e){ showIoStatus(T('Errore nel salvataggio.','Error while saving.'), true); }
       });
     } else {
-      try { downloadFallbackSave(data, filename); showIoStatus('Parametri salvati.', false); }
-      catch(e){ showIoStatus('Errore nel salvataggio.', true); }
+      try { downloadFallbackSave(data, filename); showIoStatus(T('Parametri salvati.','Parameters saved.'), false); }
+      catch(e){ showIoStatus(T('Errore nel salvataggio.','Error while saving.'), true); }
     }
   });
 
@@ -1429,9 +1434,9 @@ function init(){
         }
       }
       syncSlidersFromConfig();
-      showIoStatus('Caricati ' + applied + ' parametri.', false);
+      showIoStatus(T('Caricati ','Loaded ') + applied + T(' parametri.',' parameters.'), false);
     } catch (err) {
-      showIoStatus('File non valido.', true);
+      showIoStatus(T('File non valido.','Invalid file.'), true);
     }
   }
 
@@ -1463,7 +1468,7 @@ function init(){
     if (!file) return;
     var reader = new FileReader();
     reader.onload = function(){ applyLoadedParams(reader.result); };
-    reader.onerror = function(){ showIoStatus('Errore nella lettura del file.', true); };
+    reader.onerror = function(){ showIoStatus(T('Errore nella lettura del file.','Error while reading the file.'), true); };
     reader.readAsText(file);
   });
 
@@ -1482,7 +1487,12 @@ function init(){
 .cc-n,.cc-badge a{white-space:nowrap}
 .cc-badge a{color:inherit;text-decoration:underline;text-underline-offset:2px}
 .cc-badge.cc-fixed{position:fixed;top:10px;right:10px;margin:0;z-index:2147483000;background:rgba(10,10,18,.62);color:#f2efe6;border-color:rgba(242,239,230,.45);opacity:1;backdrop-filter:blur(4px)}
+.cc-badge.cc-doc{text-decoration:none;opacity:1;font-weight:600;margin-left:.4em}
+.cc-badge.lang-sw{opacity:1;margin-left:.4em}.cc-badge.lang-sw a{cursor:pointer}
 @media (max-width:520px){.cc-badge{font-size:11px;padding:2px 7px}}
 </style>
+<script src="struttura_fibrille_scheda.js"></script>
+<script src="struttura_fibrille_scheda_en.js"></script>
+<script src="scheda.js"></script>
 </body>
 </html>

@@ -7,7 +7,7 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8">
-<title>Onda magnetoacustica nel tubo di flusso — vista 3D</title>
+<title data-en="Magnetoacoustic wave in the granule — 3D view">L'onda magnetoacustica del granulo — vista 3D</title>
 <style>
   html, body { margin:0; padding:0; background:#3a2408; font-family: -apple-system, "Segoe UI", Arial, sans-serif; overflow:hidden; }
   #bg {
@@ -45,17 +45,19 @@
 <div id="bg"></div>
 <div id="app">
   <div id="mount"></div>
-  <div id="errbox">Impossibile caricare la libreria 3D (three.js) da rete in questo ambiente.<br>Prova ad aprire il file in un browser normale.</div>
+  <div id="errbox" data-en="Unable to load the 3D library (three.js) from the network in this environment.<br>Try opening the file in a regular browser.">Impossibile caricare la libreria 3D (three.js) da rete in questo ambiente.<br>Prova ad aprire il file in un browser normale.</div>
   <div class="panel">
-    <button id="btn-top">Vista dall'alto</button>
-    <button id="btn-iso">Vista 3D</button>
-    <button id="btn-side">Vista laterale</button>
-    <button id="btn-spin">Rotazione auto: off</button>
+    <button id="btn-top" data-en="Top view">Vista dall'alto</button>
+    <button id="btn-iso" data-en="3D view">Vista 3D</button>
+    <button id="btn-side" data-en="Side view">Vista laterale</button>
+    <button id="btn-spin" data-en="Auto-rotation: off">Rotazione auto: off</button>
+    <a class="cc-badge cc-doc" href="#scheda" data-scheda data-en="📖 Animation description">📖 Scheda dell'animazione</a> <span data-lang-switch></span>
     <span class="cc-badge"><span class="cc-n">© 2026 Carlo Casoli ·</span> <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it" target="_blank" rel="license noopener">CC BY-NC-ND 4.0</a></span>
   </div>
-  <div class="hint">Trascina per ruotare · rotellina per zoom · tasto destro per pan</div>
+  <div class="hint" data-en="Drag to rotate · scroll wheel to zoom · right button to pan">Trascina per ruotare · rotellina per zoom · tasto destro per pan</div>
 </div>
 
+<script src="lingua.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 <script>
@@ -65,13 +67,15 @@ window.addEventListener('load', function(){
     return;
   }
   try { init(); } catch(e){
+    var T0=window.T||(it=>it);
     document.getElementById('errbox').style.display = 'flex';
-    document.getElementById('errbox').innerHTML = 'Errore nella scena 3D: ' + e.message;
+    document.getElementById('errbox').innerHTML = T0('Errore nella scena 3D: ','Error in the 3D scene: ') + e.message;
     console.error(e);
   }
 });
 
 function init(){
+  var T=window.T||function(it){return it;};
   var mount = document.getElementById('mount');
   var width = mount.clientWidth;
   var height = mount.clientHeight;
@@ -429,7 +433,7 @@ function init(){
   var spinBtn = document.getElementById('btn-spin');
   spinBtn.addEventListener('click', function(){
     autoSpin = !autoSpin;
-    spinBtn.textContent = 'Rotazione auto: ' + (autoSpin ? 'on' : 'off');
+    spinBtn.textContent = T('Rotazione auto: ','Auto-rotation: ') + (autoSpin ? 'on' : 'off');
     spinBtn.classList.toggle('active', autoSpin);
   });
 
@@ -523,7 +527,12 @@ function init(){
 .cc-n,.cc-badge a{white-space:nowrap}
 .cc-badge a{color:inherit;text-decoration:underline;text-underline-offset:2px}
 .cc-badge.cc-fixed{position:fixed;top:10px;right:10px;margin:0;z-index:2147483000;background:rgba(10,10,18,.62);color:#f2efe6;border-color:rgba(242,239,230,.45);opacity:1;backdrop-filter:blur(4px)}
+.cc-badge.cc-doc{text-decoration:none;opacity:1;font-weight:600;margin-left:.4em}
+.cc-badge.lang-sw{opacity:1;margin-left:.4em}.cc-badge.lang-sw a{cursor:pointer}
 @media (max-width:520px){.cc-badge{font-size:11px;padding:2px 7px}}
 </style>
+<script src="onda_magnetoacustica_granulo_scheda.js"></script>
+<script src="onda_magnetoacustica_granulo_scheda_en.js"></script>
+<script src="scheda.js"></script>
 </body>
 </html>
