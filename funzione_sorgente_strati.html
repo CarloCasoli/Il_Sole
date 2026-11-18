@@ -5,7 +5,7 @@
   Vietati l'uso commerciale e la distribuzione di versioni modificate senza autorizzazione scritta dell'autore.
 -->
 <html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title data-en="The source function across the Sun's layers">La funzione sorgente negli strati del Sole</title>
+<title data-en="The source function across the layers of the Sun's atmosphere">La funzione sorgente negli strati dell'atmosfera del Sole</title>
 <style>
 :root{--text-primary:#1f1e1d;--text-secondary:#5f5e5a;--border:rgba(0,0,0,.12);--border-strong:rgba(0,0,0,.25);--bg:#ffffff;--panel:rgba(0,0,0,.03);--acc:#378ADD}
 @media (prefers-color-scheme:dark){:root{--text-primary:#f1efe8;--text-secondary:#b4b2a9;--border:rgba(255,255,255,.12);--border-strong:rgba(255,255,255,.28);--bg:#1f1f1e;--panel:rgba(255,255,255,.04)}}
@@ -54,7 +54,7 @@ table.bilancio td.s{color:#52b8ff;font-weight:600}
 </style></head><body>
 
 <div class="top">
-  <h1><span data-en="The source function across the Sun's layers">La funzione sorgente negli strati del Sole</span><span class="cc-badge"><span class="cc-n">© 2026 Carlo Casoli ·</span> <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it" target="_blank" rel="license noopener">CC BY-NC-ND 4.0</a></span> <a class="cc-badge cc-doc" href="#scheda" data-scheda data-en="📖 Animation description">📖 Scheda dell'animazione</a> <span data-lang-switch></span></h1>
+  <h1><span data-en="The source function across the layers of the Sun's atmosphere">La funzione sorgente negli strati dell'atmosfera del Sole</span><span class="cc-badge"><span class="cc-n">© 2026 Carlo Casoli ·</span> <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it" target="_blank" rel="license noopener">CC BY-NC-ND 4.0</a></span> <a class="cc-badge cc-doc" href="#scheda" data-scheda data-en="📖 Animation description">📖 Scheda dell'animazione</a> <span data-lang-switch></span></h1>
   <a href="index.html" data-en="← Index of the animations">← Indice delle animazioni</a>
 </div>
 <p class="sub" data-en="Chapter 2 — Radiation and matter · In-depth section 2.9 &quot;Quantitative analysis of the Source Function&quot;">Capitolo 2 — Radiazione e materia · Approfondimento 2.9 "Analisi quantitativa della Funzione Sorgente"</p>
@@ -75,7 +75,7 @@ table.bilancio td.s{color:#52b8ff;font-weight:600}
 <div class="layout">
 
   <div>
-    <canvas class="cv" id="scena" width="980" height="560" aria-label="Animazione della funzione sorgente attraverso 4 strati del Sole, con vettori di emissione/assorbimento e profilo spettrale" data-en-aria="Animation of the source function across 4 layers of the Sun, with emission/absorption vectors and spectral profile"></canvas>
+    <canvas class="cv" id="scena" width="1020" height="560" aria-label="Animazione della funzione sorgente attraverso 4 strati del Sole, con freccia del flusso radiativo, vettori di emissione/assorbimento e profilo spettrale" data-en-aria="Animation of the source function across 4 layers of the Sun, with radiative flux arrow, emission/absorption vectors and spectral profile"></canvas>
     <div class="caption" id="narratore"></div>
   </div>
 
@@ -151,22 +151,22 @@ table.bilancio td.s{color:#52b8ff;font-weight:600}
 
   // ---------- Dati fisici (Approfondimento 2.9, scala 0-150) ----------
   const STRATI = [
-    { nome: T('1. Regione profonda — prigione termica (LTE)','1. Deep region — thermal prison (LTE)'),
+    { nome: T('1. Regione profonda — prigione termica (LTE) (bassa fotosfera)','1. Deep region — thermal prison (LTE) (lower photosphere)'),
       testo: T('Il gas è densissimo e caldissimo: assorbe tutta la radiazione che riceve, ma emette altrettanto. In equilibrio termodinamico locale (LTE) il bilancio è un pareggio perfetto: tanto entra, tanto esce, sia per il continuo sia per la riga.',
                'The gas is extremely dense and hot: it absorbs all the radiation it receives, but emits just as much. In local thermodynamic equilibrium (LTE) the balance is a perfect draw: as much goes in as comes out, for both the continuum and the line.'),
       g:{in:150, em:150, ab:-150, out:150},
       s:{in:150, em:150, ab:-150, out:150} },
-    { nome: T('2. Strato intermedio — transizione verso la trasparenza','2. Intermediate layer — transition towards transparency'),
+    { nome: T('2. Strato intermedio — transizione verso la trasparenza (alta fotosfera)','2. Intermediate layer — transition towards transparency (upper photosphere)'),
       testo: T('Per le frequenze generiche il gas è ormai quasi trasparente: la radiazione esce quasi intatta (150→150). Ma alcuni atomi (es. l\'idrogeno) sono pronti ad agganciare proprio questa frequenza specifica: lì l\'assorbimento prevale e nascono le prime righe di assorbimento (150→100).',
                'At generic frequencies the gas is by now almost transparent: the radiation comes out nearly intact (150→150). But some atoms (e.g. hydrogen) are ready to latch onto this specific frequency: there absorption prevails and the first absorption lines appear (150→100).'),
       g:{in:150, em:5, ab:-5, out:150},
       s:{in:150, em:5, ab:-55, out:100} },
-    { nome: T('3. Strato freddo — minimo di temperatura','3. Cold layer — temperature minimum'),
+    { nome: T('3. Strato freddo (minimo di temperatura)','3. Cold layer (temperature minimum)'),
       testo: T('Il gas è rarefatto e freddo: non ha energia per emettere, ma per questa frequenza specifica il poco gas rimasto è ancora un filtro fortissimo. L\'intensità della riga crolla al suo minimo (100→50), mentre il continuo resta inalterato.',
                'The gas is rarefied and cold: it has no energy to emit, but for this specific frequency the little gas left is still a very strong filter. The line\'s intensity drops to its minimum (100→50), while the continuum stays unchanged.'),
       g:{in:150, em:0, ab:0, out:150},
       s:{in:100, em:2, ab:-52, out:50} },
-    { nome: T('4. Strato esterno surriscaldato','4. Superheated outer layer'),
+    { nome: T('4. Strato esterno surriscaldato (cromosfera)','4. Superheated outer layer (chromosphere)'),
       testo: T('Qui il paradosso: la densità è quasi nulla, ma meccanismi come i campi magnetici fanno risalire la temperatura. Gli atomi rarefatti ma eccitati riemettono proprio su questa frequenza, risollevando un poco l\'intensità della riga (50→75).',
                'Here is the paradox: the density is almost zero, but mechanisms such as magnetic fields make the temperature rise again. The rarefied but excited atoms re-emit exactly at this frequency, lifting the line\'s intensity a little (50→75).'),
       g:{in:150, em:0, ab:0, out:150},
@@ -182,14 +182,16 @@ table.bilancio td.s{color:#52b8ff;font-weight:600}
     const y0 = y1 - LAYER_H;
     return {y0, y1};
   }
+  // margine sinistro: grande freccia del flusso radiativo in uscita
+  const xFlusso = 20;
   // zona sinistra: strati + fasci + vettori di emissione/assorbimento
-  const bandX0 = 40, bandX1 = 460;
-  const labelX = 50, labelMaxW = 100;
-  const xG = 200, xS = 320, beamW = 60;
-  const vecG_x = 245, vecS_x = 365;
+  const bandX0 = 80, bandX1 = 500;
+  const labelX = 90, labelMaxW = 100;
+  const xG = 240, xS = 360, beamW = 60;
+  const vecG_x = 285, vecS_x = 405;
   const vecScale = 42/150; // px per unità, lunghezza massima 42px
   // zona destra: profilo spettrale
-  const pX0 = 510, pX1 = 940;
+  const pX0 = 550, pX1 = 980;
 
   // ---------- Stato ----------
   // step: 0 = intro (nulla è salito), 1..N = strato k appena elaborato, N+1 = risultato finale
@@ -482,6 +484,64 @@ table.bilancio td.s{color:#52b8ff;font-weight:600}
     ctx.textAlign = 'left';
   }
 
+  // grande freccia rossa sul margine sinistro: il flusso di radiazione
+  // che sale ed esce dal Sole, sempre visibile, indipendente dallo step
+  function disegnaFlussoRadiazione(){
+    const yBottom = BOTTOM_Y + 14, yTop = TOP_Y - 6;
+    const grad = ctx.createLinearGradient(0, yBottom, 0, yTop);
+    grad.addColorStop(0, 'rgba(255,70,60,0.18)');
+    grad.addColorStop(1, 'rgba(255,70,60,0.95)');
+    ctx.strokeStyle = grad;
+    ctx.lineWidth = 9;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(xFlusso, yBottom);
+    ctx.lineTo(xFlusso, yTop + 16);
+    ctx.stroke();
+    ctx.fillStyle = 'rgba(255,70,60,0.95)';
+    ctx.beginPath();
+    ctx.moveTo(xFlusso, yTop - 6);
+    ctx.lineTo(xFlusso - 13, yTop + 18);
+    ctx.lineTo(xFlusso + 13, yTop + 18);
+    ctx.closePath();
+    ctx.fill();
+    ctx.save();
+    ctx.translate(xFlusso, (yBottom + yTop) / 2);
+    ctx.rotate(-Math.PI / 2);
+    ctx.font = 'bold 10px Segoe UI';
+    ctx.fillStyle = 'rgba(255,255,255,0.9)';
+    ctx.textAlign = 'center';
+    ctx.fillText(T('flusso di radiazione','radiation flux'), 0, 4);
+    ctx.restore();
+  }
+
+  // freccia orizzontale che collega lo strato "attivo" (quello appena
+  // elaborato) con il pannello del profilo spettrale; si sposta di livello
+  // ad ogni avanzamento, e resta sullo strato 4 nel risultato finale
+  function disegnaCollegamentoProfilo(){
+    if (step === 0) return;
+    const idx = Math.min(step - 1, N - 1);
+    const {y0, y1} = bandaY(idx);
+    const y = (y0 + y1) / 2;
+    const xStart = bandX1 + 6, xEnd = pX0 - 6;
+    ctx.save();
+    ctx.setLineDash([7, 5]);
+    ctx.strokeStyle = 'rgba(255,255,255,0.55)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(xStart, y);
+    ctx.lineTo(xEnd, y);
+    ctx.stroke();
+    ctx.restore();
+    ctx.fillStyle = 'rgba(255,255,255,0.75)';
+    ctx.beginPath();
+    ctx.moveTo(xEnd, y);
+    ctx.lineTo(xEnd - 9, y - 5);
+    ctx.lineTo(xEnd - 9, y + 5);
+    ctx.closePath();
+    ctx.fill();
+  }
+
   function disegnaRisultatoFinale(){
     if (step < N+1) return;
     const bx = W/2 - 170, by = 10, bw = 340, bh = 34;
@@ -500,8 +560,10 @@ table.bilancio td.s{color:#52b8ff;font-weight:600}
 
   function disegna(){
     disegnaSfondo();
+    disegnaFlussoRadiazione();
     disegnaStrati();
     disegnaFasci();
+    disegnaCollegamentoProfilo();
     disegnaProfilo();
     disegnaRisultatoFinale();
   }

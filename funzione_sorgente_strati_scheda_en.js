@@ -4,7 +4,7 @@ SCHEDA_EN = String.raw`
 %%   Do not use the backtick character.
 %%   Testo inglese della scheda: corrisponde a funzione_sorgente_strati_scheda.js e all'Approfondimento 2.9 del libro inglese.
 
-# The source function across the Sun's layers
+# The source function across the layers of the Sun's atmosphere
 
 ## What the animation shows
 

@@ -4,7 +4,7 @@ SCHEDA = String.raw`
 %%   Non usare l'accento grave.
 %%   Testo dell'Approfondimento 2.9 del libro (capitolo2.tex).
 
-# La funzione sorgente negli strati del Sole
+# La funzione sorgente negli strati dell'atmosfera del Sole
 
 ## Che cosa mostra l'animazione
 
