@@ -1,0 +1,605 @@
+<!doctype html>
+<!--
+  © 2026 Carlo Casoli — "Il Sole: Osservazione e Fisica"
+  Licenza CC BY-NC-ND 4.0: https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it
+  Vietati l'uso commerciale e la distribuzione di versioni modificate senza autorizzazione scritta dell'autore.
+-->
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title data-en="The source function across the Sun's layers">La funzione sorgente negli strati del Sole</title>
+<style>
+:root{--text-primary:#1f1e1d;--text-secondary:#5f5e5a;--border:rgba(0,0,0,.12);--border-strong:rgba(0,0,0,.25);--bg:#ffffff;--panel:rgba(0,0,0,.03);--acc:#378ADD}
+@media (prefers-color-scheme:dark){:root{--text-primary:#f1efe8;--text-secondary:#b4b2a9;--border:rgba(255,255,255,.12);--border-strong:rgba(255,255,255,.28);--bg:#1f1f1e;--panel:rgba(255,255,255,.04)}}
+*{box-sizing:border-box}
+body{margin:0;padding:16px;background:var(--bg);color:var(--text-primary);font-family:-apple-system,"Segoe UI",Roboto,sans-serif;max-width:1280px;margin:0 auto;line-height:1.5}
+a{color:var(--acc)}
+button{background:transparent;color:var(--text-primary);border:1px solid var(--border-strong);border-radius:8px;cursor:pointer;font-family:inherit;font-size:13px;padding:7px 12px}
+button:hover{background:rgba(127,127,127,.12)}
+button:disabled{opacity:.4;cursor:default}
+button:disabled:hover{background:transparent}
+button.sel[aria-pressed=true]{background:var(--acc);color:#fff;border-color:var(--acc)}
+.top{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 14px;margin-bottom:4px}
+.top h1{font-size:19px;font-weight:600;margin:0}
+.top a{font-size:13px;text-decoration:none}
+.sub{font-size:13px;color:var(--text-secondary);margin:0 0 12px;max-width:900px;line-height:1.45}
+.guida{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:14px;font-size:13px}
+.guida h2{margin:0 0 8px;font-size:14px}
+.guida ol{margin:0 0 10px;padding-left:20px}
+.guida li{margin-bottom:5px}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:14px;align-items:start}
+@media (max-width:900px){.layout{grid-template-columns:1fr}}
+.cv{width:100%;display:block;border:1px solid var(--border);border-radius:10px;background:#0a0e14}
+.caption{margin-top:8px;min-height:20px;background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:13px;color:var(--text-primary)}
+.caption b{color:#EF9F27}
+.card{border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--panel)}
+.card h2{font-size:14px;margin:0 0 10px}
+.gruppo{margin-bottom:14px;padding-bottom:12px;border-bottom:1px dashed var(--border)}
+.gruppo:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.riga{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px}
+.stadio{font-size:12.5px;color:var(--text-secondary);margin:2px 0 8px}
+.stadio b{color:var(--text-primary);font-weight:600}
+table.bilancio{border-collapse:collapse;width:100%;font-size:12.5px;margin-top:4px}
+table.bilancio th,table.bilancio td{border:1px solid var(--border);padding:5px 7px;text-align:center}
+table.bilancio th{background:var(--panel);font-weight:600;color:var(--text-secondary);font-size:11.5px}
+table.bilancio td.etichetta{text-align:left;color:var(--text-secondary)}
+table.bilancio td.g{color:#ffb454;font-weight:600}
+table.bilancio td.s{color:#52b8ff;font-weight:600}
+.legend{display:flex;flex-direction:column;gap:5px;font-size:12.5px;color:var(--text-secondary);margin:0}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:-1px;flex:none}
+.legend span{display:flex;align-items:center}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:12px;margin-top:2px}
+.grid2 div{background:var(--panel);border-radius:8px;padding:6px 9px}
+.grid2 span{display:block;color:var(--text-secondary);font-size:11.5px}
+.grid2 b{display:block;font-size:14px;color:var(--text-primary);font-weight:600}
+@media (max-width:760px){.top h1{font-size:17px}body{padding:12px}}
+</style></head><body>
+
+<div class="top">
+  <h1><span data-en="The source function across the Sun's layers">La funzione sorgente negli strati del Sole</span><span class="cc-badge"><span class="cc-n">© 2026 Carlo Casoli ·</span> <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it" target="_blank" rel="license noopener">CC BY-NC-ND 4.0</a></span> <a class="cc-badge cc-doc" href="#scheda" data-scheda data-en="📖 Animation description">📖 Scheda dell'animazione</a> <span data-lang-switch></span></h1>
+  <a href="index.html" data-en="← Index of the animations">← Indice delle animazioni</a>
+</div>
+<p class="sub" data-en="Chapter 2 — Radiation and matter · In-depth section 2.9 &quot;Quantitative analysis of the Source Function&quot;">Capitolo 2 — Radiazione e materia · Approfondimento 2.9 "Analisi quantitativa della Funzione Sorgente"</p>
+
+<div class="guida" id="guidaIniziale">
+  <h2 data-en="How to read this animation (30 seconds)">Come leggere questa animazione (30 secondi)</h2>
+  <ol>
+    <li data-en="Radiation rises from the bottom (deep, dense Sun) through 4 ideal layers of the atmosphere, up to the observer at the top.">La radiazione sale dal basso (Sole profondo e denso) attraverso 4 strati ideali dell'atmosfera, fino all'osservatore in cima.</li>
+    <li data-en="Two beams rise side by side: the &lt;b&gt;continuum&lt;/b&gt; (generic frequencies, orange) and a &lt;b&gt;specific spectral line&lt;/b&gt; (selective frequencies, blue).">Salgono due fasci affiancati: il <b>continuo</b> (frequenze generiche, arancione) e una <b>riga spettrale specifica</b> (frequenze selettive, azzurro).</li>
+    <li data-en="In each layer the numbers on a 0-150 scale change: what arrives, what the gas emits (+) and absorbs (−), and the resulting balance.">In ogni strato i numeri su una scala 0-150 cambiano: quanto arriva, quanto il gas emette (+) e assorbe (−), e il saldo risultante.</li>
+    <li data-en="The continuum passes through almost unchanged (150→150). The line is instead absorbed in the intermediate and cold layers, and partly re-emitted in the hot outer layer.">Il continuo passa quasi inalterato (150→150). La riga invece viene assorbita negli strati intermedio e freddo, e in parte riemessa nello strato esterno caldo.</li>
+    <li data-en="The final result (150 vs 75) is exactly the absorption line we observe in the spectrum.">Il risultato finale (150 contro 75) è esattamente la riga di assorbimento che osserviamo nello spettro.</li>
+    <li data-en="On each layer small arrows appear: green = emission (gain), red = absorption (loss). On the right, a panel shows the spectral profile that gets carved out step by step.">Su ogni strato compaiono piccole freccette: verde = emissione (guadagno), rossa = assorbimento (perdita). A destra, un pannello mostra il profilo spettrale che si scava passo dopo passo.</li>
+  </ol>
+  <button data-en="Got it, close" onclick="document.getElementById('guidaIniziale').style.display='none'">Ho capito, chiudi</button>
+</div>
+
+<div class="layout">
+
+  <div>
+    <canvas class="cv" id="scena" width="980" height="560" aria-label="Animazione della funzione sorgente attraverso 4 strati del Sole, con vettori di emissione/assorbimento e profilo spettrale" data-en-aria="Animation of the source function across 4 layers of the Sun, with emission/absorption vectors and spectral profile"></canvas>
+    <div class="caption" id="narratore"></div>
+  </div>
+
+  <div class="card">
+    <h2 data-en="Controls">Comandi</h2>
+
+    <div class="gruppo">
+      <div class="riga">
+        <button id="btnPrec" data-en="◀ Previous layer">◀ Strato precedente</button>
+        <button id="btnSucc" data-en="Next layer ▶">Strato successivo ▶</button>
+      </div>
+      <div class="riga">
+        <button id="btnAuto" data-en="▶ Play automatically">▶ Riproduci automaticamente</button>
+        <button id="btnReset" data-en="↺ Restart">↺ Ricomincia</button>
+      </div>
+    </div>
+
+    <div class="gruppo">
+      <div class="stadio" data-en="Current stage: &lt;b id=&quot;valStadio&quot;&gt;—&lt;/b&gt;">Fase attuale: <b id="valStadio">—</b></div>
+      <table class="bilancio">
+        <tr><th data-en="Balance"></th><th data-en="Continuum">Continuo</th><th data-en="Line">Riga</th></tr>
+        <tr><td class="etichetta" data-en="Arriving">Arriva</td><td class="g" id="bIn_g">–</td><td class="s" id="bIn_s">–</td></tr>
+        <tr><td class="etichetta" data-en="Emission">Emissione</td><td class="g" id="bEm_g">–</td><td class="s" id="bEm_s">–</td></tr>
+        <tr><td class="etichetta" data-en="Absorption">Assorbimento</td><td class="g" id="bAb_g">–</td><td class="s" id="bAb_s">–</td></tr>
+        <tr><td class="etichetta" data-en="Balance">Saldo</td><td class="g" id="bOut_g">–</td><td class="s" id="bOut_s">–</td></tr>
+      </table>
+    </div>
+
+    <div class="gruppo">
+      <h2 data-en="What you are seeing">Cosa stai vedendo</h2>
+      <div class="legend">
+        <span data-en="Continuum (generic frequencies): the thermal background, scale 0-150"><i style="background:#ffb454"></i>Continuo (frequenze generiche): fondo termico, scala 0-150</span>
+        <span data-en="Spectral line (selective frequencies of the atoms)"><i style="background:#52b8ff"></i>Riga spettrale (frequenze selettive degli atomi)</span>
+        <span data-en="Brightness of the beam ∝ intensity on the 0-150 scale"><i style="background:#ffffff;box-shadow:0 0 0 1px #ccc inset"></i>Luminosità del fascio ∝ intensità sulla scala 0-150</span>
+        <span data-en="Green arrow = emission (gain), red arrow = absorption (loss); length ∝ magnitude"><i style="background:#6fdc8c"></i>Freccia verde = emissione (guadagno), rossa = assorbimento (perdita)</span>
+        <span data-en="Right panel: spectral profile that is carved out as the line is absorbed"><i style="background:#52b8ff"></i>Pannello a destra: profilo spettrale che si scava via via che la riga viene assorbita</span>
+      </div>
+    </div>
+
+    <div class="gruppo">
+      <h2 data-en="Final result">Risultato finale</h2>
+      <div class="grid2">
+        <div><span data-en="Continuum received">Continuo ricevuto</span><b id="finG">–</b></div>
+        <div><span data-en="Line received">Riga ricevuta</span><b id="finS">–</b></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="lingua.js"></script>
+<script>
+(function(){
+  "use strict";
+  const T = window.T || (it=>it);
+
+  // ---------- Riferimenti DOM ----------
+  const canvas = document.getElementById('scena');
+  const ctx = canvas.getContext('2d');
+  const narratore = document.getElementById('narratore');
+
+  const btnPrec = document.getElementById('btnPrec');
+  const btnSucc = document.getElementById('btnSucc');
+  const btnAuto = document.getElementById('btnAuto');
+  const btnReset = document.getElementById('btnReset');
+  const valStadio = document.getElementById('valStadio');
+
+  const bIn_g=document.getElementById('bIn_g'), bEm_g=document.getElementById('bEm_g'), bAb_g=document.getElementById('bAb_g'), bOut_g=document.getElementById('bOut_g');
+  const bIn_s=document.getElementById('bIn_s'), bEm_s=document.getElementById('bEm_s'), bAb_s=document.getElementById('bAb_s'), bOut_s=document.getElementById('bOut_s');
+  const finG = document.getElementById('finG'), finS = document.getElementById('finS');
+
+  const W = canvas.width, H = canvas.height;
+
+  // ---------- Dati fisici (Approfondimento 2.9, scala 0-150) ----------
+  const STRATI = [
+    { nome: T('1. Regione profonda — prigione termica (LTE)','1. Deep region — thermal prison (LTE)'),
+      testo: T('Il gas è densissimo e caldissimo: assorbe tutta la radiazione che riceve, ma emette altrettanto. In equilibrio termodinamico locale (LTE) il bilancio è un pareggio perfetto: tanto entra, tanto esce, sia per il continuo sia per la riga.',
+               'The gas is extremely dense and hot: it absorbs all the radiation it receives, but emits just as much. In local thermodynamic equilibrium (LTE) the balance is a perfect draw: as much goes in as comes out, for both the continuum and the line.'),
+      g:{in:150, em:150, ab:-150, out:150},
+      s:{in:150, em:150, ab:-150, out:150} },
+    { nome: T('2. Strato intermedio — transizione verso la trasparenza','2. Intermediate layer — transition towards transparency'),
+      testo: T('Per le frequenze generiche il gas è ormai quasi trasparente: la radiazione esce quasi intatta (150→150). Ma alcuni atomi (es. l\'idrogeno) sono pronti ad agganciare proprio questa frequenza specifica: lì l\'assorbimento prevale e nascono le prime righe di assorbimento (150→100).',
+               'At generic frequencies the gas is by now almost transparent: the radiation comes out nearly intact (150→150). But some atoms (e.g. hydrogen) are ready to latch onto this specific frequency: there absorption prevails and the first absorption lines appear (150→100).'),
+      g:{in:150, em:5, ab:-5, out:150},
+      s:{in:150, em:5, ab:-55, out:100} },
+    { nome: T('3. Strato freddo — minimo di temperatura','3. Cold layer — temperature minimum'),
+      testo: T('Il gas è rarefatto e freddo: non ha energia per emettere, ma per questa frequenza specifica il poco gas rimasto è ancora un filtro fortissimo. L\'intensità della riga crolla al suo minimo (100→50), mentre il continuo resta inalterato.',
+               'The gas is rarefied and cold: it has no energy to emit, but for this specific frequency the little gas left is still a very strong filter. The line\'s intensity drops to its minimum (100→50), while the continuum stays unchanged.'),
+      g:{in:150, em:0, ab:0, out:150},
+      s:{in:100, em:2, ab:-52, out:50} },
+    { nome: T('4. Strato esterno surriscaldato','4. Superheated outer layer'),
+      testo: T('Qui il paradosso: la densità è quasi nulla, ma meccanismi come i campi magnetici fanno risalire la temperatura. Gli atomi rarefatti ma eccitati riemettono proprio su questa frequenza, risollevando un poco l\'intensità della riga (50→75).',
+               'Here is the paradox: the density is almost zero, but mechanisms such as magnetic fields make the temperature rise again. The rarefied but excited atoms re-emit exactly at this frequency, lifting the line\'s intensity a little (50→75).'),
+      g:{in:150, em:0, ab:0, out:150},
+      s:{in:50, em:30, ab:-5, out:75} }
+  ];
+  const N = STRATI.length;
+
+  // ---------- Geometria dello stack (dal basso = strato 1, verso l'alto = strato 4) ----------
+  const TOP_Y = 56, BOTTOM_Y = 516;
+  const LAYER_H = (BOTTOM_Y - TOP_Y) / N;
+  function bandaY(i){ // i=0..N-1, i=0 è lo strato più profondo (in basso)
+    const y1 = BOTTOM_Y - i*LAYER_H;
+    const y0 = y1 - LAYER_H;
+    return {y0, y1};
+  }
+  // zona sinistra: strati + fasci + vettori di emissione/assorbimento
+  const bandX0 = 40, bandX1 = 460;
+  const labelX = 50, labelMaxW = 100;
+  const xG = 200, xS = 320, beamW = 60;
+  const vecG_x = 245, vecS_x = 365;
+  const vecScale = 42/150; // px per unità, lunghezza massima 42px
+  // zona destra: profilo spettrale
+  const pX0 = 510, pX1 = 940;
+
+  // ---------- Stato ----------
+  // step: 0 = intro (nulla è salito), 1..N = strato k appena elaborato, N+1 = risultato finale
+  let step = 0;
+  let autoPlay = false;
+  let autoTimer = null;
+  let animProgress = 1; // 0..1, avanzamento dell'animazione di salita nello strato corrente
+  let animFrom = 0;
+
+  function datiStrato(i){ return STRATI[i]; } // i=0..N-1
+
+  // valore del fascio appena sotto lo strato i (cioè il valore "in" di quello strato),
+  // utile anche per sapere cosa è già "salito" fino a un certo punto
+  function valoreIngressoAlloStrato(i, campo){ return STRATI[i][campo].in; }
+  function valoreUscitaAlloStrato(i, campo){ return STRATI[i][campo].out; }
+
+  // ---------- Disegno ----------
+  function disegnaSfondo(){
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle = '#0a0e14';
+    ctx.fillRect(0,0,W,H);
+  }
+
+  function disegnaStrati(){
+    for (let i=0;i<N;i++){
+      const {y0,y1} = bandaY(i);
+      ctx.fillStyle = i%2===0 ? 'rgba(255,255,255,0.025)' : 'rgba(255,255,255,0.05)';
+      ctx.fillRect(bandX0, y0, bandX1-bandX0, y1-y0);
+      ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(bandX0, y0, bandX1-bandX0, y1-y0);
+
+      ctx.fillStyle = 'rgba(230,236,240,0.78)';
+      ctx.font = '11px Segoe UI';
+      ctx.textAlign = 'left';
+      const nome = STRATI[i].nome;
+      wrapText(nome, labelX, y0+15, labelMaxW, 13);
+    }
+    // etichette osservatore / interno (nascoste quando è in mostra il
+    // riquadro del risultato finale, per non sovrapporsi)
+    if (step < N+1){
+      ctx.fillStyle = 'rgba(230,236,240,0.6)';
+      ctx.font = '12px Segoe UI';
+      ctx.textAlign = 'center';
+      ctx.fillText(T('osservatore ↑','observer ↑'), (bandX0+bandX1)/2, TOP_Y-16);
+      ctx.textAlign = 'left';
+    }
+    ctx.fillStyle = 'rgba(230,236,240,0.6)';
+    ctx.font = '12px Segoe UI';
+    ctx.textAlign = 'center';
+    ctx.fillText(T('↑ verso l\'interno del Sole','↑ towards the Sun\'s interior'), (bandX0+bandX1)/2, BOTTOM_Y+36);
+    ctx.textAlign = 'left';
+  }
+
+  // numeri dell'intensità che arriva dal basso (dall'interno del Sole),
+  // condizione al contorno sempre presente, indipendente dallo step
+  function disegnaIngressoBase(){
+    const y = BOTTOM_Y + 10;
+    ['g','s'].forEach(campo=>{
+      const x = campo==='g' ? xG : xS;
+      const valore = STRATI[0][campo].in;
+      ctx.font = 'bold 13px Segoe UI';
+      const testo = Math.round(valore)+'';
+      const lw = ctx.measureText(testo).width;
+      ctx.fillStyle = 'rgba(10,14,20,0.55)';
+      ctx.fillRect(x-lw/2-6, y-9, lw+12, 18);
+      ctx.fillStyle = '#eef4f8';
+      ctx.textAlign = 'center';
+      ctx.fillText(testo, x, y+5);
+      ctx.textAlign = 'left';
+    });
+  }
+
+  // disegna una freccetta verticale centrata in (x,yCentro): verso l'alto
+  // (verde) se valore>=0 (emissione/guadagno), verso il basso (rosso) se
+  // valore<0 (assorbimento/perdita). Lunghezza proporzionale al valore.
+  function disegnaVettore(x, yCentro, valore){
+    if (!valore) return;
+    const len = Math.min(42, Math.abs(valore)*vecScale);
+    if (len < 2) return;
+    const dir = valore >= 0 ? -1 : 1;
+    const yEnd = yCentro + dir*len;
+    const colore = valore >= 0 ? '#6fdc8c' : '#ff6b6b';
+    ctx.strokeStyle = colore;
+    ctx.fillStyle = colore;
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.moveTo(x, yCentro);
+    ctx.lineTo(x, yEnd);
+    ctx.stroke();
+    // punta della freccia
+    const hl = 6;
+    ctx.beginPath();
+    ctx.moveTo(x, yEnd);
+    ctx.lineTo(x-4, yEnd - dir*hl);
+    ctx.lineTo(x+4, yEnd - dir*hl);
+    ctx.closePath();
+    ctx.fill();
+    // etichetta numerica
+    ctx.font = '10px Segoe UI';
+    ctx.textAlign = 'center';
+    const testo = (valore>=0?'+':'')+valore;
+    ctx.fillText(testo, x, yEnd + dir*11);
+    ctx.textAlign = 'left';
+  }
+
+  function disegnaVettoriStrato(i){
+    const {y0,y1} = bandaY(i);
+    const yc = (y0+y1)/2;
+    const s = STRATI[i];
+    disegnaVettore(vecG_x, yc, s.g.em);
+    disegnaVettore(vecG_x, yc, s.g.ab);
+    disegnaVettore(vecS_x, yc, s.s.em);
+    disegnaVettore(vecS_x, yc, s.s.ab);
+  }
+
+  function wrapText(testo, x, y, maxW, lineH){
+    const parole = testo.split(' ');
+    let riga = '';
+    let yy = y;
+    for (const p of parole){
+      const prova = riga ? riga+' '+p : p;
+      if (ctx.measureText(prova).width > maxW && riga){
+        ctx.fillText(riga, x, yy);
+        riga = p;
+        yy += lineH;
+      } else {
+        riga = prova;
+      }
+    }
+    if (riga) ctx.fillText(riga, x, yy);
+  }
+
+  // intensità del fascio (0-150) nello strato i, al progresso corrente dell'animazione
+  function intensitaCorrente(i, campo){
+    const s = STRATI[i][campo];
+    if (step < i+1) return null; // lo strato i non è ancora stato raggiunto
+    if (step === i+1 && animProgress < 1){
+      // sta transitando dal valore di ingresso a quello di uscita
+      return s.in + (s.out - s.in)*easeInOut(animProgress);
+    }
+    return s.out;
+  }
+  function easeInOut(t){ return t<0?0:t>1?1:t*t*(3-2*t); }
+
+  function disegnaFasci(){
+    for (let i=0;i<N;i++){
+      const {y0,y1} = bandaY(i);
+      const completo = step > i+1 || (step===i+1 && animProgress>=0.999);
+      ['g','s'].forEach(campo=>{
+        const val = intensitaCorrente(i, campo);
+        if (val===null) return;
+        const x = campo==='g' ? xG : xS;
+        const colore = campo==='g' ? [255,180,84] : [82,184,255];
+        const alpha = Math.max(0.05, val/150);
+        ctx.fillStyle = `rgba(${colore[0]},${colore[1]},${colore[2]},${alpha})`;
+        ctx.fillRect(x-beamW/2, y0+4, beamW, (y1-y0)-8);
+
+        // numero del valore "in uscita" (in cima allo strato), mostrato solo
+        // quando l'animazione di questo strato è completa o già passata
+        if (completo){
+          ctx.fillStyle = 'rgba(10,14,20,0.55)';
+          const testo = Math.round(STRATI[i][campo].out)+'';
+          ctx.font = 'bold 13px Segoe UI';
+          const lw = ctx.measureText(testo).width;
+          ctx.fillRect(x-lw/2-6, y0-10, lw+12, 18);
+          ctx.fillStyle = '#eef4f8';
+          ctx.textAlign = 'center';
+          ctx.fillText(testo, x, y0+4);
+          ctx.textAlign = 'left';
+        }
+      });
+      // vettori di emissione/assorbimento, solo a strato completato
+      if (completo) disegnaVettoriStrato(i);
+    }
+    disegnaIngressoBase();
+    // etichette di colonna in cima (nascoste quando è in mostra il riquadro
+    // del risultato finale, per non sovrapporsi)
+    if (step < N+1){
+      ctx.font = 'bold 12px Segoe UI';
+      ctx.textAlign = 'center';
+      ctx.fillStyle = 'rgba(255,180,84,0.9)';
+      ctx.fillText(T('continuo','continuum'), xG, TOP_Y-34);
+      ctx.fillStyle = 'rgba(82,184,255,0.9)';
+      ctx.fillText(T('riga','line'), xS, TOP_Y-34);
+      ctx.textAlign = 'left';
+    }
+  }
+
+  // ---------- Profilo spettrale (pannello destro) ----------
+  // valore corrente del continuo/riga al "fronte di avanzamento" (per
+  // disegnare il profilo che si aggiorna in sincrono con i fasci)
+  function valoreCorrente(campo){
+    if (step===0) return STRATI[0][campo].in;
+    if (step>=1 && step<=N) return intensitaCorrente(step-1, campo);
+    return STRATI[N-1][campo].out;
+  }
+
+  function disegnaProfilo(){
+    const innerX0 = pX0+34, innerX1 = pX1-16;
+    const innerY0 = TOP_Y+30, innerY1 = BOTTOM_Y-22;
+    ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(pX0, TOP_Y, pX1-pX0, BOTTOM_Y-TOP_Y);
+
+    ctx.font = 'bold 12px Segoe UI';
+    ctx.fillStyle = 'rgba(230,236,240,0.85)';
+    ctx.textAlign = 'center';
+    ctx.fillText(T('Profilo spettrale','Spectral profile'), (pX0+pX1)/2, TOP_Y+18);
+
+    const mapY = v => innerY1 - (v/150)*(innerY1-innerY0);
+    // assi: tacche intensità 0/50/100/150
+    ctx.font = '10px Segoe UI';
+    ctx.fillStyle = 'rgba(230,236,240,0.55)';
+    ctx.textAlign = 'right';
+    [0,50,100,150].forEach(v=>{
+      const y = mapY(v);
+      ctx.fillText(String(v), innerX0-6, y+3);
+      ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+      ctx.beginPath(); ctx.moveTo(innerX0, y); ctx.lineTo(innerX1, y); ctx.stroke();
+    });
+    ctx.textAlign = 'left';
+
+    const contG = valoreCorrente('g');
+    const contS = valoreCorrente('s');
+
+    // linea del continuo (riferimento, tratteggiata, arancione)
+    ctx.save();
+    ctx.setLineDash([5,4]);
+    ctx.strokeStyle = 'rgba(255,180,84,0.85)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(innerX0, mapY(contG));
+    ctx.lineTo(innerX1, mapY(contG));
+    ctx.stroke();
+    ctx.restore();
+    ctx.fillStyle = 'rgba(255,180,84,0.85)';
+    ctx.font = '11px Segoe UI';
+    ctx.fillText(T('continuo','continuum'), innerX0+4, mapY(contG)-6);
+
+    // profilo della riga: curva gaussiana che si scava in base a contS
+    const xCentro = (innerX0+innerX1)/2;
+    const semiLarghezza = (innerX1-innerX0)/2 - 6;
+    const sigma = 0.6;
+    const profondita = 150 - contS;
+
+    // area ombreggiata tra continuo e riga (evidenzia la profondità)
+    ctx.beginPath();
+    ctx.moveTo(innerX0, mapY(contG));
+    for (let px=innerX0; px<=innerX1; px+=4){
+      const u = (px - xCentro)/semiLarghezza*3;
+      const v = 150 - profondita*Math.exp(-(u*u)/(2*sigma*sigma));
+      ctx.lineTo(px, mapY(v));
+    }
+    ctx.lineTo(innerX1, mapY(contG));
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(82,184,255,0.14)';
+    ctx.fill();
+
+    // curva della riga
+    ctx.beginPath();
+    for (let px=innerX0; px<=innerX1; px+=4){
+      const u = (px - xCentro)/semiLarghezza*3;
+      const v = 150 - profondita*Math.exp(-(u*u)/(2*sigma*sigma));
+      if (px===innerX0) ctx.moveTo(px, mapY(v)); else ctx.lineTo(px, mapY(v));
+    }
+    ctx.strokeStyle = '#52b8ff';
+    ctx.lineWidth = 2.5;
+    ctx.stroke();
+    ctx.fillStyle = '#52b8ff';
+    ctx.font = 'bold 11px Segoe UI';
+    ctx.fillText(T('riga','line'), innerX0+4, mapY(Math.max(0,150-profondita))+16);
+
+    // linea verticale al centro della riga
+    ctx.save();
+    ctx.setLineDash([3,4]);
+    ctx.strokeStyle = 'rgba(230,236,240,0.3)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(xCentro, innerY0);
+    ctx.lineTo(xCentro, innerY1);
+    ctx.stroke();
+    ctx.restore();
+
+    ctx.font = '10px Segoe UI';
+    ctx.fillStyle = 'rgba(230,236,240,0.5)';
+    ctx.textAlign = 'center';
+    ctx.fillText(T('ν (frequenza) →','ν (frequency) →'), (innerX0+innerX1)/2, innerY1+16);
+    ctx.fillText(T('centro riga','line centre'), xCentro, innerY0-8);
+    ctx.textAlign = 'left';
+  }
+
+  function disegnaRisultatoFinale(){
+    if (step < N+1) return;
+    const bx = W/2 - 170, by = 10, bw = 340, bh = 34;
+    ctx.fillStyle = 'rgba(10,14,20,0.72)';
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(bx,by,bw,bh,8); else ctx.rect(bx,by,bw,bh);
+    ctx.fill();
+    ctx.font = 'bold 13px Segoe UI';
+    ctx.fillStyle = '#ffb454';
+    ctx.textAlign = 'center';
+    ctx.fillText(T('Continuo: 150','Continuum: 150'), bx+bw*0.27, by+22);
+    ctx.fillStyle = '#52b8ff';
+    ctx.fillText(T('Riga: 75 → riga di assorbimento','Line: 75 → absorption line'), bx+bw*0.73, by+22);
+    ctx.textAlign = 'left';
+  }
+
+  function disegna(){
+    disegnaSfondo();
+    disegnaStrati();
+    disegnaFasci();
+    disegnaProfilo();
+    disegnaRisultatoFinale();
+  }
+
+  // ---------- Loop di animazione ----------
+  let ultimoTs = null;
+  function loop(ts){
+    requestAnimationFrame(loop);
+    if (ultimoTs===null) ultimoTs = ts;
+    const dt = Math.min(50, ts-ultimoTs);
+    ultimoTs = ts;
+    if (animProgress < 1){
+      animProgress = Math.min(1, animProgress + dt/900);
+      disegna();
+    }
+  }
+
+  // ---------- Pannello numerico ----------
+  function aggiornaPannello(){
+    if (step>=1 && step<=N){
+      const s = STRATI[step-1];
+      valStadio.textContent = s.nome;
+      bIn_g.textContent = s.g.in; bEm_g.textContent = (s.g.em>=0?'+':'')+s.g.em; bAb_g.textContent = s.g.ab; bOut_g.textContent = s.g.out;
+      bIn_s.textContent = s.s.in; bEm_s.textContent = (s.s.em>=0?'+':'')+s.s.em; bAb_s.textContent = s.s.ab; bOut_s.textContent = s.s.out;
+    } else if (step===0){
+      valStadio.textContent = T('in attesa — premi "Strato successivo"','waiting — press "Next layer"');
+      [bIn_g,bEm_g,bAb_g,bOut_g,bIn_s,bEm_s,bAb_s,bOut_s].forEach(el=>el.textContent='–');
+    } else { // risultato finale
+      valStadio.textContent = T('risultato finale','final result');
+      const s4 = STRATI[N-1];
+      bIn_g.textContent = s4.g.in; bEm_g.textContent = (s4.g.em>=0?'+':'')+s4.g.em; bAb_g.textContent = s4.g.ab; bOut_g.textContent = s4.g.out;
+      bIn_s.textContent = s4.s.in; bEm_s.textContent = (s4.s.em>=0?'+':'')+s4.s.em; bAb_s.textContent = s4.s.ab; bOut_s.textContent = s4.s.out;
+    }
+    if (step>=N+1){
+      finG.textContent = STRATI[N-1].g.out;
+      finS.textContent = STRATI[N-1].s.out;
+    } else {
+      finG.textContent = '–'; finS.textContent = '–';
+    }
+    btnPrec.disabled = (step<=0);
+    btnSucc.disabled = (step>=N+1);
+  }
+
+  function messaggioPerStep(){
+    if (step===0) return T('La radiazione parte dal nucleo. Premi <b>Strato successivo ▶</b> per farla salire attraverso i 4 strati dell\'atmosfera.','Radiation starts from the core. Press <b>Next layer ▶</b> to make it rise through the 4 layers of the atmosphere.');
+    if (step>=1 && step<=N) return STRATI[step-1].testo;
+    return T('🔭 La radiazione che arriva infine all\'osservatore: <b>150</b> per il continuo, <b>75</b> per la riga. La differenza tra i due è esattamente la riga di assorbimento che vediamo nello spettro del Sole — e la piccola risalita da 50 a 75 porta l\'impronta dello strato esterno più caldo.',
+               '🔭 The radiation that finally reaches the observer: <b>150</b> for the continuum, <b>75</b> for the line. The difference between the two is exactly the absorption line we see in the Sun\'s spectrum — and the small rise from 50 to 75 carries the imprint of the hotter outer layer.');
+  }
+
+  function vaiA(nuovoStep){
+    step = Math.max(0, Math.min(N+1, nuovoStep));
+    animProgress = (step>=1 && step<=N) ? 0 : 1;
+    ultimoTs = null;
+    aggiornaPannello();
+    narratore.innerHTML = messaggioPerStep();
+    disegna();
+  }
+
+  btnSucc.addEventListener('click', ()=>vaiA(step+1));
+  btnPrec.addEventListener('click', ()=>vaiA(step-1));
+  btnReset.addEventListener('click', ()=>{ fermaAuto(); vaiA(0); });
+
+  function fermaAuto(){
+    autoPlay = false;
+    btnAuto.setAttribute('aria-pressed','false');
+    btnAuto.textContent = T('▶ Riproduci automaticamente','▶ Play automatically');
+    if (autoTimer) clearInterval(autoTimer);
+    autoTimer = null;
+  }
+  btnAuto.addEventListener('click', ()=>{
+    if (autoPlay){ fermaAuto(); return; }
+    autoPlay = true;
+    btnAuto.setAttribute('aria-pressed','true');
+    btnAuto.textContent = T('⏸ Pausa riproduzione','⏸ Pause playback');
+    autoTimer = setInterval(()=>{
+      if (step>=N+1){ fermaAuto(); return; }
+      vaiA(step+1);
+    }, 2400);
+  });
+
+  // ---------- Avvio ----------
+  vaiA(0);
+  requestAnimationFrame(loop);
+
+})();
+</script>
+
+<style id="cc-copyright">
+.cc-badge{display:inline-block;vertical-align:middle;margin:0 0 0 .5em;padding:2px 8px;border:1px solid currentColor;border-radius:999px;font:400 11.5px/1.35 -apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;letter-spacing:0;text-transform:none;white-space:normal;max-width:100%;box-sizing:border-box;opacity:.8;color:inherit;text-shadow:none;pointer-events:auto}
+.cc-n,.cc-badge a{white-space:nowrap}
+.cc-badge.cc-doc{text-decoration:none;opacity:1;font-weight:600;margin-left:.4em}
+.cc-badge a{color:inherit;text-decoration:underline;text-underline-offset:2px}
+.cc-badge.lang-sw{opacity:1;margin-left:.4em}.cc-badge.lang-sw a{cursor:pointer}
+@media (max-width:520px){.cc-badge{font-size:11px;padding:2px 7px}}
+</style>
+
+<script src="funzione_sorgente_strati_scheda.js"></script>
+<script src="funzione_sorgente_strati_scheda_en.js"></script>
+<script src="scheda.js"></script>
+</body></html>
