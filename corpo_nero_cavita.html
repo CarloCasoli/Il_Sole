@@ -1,0 +1,946 @@
+<!doctype html>
+<!--
+  © 2026 Carlo Casoli — "Il Sole: Osservazione e Fisica"
+  Licenza CC BY-NC-ND 4.0: https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it
+  Vietati l'uso commerciale e la distribuzione di versioni modificate senza autorizzazione scritta dell'autore.
+-->
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title data-en="The black body as a cavity">Il corpo nero come cavità</title>
+<style>
+:root{--text-primary:#1f1e1d;--text-secondary:#5f5e5a;--border:rgba(0,0,0,.12);--border-strong:rgba(0,0,0,.25);--bg:#ffffff;--panel:rgba(0,0,0,.03);--acc:#378ADD}
+@media (prefers-color-scheme:dark){:root{--text-primary:#f1efe8;--text-secondary:#b4b2a9;--border:rgba(255,255,255,.12);--border-strong:rgba(255,255,255,.28);--bg:#1f1f1e;--panel:rgba(255,255,255,.04)}}
+*{box-sizing:border-box}
+body{margin:0;padding:16px;background:var(--bg);color:var(--text-primary);font-family:-apple-system,"Segoe UI",Roboto,sans-serif;max-width:1280px;margin:0 auto;line-height:1.5}
+a{color:var(--acc)}
+button{background:transparent;color:var(--text-primary);border:1px solid var(--border-strong);border-radius:8px;cursor:pointer;font-family:inherit;font-size:13px;padding:7px 12px}
+button:hover{background:rgba(127,127,127,.12)}
+button.sel[aria-pressed=true],button.tab[aria-pressed=true]{background:var(--acc);color:#fff;border-color:var(--acc)}
+.top{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 14px;margin-bottom:4px}
+.top h1{font-size:19px;font-weight:600;margin:0}
+.top a{font-size:13px;text-decoration:none}
+.sub{font-size:13px;color:var(--text-secondary);margin:0 0 12px;max-width:900px;line-height:1.45}
+.guida{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:14px;font-size:13px}
+.guida h2{margin:0 0 8px;font-size:14px}
+.guida ol{margin:0 0 10px;padding-left:20px}
+.guida li{margin-bottom:5px}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:14px;align-items:start}
+@media (max-width:900px){.layout{grid-template-columns:1fr}}
+.cv{width:100%;display:block;border:1px solid var(--border);border-radius:10px;background:#050d14}
+.caption{margin-top:8px;min-height:20px;background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:13px;color:var(--text-primary)}
+.caption b{color:#EF9F27}
+.card{border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--panel)}
+.card h2{font-size:14px;margin:0 0 10px}
+.gruppo{margin-bottom:14px;padding-bottom:12px;border-bottom:1px dashed var(--border)}
+.gruppo:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.riga{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px}
+label.controllo{display:block;font-size:12.5px;margin:10px 0 4px;color:var(--text-secondary)}
+label.controllo b{font-weight:600;color:var(--text-primary)}
+input[type=range]{width:100%;accent-color:var(--acc)}
+.swatch-riga{display:flex;align-items:center;gap:10px;margin-top:8px;font-size:12.5px;color:var(--text-secondary)}
+.swatch{width:26px;height:26px;border-radius:50%;border:2px solid var(--bg);box-shadow:0 0 0 1px var(--border);flex-shrink:0}
+.legend{display:flex;flex-direction:column;gap:5px;font-size:12.5px;color:var(--text-secondary);margin:0}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:-1px;flex:none}
+.legend span{display:flex;align-items:center}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:12px;margin-top:2px}
+.grid2 div{background:var(--panel);border-radius:8px;padding:6px 9px}
+.grid2 span{display:block;color:var(--text-secondary);font-size:11.5px}
+.grid2 b{display:block;font-size:14px;color:var(--text-primary);font-weight:600}
+@media (max-width:760px){.top h1{font-size:17px}body{padding:12px}}
+</style></head><body>
+
+<div class="top">
+  <h1><span data-en="The black body as a cavity">Il corpo nero come cavità</span><span class="cc-badge"><span class="cc-n">© 2026 Carlo Casoli ·</span> <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it" target="_blank" rel="license noopener">CC BY-NC-ND 4.0</a></span> <a class="cc-badge cc-doc" href="#scheda" data-scheda data-en="📖 Animation description">📖 Scheda dell'animazione</a> <span data-lang-switch></span></h1>
+  <a href="index.html" data-en="← Index of the animations">← Indice delle animazioni</a>
+</div>
+<p class="sub" data-en='Chapter 2 — Radiation and matter · In-depth section 2.3 "The black body"'>Capitolo 2 — Radiazione e materia · Approfondimento 2.3 "Il corpo nero"</p>
+
+<div class="guida" id="guidaIniziale">
+  <h2 data-en="How to read this animation (30 seconds)">Come leggere questa animazione (30 secondi)</h2>
+  <ol>
+    <li data-en="Inside the box there is a &lt;b&gt;cavity&lt;/b&gt; with jagged walls and a small &lt;b&gt;hole&lt;/b&gt; on the right side.">Dentro la scatola c'è una <b>cavità</b> con pareti frastagliate e un piccolo <b>foro</b> sul lato destro.</li>
+    <li data-en='Photons enter through the hole with a "random" color (the color they happened to arrive with, with no physical meaning).'>I fotoni entrano dal foro con un colore "casuale" (il colore con cui sono arrivati, senza nessun significato fisico).</li>
+    <li data-en="Every time they touch a wall they are &lt;b&gt;absorbed and re-emitted in a random direction&lt;/b&gt; (a small flash marks the collision).">Ogni volta che toccano una parete vengono <b>assorbiti e riemessi in una direzione a caso</b> (un piccolo lampo segna l'urto).</li>
+    <li data-en="After many collisions the photon &lt;b&gt;loses the memory&lt;/b&gt; of how it entered: its color drifts towards the cavity's &lt;b&gt;equilibrium color&lt;/b&gt;, which depends only on the temperature T.">Dopo molti urti il fotone <b>perde la memoria</b> di come è entrato: il suo colore scivola verso il <b>colore di equilibrio</b> della cavità, che dipende solo dalla temperatura T.</li>
+    <li data-en="When it leaves through the hole, it carries that equilibrium color with it: this is exactly the black-body spectrum at temperature T.">Quando esce dal foro, porta con sé quel colore di equilibrio: è esattamente lo spettro di corpo nero alla temperatura T.</li>
+  </ol>
+  <button data-en="Got it, close" onclick="document.getElementById('guidaIniziale').style.display='none'">Ho capito, chiudi</button>
+</div>
+
+<div class="layout">
+
+  <div>
+    <canvas class="cv" id="scena" width="900" height="560" aria-label="Animazione della cavità di corpo nero" data-en-aria="Black-body cavity animation"></canvas>
+    <div class="caption" id="narratore" data-en="Press &lt;b&gt;▶ Start&lt;/b&gt; to let radiation into the cavity…">Premi <b>▶ Avvia</b> per far entrare la radiazione nella cavità…</div>
+  </div>
+
+  <div class="card">
+    <h2 data-en="Controls">Comandi</h2>
+
+    <div class="gruppo">
+      <div class="riga">
+        <button id="btnAvvia" data-en="▶ Start">▶ Avvia</button>
+        <button id="btnAzzera" data-en="↺ Reset scene">↺ Azzera scena</button>
+      </div>
+      <div class="riga">
+        <button class="sel" id="btnGuidata" aria-pressed="true" data-en="👁 Guided mode (1 photon)">👁 Modalità guidata (1 fotone)</button>
+        <button class="sel" id="btnLibera" aria-pressed="false" data-en="🎲 Free mode (many photons)">🎲 Modalità libera (molti fotoni)</button>
+      </div>
+    </div>
+
+    <div class="gruppo">
+      <label class="controllo" data-en="Cavity temperature: &lt;b id=&quot;valT&quot;&gt;5800&lt;/b&gt; K">Temperatura della cavità: <b id="valT">5800</b> K</label>
+      <input type="range" id="sliderT" min="2000" max="25000" step="100" value="5800">
+      <div class="riga" style="margin-top:8px">
+        <button class="sel" id="presetFreddo" aria-pressed="false" data-en="❄️ Cold star (2500 K)">❄️ Stella fredda (2500 K)</button>
+        <button class="sel" id="presetSole" aria-pressed="true" data-en="🟡 Solar star (5800 K)">🟡 Stella solare (5800 K)</button>
+        <button class="sel" id="presetCalda" aria-pressed="false" data-en="🔵 Hot star (18000 K)">🔵 Stella calda (18000 K)</button>
+      </div>
+      <div class="swatch-riga">
+        <div class="swatch" id="swatchEquilibrio" style="background:#fff4e0"></div>
+        <span data-en="Equilibrium color at this T&lt;br&gt;λ&lt;sub&gt;max&lt;/sub&gt; ≈ &lt;b id=&quot;lambdaMax&quot;&gt;500&lt;/b&gt; nm (Wien's law)">Colore di equilibrio a questa T<br>λ<sub>max</sub> ≈ <b id="lambdaMax">500</b> nm (legge di Wien)</span>
+      </div>
+    </div>
+
+    <div class="gruppo" id="controlliLiberi">
+      <label class="controllo" data-en="Photon emission rate: &lt;b id=&quot;valFreq&quot;&gt;3&lt;/b&gt;/s">Frequenza di immissione fotoni: <b id="valFreq">3</b>/s</label>
+      <input type="range" id="sliderFreq" min="1" max="12" step="1" value="3">
+
+      <label class="controllo" data-en="Maximum number of photons on screen: &lt;b id=&quot;valMax&quot;&gt;40&lt;/b&gt;">Numero massimo di fotoni in scena: <b id="valMax">40</b></label>
+      <input type="range" id="sliderMax" min="5" max="80" step="5" value="40">
+    </div>
+
+    <div class="gruppo">
+      <label class="controllo" data-en="Simulation speed: &lt;b id=&quot;valVel&quot;&gt;1,0&lt;/b&gt;×">Velocità di simulazione: <b id="valVel">1,0</b>×</label>
+      <input type="range" id="sliderVel" min="0.2" max="3" step="0.1" value="1.0">
+
+      <label class="controllo" data-en="Wall roughness: &lt;b id=&quot;valRug&quot;&gt;0,50&lt;/b&gt;">Rugosità delle pareti: <b id="valRug">0,50</b></label>
+      <input type="range" id="sliderRug" min="0" max="1" step="0.05" value="0.5">
+
+      <label class="controllo" data-en='Hole size: &lt;b id="valForo"&gt;medium&lt;/b&gt;'>Dimensione del foro: <b id="valForo">media</b></label>
+      <input type="range" id="sliderForo" min="1" max="3" step="1" value="2">
+    </div>
+
+    <div class="gruppo">
+      <h2 data-en="What you are seeing">Cosa stai vedendo</h2>
+      <div class="legend">
+        <span data-en="Photon just entered (arbitrary color)"><i style="background:#ff5a5a"></i>Fotone appena entrato (colore arbitrario)</span>
+        <span data-en="Flash = collision with the wall (absorption + re-emission)"><i style="background:#ffd166"></i>Lampo = urto con la parete (assorbimento + riemissione)</span>
+        <span data-en='Photon that has "thermalized" (color ≈ equilibrium)'><i style="background:#9adcf0"></i>Fotone che si è "termalizzato" (colore ≈ equilibrio)</span>
+        <span data-en="Exit hole"><i style="background:#ffffff;box-shadow:0 0 0 1px #ccc inset"></i>Foro di uscita</span>
+      </div>
+    </div>
+
+    <div class="gruppo">
+      <h2 data-en="Counters">Contatori</h2>
+      <div class="grid2">
+        <div><span data-en="Active photons">Fotoni attivi</span><b id="cAttivi">0</b></div>
+        <div><span data-en="Emitted photons">Fotoni usciti</span><b id="cUsciti">0</b></div>
+        <div><span data-en="Total collisions">Urti totali</span><b id="cUrti">0</b></div>
+        <div><span data-en="Avg. collisions / emitted photon">Urti medi/fotone uscito</span><b id="cUrtiMedi">–</b></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="lingua.js"></script>
+<script>
+(function(){
+  "use strict";
+  // lingua: T(it,en) viene da lingua.js; se il file manca la pagina resta in italiano
+  const T = window.T || (it=>it);
+  const EN = window.LANG === 'en';
+  const fmt = (x,d=2) => EN ? x.toFixed(d) : x.toFixed(d).replace('.',',');
+
+  // ---------- Riferimenti DOM ----------
+  const canvas = document.getElementById('scena');
+  const ctx = canvas.getContext('2d');
+  const narratore = document.getElementById('narratore');
+
+  const btnAvvia = document.getElementById('btnAvvia');
+  const btnAzzera = document.getElementById('btnAzzera');
+  const btnGuidata = document.getElementById('btnGuidata');
+  const btnLibera = document.getElementById('btnLibera');
+  const controlliLiberi = document.getElementById('controlliLiberi');
+
+  const sliderT = document.getElementById('sliderT');
+  const valT = document.getElementById('valT');
+  const swatchEq = document.getElementById('swatchEquilibrio');
+  const lambdaMaxEl = document.getElementById('lambdaMax');
+
+  const presetFreddo = document.getElementById('presetFreddo');
+  const presetSole = document.getElementById('presetSole');
+  const presetCalda = document.getElementById('presetCalda');
+
+  const sliderFreq = document.getElementById('sliderFreq');
+  const valFreq = document.getElementById('valFreq');
+  const sliderMax = document.getElementById('sliderMax');
+  const valMax = document.getElementById('valMax');
+  const sliderVel = document.getElementById('sliderVel');
+  const valVel = document.getElementById('valVel');
+  const sliderRug = document.getElementById('sliderRug');
+  const valRug = document.getElementById('valRug');
+  const sliderForo = document.getElementById('sliderForo');
+  const valForo = document.getElementById('valForo');
+
+  const cAttivi = document.getElementById('cAttivi');
+  const cUsciti = document.getElementById('cUsciti');
+  const cUrti = document.getElementById('cUrti');
+  const cUrtiMedi = document.getElementById('cUrtiMedi');
+
+  const NOME_FORO = {1:T('piccola','small'), 2:T('media','medium'), 3:T('grande','large')};
+
+  // ---------- Stato globale ----------
+  let W = canvas.width, H = canvas.height;
+  let centro = {x: W*0.42, y: H/2};
+  let raggioBase = Math.min(W,H)*0.33;
+  let margineEsterno = 65;      // spazio tra parete della cavità e contorno esterno solido
+  let verticiCavita = [];       // vertici del poligono frastagliato (per disegno struttura)
+  let metaForoPx = 22;          // semi-larghezza in pixel del corridoio di uscita
+  let foroVertici = [];         // TUTTI i vertici reali lungo il foro, dal bordo A al bordo B
+
+  let pareti = [];          // segmenti {x1,y1,x2,y2,isForo}
+  let fotoni = [];
+  let inEsecuzione = false;
+  let modalita = 'guidata';  // 'guidata' | 'libera'
+  let fotoneGuidato = null;
+  let tempoAccumuloSpawn = 0;
+
+  let statistiche = { usciti:0, urtiTotali:0, sommaUrtiUsciti:0 };
+
+  // canvas "offscreen" dove la struttura (contorno + retinatura) viene disegnata
+  // una sola volta quando cambiano le pareti, invece che ad ogni fotogramma
+  // (evita rallentamenti, soprattutto con rugosità alta)
+  const canvasStruttura = document.createElement('canvas');
+  canvasStruttura.width = W; canvasStruttura.height = H;
+  const ctxStruttura = canvasStruttura.getContext('2d');
+
+  // raccolta dei fotoni usciti, mostrati come piccoli pallini accumulati fuori dalla struttura
+  let fotoniEsterni = [];
+  const MAX_ESTERNI = 28;
+
+  // ---------- Utilità: colore di corpo nero da temperatura ----------
+  // Approssimazione classica (algoritmo di Tanner Helland), valida ~1000-40000K
+  function kelvinToRGB(kelvinIn){
+    const k = Math.max(1000, Math.min(40000, kelvinIn)) / 100;
+    let r,g,b;
+    if (k <= 66){
+      r = 255;
+      g = k <= 19 ? 0 : 99.4708025861*Math.log(k-10) - 161.1195681661;
+    } else {
+      r = 329.698727446 * Math.pow(k-60, -0.1332047592);
+      g = 288.1221695283 * Math.pow(k-60, -0.0755148492);
+    }
+    if (k >= 66) b = 255;
+    else if (k <= 19) b = 0;
+    else b = 138.5177312231*Math.log(k-10) - 305.0447927307;
+
+    const cl = (x)=>Math.max(0,Math.min(255,Math.round(x)));
+    return [cl(r), cl(g), cl(b)];
+  }
+  function rgbToCss(rgb, alpha){
+    alpha = (alpha===undefined)?1:alpha;
+    return `rgba(${rgb[0]},${rgb[1]},${rgb[2]},${alpha})`;
+  }
+  function mescolaRGB(a,b,t){
+    return [
+      a[0]+(b[0]-a[0])*t,
+      a[1]+(b[1]-a[1])*t,
+      a[2]+(b[2]-a[2])*t
+    ];
+  }
+  function coloreCasualeIngresso(){
+    // colori "arbitrari" di ingresso, volutamente lontani dai toni da corpo nero
+    const palette = [ [255,90,90],[120,220,255],[190,120,255],[120,255,160],[255,170,70] ];
+    return palette[Math.floor(Math.random()*palette.length)];
+  }
+
+  function aggiornaSwatchTemperatura(){
+    const T = parseInt(sliderT.value,10);
+    valT.textContent = T;
+    const rgb = kelvinToRGB(T);
+    swatchEq.style.background = rgbToCss(rgb);
+    const lmax = Math.round(2.898e6 / T); // nm
+    lambdaMaxEl.textContent = lmax;
+    // la struttura solida è colorata con il colore della "stella" a questa T:
+    // va ridisegnata ogni volta che la temperatura cambia (le pareti no).
+    if (verticiCavita.length) renderizzaStrutturaOffscreen();
+  }
+
+  // --- conversioni RGB <-> HSL, per rendere i colori più "vivaci" e
+  // riconoscibili (es. il Sole chiaramente GIALLO, come nel pulsante),
+  // invece del tono fisico reale che a 5800 K è quasi bianco/pallido.
+  function rgbToHsl(rgb){
+    const r = rgb[0]/255, g = rgb[1]/255, b = rgb[2]/255;
+    const max = Math.max(r,g,b), min = Math.min(r,g,b);
+    let h, s, l = (max+min)/2;
+    if (max === min){ h = 0; s = 0; }
+    else{
+      const d = max-min;
+      s = l > 0.5 ? d/(2-max-min) : d/(max+min);
+      switch(max){
+        case r: h = (g-b)/d + (g<b?6:0); break;
+        case g: h = (b-r)/d + 2; break;
+        default: h = (r-g)/d + 4;
+      }
+      h /= 6;
+    }
+    return [h,s,l];
+  }
+  function hslToRgb(h,s,l){
+    let r,g,b;
+    if (s === 0){ r=g=b=l; }
+    else{
+      const hue2rgb = (p,q,t)=>{
+        if (t<0) t += 1;
+        if (t>1) t -= 1;
+        if (t < 1/6) return p + (q-p)*6*t;
+        if (t < 1/2) return q;
+        if (t < 2/3) return p + (q-p)*(2/3-t)*6;
+        return p;
+      };
+      const q = l < 0.5 ? l*(1+s) : l+s-l*s;
+      const p = 2*l-q;
+      r = hue2rgb(p,q,h+1/3);
+      g = hue2rgb(p,q,h);
+      b = hue2rgb(p,q,h-1/3);
+    }
+    return [Math.round(r*255), Math.round(g*255), Math.round(b*255)];
+  }
+  // Colore "didattico" della sezione in funzione della temperatura: non usa
+  // l'approssimazione fisica di kelvinToRGB (che verso 5000-6000 K dà un rosa
+  // pallido poco riconoscibile), ma una tinta che segue la stessa logica reale
+  // delle stelle (fredda = rossa, come il Sole = gialla, calda = blu), scelta
+  // per essere SEMPRE chiaramente leggibile — coerente col colore mostrato
+  // nei pulsanti di preset (🔴🟡🔵).
+  const PUNTI_COLORE_STELLA = [
+    // [T, tinta(gradi), saturazione, luminosità]
+    [2000,  8, 0.85, 0.40],
+    [2500, 14, 0.85, 0.42],
+    [4000, 28, 0.82, 0.46],
+    [5800, 46, 0.80, 0.50],   // Sole: giallo pieno
+    [7000, 52, 0.55, 0.58],
+    [10000, 205, 0.45, 0.55],
+    [15000, 212, 0.62, 0.50],
+    [18000, 215, 0.70, 0.46],
+    [25000, 222, 0.78, 0.40]
+  ];
+  function colorePerTemperatura(T){
+    const p = PUNTI_COLORE_STELLA;
+    let i = 0;
+    while (i < p.length-2 && T > p[i+1][0]) i++;
+    const [T0,h0,s0,l0] = p[i], [T1,h1,s1,l1] = p[i+1];
+    const t = T1===T0 ? 0 : Math.max(0, Math.min(1, (T-T0)/(T1-T0)));
+    const h = h0 + (h1-h0)*t;
+    const s = s0 + (s1-s0)*t;
+    const l = l0 + (l1-l0)*t;
+    return hslToRgb(h/360, s, l);
+  }
+
+  // colore del materiale della sezione: la tinta didattica alla T scelta,
+  // leggermente scurita per lasciare leggibile la retinatura sopra
+  function coloreMaterialeStruttura(){
+    const T = parseInt(sliderT.value,10);
+    return colorePerTemperatura(T).map(c => Math.round(c*0.82));
+  }
+
+  // ---------- Generazione pareti frastagliate ----------
+  function generaPareti(){
+    const rugosita = parseFloat(sliderRug.value);
+    const nLati = 72;
+
+    // rumore pseudo-casuale ma riproducibile, in [-1,1)
+    const rumoreGrezzo = [];
+    for(let i=0;i<nLati;i++){
+      const h = Math.sin(i*12.9898)*43758.5453;
+      rumoreGrezzo.push( (h - Math.floor(h)) * 2 - 1 );
+    }
+    // leggero smoothing (media mobile a 3 punti): evita che a rugosità alta
+    // il poligono diventi auto-intersecante (il che mandava in crisi il disegno
+    // e il rimbalzo dei fotoni)
+    const rumore = rumoreGrezzo.map((v,i)=>{
+      const prev = rumoreGrezzo[(i-1+nLati)%nLati];
+      const next = rumoreGrezzo[(i+1)%nLati];
+      return (prev + v + next) / 3;
+    });
+
+    const AMPIEZZA_MAX = 0.15; // tenuta volutamente prudente anche a rugosità=1
+    const puntiEsterni = [];
+    for(let i=0;i<nLati;i++){
+      const ang = (i/nLati)*Math.PI*2;
+      const r = raggioBase * (1 + rumore[i]*AMPIEZZA_MAX*rugosita);
+      puntiEsterni.push({
+        x: centro.x + Math.cos(ang)*r,
+        y: centro.y + Math.sin(ang)*r,
+        ang: ang
+      });
+    }
+
+    // dimensione del foro in "numero di lati" coperti
+    const taglioForo = {1:1, 2:2, 3:4}[sliderForo.value] || 2;
+    metaForoPx = {1:14, 2:22, 3:34}[sliderForo.value] || 22;
+    valForo.textContent = NOME_FORO[sliderForo.value] || NOME_FORO[2];
+
+    // il foro è centrato sul lato destro (angolo 0)
+    const indiceCentroForo = 0;
+    const foroIdxSet = new Set();
+    for(let d=-taglioForo; d<=taglioForo; d++){
+      foroIdxSet.add(((indiceCentroForo+d)%nLati+nLati)%nLati);
+    }
+
+    const segmenti = [];
+    for(let i=0;i<nLati;i++){
+      const p1 = puntiEsterni[i];
+      const p2 = puntiEsterni[(i+1)%nLati];
+      const isForo = foroIdxSet.has(i) && foroIdxSet.has((i+1)%nLati);
+      segmenti.push({x1:p1.x,y1:p1.y,x2:p2.x,y2:p2.y,isForo});
+    }
+    pareti = segmenti;
+    verticiCavita = puntiEsterni;
+
+    // TUTTI i vertici REALI del poligono lungo il foro (non solo i due estremi):
+    // il corridoio ripercorrerà esattamente questa spezzata, così combacia col
+    // bordo frastagliato vertice per vertice, qualunque sia la rugosità o la
+    // dimensione del foro (anche con foro piccolo, dove i vertici intermedi
+    // possono discostarsi molto dalla semplice corda che li congiunge).
+    const verticiForo = [];
+    for(let d=-taglioForo; d<=taglioForo; d++){
+      const idx = ((indiceCentroForo+d)%nLati+nLati)%nLati;
+      verticiForo.push(puntiEsterni[idx]);
+    }
+    foroVertici = verticiForo;
+
+    renderizzaStrutturaOffscreen();
+  }
+
+  // punto medio reale del foro (usato sia per far nascere i fotoni sia per
+  // disegnare il corridoio, così restano sempre allineati qualunque sia la rugosità)
+  function centroForo(){
+    const foroSegs = pareti.filter(s=>s.isForo);
+    const mx = foroSegs.reduce((a,s)=>a+(s.x1+s.x2)/2,0)/foroSegs.length;
+    const my = foroSegs.reduce((a,s)=>a+(s.y1+s.y2)/2,0)/foroSegs.length;
+    return {mx,my};
+  }
+
+  // ---------- Percorso della struttura solida (contorno esterno + sezione) ----------
+  function costruisciPathStruttura(){
+    const rOut = raggioBase + margineEsterno;
+    const {mx, my} = centroForo();
+
+    const path = new Path2D();
+
+    // 1. contorno esterno (cerchio "lavorato", liscio)
+    path.moveTo(centro.x + rOut, centro.y);
+    path.arc(centro.x, centro.y, rOut, 0, Math.PI*2);
+
+    // 2. poligono della cavità interna (sottratto in evenodd)
+    path.moveTo(verticiCavita[0].x, verticiCavita[0].y);
+    for (let i=1;i<verticiCavita.length;i++) path.lineTo(verticiCavita[i].x, verticiCavita[i].y);
+    path.closePath();
+
+    // 3. corridoio del foro: il lato "interno" ripercorre TUTTI i vertici reali
+    // del poligono lungo il foro (A -> ... -> B), non solo i due estremi — così
+    // combacia esattamente col bordo frastagliato, vertice per vertice, senza
+    // fessure qualunque sia la rugosità o la dimensione del foro. I due angoli
+    // "esterni" sono la proiezione di A e B fino al bordo esterno, mai oltre.
+    const xOut = centro.x + rOut;
+    const A = foroVertici[0], B = foroVertici[foroVertici.length-1];
+    path.moveTo(A.x, A.y);
+    for (let i=1;i<foroVertici.length;i++) path.lineTo(foroVertici[i].x, foroVertici[i].y);
+    path.lineTo(xOut, B.y);
+    path.lineTo(xOut, A.y);
+    path.closePath();
+
+    const y0 = Math.min(A.y, B.y), y1 = Math.max(A.y, B.y);
+    return {path, rOut, xOut, y0, y1, mx, my};
+  }
+
+  // disegna il contorno esterno + la retinatura di sezione una sola volta
+  // (quando le pareti cambiano), su un canvas separato, poi semplicemente
+  // "incollato" ad ogni fotogramma: molto più leggero e niente artefatti.
+  function renderizzaStrutturaOffscreen(){
+    const {path, rOut, xOut, y0, y1} = costruisciPathStruttura();
+    const cx = ctxStruttura;
+
+    cx.clearRect(0,0,W,H);
+    cx.save();
+
+    // clip di sicurezza al solo cerchio esterno: qualunque cosa succeda nel
+    // calcolo del corridoio, non si disegna MAI nulla oltre il contorno.
+    cx.beginPath();
+    cx.arc(centro.x, centro.y, rOut, 0, Math.PI*2);
+    cx.clip();
+
+    // riempimento di base del materiale solido (annulus - cavità - corridoio),
+    // colorato con il colore di corpo nero alla temperatura scelta: la "stella"
+    const coloreMateriale = coloreMaterialeStruttura();
+    cx.fillStyle = rgbToCss(coloreMateriale);
+    cx.fill(path, 'evenodd');
+
+    // retinatura a 45° (segno di sezione da disegno meccanico), ritagliata alla sola struttura
+    cx.save();
+    cx.clip(path, 'evenodd');
+    cx.strokeStyle = 'rgba(255,255,255,0.35)';
+    cx.lineWidth = 1;
+    const passo = 11;
+    for (let x = -H; x < W + H; x += passo){
+      cx.beginPath();
+      cx.moveTo(x, 0);
+      cx.lineTo(x + H, H);
+      cx.stroke();
+    }
+    cx.restore(); // tolto il clip del path, resta il clip del cerchio
+
+    cx.restore(); // tolto anche il clip del cerchio
+
+    // contorno esterno (linea pulita, stile "disegno tecnico"), un po' più
+    // chiaro del colore di riempimento così resta leggibile su ogni temperatura
+    cx.beginPath();
+    cx.arc(centro.x, centro.y, rOut, 0, Math.PI*2);
+    const bordo = coloreMateriale.map(c => Math.min(255, c+90));
+    cx.strokeStyle = rgbToCss(bordo);
+    cx.lineWidth = 2;
+    cx.stroke();
+
+    // etichetta esterna (statica: resta sul canvas offscreen)
+    cx.fillStyle = 'rgba(220,230,236,0.85)';
+    cx.font = '12px Segoe UI';
+    cx.fillText(T("verso l'esterno →","outward →"), Math.min(xOut+6, W-120), (y0+y1)/2 - 10);
+  }
+
+  // ---------- Intersezione segmento-segmento ----------
+  function interseca(px,py,qx,qy, seg){
+    // ritorna {t, x, y} con t in (0,1] lungo p->q se interseca il segmento, altrimenti null
+    const x1=seg.x1,y1=seg.y1,x2=seg.x2,y2=seg.y2;
+    const d1x=qx-px, d1y=qy-py;
+    const d2x=x2-x1, d2y=y2-y1;
+    const denom = d1x*d2y - d1y*d2x;
+    if (Math.abs(denom) < 1e-9) return null;
+    const t = ((x1-px)*d2y - (y1-py)*d2x) / denom;
+    const u = ((x1-px)*d1y - (y1-py)*d1x) / denom;
+    if (t > 1e-6 && t <= 1 && u >= 0 && u <= 1){
+      return { t, x: px + d1x*t, y: py + d1y*t };
+    }
+    return null;
+  }
+
+  // ---------- Classe Fotone ----------
+  function nuovoFotone(guidato){
+    // nasce appena dentro il foro, con direzione verso l'interno
+    const {mx, my} = centroForo();
+
+    const dirInterna = Math.atan2(centro.y-my, centro.x-mx);
+    const spread = (Math.random()-0.5)*0.6;
+    const angolo = dirInterna + spread;
+
+    const velBase = 2.6;
+    // il fotone nasce GIÀ DENTRO la cavità (spostato verso il centro), non sul foro stesso:
+    // altrimenti il primo passo attraverserebbe subito il segmento del foro e verrebbe
+    // interpretato come un'uscita immediata.
+    const distanzaIngresso = 20;
+    return {
+      x: mx + Math.cos(dirInterna)*distanzaIngresso,
+      y: my + Math.sin(dirInterna)*distanzaIngresso,
+      vx: Math.cos(angolo)*velBase,
+      vy: Math.sin(angolo)*velBase,
+      urti: 0,
+      coloreIngresso: coloreCasualeIngresso(),
+      trail: [],
+      guidato: !!guidato,
+      uscito:false,
+      inFugaUscita:false,
+      coloreUscita:null,
+      lampo: 0
+    };
+  }
+
+  function coloreAttualeFotone(f){
+    const T = parseInt(sliderT.value,10);
+    const rgbEq = kelvinToRGB(T);
+    // dopo ~12 urti si considera "termalizzato" al 100%
+    const frazione = Math.min(1, f.urti/12);
+    return mescolaRGB(f.coloreIngresso, rgbEq, frazione);
+  }
+
+  // raccolta dei fotoni usciti: li mostriamo accumulati in una piccola "zona esterna"
+  function registraFotoneEsterno(colore){
+    fotoniEsterni.push(colore);
+    if (fotoniEsterni.length > MAX_ESTERNI) fotoniEsterni.shift();
+  }
+
+  // ---------- Narratore ----------
+  let ultimoMessaggio = '';
+  let cooldownNarratore = 0;
+  function dillo(msg, forza){
+    if (!forza && (msg===ultimoMessaggio || cooldownNarratore>0)) return;
+    narratore.innerHTML = msg;
+    ultimoMessaggio = msg;
+    cooldownNarratore = 90; // ~1.5s a 60fps prima del prossimo messaggio automatico
+  }
+
+  // ---------- Aggiornamento fisico ----------
+  function aggiornaFotone(f, dtStep){
+    if (f.uscito) return;
+
+    // fase di "volo libero" dopo essere passato dal foro: nessuna collisione,
+    // prosegue dritto verso l'esterno finché non esce completamente dalla scena
+    if (f.inFugaUscita){
+      f.x += f.vx*dtStep*1.4;
+      f.y += f.vy*dtStep*1.4;
+      const rOut = raggioBase + margineEsterno;
+      if (f.x > centro.x + rOut + 55){
+        f.uscito = true;
+        registraFotoneEsterno(f.coloreUscita);
+      }
+      return;
+    }
+
+    const nx = f.x + f.vx*dtStep;
+    const ny = f.y + f.vy*dtStep;
+
+    let migliore = null;
+    for (const seg of pareti){
+      const hit = interseca(f.x,f.y,nx,ny, seg);
+      if (hit && (!migliore || hit.t < migliore.t)){
+        migliore = Object.assign({seg}, hit);
+      }
+    }
+
+    if (!migliore){
+      f.x = nx; f.y = ny;
+      f.trail.push({x:f.x,y:f.y});
+      if (f.trail.length>14) f.trail.shift();
+      return;
+    }
+
+    // punto di impatto
+    f.x = migliore.x; f.y = migliore.y;
+
+    if (migliore.seg.isForo){
+      // non sparisce subito: vola in linea retta attraverso il corridoio e si
+      // allontana visibilmente verso l'esterno, portando con sé il colore
+      // "congelato" nel momento dell'uscita
+      f.inFugaUscita = true;
+      f.coloreUscita = coloreAttualeFotone(f);
+      statistiche.usciti++;
+      statistiche.sommaUrtiUsciti += f.urti;
+      if (f.guidato){
+        dillo(T(
+          `✅ Il fotone esce dal foro dopo <b>${f.urti} urti</b>, con il colore di equilibrio della cavità a T = ${sliderT.value} K. Guardalo allontanarsi verso l'esterno: ha completamente perso memoria di come era entrato!`,
+          `✅ The photon leaves through the hole after <b>${f.urti} collisions</b>, with the equilibrium color of the cavity at T = ${sliderT.value} K. Watch it move away: it has completely lost the memory of how it entered!`
+        ), true);
+      }
+      return;
+    }
+
+    // assorbimento + riemissione isotropa verso l'interno
+    f.urti++;
+    statistiche.urtiTotali++;
+    f.lampo = 10;
+
+    const nxw = migliore.seg.y2-migliore.seg.y1;
+    const nyw = -(migliore.seg.x2-migliore.seg.x1);
+    let nlen = Math.hypot(nxw,nyw);
+    let nxn = nxw/nlen, nyn = nyw/nlen;
+    // assicura normale verso il centro (interno)
+    if ((centro.x-f.x)*nxn + (centro.y-f.y)*nyn < 0){ nxn=-nxn; nyn=-nyn; }
+
+    // direzione casuale nel semipiano interno (coseno-pesata semplice)
+    const baseAng = Math.atan2(nyn,nxn);
+    const delta = (Math.random()-0.5)*Math.PI*0.9;
+    const angoloNuovo = baseAng + delta;
+    const vel = 2.2 + Math.random()*0.8;
+    f.vx = Math.cos(angoloNuovo)*vel;
+    f.vy = Math.sin(angoloNuovo)*vel;
+
+    f.trail = [];
+
+    if (f.guidato){
+      if (f.urti===1) dillo(T(
+        `💥 Primo urto! Il fotone viene <b>assorbito</b> dalla parete e <b>riemesso</b> in una direzione a caso.`,
+        `💥 First collision! The photon is <b>absorbed</b> by the wall and <b>re-emitted</b> in a random direction.`
+      ));
+      else if (f.urti===5) dillo(T(
+        `🔄 Dopo ${f.urti} urti, il fotone sta già perdendo la memoria della sua direzione e del suo colore d'ingresso…`,
+        `🔄 After ${f.urti} collisions, the photon is already losing the memory of its entry direction and color…`
+      ));
+      else if (f.urti===10) dillo(T(
+        `🌡️ Il colore si sta assestando verso l'equilibrio alla temperatura della cavità (T = ${sliderT.value} K).`,
+        `🌡️ The color is settling towards equilibrium at the cavity's temperature (T = ${sliderT.value} K).`
+      ));
+    }
+  }
+
+  // ---------- Disegno ----------
+  function disegnaScena(){
+    ctx.clearRect(0,0,W,H);
+
+    // sfondo stellato leggero
+    ctx.fillStyle = '#050d14';
+    ctx.fillRect(0,0,W,H);
+
+    // struttura solida esterna con retinatura di sezione (disegnata una sola
+    // volta su un canvas separato, qui solo "incollata": veloce e senza artefatti)
+    ctx.drawImage(canvasStruttura, 0, 0);
+
+    // etichetta dinamica della temperatura, dentro l'anello della sezione
+    {
+      const rOut = raggioBase + margineEsterno;
+      const yEtichetta = centro.y - raggioBase - margineEsterno*0.5;
+      const testo = T(`Temperatura = ${sliderT.value} K`, `Temperature = ${sliderT.value} K`);
+      ctx.font = 'bold 14px Segoe UI';
+      const largh = ctx.measureText(testo).width;
+      ctx.fillStyle = 'rgba(6,18,26,0.78)';
+      ctx.fillRect(centro.x - largh/2 - 10, yEtichetta - 16, largh + 20, 24);
+      ctx.fillStyle = '#eaf4fa';
+      ctx.textAlign = 'center';
+      ctx.fillText(testo, centro.x, yEtichetta + 1);
+      ctx.textAlign = 'left';
+    }
+
+    // pareti
+    ctx.lineWidth = 3;
+    for (const seg of pareti){
+      ctx.beginPath();
+      ctx.moveTo(seg.x1, seg.y1);
+      ctx.lineTo(seg.x2, seg.y2);
+      if (seg.isForo){
+        ctx.strokeStyle = 'rgba(255,255,255,0.95)';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([4,4]);
+      } else {
+        ctx.strokeStyle = '#3d5466';
+        ctx.lineWidth = 3;
+        ctx.setLineDash([]);
+      }
+      ctx.stroke();
+    }
+    ctx.setLineDash([]);
+
+    // etichetta foro
+    const foroSegs = pareti.filter(s=>s.isForo);
+    if (foroSegs.length){
+      const mx = foroSegs.reduce((a,s)=>a+(s.x1+s.x2)/2,0)/foroSegs.length;
+      const my = foroSegs.reduce((a,s)=>a+(s.y1+s.y2)/2,0)/foroSegs.length;
+      ctx.fillStyle = 'rgba(255,255,255,0.8)';
+      ctx.font = '13px Segoe UI';
+      ctx.fillText(T('foro','hole'), mx+10, my+4);
+    }
+
+    // fotoni
+    for (const f of fotoni){
+      if (f.uscito) continue;
+
+      // durante il volo verso l'esterno il colore resta "congelato" a quello
+      // raggiunto al momento dell'uscita dal foro
+      const colCorrente = f.inFugaUscita ? f.coloreUscita : coloreAttualeFotone(f);
+
+      // scia
+      for (let i=0;i<f.trail.length;i++){
+        const p = f.trail[i];
+        const alpha = (i/f.trail.length)*0.35;
+        ctx.beginPath();
+        ctx.arc(p.x,p.y, 2, 0, Math.PI*2);
+        ctx.fillStyle = rgbToCss(colCorrente, alpha);
+        ctx.fill();
+      }
+
+      const col = colCorrente;
+      ctx.beginPath();
+      ctx.arc(f.x, f.y, f.guidato?6:4, 0, Math.PI*2);
+      ctx.fillStyle = rgbToCss(col, 1);
+      ctx.shadowColor = rgbToCss(col,0.9);
+      ctx.shadowBlur = f.guidato?14:8;
+      ctx.fill();
+      ctx.shadowBlur = 0;
+
+      if (f.guidato){
+        ctx.beginPath();
+        ctx.arc(f.x, f.y, 11, 0, Math.PI*2);
+        ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+      }
+
+      if (f.lampo > 0){
+        ctx.beginPath();
+        ctx.arc(f.x, f.y, 14 - f.lampo*0.6, 0, Math.PI*2);
+        ctx.strokeStyle = `rgba(255,214,102,${f.lampo/10})`;
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        f.lampo--;
+      }
+    }
+
+    // zona esterna: dove si "vede" dove finiscono i fotoni usciti
+    disegnaFotoniEsterni();
+  }
+
+  function disegnaFotoniEsterni(){
+    if (fotoniEsterni.length === 0) return;
+    const zonaX = W - 118;
+    const zonaY = 36;
+    ctx.font = '12px Segoe UI';
+    ctx.fillStyle = 'rgba(220,230,236,0.85)';
+    ctx.fillText(T('Fotoni usciti →','Photons emitted →'), zonaX, zonaY - 14);
+    ctx.strokeStyle = 'rgba(220,230,236,0.25)';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(zonaX - 6, zonaY - 6, 104, 118);
+    fotoniEsterni.forEach((colore, i) => {
+      const col = i % 7;
+      const row = Math.floor(i / 7);
+      const x = zonaX + col*14 + 6;
+      const y = zonaY + row*20 + 8;
+      ctx.beginPath();
+      ctx.arc(x, y, 5, 0, Math.PI*2);
+      ctx.fillStyle = rgbToCss(colore, 0.95);
+      ctx.shadowColor = rgbToCss(colore, 0.8);
+      ctx.shadowBlur = 6;
+      ctx.fill();
+      ctx.shadowBlur = 0;
+    });
+  }
+
+  // ---------- Loop principale ----------
+  let ultimoTimestamp = null;
+  function loop(ts){
+    requestAnimationFrame(loop);
+    if (!inEsecuzione) { disegnaScena(); return; }
+
+    if (ultimoTimestamp===null) ultimoTimestamp = ts;
+    const dtReale = Math.min(40, ts - ultimoTimestamp);
+    ultimoTimestamp = ts;
+
+    const velocita = parseFloat(sliderVel.value);
+    const dtStep = (dtReale/16) * velocita;
+
+    if (cooldownNarratore>0) cooldownNarratore--;
+
+    // generazione nuovi fotoni
+    if (modalita==='guidata'){
+      if (!fotoneGuidato || fotoneGuidato.uscito){
+        fotoneGuidato = nuovoFotone(true);
+        fotoni = [fotoneGuidato];
+        dillo(T(
+          '🔵 Un nuovo fotone entra dal foro con un colore "casuale" senza significato fisico…',
+          '🔵 A new photon enters through the hole with a "random" color with no physical meaning…'
+        ), true);
+      }
+    } else {
+      tempoAccumuloSpawn += dtReale/1000 * velocita;
+      const freq = parseFloat(sliderFreq.value);
+      const massimo = parseInt(sliderMax.value,10);
+      const intervallo = 1/freq;
+      const attivi = fotoni.filter(f=>!f.uscito).length;
+      if (tempoAccumuloSpawn > intervallo && attivi < massimo){
+        tempoAccumuloSpawn = 0;
+        fotoni.push(nuovoFotone(false));
+      }
+      // pulizia array per non crescere all'infinito
+      if (fotoni.length > massimo*3){
+        fotoni = fotoni.filter(f=>!f.uscito).slice(-massimo);
+      }
+    }
+
+    for (const f of fotoni) aggiornaFotone(f, dtStep);
+
+    disegnaScena();
+    aggiornaContatori();
+  }
+
+  function aggiornaContatori(){
+    const attivi = fotoni.filter(f=>!f.uscito).length;
+    cAttivi.textContent = attivi;
+    cUsciti.textContent = statistiche.usciti;
+    cUrti.textContent = statistiche.urtiTotali;
+    cUrtiMedi.textContent = statistiche.usciti>0
+      ? fmt(statistiche.sommaUrtiUsciti/statistiche.usciti, 1)
+      : '–';
+  }
+
+  // ---------- Azzeramento ----------
+  function azzeraScena(){
+    generaPareti();
+    fotoni = [];
+    fotoneGuidato = null;
+    fotoniEsterni = [];
+    statistiche = { usciti:0, urtiTotali:0, sommaUrtiUsciti:0 };
+    tempoAccumuloSpawn = 0;
+    ultimoTimestamp = null;
+    aggiornaContatori();
+    disegnaScena();
+    dillo(T(
+      'Scena azzerata. Premi ▶ Avvia per far entrare la radiazione nella cavità…',
+      'Scene reset. Press ▶ Start to let radiation into the cavity…'
+    ), true);
+  }
+
+  // ---------- Gestione eventi UI ----------
+  btnAvvia.addEventListener('click', ()=>{
+    inEsecuzione = !inEsecuzione;
+    btnAvvia.textContent = inEsecuzione ? T('⏸ Pausa','⏸ Pause') : T('▶ Avvia','▶ Start');
+    if (inEsecuzione) ultimoTimestamp = null;
+  });
+
+  btnAzzera.addEventListener('click', azzeraScena);
+
+  btnGuidata.addEventListener('click', ()=>{
+    modalita = 'guidata';
+    btnGuidata.setAttribute('aria-pressed','true');
+    btnLibera.setAttribute('aria-pressed','false');
+    controlliLiberi.style.opacity = 0.4;
+    controlliLiberi.style.pointerEvents = 'none';
+    fotoni = []; fotoneGuidato = null;
+    dillo(T('Modalità guidata: segui un solo fotone passo-passo.','Guided mode: follow a single photon step by step.'), true);
+  });
+  btnLibera.addEventListener('click', ()=>{
+    modalita = 'libera';
+    btnLibera.setAttribute('aria-pressed','true');
+    btnGuidata.setAttribute('aria-pressed','false');
+    controlliLiberi.style.opacity = 1;
+    controlliLiberi.style.pointerEvents = 'auto';
+    fotoni = []; fotoneGuidato = null;
+    dillo(T('Modalità libera: tanti fotoni insieme, osserva le statistiche.','Free mode: many photons together, watch the statistics.'), true);
+  });
+  controlliLiberi.style.opacity = 0.4;
+  controlliLiberi.style.pointerEvents = 'none';
+
+  function deselezionaPreset(){
+    [presetFreddo, presetSole, presetCalda].forEach(b=>b.setAttribute('aria-pressed','false'));
+  }
+  sliderT.addEventListener('input', ()=>{ aggiornaSwatchTemperatura(); deselezionaPreset(); });
+  presetFreddo.addEventListener('click', ()=>{ sliderT.value=2500; aggiornaSwatchTemperatura(); deselezionaPreset(); presetFreddo.setAttribute('aria-pressed','true'); dillo(T('Cavità "fredda": il colore di equilibrio si sposta verso il rosso.','"Cold" cavity: the equilibrium color shifts towards red.'), true); });
+  presetSole.addEventListener('click', ()=>{ sliderT.value=5800; aggiornaSwatchTemperatura(); deselezionaPreset(); presetSole.setAttribute('aria-pressed','true'); dillo(T('Cavità alla temperatura della fotosfera solare (≈5800 K): colore bianco-giallastro.','Cavity at the temperature of the solar photosphere (≈5800 K): a whitish-yellow color.'), true); });
+  presetCalda.addEventListener('click', ()=>{ sliderT.value=18000; aggiornaSwatchTemperatura(); deselezionaPreset(); presetCalda.setAttribute('aria-pressed','true'); dillo(T('Cavità "calda": il colore di equilibrio si sposta verso l\'azzurro.','"Hot" cavity: the equilibrium color shifts towards blue.'), true); });
+
+  sliderFreq.addEventListener('input', ()=>{ valFreq.textContent = sliderFreq.value; });
+  sliderMax.addEventListener('input', ()=>{ valMax.textContent = sliderMax.value; });
+  sliderVel.addEventListener('input', ()=>{ valVel.textContent = fmt(parseFloat(sliderVel.value),1); });
+  sliderRug.addEventListener('input', ()=>{ valRug.textContent = fmt(parseFloat(sliderRug.value),2); });
+  sliderRug.addEventListener('change', azzeraScena);
+  sliderForo.addEventListener('change', azzeraScena);
+  sliderForo.addEventListener('input', ()=>{
+    valForo.textContent = NOME_FORO[sliderForo.value] || NOME_FORO[2];
+  });
+
+  // ---------- Avvio ----------
+  aggiornaSwatchTemperatura();
+  azzeraScena();
+  requestAnimationFrame(loop);
+
+})();
+</script>
+
+<style id="cc-copyright">
+.cc-badge{display:inline-block;vertical-align:middle;margin:0 0 0 .5em;padding:2px 8px;border:1px solid currentColor;border-radius:999px;font:400 11.5px/1.35 -apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;letter-spacing:0;text-transform:none;white-space:normal;max-width:100%;box-sizing:border-box;opacity:.8;color:inherit;text-shadow:none;pointer-events:auto}
+.cc-n,.cc-badge a{white-space:nowrap}
+.cc-badge.cc-doc{text-decoration:none;opacity:1;font-weight:600;margin-left:.4em}
+.cc-badge a{color:inherit;text-decoration:underline;text-underline-offset:2px}
+.cc-badge.lang-sw{opacity:1;margin-left:.4em}.cc-badge.lang-sw a{cursor:pointer}
+@media (max-width:520px){.cc-badge{font-size:11px;padding:2px 7px}}
+</style>
+
+<script src="corpo_nero_cavita_scheda.js"></script>
+<script src="corpo_nero_cavita_scheda_en.js"></script>
+<script src="scheda.js"></script>
+</body></html>
