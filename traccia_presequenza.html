@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<!--
+  © 2026 Carlo Casoli — "Il Sole: Osservazione e Fisica"
+  Licenza CC BY-NC-ND 4.0: https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it
+  Vietati l'uso commerciale e la distribuzione di versioni modificate senza autorizzazione scritta dell'autore.
+-->
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title data-en="Pre-main-sequence track of the Sun on the H-R diagram">Traccia di pre-sequenza del Sole sul diagramma H-R</title>
+<style>
+:root{
+  --bg:#05070d; --panel:#0d1220; --panel2:#141b30; --text:#e8ecf5; --muted:#8b93ab;
+  --accent:#ffb347; --accent2:#ff6b35; --line:#232c47;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--text);
+  font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif;overflow:hidden;}
+#app{display:flex;height:100vh;height:100dvh;width:100vw;}
+#stage{position:relative;flex:1;min-width:0;}
+canvas{display:block;width:100%;height:100%;background:#05070d;}
+#panel{width:290px;flex:none;background:var(--panel);border-left:1px solid var(--line);
+  padding:20px 18px;display:flex;flex-direction:column;gap:16px;overflow-y:auto;}
+#panel h1{font-size:15px;font-weight:600;margin:0 0 2px;letter-spacing:.2px;}
+#panel p.sub{margin:0;color:var(--muted);font-size:12px;line-height:1.5;}
+.ctrl{display:flex;flex-direction:column;gap:6px;}
+.ctrl label{font-size:12px;color:var(--muted);display:flex;justify-content:space-between;}
+.ctrl label b{color:var(--text);font-weight:500;}
+input[type=range]{width:100%;accent-color:var(--accent);}
+#toggleBtn{background:var(--accent2);color:#1a0d05;border:none;border-radius:8px;
+  padding:12px;font-size:14px;font-weight:600;cursor:pointer;letter-spacing:.2px;}
+#toggleBtn:active{transform:translateY(1px);}
+#resetBtn{background:transparent;color:var(--muted);border:1px solid var(--line);
+  border-radius:8px;padding:9px;font-size:12px;cursor:pointer;}
+#resetBtn:hover{color:var(--text);border-color:var(--muted);}
+.jumpRow{display:flex;gap:6px;flex-wrap:wrap;}
+.jumpRow button{flex:1;min-width:34px;background:var(--panel2);color:var(--accent);
+  border:1px solid var(--line);border-radius:7px;padding:7px 0;font-weight:700;font-size:13px;cursor:pointer;}
+.jumpRow button:hover{border-color:var(--accent);}
+.jumpRow button.cur{background:var(--accent2);color:#1a0d05;border-color:var(--accent2);}
+.stats{background:var(--panel2);border-radius:8px;padding:12px 14px;display:flex;
+  flex-direction:column;gap:6px;font-size:12px;}
+.stats div{display:flex;justify-content:space-between;color:var(--muted);}
+.stats div b{color:var(--accent);font-weight:600;}
+#classeBadge{font-size:11px;color:var(--accent2);font-weight:600;}
+hr{border:none;border-top:1px solid var(--line);margin:2px 0;}
+.tools{margin:6px 0 8px;display:flex;flex-wrap:wrap;gap:6px}
+.tools .cc-badge{margin-left:0}
+#descBox{font-size:12.5px;line-height:1.55;color:var(--text);background:var(--panel2);
+  border-radius:8px;padding:10px 12px;min-height:70px;}
+/* telefono in verticale: il grafico sopra (quadrato), il pannello dei comandi sotto, scorrevole */
+@media (max-width:700px) and (orientation:portrait){
+  #app{flex-direction:column;height:100vh;height:100dvh;}
+  #stage{flex:none;height:min(100vw,52vh);}
+  #panel{width:auto;flex:1;min-height:0;border-left:none;border-top:1px solid var(--line);padding:14px 16px;gap:14px;}
+}
+/* telefono in orizzontale: pannello più stretto, tutta l'altezza disponibile */
+@media (max-height:500px) and (orientation:landscape){
+  #app{height:100vh;height:100dvh;}
+  #panel{width:260px;padding:12px 14px;gap:12px;}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="stage"><canvas id="cv"></canvas></div>
+  <div id="panel">
+    <div>
+      <h1><span data-en="☀ Pre-main-sequence track (H-R)">☀ Traccia di pre-sequenza (H-R)</span><span class="cc-badge"><span class="cc-n">© 2026 Carlo Casoli ·</span> <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it" target="_blank" rel="license noopener">CC BY-NC-ND 4.0</a></span></h1>
+      <div class="tools"><a class="cc-badge cc-doc" href="#scheda" data-scheda data-en="📖 Animation description">📖 Scheda dell'animazione</a> <span data-lang-switch></span></div>
+      <p class="sub" data-en="From the collapse of the protostellar cloud to the ZAMS: points A→F.">Dal collasso della nube protostellare alla ZAMS: punti A→F.</p>
+    </div>
+    <button id="toggleBtn" data-en="▶ Start">▶ Avvia</button>
+    <button id="resetBtn" data-en="↺ Reset">↺ Azzera</button>
+    <hr>
+    <div class="ctrl">
+      <label><span data-en="Simulation speed">Velocità simulazione</span> <b id="speedVal"></b></label>
+      <input id="speed" type="range" min="0.2" max="4" step="0.1" value="1">
+    </div>
+    <div class="ctrl">
+      <label data-en="Elapsed time since the start of the collapse (log scale)">Tempo trascorso dall'inizio del collasso (scala log)</label>
+      <input id="timeline" type="range" min="0" max="1000" step="1" value="0">
+    </div>
+    <div class="ctrl">
+      <label data-en="Jump to point">Vai al punto</label>
+      <div class="jumpRow">
+        <button data-jump="A">A</button>
+        <button data-jump="B">B</button>
+        <button data-jump="C">C</button>
+        <button data-jump="D">D</button>
+        <button data-jump="E">E</button>
+        <button data-jump="F">F</button>
+      </div>
+    </div>
+    <hr>
+    <div class="stats">
+      <div><span data-en="Current point">Punto attuale</span><b id="sPoint">A</b></div>
+      <div><span data-en="YSO class">Classe YSO</span><b id="classeBadge">Classe 0</b></div>
+      <div><span data-en="Effective temperature">T_eff</span><b id="sTeff">–</b></div>
+      <div><span data-en="Luminosity">Luminosità L/L☉</span><b id="sL">–</b></div>
+      <div><span data-en="Radius (Stefan-Boltzmann)">Raggio R/R☉</span><b id="sR">–</b></div>
+      <div><span data-en="Elapsed time">Tempo trascorso</span><b id="sT">–</b></div>
+    </div>
+    <div id="descBox" data-en="Click “Start” or move the slider to follow the protostar's evolution.">Clicca "Avvia" oppure muovi lo slider per seguire l'evoluzione della protostella.</div>
+  </div>
+</div>
+<script src="lingua.js"></script>
+<script>
+/* lingua: T(it,en) e NUM() vengono da lingua.js; se il file manca la pagina resta in italiano */
+const T=window.T||((it)=>it), NUM=window.NUM||((s)=>s), LOC=window.LANG==='en'?'en-US':'it-IT';
+const cv=document.getElementById('cv'), ctx=cv.getContext('2d');
+const stage=document.getElementById('stage');
+
+/* ---- Punti della traccia evolutiva (valori indicativi, vedi Scheda) ---- */
+const stops=[
+  {id:'A', t:10,      teff:13,   L:0.08,   classe:T('Classe 0 (nube pre-stellare)','Class 0 (pre-stellar core)'),
+    it:'Punto A — inizio del collasso. La protostella è essenzialmente una nube di gas di grande estensione (R≈10²–10³ UA), bassa luminosità e bassa temperatura (T≈10–15 K, l\'inviluppo è ancora isotermo e otticamente sottile): questi sono i valori letti dalla Fig. 3.5 del corso.',
+    en:'Point A — the collapse begins. The protostar is essentially a gas cloud of large extent (R≈10²–10³ AU), low luminosity and low temperature (T≈10–15 K, the envelope is still isothermal and optically thin): these values are read from the course\'s Fig. 3.5.',
+    teff_label:'≈13', L_label:'≈0.08'},
+  {id:'B', t:300,     teff:20,   L:0.0005, classe:T('Classe 0 (nube pre-stellare)','Class 0 (pre-stellar core)'),
+    it:'Tratto A→B e punto B. Il collasso iniziale avviene sulla scala del tempo di caduta libera, τ_FF≈10² anni per una nube di 1 M☉: le regioni centrali, più dense, collassano più in fretta di quelle esterne e sono le prime a raggiungere l\'equilibrio idrostatico. La temperatura resta pressoché costante (collasso isotermo) mentre il raggio si riduce bruscamente: la luminosità crolla di oltre 2 ordini di grandezza, dando il breve tratto verticale e discendente A→B.',
+    en:'Segment A→B and point B. The initial collapse proceeds on the free-fall time-scale, τ_FF≈10² years for a 1 M☉ cloud: the denser central regions collapse faster than the outer ones and are the first to reach hydrostatic equilibrium. The temperature stays nearly constant (isothermal collapse) while the radius shrinks abruptly: luminosity drops by more than 2 orders of magnitude, giving the short, descending, nearly vertical A→B segment.'},
+  {id:'C', t:300.03,  teff:800,  L:5000, classe:T('Classe 0→I','Class 0→I'),
+    it:'Tratto B→C e punto C. Il rimbalzo del nucleo in equilibrio idrostatico genera un\'onda d\'urto che si propaga verso l\'esterno, riducendo drasticamente l\'opacità del mezzo intorno alla struttura in formazione: la radiazione può così sfuggire molto più efficacemente e la luminosità sale bruscamente (letto dalla Fig. 3.5: T≈800 K, L≈5000 L☉). Fase durata solo ≈10 giorni per 1 M☉.',
+    en:'Segment B→C and point C. The bounce of the hydrostatic core generates a shock wave that propagates outward, sharply reducing the opacity of the medium around the forming structure: radiation can then escape much more efficiently and luminosity rises sharply (read from Fig. 3.5: T≈800 K, L≈5000 L☉). This phase lasts only ≈10 days for 1 M☉.'},
+  {id:'D', t:1.003e5, teff:2500, L:1000, classe:T('Classe I→II','Class I→II'),
+    it:'Tratto C→D e punto D. È una contrazione che porta progressivamente all\'equilibrio idrostatico tutti gli strati dell\'inviluppo, a distanza crescente dal centro; dura circa 10⁵ anni per 1 M☉. Nel punto D l\'intera protostella è finalmente in equilibrio idrostatico ed è interamente convettiva: è il primo punto sulla traccia di Hayashi (per 1 M☉: L≈10³ L☉, R≈10² R☉, T≈2500 K).',
+    en:'Segment C→D and point D. This is a contraction that progressively brings all layers of the envelope, at increasing distance from the centre, into hydrostatic equilibrium; it lasts about 10⁵ years for 1 M☉. At point D the entire protostar is finally in hydrostatic equilibrium and fully convective: it is the first point on the Hayashi track (for 1 M☉: L≈10³ L☉, R≈10² R☉, T≈2500 K).'},
+  {id:'E', t:1.1e6,   teff:2800, L:3,    classe:T('Classe II','Class II'),
+    it:'Punto E — innesco della combustione del deuterio. Scendendo lungo la traccia di Hayashi (a T_eff quasi costante) la protostella continua a contrarsi e a perdere luminosità; quando la temperatura centrale è sufficiente si accende la combustione del deuterio, l\'opacità diminuisce e nasce una zona radiativa: la traccia si stacca dalla verticale di Hayashi e comincia a risalire verso destra, lungo la traccia di Henyey.',
+    en:'Point E — deuterium burning ignites. Moving down the Hayashi track (at nearly constant T_eff) the protostar keeps contracting and losing luminosity; once the central temperature is high enough, deuterium burning ignites, the opacity drops and a radiative zone is born: the track detaches from the vertical Hayashi line and starts rising to the right, along the Henyey track.'},
+  {id:'F', t:7.5e7,   teff:5772, L:1.0,  classe:T('ZAMS','ZAMS'),
+    it:'Punto F — Zero Age Main Sequence. Dopo il breve "flash" della combustione del ¹²C e l\'innesco stabile del ciclo p-p, la stella raggiunge l\'equilibrio idrostatico e termico: T_eff=5772 K, L=L☉, R=R☉. Sono trascorsi circa 7,5·10⁷ anni dall\'inizio del collasso della nube protostellare.',
+    en:'Point F — Zero Age Main Sequence. After the brief ¹²C-burning "flash" and the stable ignition of the p-p chain, the star reaches hydrostatic and thermal equilibrium: T_eff=5772 K, L=L☉, R=R☉. About 7.5·10⁷ years have elapsed since the collapse of the protostellar cloud began.'}
+];
+stops.forEach(s=>{ s.desc = T(s.it, s.en); });
+
+const logTmin=Math.log10(stops[0].t), logTmax=Math.log10(stops[stops.length-1].t);
+const TEFF_MAX=45000, TEFF_MIN=8, L_MIN=0.0003, L_MAX=400000;
+let plotX0,plotX1,plotY0,plotY1;
+
+/* ---- Tratto D->E: sulla traccia di Hayashi reale non e' un segmento verticale perfetto, ma ha una
+   leggera concavita' verso destra: il lato cavo guarda verso T_eff basse, quindi la curva stessa si
+   inarca verso sinistra (verso T_eff piu' alte) prima del distacco in E. La curva e' una Bezier
+   quadratica in spazio log-log, con punto di controllo piu' caldo di D ed E: lo stesso punto di
+   controllo serve anche a dimensionare la fascia di Hayashi, cosi' i due restano coerenti. */
+const hayashiBowTeff = Math.max(stops[3].teff, stops[4].teff) * 1.28;
+function hayashiBezier(frac){
+  const lt0=Math.log10(stops[3].teff), ll0=Math.log10(stops[3].L);
+  const lt1=Math.log10(stops[4].teff), ll1=Math.log10(stops[4].L);
+  const ltc=Math.log10(hayashiBowTeff), llc=(ll0+ll1)/2;
+  const u=1-frac;
+  const lt = u*u*lt0 + 2*u*frac*ltc + frac*frac*lt1;
+  const ll = u*u*ll0 + 2*u*frac*llc + frac*frac*ll1;
+  return {teff:Math.pow(10,lt), L:Math.pow(10,ll)};
+}
+
+function layout(){
+  const w=cv.width,h=cv.height;
+  plotX0=56; plotX1=w-18;
+  plotY0=20; plotY1=h-46;
+}
+function teffToX(teff){
+  const lt=Math.log10(teff), ltmax=Math.log10(TEFF_MAX), ltmin=Math.log10(TEFF_MIN);
+  const frac=(lt-ltmin)/(ltmax-ltmin);
+  return plotX1-frac*(plotX1-plotX0);
+}
+function lToY(L){
+  const ll=Math.log10(L), llmax=Math.log10(L_MAX), llmin=Math.log10(L_MIN);
+  const frac=(ll-llmin)/(llmax-llmin);
+  return plotY1-frac*(plotY1-plotY0);
+}
+function drawAxes(){
+  ctx.clearRect(0,0,cv.width,cv.height);
+  ctx.save();
+  ctx.strokeStyle='#232c47'; ctx.lineWidth=1; ctx.font='11px -apple-system,sans-serif';
+  const teffTicks=[40000,20000,10000,5000,2000,1000,500,200,100,50,20,10];
+  teffTicks.forEach(tk=>{
+    if(tk>TEFF_MAX||tk<TEFF_MIN) return;
+    const x=teffToX(tk);
+    ctx.beginPath(); ctx.moveTo(x,plotY0); ctx.lineTo(x,plotY1); ctx.stroke();
+    ctx.fillStyle='#8b93ab'; ctx.fillText(NUM(tk.toLocaleString(LOC)), x-16, plotY1+16);
+  });
+  [0.001,0.01,0.1,1,10,100,1000,10000,100000].forEach(Lv=>{
+    const y=lToY(Lv);
+    ctx.beginPath(); ctx.moveTo(plotX0,y); ctx.lineTo(plotX1,y); ctx.stroke();
+    ctx.fillStyle='#8b93ab'; ctx.fillText(NUM(Lv.toString())+' L☉', 4, y+4);
+  });
+  ctx.strokeStyle='#e8ecf5'; ctx.lineWidth=1.3; ctx.strokeRect(plotX0,plotY0,plotX1-plotX0,plotY1-plotY0);
+
+  // titolo asse X
+  ctx.fillStyle='#e8ecf5'; ctx.font='bold 11px -apple-system,sans-serif';
+  ctx.fillText(T('Temperatura effettiva T_eff (K) — asse invertito','Effective temperature T_eff (K) — reversed axis'), plotX0, plotY1+34);
+
+  // titolo asse Y (verticale)
+  ctx.save();
+  ctx.translate(14, (plotY0+plotY1)/2 + 60);
+  ctx.rotate(-Math.PI/2);
+  ctx.fillStyle='#e8ecf5'; ctx.font='bold 11px -apple-system,sans-serif';
+  ctx.textAlign='center';
+  ctx.fillText(T('Luminosità L / L☉ (scala log)','Luminosity L / L☉ (log scale)'), 0, 0);
+  ctx.textAlign='left';
+  ctx.restore();
+
+  // banda indicativa traccia di Hayashi: ancorata ai punti D ed E e al punto di controllo della
+  // curva D->E (piu' caldo di entrambi), cosi' la fascia contiene anche la concavita' del tratto
+  const dPt=stops[3], ePt=stops[4];
+  const hx0=teffToX(hayashiBowTeff*1.12), hx1=teffToX(Math.min(dPt.teff,ePt.teff)*0.88);
+  ctx.fillStyle='rgba(255,179,71,0.10)';
+  ctx.fillRect(Math.min(hx0,hx1), plotY0, Math.abs(hx1-hx0), plotY1-plotY0);
+  ctx.fillStyle='rgba(255,179,71,0.85)'; ctx.font='italic 10px -apple-system,sans-serif';
+  ctx.fillText(T('traccia di Hayashi (indicativa)','Hayashi track (indicative)'), Math.min(hx0,hx1)-6, plotY0+13);
+  ctx.restore();
+}
+
+/* ---- Linee di raggio costante (R/R_sun), come in Fig.3.5, per dare il contesto dell'intero diagramma HR ---- */
+const RADIUS_LINES=[10000,1000,100,10,1,0.1];
+function drawRadiusLines(){
+  ctx.save();
+  ctx.strokeStyle='rgba(139,147,171,0.38)';
+  ctx.setLineDash([3,4]);
+  ctx.lineWidth=1;
+  ctx.font='10px -apple-system,sans-serif';
+  RADIUS_LINES.forEach(R=>{
+    let started=false, lastX=null, lastY=null, midX=null, midY=null;
+    ctx.beginPath();
+    for(let px=plotX0; px<=plotX1; px+=4){
+      const ltmax=Math.log10(TEFF_MAX), ltmin=Math.log10(TEFF_MIN);
+      const frac=(plotX1-px)/(plotX1-plotX0);
+      const teff=Math.pow(10, ltmin+frac*(ltmax-ltmin));
+      const L = R*R*Math.pow(teff/5772,4);
+      if(L<L_MIN||L>L_MAX){ started=false; continue; }
+      const y=lToY(L);
+      if(!started){ ctx.moveTo(px,y); started=true; } else { ctx.lineTo(px,y); }
+      lastX=px; lastY=y;
+      if(midX===null && px>(plotX0+plotX1)/2-20 && px<(plotX0+plotX1)/2+20){ midX=px; midY=y; }
+    }
+    ctx.stroke();
+    const labelX=midX!==null?midX:lastX, labelY=midY!==null?midY:lastY;
+    if(labelX!==null){
+      ctx.fillStyle='rgba(139,147,171,0.75)';
+      const rLabel = R>=1 ? NUM(R.toLocaleString(LOC))+' R☉' : NUM(R.toString())+' R☉';
+      ctx.fillText(rLabel, labelX-14, labelY-4);
+    }
+  });
+  ctx.setLineDash([]);
+  ctx.restore();
+}
+
+/* ---- Linea della Zero Age Main Sequence (ZAMS), disegnata sempre per intero (da nane rosse a stelle O), valori indicativi ----
+   Generata da un'unica relazione massa-luminosita'/massa-raggio continua (fit quadratico in log-log,
+   ancorato a M=0.1, 1 e 40 M_sun) + legge di Stefan-Boltzmann per T_eff: cosi' la pendenza della linea
+   varia con gradualita' invece di avere "gobbe" dovute a valori scelti punto per punto in modo incoerente. */
+const zamsPoints=(function(){
+  const masses=[0.1,0.15,0.2,0.3,0.5,0.7,1,1.5,2,3,5,7,9,12,15,20,25,30,40];
+  return masses.map(M=>{
+    const lm=Math.log10(M);
+    const L=Math.pow(10, 3.193*lm+0.096*lm*lm);
+    const R=Math.pow(10, 0.804*lm-0.096*lm*lm);
+    const teff=5772*Math.pow(L/(R*R),0.25);
+    return {teff, L, mass:String(M)};
+  });
+})();
+function drawZAMS(){
+  ctx.save();
+  ctx.strokeStyle='rgba(133,195,255,0.55)';
+  ctx.setLineDash([5,4]);
+  ctx.lineWidth=1.8;
+  ctx.beginPath();
+  zamsPoints.forEach((p,i)=>{
+    const x=Math.max(plotX0,Math.min(plotX1,teffToX(p.teff)));
+    const y=lToY(p.L);
+    if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // etichetta scritta parallela alla ZAMS, ancorata a un punto sicuramente interno al grafico
+  // (non all'estremo della linea, che spesso cade vicino al bordo)
+  let mi=Math.floor(zamsPoints.length*0.55);
+  mi=Math.max(1, Math.min(zamsPoints.length-2, mi));
+  const p0=zamsPoints[mi-1], p1=zamsPoints[mi+1], pm=zamsPoints[mi];
+  const x0=teffToX(p0.teff), y0=lToY(p0.L), x1=teffToX(p1.teff), y1=lToY(p1.L);
+  let angle=Math.atan2(y1-y0, x1-x0);
+  if(angle>Math.PI/2 || angle<-Math.PI/2) angle+=Math.PI; // non scrivere mai il testo capovolto
+  const mx=teffToX(pm.teff), my=lToY(pm.L);
+  ctx.save();
+  ctx.translate(mx,my);
+  ctx.rotate(angle);
+  ctx.fillStyle='rgba(133,195,255,0.95)'; ctx.font='italic 10px -apple-system,sans-serif';
+  ctx.textAlign='center';
+  ctx.fillText(T('ZAMS (indicativa)','ZAMS (indicative)'), 0, -8);
+  ctx.textAlign='left';
+  ctx.restore();
+
+  ctx.restore();
+}
+function drawTrack(){
+  ctx.save();
+  ctx.strokeStyle='#ffb347'; ctx.lineWidth=2.2;
+  ctx.beginPath();
+  stops.forEach((s,i)=>{
+    const x=teffToX(s.teff), y=lToY(s.L);
+    if(i===0){ ctx.moveTo(x,y); return; }
+    if(i===4){ // tratto D->E: curva con concavita' verso destra, non segmento rettilineo
+      for(let k=1;k<=16;k++){ const p=hayashiBezier(k/16); ctx.lineTo(teffToX(p.teff), lToY(p.L)); }
+      return;
+    }
+    ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+  stops.forEach(s=>{
+    const x=teffToX(s.teff), y=lToY(s.L);
+    ctx.beginPath(); ctx.arc(x,y,5,0,7); ctx.fillStyle='#e8ecf5'; ctx.fill();
+    ctx.fillStyle='#ff6b35'; ctx.font='bold 13px -apple-system,sans-serif';
+    ctx.fillText(s.id, x+8, y-6);
+  });
+  ctx.restore();
+}
+function stateAtLogT(logt){
+  for(let i=0;i<stops.length-1;i++){
+    const a=stops[i], b=stops[i+1], la=Math.log10(a.t), lb=Math.log10(b.t);
+    if((logt>=la && logt<=lb) || (i===stops.length-2 && logt>lb)){
+      let frac=(lb-la)>1e-9 ? (logt-la)/(lb-la) : 1;
+      frac=Math.max(0,Math.min(1,frac));
+      let teffOut, Lout;
+      if(i===3){ // tratto D->E: segue la stessa curva disegnata (concavita' verso destra)
+        const p=hayashiBezier(frac); teffOut=p.teff; Lout=p.L;
+      } else {
+        const lt=Math.log10(a.teff)+frac*(Math.log10(b.teff)-Math.log10(a.teff));
+        const ll=Math.log10(a.L)+frac*(Math.log10(b.L)-Math.log10(a.L));
+        teffOut=Math.pow(10,lt); Lout=Math.pow(10,ll);
+      }
+      return {teff:teffOut, L:Lout, seg:i, frac,
+        id: frac<0.5?a.id:b.id, classe: frac<0.5?a.classe:b.classe, desc: frac<0.98?a.desc:b.desc};
+    }
+  }
+  const last=stops[stops.length-1];
+  return {teff:last.teff, L:last.L, seg:stops.length-2, frac:1, id:last.id, classe:last.classe, desc:last.desc};
+}
+function fmtSci(v){
+  // formattazione adattiva: valori "normali" con virgola/punto decimale,
+  // valori molto piccoli o molto grandi in notazione scientifica (per evitare che
+  // l'arrotondamento li faccia apparire come 0 o come numeri interi illeggibili)
+  if(v===0) return '0';
+  const av=Math.abs(v);
+  if(av>=0.01 && av<100000){
+    const digits = av<1?4 : av<10?3 : av<1000?2 : 0;
+    return NUM(v.toFixed(digits));
+  }
+  const exp=Math.floor(Math.log10(av));
+  const mant=v/Math.pow(10,exp);
+  const supMap={'-':'⁻','0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹'};
+  const supExp=String(exp).split('').map(c=>supMap[c]||c).join('');
+  return NUM(mant.toFixed(2))+'×10'+supExp;
+}
+function fmtYears(y){
+  if(y<1000) return Math.round(y).toLocaleString(LOC)+T(' anni',' years');
+  if(y<1e6) return (y/1000).toLocaleString(LOC,{maximumFractionDigits:1})+T(' mila anni',' thousand years');
+  return (y/1e6).toLocaleString(LOC,{maximumFractionDigits:2})+T(' milioni di anni',' million years');
+}
+
+function render(logt){
+  drawAxes(); drawRadiusLines(); drawZAMS(); drawTrack();
+  const st=stateAtLogT(logt);
+  const x=teffToX(st.teff), y=lToY(st.L);
+  ctx.save();
+  ctx.beginPath(); ctx.arc(x,y,9,0,7);
+  ctx.fillStyle='#ff6b35'; ctx.shadowColor='rgba(255,107,53,0.65)'; ctx.shadowBlur=16; ctx.fill();
+  ctx.lineWidth=2; ctx.strokeStyle='#1a0d05'; ctx.stroke();
+  ctx.restore();
+
+  const t=Math.pow(10,logt);
+  document.getElementById('sPoint').textContent=st.id;
+  document.getElementById('classeBadge').textContent=st.classe;
+  document.getElementById('sTeff').textContent=NUM(Math.round(st.teff).toLocaleString(LOC))+' K';
+  document.getElementById('sL').textContent=fmtSci(st.L);
+  const R=Math.sqrt(st.L)*Math.pow(5772/st.teff,2);
+  document.getElementById('sR').textContent=fmtSci(R);
+  document.getElementById('sT').textContent=fmtYears(t);
+  document.getElementById('descBox').textContent=st.desc;
+  document.querySelectorAll('.jumpRow button').forEach(b=>b.classList.toggle('cur', b.dataset.jump===st.id));
+}
+
+let playing=false, logt=logTmin, lastTs=null;
+const totalSpan=logTmax-logTmin;
+const timelineEl=document.getElementById('timeline'), speedEl=document.getElementById('speed');
+const btnPlay=document.getElementById('toggleBtn'), btnReset=document.getElementById('resetBtn');
+
+function logtToSlider(lt){ return Math.round(1000*(lt-logTmin)/totalSpan); }
+function sliderToLogt(v){ return logTmin+(v/1000)*totalSpan; }
+function syncSlider(){ timelineEl.value=logtToSlider(logt); }
+
+function loop(ts){
+  if(!playing){ lastTs=null; return; }
+  if(lastTs===null) lastTs=ts;
+  const dt=(ts-lastTs)/1000; lastTs=ts;
+  const speed=+speedEl.value;
+  const rate=totalSpan/22; // percorso completo in ~22s a velocità 1x
+  logt+=rate*speed*dt;
+  if(logt>=logTmax){ logt=logTmax; playing=false; btnPlay.textContent=T('▶ Avvia','▶ Start'); }
+  syncSlider(); render(logt);
+  if(playing) requestAnimationFrame(loop);
+}
+btnPlay.addEventListener('click',()=>{
+  playing=!playing;
+  btnPlay.textContent = playing ? T('⏸ Pausa','⏸ Pause') : T('▶ Avvia','▶ Start');
+  if(playing){ lastTs=null; requestAnimationFrame(loop); }
+});
+btnReset.addEventListener('click',()=>{
+  playing=false; btnPlay.textContent=T('▶ Avvia','▶ Start');
+  logt=logTmin; syncSlider(); render(logt);
+});
+timelineEl.addEventListener('input',()=>{
+  playing=false; btnPlay.textContent=T('▶ Avvia','▶ Start');
+  logt=sliderToLogt(+timelineEl.value); render(logt);
+});
+document.querySelectorAll('[data-jump]').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    playing=false; btnPlay.textContent=T('▶ Avvia','▶ Start');
+    const s=stops.find(x=>x.id===btn.dataset.jump);
+    logt=Math.log10(s.t); syncSlider(); render(logt);
+  });
+});
+
+function resize(){
+  const w=stage.clientWidth, h=stage.clientHeight;
+  if(w===cv.width && h===cv.height) return;
+  cv.width=w; cv.height=h; layout(); render(logt);
+}
+window.addEventListener('resize', resize);
+window.addEventListener('orientationchange', ()=>setTimeout(resize,350));
+
+layout(); resize(); render(logt);
+</script>
+<style id="cc-copyright">
+.cc-badge{display:inline-block;vertical-align:middle;margin:0 0 0 .5em;padding:2px 8px;border:1px solid currentColor;border-radius:999px;font:400 11.5px/1.35 -apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;letter-spacing:0;text-transform:none;white-space:normal;max-width:100%;box-sizing:border-box;opacity:.8;color:inherit;text-shadow:none;pointer-events:auto}
+.cc-n,.cc-badge a{white-space:nowrap}
+.cc-badge a{color:inherit;text-decoration:underline;text-underline-offset:2px}
+.cc-badge.cc-doc{text-decoration:none;opacity:1;font-weight:600;margin-left:.4em}
+.cc-badge.lang-sw{opacity:1;margin-left:.4em}.cc-badge.lang-sw a{cursor:pointer}
+@media (max-width:520px){.cc-badge{font-size:11px;padding:2px 7px}}
+</style>
+<script src="traccia_presequenza_scheda.js"></script>
+<script src="traccia_presequenza_scheda_en.js"></script>
+<script src="scheda.js"></script>
+</body>
+</html>
