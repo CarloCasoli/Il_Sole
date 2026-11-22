@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<!--
+  © 2026 Carlo Casoli — "Il Sole: Osservazione e Fisica"
+  Licenza CC BY-NC-ND 4.0: https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it
+  Vietati l'uso commerciale e la distribuzione di versioni modificate senza autorizzazione scritta dell'autore.
+-->
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title data-en="Jeans Diagram (T, n) — Gravitational Instability Threshold">Diagramma di Jeans (T, n) — Soglia di instabilità gravitazionale</title>
+<style>
+ :root{--bg:#05070d;--text:#e8ecf5;--muted:#8b95ac;--panel:#0d1220;--panel2:#141b30;--line:#232c47;--accent:#ffb347;--accent2:#ff6b35;--ok:#3ddc84;--bad:#ff5c5c;}
+ @media (prefers-color-scheme: light){ :root:not([data-theme="dark"]){--bg:#eef1f8;--text:#11141c;--muted:#5b6478;--panel:#ffffff;--panel2:#e6eaf4;--line:#cfd6e6;} }
+ :root[data-theme="dark"]{--bg:#05070d;--text:#e8ecf5;--muted:#8b95ac;--panel:#0d1220;--panel2:#141b30;--line:#232c47;}
+ :root[data-theme="light"]{--bg:#eef1f8;--text:#11141c;--muted:#5b6478;--panel:#ffffff;--panel2:#e6eaf4;--line:#cfd6e6;}
+ *{box-sizing:border-box;}
+ body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,Segoe UI,Roboto,sans-serif;padding:10px;min-height:100vh;}
+ #app{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;align-items:flex-start;width:100%;max-width:1300px;margin:0 auto;}
+ .left{flex:1 1 640px;min-width:0;display:flex;flex-direction:column;align-items:center;}
+ .stage{position:relative;width:min(100%,900px);aspect-ratio:7/6;}
+ canvas{width:100%;height:100%;display:block;border-radius:14px;position:absolute;top:0;left:0;}
+ #bgcv{background:var(--panel);}
+ .legend{display:flex;flex-wrap:wrap;gap:8px 18px;justify-content:center;margin-top:14px;max-width:700px;font-size:.78rem;color:var(--muted);}
+ .legend span.item{display:inline-flex;align-items:center;gap:6px;}
+ .dot{width:10px;height:10px;border-radius:50%;display:inline-block;flex:none;}
+ #panel{width:300px;flex:none;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:14px;}
+ #panel h1{font-size:15px;margin:0;font-weight:600;}
+ #panel p.sub{margin:0;color:var(--muted);font-size:12px;line-height:1.5;}
+ .ctrl{display:flex;flex-direction:column;gap:4px;}
+ .ctrl label{font-size:12px;color:var(--muted);display:flex;justify-content:space-between;}
+ .ctrl label b{color:var(--text);font-weight:600;}
+ input[type=range]{width:100%;accent-color:var(--accent);}
+ button{border-radius:8px;padding:9px;font-size:13px;cursor:pointer;font-weight:600;}
+ #resetBtn{width:100%;background:transparent;color:var(--muted);border:1px solid var(--line);font-weight:500;}
+ #resetBtn:hover{color:var(--text);border-color:var(--accent);}
+ #statoBox{padding:10px 12px;border-radius:8px;font-weight:700;text-align:center;font-size:13px;background:var(--panel2);border:1px solid var(--line);color:var(--muted);transition:background .2s,color .2s,border-color .2s;}
+ #statoBox.stabile{background:rgba(61,220,132,.12);color:var(--ok);border-color:var(--ok);}
+ #statoBox.instabile{background:rgba(255,92,92,.12);color:var(--bad);border-color:var(--bad);}
+ .info{background:var(--panel2);border-radius:8px;padding:10px 12px;font-size:11.5px;line-height:1.55;color:var(--muted);}
+ .info strong{color:var(--text);}
+ hr{border:none;border-top:1px solid var(--line);margin:0;}
+ .tools{margin:6px 0 8px;display:flex;flex-wrap:wrap;gap:6px}
+ .tools .cc-badge{margin-left:0}
+ @media (max-width:640px){ #panel{width:100%;} }
+</style>
+</head>
+<body>
+<div id="app">
+ <div class="left">
+  <div class="stage"><canvas id="bgcv"></canvas><canvas id="c"></canvas></div>
+  <div class="legend" id="legend"></div>
+ </div>
+ <div id="panel">
+  <div>
+   <h1><span data-en="☀ Jeans diagram">☀ Diagramma di Jeans</span><span class="cc-badge"><span class="cc-n">© 2026 Carlo Casoli ·</span> <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it" target="_blank" rel="license noopener">CC BY-NC-ND 4.0</a></span></h1>
+   <div class="tools"><a class="cc-badge cc-doc" href="#scheda" data-scheda data-en="📖 Animation description">📖 Scheda dell'animazione</a> <span data-lang-switch></span></div>
+   <p class="sub" data-en="Explore how the critical mass threshold (Jeans mass) depends on temperature and density. Move the slider to change the cloud mass, then drag the point to see whether the cloud is stable or collapses.">Esplora come la soglia critica di massa (Massa di Jeans) dipenda da temperatura e densità del gas. Sposta lo slider per cambiare la massa della nube, poi trascina il punto sul grafico per vedere se è stabile o collassa.</p>
+  </div>
+
+  <div class="ctrl">
+   <label><span data-en="Cloud mass">Massa della nube</span> <b id="massaVal"></b></label>
+   <input id="massa" type="range" min="-1" max="4" step="0.01" value="1">
+  </div>
+
+  <div id="statoBox" data-en="Drag the point on the graph">Trascina il punto sul grafico</div>
+
+  <button id="resetBtn" data-en="↺ Reset point">↺ Reimposta punto</button>
+
+  <hr>
+
+  <div class="info">
+   <strong data-en="How to read the graph">Come leggere il grafico</strong><br>
+   <span data-en="The colored line represents, for the chosen mass, the Jeans critical threshold:">La retta colorata rappresenta, per la massa scelta, la soglia critica di Jeans:</span>
+   <br><em>M<sub>J</sub> &prop; T<sup>3/2</sup> &middot; &rho;<sup>&minus;1/2</sup></em>
+   <br><br>
+   &bull; <strong style="color:var(--bad)" data-en="Above the line">Sopra la retta</strong> <span data-en="(high density / low temperature): gravity wins, the cloud collapses.">(alta densità / bassa temperatura): la gravità vince, la nube collassa.</span>
+   <br>
+   &bull; <strong style="color:var(--ok)" data-en="Below the line">Sotto la retta</strong><span data-en=": thermal pressure supports the cloud.">: la pressione termica sostiene la nube.</span>
+   <br><br>
+   <span data-en="The dashed gray lines show the thresholds for 1, 10, 100 and 1000 M&#9737; as reference. The dashed red arrow shows the typical evolutionary path of a real cooling/compressing cloud.">Le rette grigie tratteggiate mostrano le soglie per 1, 10, 100 e 1000 M<sub>&#9737;</sub> come riferimento. La freccia rossa tratteggiata indica il tipico percorso evolutivo di raffreddamento/compressione di una nube reale.</span>
+  </div>
+ </div>
+</div>
+<script src="lingua.js"></script>
+<script>
+(function(){
+/* lingua: T(it,en) e NUM(s) vengono da lingua.js; se il file manca la pagina resta in italiano */
+const T=window.T||(it=>it);
+const NUM=window.NUM||(s=>s);
+
+const canvas=document.getElementById('c');
+const ctx=canvas.getContext('2d');
+const bgc=document.getElementById('bgcv');
+const bctx=bgc.getContext('2d');
+let W,H,DPR=1;
+
+// Margini del plot (in pixel "logici", prima dello scaling DPR)
+let margin;
+
+function resize(){
+  const rect=canvas.parentElement.getBoundingClientRect();
+  if(!rect.width) return;
+  DPR=Math.min(window.devicePixelRatio||1,2);
+  W=canvas.width=bgc.width=rect.width*DPR;
+  H=canvas.height=bgc.height=rect.height*DPR;
+  canvas.style.width=bgc.style.width=rect.width+'px';
+  canvas.style.height=bgc.style.height=rect.height+'px';
+  margin = { left: 118*DPR, right: 25*DPR, top: 28*DPR, bottom: 78*DPR };
+  plotW = W - margin.left - margin.right;
+  plotH = H - margin.top - margin.bottom;
+  draw();
+}
+
+let plotW=0, plotH=0;
+
+// Range assi in log10
+const T_MIN = 0, T_MAX = 6;      // log10(T) da 1 a 1e6 K
+const N_MIN = -3, N_MAX = 11;    // log10(n) da 1e-3 a 1e11 cm^-3
+
+// Formula calibrata sul diagramma originale del libro (Approfondimento 3.3):
+// log10(n) = 3*log10(T) - 2*log10(M) + 4   (M in masse solari)
+function logN_soglia(logT, logM){
+  return 3*logT - 2*logM + 4;
+}
+
+function xToPx(logT){ return margin.left + (logT - T_MIN) / (T_MAX - T_MIN) * plotW; }
+function yToPx(logN){ return margin.top + (1 - (logN - N_MIN) / (N_MAX - N_MIN)) * plotH; }
+function pxToLogT(px){ return T_MIN + (px - margin.left) / plotW * (T_MAX - T_MIN); }
+function pxToLogN(py){ return N_MIN + (1 - (py - margin.top) / plotH) * (N_MAX - N_MIN); }
+
+// Stato: punto nube (coordinate log), massa (log10 Msun)
+let logM = 1.0;        // 10 Msun iniziale
+let puntoLogT = 1.3;   // ~20 K
+let puntoLogN = 3.5;   // ~3000 cm^-3
+let dragging = false;
+
+const regioni = [
+  { nome: T("Nuclei densi freddi","Cold dense cores"), logT: [0.3, 1.3], logN: [6, 9], colore: "rgba(255,179,71,0.08)" },
+  { nome: T("Nubi Molecolari Giganti (GMC)","Giant Molecular Clouds (GMC)"), logT: [0.5, 2.0], logN: [1.5, 4], colore: "rgba(255,179,71,0.05)" },
+  { nome: T("Nubi diffuse (HI)","Diffuse clouds (HI)"), logT: [1.2, 2.3], logN: [-0.3, 1.3], colore: "rgba(139,149,172,0.07)" },
+  { nome: T("Regioni HII / ISM caldo","HII regions / warm ISM"), logT: [3.2, 4.5], logN: [-0.5, 1.3], colore: "rgba(255,92,92,0.06)" },
+  { nome: T("Mezzo Inter-nube Rovente (HIM)","Hot Intercloud Medium (HIM)"), logT: [5.0, 6.0], logN: [-3, -1], colore: "rgba(255,107,53,0.08)" },
+  { nome: T("Resti di Supernova (SNR)","Supernova Remnants (SNR)"), logT: [4.3, 5.7], logN: [1.5, 4], colore: "rgba(180,140,255,0.07)" }
+];
+
+function drawArrowhead(c, x0,y0,x1,y1){
+  const angle = Math.atan2(y1-y0, x1-x0);
+  const len = 10*DPR;
+  c.beginPath();
+  c.moveTo(x1,y1);
+  c.lineTo(x1-len*Math.cos(angle-Math.PI/6), y1-len*Math.sin(angle-Math.PI/6));
+  c.lineTo(x1-len*Math.cos(angle+Math.PI/6), y1-len*Math.sin(angle+Math.PI/6));
+  c.closePath();
+  c.fill();
+}
+
+function fmtSmart(v){
+  if(v >= 0.01 && v < 10000){
+    const cifre = v < 1 ? 2 : (v < 100 ? 1 : 0);
+    return NUM(v.toLocaleString('it-IT', {maximumFractionDigits: cifre}));
+  }
+  const esp = v.toExponential(1).split('e');
+  const mant = NUM(esp[0]);
+  const exp = parseInt(esp[1], 10);
+  return mant + "×10" + toSupExp(exp);
+}
+function toSupExp(n){
+  const supDigits = {'-':'⁻','0':'⁰','1':'¹','2':'²','3':'³',
+    '4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹'};
+  return String(n).split('').map(c=>supDigits[c]||c).join('');
+}
+
+/* ---------- Sfondo statico: griglia, regioni, assi, rette di riferimento ---------- */
+function drawStatic(){
+  bctx.clearRect(0,0,W,H);
+  const isLight = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim()!=='#05070d'
+    && window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches
+    && document.documentElement.getAttribute('data-theme')!=='dark';
+  const lineCol = isLight ? "rgba(17,20,28,0.12)" : "rgba(232,236,245,0.12)";
+  const textCol = isLight ? "#5b6478" : "#8b95ac";
+  const axisCol = isLight ? "#11141c" : "#e8ecf5";
+
+  // Regioni di sfondo, con etichetta del nome centrata (testo a capo se necessario)
+  regioni.forEach(r=>{
+    const x0 = xToPx(r.logT[0]), x1 = xToPx(r.logT[1]);
+    const y0 = yToPx(r.logN[1]), y1 = yToPx(r.logN[0]);
+    bctx.fillStyle = r.colore;
+    bctx.fillRect(x0, y0, x1-x0, y1-y0);
+
+    // Colore etichetta: stessa tinta della regione ma più satura/leggibile
+    const rgbMatch = r.colore.match(/rgba\((\d+),(\d+),(\d+)/);
+    const labelColor = rgbMatch ? `rgba(${rgbMatch[1]},${rgbMatch[2]},${rgbMatch[3]},0.95)` : textCol;
+
+    const boxW = x1 - x0, boxH = y1 - y0;
+    const padX = 6*DPR;
+    const fontSize = 10.5*DPR;
+    bctx.font = (fontSize)+"px sans-serif";
+    bctx.fillStyle = labelColor;
+    bctx.textAlign = "center";
+
+    // A capo automatico per parole, entro la larghezza della regione
+    const parole = r.nome.split(' ');
+    let righe = [], rigaCorr = '';
+    parole.forEach(p=>{
+      const prova = rigaCorr ? rigaCorr+' '+p : p;
+      if(bctx.measureText(prova).width > boxW - padX*2 && rigaCorr){
+        righe.push(rigaCorr); rigaCorr = p;
+      } else {
+        rigaCorr = prova;
+      }
+    });
+    if(rigaCorr) righe.push(rigaCorr);
+
+    const lineH = fontSize * 1.25;
+    const totalH = righe.length * lineH;
+    const startY = (y0+y1)/2 - totalH/2 + fontSize*0.8;
+    righe.forEach((riga,i)=>{
+      bctx.fillText(riga, (x0+x1)/2, startY + i*lineH);
+    });
+    bctx.textAlign = "left";
+  });
+
+  // Griglia
+  bctx.strokeStyle = lineCol;
+  bctx.lineWidth = 1*DPR;
+  bctx.font = (10*DPR)+"px sans-serif";
+  bctx.fillStyle = textCol;
+  for(let t=T_MIN; t<=T_MAX; t++){
+    const x = xToPx(t);
+    bctx.beginPath(); bctx.moveTo(x, margin.top); bctx.lineTo(x, margin.top+plotH); bctx.stroke();
+    bctx.fillText("10^"+t, x-10*DPR, margin.top+plotH+15*DPR);
+  }
+  for(let n=N_MIN; n<=N_MAX; n+=2){
+    const y = yToPx(n);
+    bctx.beginPath(); bctx.moveTo(margin.left, y); bctx.lineTo(margin.left+plotW, y); bctx.stroke();
+    bctx.fillText("10^"+n, margin.left-42*DPR, y+3*DPR);
+  }
+
+  // Assi
+  bctx.strokeStyle = axisCol;
+  bctx.lineWidth = 1.5*DPR;
+  bctx.beginPath();
+  bctx.moveTo(margin.left, margin.top);
+  bctx.lineTo(margin.left, margin.top+plotH);
+  bctx.lineTo(margin.left+plotW, margin.top+plotH);
+  bctx.stroke();
+
+  bctx.fillStyle = axisCol;
+  bctx.font = (13*DPR)+"px sans-serif";
+  bctx.textAlign = "center";
+  bctx.fillText(T("Temperatura T (K)","Temperature T (K)"), margin.left+plotW/2, H-10*DPR);
+  bctx.save();
+  bctx.translate(18*DPR, margin.top+plotH/2);
+  bctx.rotate(-Math.PI/2);
+  bctx.fillText(T("Densità numerica n (cm⁻³)","Number density n (cm⁻³)"), 0, 0);
+  bctx.restore();
+  bctx.textAlign = "left";
+
+  // Rette di riferimento (1,10,100,1000 Msun)
+  const riferimenti = [0, 1, 2, 3];
+  bctx.setLineDash([5*DPR,4*DPR]);
+  bctx.strokeStyle = textCol;
+  bctx.lineWidth = 1*DPR;
+  riferimenti.forEach(lm=>{
+    bctx.beginPath();
+    let first = true;
+    for(let logT=T_MIN; logT<=T_MAX; logT+=0.1){
+      const logN = logN_soglia(logT, lm);
+      if(logN < N_MIN-1 || logN > N_MAX+1) continue;
+      const x = xToPx(logT), y = yToPx(logN);
+      if(first){ bctx.moveTo(x,y); first=false; } else { bctx.lineTo(x,y); }
+    }
+    bctx.stroke();
+    const logTlab = 0.9;
+    const logNlab = logN_soglia(logTlab, lm);
+    if(logNlab>=N_MIN && logNlab<=N_MAX){
+      bctx.save();
+      bctx.fillStyle = textCol;
+      bctx.font = (10*DPR)+"px sans-serif";
+      bctx.translate(xToPx(logTlab), yToPx(logNlab));
+      bctx.rotate(-Math.atan2(3*(plotH/(N_MAX-N_MIN)), (plotW/(T_MAX-T_MIN))));
+      bctx.fillText(Math.pow(10,lm)+" M☉", 2*DPR, -4*DPR);
+      bctx.restore();
+    }
+  });
+  bctx.setLineDash([]);
+
+  // Freccia traiettoria di collasso (indicativa)
+  bctx.strokeStyle = "rgba(255,92,92,0.85)";
+  bctx.fillStyle = "rgba(255,92,92,0.85)";
+  bctx.lineWidth = 2.5*DPR;
+  bctx.setLineDash([6*DPR,4*DPR]);
+  const a0T=2.3, a0N=2.0, a1T=1.75, a1N=7.0;
+  bctx.beginPath();
+  bctx.moveTo(xToPx(a0T), yToPx(a0N));
+  bctx.lineTo(xToPx(a1T), yToPx(a1N));
+  bctx.stroke();
+  bctx.setLineDash([]);
+  drawArrowhead(bctx, xToPx(a0T), yToPx(a0N), xToPx(a1T), yToPx(a1N));
+
+  const segX0=xToPx(a0T), segY0=yToPx(a0N), segX1=xToPx(a1T), segY1=yToPx(a1N);
+  let segAngle = Math.atan2(segY1-segY0, segX1-segX0);
+  if (segAngle > Math.PI/2 || segAngle < -Math.PI/2) segAngle += Math.PI;
+  bctx.save();
+  bctx.font = "italic "+(10*DPR)+"px serif";
+  bctx.fillStyle = "rgba(255,92,92,0.9)";
+  bctx.translate((segX0+segX1)/2, (segY0+segY1)/2);
+  bctx.rotate(segAngle);
+  bctx.textAlign = "center";
+  bctx.fillText(T("Evoluzione verso il collasso (raffreddamento)","Evolution towards collapse (cooling)"), 0, -10*DPR);
+  bctx.restore();
+}
+
+/* ---------- Primo piano: retta corrente + punto draggabile + guide ---------- */
+function draw(){
+  if(!plotW) return;
+  drawStatic();
+  ctx.clearRect(0,0,W,H);
+
+  // Retta corrente (massa selezionata)
+  ctx.strokeStyle = "#ffb347";
+  ctx.lineWidth = 3*DPR;
+  ctx.beginPath();
+  let first = true;
+  for(let logT=T_MIN; logT<=T_MAX; logT+=0.05){
+    const logN = logN_soglia(logT, logM);
+    if(logN < N_MIN-1 || logN > N_MAX+1) continue;
+    const x = xToPx(logT), y = yToPx(logN);
+    if(first){ ctx.moveTo(x,y); first=false; } else { ctx.lineTo(x,y); }
+  }
+  ctx.stroke();
+
+  // Punto nube
+  const logNsoglia_qui = logN_soglia(puntoLogT, logM);
+  const instabile = puntoLogN > logNsoglia_qui;
+  const px = xToPx(puntoLogT), py = yToPx(puntoLogN);
+  const coloreStato = instabile ? "#ff5c5c" : "#3ddc84";
+  const assePxYbottom = margin.top + plotH;
+
+  // Guide tratteggiate verso gli assi
+  ctx.save();
+  ctx.setLineDash([4*DPR,3*DPR]);
+  ctx.strokeStyle = coloreStato;
+  ctx.lineWidth = 1.2*DPR;
+  ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(px, assePxYbottom); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(margin.left, py); ctx.stroke();
+  ctx.restore();
+
+  // Etichette dei valori sugli assi
+  const T_val = Math.pow(10, puntoLogT);
+  const n_val = Math.pow(10, puntoLogN);
+
+  ctx.save();
+  ctx.font = "bold "+(11*DPR)+"px sans-serif";
+  ctx.textAlign = "center";
+  const labelT = "T = " + fmtSmart(T_val) + " K";
+  const wT = ctx.measureText(labelT).width;
+  ctx.fillStyle = "rgba(13,18,32,0.9)";
+  ctx.fillRect(px-wT/2-6*DPR, assePxYbottom+16*DPR, wT+12*DPR, 16*DPR);
+  ctx.fillStyle = coloreStato;
+  ctx.fillText(labelT, px, assePxYbottom+28*DPR);
+
+  ctx.strokeStyle = coloreStato;
+  ctx.lineWidth = 2*DPR;
+  ctx.beginPath(); ctx.moveTo(px, assePxYbottom); ctx.lineTo(px, assePxYbottom+6*DPR); ctx.stroke();
+
+  const labelN = "n = " + fmtSmart(n_val) + " cm⁻³";
+  const wN = ctx.measureText(labelN).width;
+  ctx.fillStyle = "rgba(13,18,32,0.9)";
+  ctx.fillRect(margin.left-wN-20*DPR, py-9*DPR, wN+14*DPR, 18*DPR);
+  ctx.fillStyle = coloreStato;
+  ctx.textAlign = "right";
+  ctx.fillText(labelN, margin.left-12*DPR, py+4*DPR);
+  ctx.textAlign = "left";
+
+  ctx.strokeStyle = coloreStato;
+  ctx.beginPath(); ctx.moveTo(margin.left-6*DPR, py); ctx.lineTo(margin.left, py); ctx.stroke();
+  ctx.restore();
+
+  // Punto
+  ctx.beginPath();
+  ctx.arc(px, py, 9*DPR, 0, 2*Math.PI);
+  ctx.fillStyle = coloreStato;
+  ctx.fill();
+  ctx.lineWidth = 2*DPR;
+  ctx.strokeStyle = "#0d1220";
+  ctx.stroke();
+
+  // Stato testuale
+  const box = document.getElementById('statoBox');
+  if(instabile){
+    box.textContent = T("INSTABILE: la nube collassa sotto la propria gravità","UNSTABLE: the cloud collapses under its own gravity");
+    box.className = "instabile";
+  } else {
+    box.textContent = T("STABILE: la pressione termica sostiene la nube","STABLE: thermal pressure supports the cloud");
+    box.className = "stabile";
+  }
+}
+
+/* ---------- Legenda ---------- */
+function buildLegend(){
+  const legend = document.getElementById('legend');
+  const items = [
+    ['#ffb347', T('Soglia di Jeans (massa selezionata)','Jeans threshold (selected mass)')],
+    ['#8b95ac', T('Soglie di riferimento (1,10,100,1000 M☉)','Reference thresholds (1,10,100,1000 M☉)')],
+    ['#ff5c5c', T('Percorso evolutivo di collasso','Collapse evolutionary path')],
+    ['#3ddc84', T('Punto stabile','Stable point')],
+  ];
+  legend.innerHTML = items.map(function(it){
+    return '<span class="item"><span class="dot" style="background:'+it[0]+'"></span>'+it[1]+'</span>';
+  }).join('');
+}
+
+/* ---------- Interazione: slider massa ---------- */
+const massaSlider = document.getElementById('massa');
+const massaValEl = document.getElementById('massaVal');
+function aggiornaMassaLabel(){
+  const m = Math.pow(10, logM);
+  massaValEl.textContent = fmtSmart(m) + ' M☉';
+}
+massaSlider.addEventListener('input', (e)=>{
+  logM = parseFloat(e.target.value);
+  aggiornaMassaLabel();
+  draw();
+});
+
+/* ---------- Interazione: drag del punto ---------- */
+function getMousePos(evt){
+  const rect = canvas.getBoundingClientRect();
+  const clientX = evt.touches ? evt.touches[0].clientX : evt.clientX;
+  const clientY = evt.touches ? evt.touches[0].clientY : evt.clientY;
+  return {
+    x: (clientX - rect.left) * (canvas.width/rect.width),
+    y: (clientY - rect.top) * (canvas.height/rect.height)
+  };
+}
+function isNearPoint(mx,my){
+  const px = xToPx(puntoLogT), py = yToPx(puntoLogN);
+  return Math.hypot(mx-px, my-py) < 22*DPR;
+}
+function startDrag(evt){
+  const pos = getMousePos(evt);
+  if(isNearPoint(pos.x,pos.y)) dragging = true;
+}
+function moveDrag(evt){
+  if(!dragging) return;
+  evt.preventDefault();
+  const pos = getMousePos(evt);
+  let logT = pxToLogT(pos.x);
+  let logN = pxToLogN(pos.y);
+  logT = Math.min(Math.max(logT, T_MIN), T_MAX);
+  logN = Math.min(Math.max(logN, N_MIN), N_MAX);
+  puntoLogT = logT; puntoLogN = logN;
+  draw();
+}
+function endDrag(){ dragging = false; }
+
+canvas.addEventListener('mousedown', startDrag);
+canvas.addEventListener('mousemove', moveDrag);
+canvas.addEventListener('mouseup', endDrag);
+canvas.addEventListener('mouseleave', endDrag);
+canvas.addEventListener('touchstart', startDrag, {passive:false});
+canvas.addEventListener('touchmove', moveDrag, {passive:false});
+canvas.addEventListener('touchend', endDrag);
+
+document.getElementById('resetBtn').addEventListener('click', ()=>{
+  puntoLogT = 1.3; puntoLogN = 3.5;
+  draw();
+});
+
+/* ---------- Avvio ---------- */
+aggiornaMassaLabel();
+buildLegend();
+if(window.ResizeObserver){ new ResizeObserver(resize).observe(canvas.parentElement); }
+window.addEventListener('resize', resize);
+resize();
+})();
+</script>
+<style id="cc-copyright">
+.cc-badge{display:inline-block;vertical-align:middle;margin:0 0 0 .5em;padding:2px 8px;border:1px solid currentColor;border-radius:999px;font:400 11.5px/1.35 -apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;letter-spacing:0;text-transform:none;white-space:normal;max-width:100%;box-sizing:border-box;opacity:.8;color:inherit;text-shadow:none;pointer-events:auto}
+.cc-n,.cc-badge a{white-space:nowrap}
+.cc-badge a{color:inherit;text-decoration:underline;text-underline-offset:2px}
+.cc-badge.cc-doc{text-decoration:none;opacity:1;font-weight:600;margin-left:.4em}
+.cc-badge.lang-sw{opacity:1;margin-left:.4em}.cc-badge.lang-sw a{cursor:pointer}
+.cc-badge.cc-fixed{position:fixed;top:10px;right:10px;margin:0;z-index:2147483000;background:rgba(10,10,18,.62);color:#f2efe6;border-color:rgba(242,239,230,.45);opacity:1;backdrop-filter:blur(4px)}
+@media (max-width:520px){.cc-badge{font-size:11px;padding:2px 7px}}
+</style>
+<script src="diagramma_jeans_scheda.js"></script>
+<script src="diagramma_jeans_scheda_en.js"></script>
+<script src="scheda.js"></script>
+</body>
+</html>
