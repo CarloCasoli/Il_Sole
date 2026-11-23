@@ -18,7 +18,7 @@
  body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,Segoe UI,Roboto,sans-serif;padding:10px;min-height:100vh;}
  #app{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;align-items:flex-start;width:100%;max-width:1300px;margin:0 auto;}
  .left{flex:1 1 640px;min-width:0;display:flex;flex-direction:column;align-items:center;}
- .stage{position:relative;width:min(100%,900px);aspect-ratio:7/6;}
+ .stage{position:relative;width:min(100%,900px);aspect-ratio:7/9;}
  canvas{width:100%;height:100%;display:block;border-radius:14px;position:absolute;top:0;left:0;}
  #bgcv{background:var(--panel);}
  .legend{display:flex;flex-wrap:wrap;gap:8px 18px;justify-content:center;margin-top:14px;max-width:700px;font-size:.78rem;color:var(--muted);}
@@ -32,6 +32,8 @@
  .ctrl label b{color:var(--text);font-weight:600;}
  input[type=range]{width:100%;accent-color:var(--accent);}
  button{border-radius:8px;padding:9px;font-size:13px;cursor:pointer;font-weight:600;}
+ #evolveBtn{width:100%;background:var(--bad);color:#1a0505;border:none;}
+ #evolveBtn:hover{filter:brightness(1.08);}
  #resetBtn{width:100%;background:transparent;color:var(--muted);border:1px solid var(--line);font-weight:500;}
  #resetBtn:hover{color:var(--text);border-color:var(--accent);}
  #statoBox{padding:10px 12px;border-radius:8px;font-weight:700;text-align:center;font-size:13px;background:var(--panel2);border:1px solid var(--line);color:var(--muted);transition:background .2s,color .2s,border-color .2s;}
@@ -55,7 +57,7 @@
   <div>
    <h1><span data-en="☀ Jeans diagram">☀ Diagramma di Jeans</span><span class="cc-badge"><span class="cc-n">© 2026 Carlo Casoli ·</span> <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it" target="_blank" rel="license noopener">CC BY-NC-ND 4.0</a></span></h1>
    <div class="tools"><a class="cc-badge cc-doc" href="#scheda" data-scheda data-en="📖 Animation description">📖 Scheda dell'animazione</a> <span data-lang-switch></span></div>
-   <p class="sub" data-en="Explore how the critical mass threshold (Jeans mass) depends on temperature and density. Move the slider to change the cloud mass, then drag the point to see whether the cloud is stable or collapses.">Esplora come la soglia critica di massa (Massa di Jeans) dipenda da temperatura e densità del gas. Sposta lo slider per cambiare la massa della nube, poi trascina il punto sul grafico per vedere se è stabile o collassa.</p>
+   <p class="sub" data-en="Explore how the critical mass threshold (Jeans mass) depends on temperature and density, and how the cloud fragments as it collapses. Drag the point above; below, watch the cloud split into progressively smaller clumps — hover over a clump to see its own threshold in the graph above.">Esplora come la soglia critica di massa (Massa di Jeans) dipenda da temperatura e densità del gas, e come la nube si frammenti durante il collasso. Trascina il punto in alto; in basso osserva la nube dividersi in frammenti via via più piccoli — passa il mouse su un frammento per vederne la soglia nel grafico sopra.</p>
   </div>
 
   <div class="ctrl">
@@ -65,6 +67,12 @@
 
   <div id="statoBox" data-en="Drag the point on the graph">Trascina il punto sul grafico</div>
 
+  <div class="ctrl">
+   <label><span data-en="Evolution speed">Velocità evoluzione</span> <b id="velEvolVal"></b></label>
+   <input id="velEvol" type="range" min="2" max="20" step="1" value="7">
+  </div>
+
+  <button id="evolveBtn" data-en="▶ Evolve (cooling/compression)">▶ Evolvi (raffreddamento)</button>
   <button id="resetBtn" data-en="↺ Reset point">↺ Reimposta punto</button>
 
   <hr>
@@ -78,7 +86,12 @@
    <br>
    &bull; <strong style="color:var(--ok)" data-en="Below the line">Sotto la retta</strong><span data-en=": thermal pressure supports the cloud.">: la pressione termica sostiene la nube.</span>
    <br><br>
-   <span data-en="The dashed gray lines show the thresholds for 1, 10, 100 and 1000 M&#9737; as reference. The dashed red arrow shows the typical evolutionary path of a real cooling/compressing cloud.">Le rette grigie tratteggiate mostrano le soglie per 1, 10, 100 e 1000 M<sub>&#9737;</sub> come riferimento. La freccia rossa tratteggiata indica il tipico percorso evolutivo di raffreddamento/compressione di una nube reale.</span>
+   <span data-en="The dashed gray lines show the thresholds for 1, 10, 100 and 1000 M&#9737; as reference. The dashed red path shows the characteristic shape (not a fixed track) of real collapse: nearly vertical while the cloud cools radiating freely (isothermal phase), then bending upward once it becomes optically thick and the heat stays trapped (adiabatic phase, T~ρ^(2/3)). Pressing ▶ Evolve moves the point along this same shape, starting from wherever you left it.">Le rette grigie tratteggiate mostrano le soglie per 1, 10, 100 e 1000 M<sub>&#9737;</sub> come riferimento. Il percorso rosso tratteggiato indica la forma caratteristica (non un percorso fisso) del collasso reale: quasi verticale mentre la nube si raffredda irraggiando liberamente (fase isoterma), poi inclinato verso l'alto quando diventa otticamente spessa e il calore resta imprigionato (fase adiabatica, T~ρ^(2/3)). Premendo ▶ Evolvi il punto segue questa stessa forma, a partire da dove lo hai lasciato.</span>
+   <br><br>
+   <strong data-en="Below: fragmentation">In basso: la frammentazione</strong><br>
+   <span data-en="As soon as the local Jeans mass (at the current point) drops below the cloud's total mass, the cloud can split into independently unstable clumps — the panel below shows this hierarchical splitting live. Hover over any clump to see its own threshold curve (dashed) and whether that specific clump is stable or not.">Appena la massa di Jeans locale (nel punto attuale) scende sotto la massa totale della nube, questa può frammentarsi in porzioni indipendentemente instabili — il pannello sotto mostra in tempo reale questa suddivisione gerarchica. Passa il mouse su un frammento per vederne la curva di soglia (tratteggiata) e se quel frammento specifico è stabile o no.</span>
+   <br><br>
+   <em data-en="Illustrative diagram: real fragmentation is three-dimensional and far less regular than these clumps.">Diagramma illustrativo: la frammentazione reale è tridimensionale e molto meno regolare di questi frammenti.</em>
   </div>
  </div>
 </div>
@@ -98,6 +111,8 @@ let W,H,DPR=1;
 // Margini del plot (in pixel "logici", prima dello scaling DPR)
 let margin;
 
+let panelA, panelB; // {top,height} dei due pannelli impilati
+
 function resize(){
   const rect=canvas.parentElement.getBoundingClientRect();
   if(!rect.width) return;
@@ -106,9 +121,20 @@ function resize(){
   H=canvas.height=bgc.height=rect.height*DPR;
   canvas.style.width=bgc.style.width=rect.width+'px';
   canvas.style.height=bgc.style.height=rect.height+'px';
+
+  // margine sinistro/destro condiviso; margin.bottom = spazio per assi/etichette SOTTO il grafico T,n (pannello A)
   margin = { left: 118*DPR, right: 25*DPR, top: 28*DPR, bottom: 78*DPR };
   plotW = W - margin.left - margin.right;
-  plotH = H - margin.top - margin.bottom;
+
+  const gap = 34*DPR;      // spazio tra pannello A e pannello B
+  const padBottom = 10*DPR; // margine residuo sotto il pannello B
+  const totH = H - margin.top - padBottom - gap;
+  panelA = { top: margin.top, height: totH*0.65 };
+  panelB = { top: panelA.top + panelA.height + gap, height: totH*0.35 };
+
+  plotH = panelA.height - margin.bottom; // area del grafico (T,n) dentro il pannello A
+
+  buildFragGeom();
   draw();
 }
 
@@ -134,6 +160,146 @@ let logM = 1.0;        // 10 Msun iniziale
 let puntoLogT = 1.3;   // ~20 K
 let puntoLogN = 3.5;   // ~3000 cm^-3
 let dragging = false;
+
+// Percorso evolutivo del collasso: non una retta, ma due tratti con pendenze
+// diverse, come nella vera evoluzione termodinamica (Larson 1969):
+//  1) fase isoterma (nube otticamente sottile, si raffredda irraggiando: T
+//     resta quasi costante mentre n sale di molti ordini di grandezza — quasi verticale)
+//  2) fase adiabatica (nube otticamente spessa, il calore resta imprigionato:
+//     T ~ rho^(gamma-1), con gamma=5/3 — pendenza positiva)
+const EVOL_SEGMENTS = [
+  { dT: -0.3, dN: 6.0 },
+  { dT: (2/3)*2.0, dN: 2.0 }
+];
+// punto di ancoraggio usato solo per disegnare la freccia di riferimento (fissa)
+const EVOL_ANCHOR = { T: 1.3, N: 0.5 };
+
+function evolVertices(startT, startN){
+  const v = [{T:startT, N:startN}];
+  EVOL_SEGMENTS.forEach(s=>{
+    const prev = v[v.length-1];
+    v.push({T: prev.T+s.dT, N: prev.N+s.dN});
+  });
+  return v;
+}
+function evolSegLengths(v){
+  const lens=[]; let tot=0;
+  for(let i=0;i<v.length-1;i++){
+    const l = Math.hypot(v[i+1].T-v[i].T, v[i+1].N-v[i].N);
+    lens.push(l); tot += l;
+  }
+  return {lens, tot};
+}
+function evolPointAt(v, lens, tot, t){
+  let d = t*tot;
+  for(let i=0;i<lens.length;i++){
+    if(d<=lens[i] || i===lens.length-1){
+      const lt = lens[i]>0 ? Math.min(1, d/lens[i]) : 1;
+      return { T: v[i].T+(v[i+1].T-v[i].T)*lt, N: v[i].N+(v[i+1].N-v[i].N)*lt };
+    }
+    d -= lens[i];
+  }
+  return v[v.length-1];
+}
+
+let evolveAnim = null; // {t0,vertices,lens,tot}
+let evolveRAF = null;
+
+/* =========================================================================
+   FRAMMENTAZIONE (pannello B): la nube si suddivide gerarchicamente quando
+   la massa di Jeans locale, nel punto (T,n) attuale, scende sotto la massa
+   totale della nube. Rappresentazione illustrativa, non una simulazione.
+   ========================================================================= */
+const MAX_GEN = 6; // fino a 2^6 = 64 frammenti
+
+// hash deterministico stringa->[0.35,0.65]: frazione di massa/area che il
+// ramo "0" riceve dal nodo "path" (il ramo "1" riceve il resto) — stabile
+// ad ogni ridisegno, ma non uguale per ogni nodo: dà frammenti di taglie
+// diverse, come nella frammentazione reale.
+function hashFrac(path){
+  let h = 2166136261;
+  for(let i=0;i<path.length;i++){ h ^= path.charCodeAt(i); h = Math.imul(h,16777619); }
+  h = ((h>>>0) % 100000) / 100000;
+  return 0.35 + 0.30*h;
+}
+
+// massa (in Msun) del nodo "path", a partire dalla massa totale 10^logM
+function massaDiPath(path, logMroot){
+  let m = Math.pow(10, logMroot);
+  for(let i=0;i<path.length;i++){
+    const f = hashFrac(path.slice(0,i));
+    m *= (path[i]==='0') ? f : (1-f);
+  }
+  return m;
+}
+
+// geometria fissa (dipende solo dalle dimensioni del pannello B, non da logM):
+// per ogni nodo "path" fino a profondità MAX_GEN, il rettangolo che occupa.
+let fragGeom = {};
+function buildFragGeom(){
+  fragGeom = {};
+  if(!panelB) return;
+  const pad = 10*DPR, topPad = 26*DPR;
+  const x0 = margin.left+pad, y0 = panelB.top+topPad;
+  const w = plotW-2*pad, h = panelB.height-topPad-pad;
+  (function rec(x0,y0,w,h,path,depth,axis){
+    fragGeom[path] = {x0,y0,w,h};
+    if(depth>=MAX_GEN) return;
+    const f = hashFrac(path);
+    if(axis===0){
+      const w0=w*f;
+      rec(x0,y0,w0,h, path+'0', depth+1, 1);
+      rec(x0+w0,y0,w-w0,h, path+'1', depth+1, 1);
+    } else {
+      const h0=h*f;
+      rec(x0,y0,w,h0, path+'0', depth+1, 0);
+      rec(x0,y0+h0,w,h-h0, path+'1', depth+1, 0);
+    }
+  })(x0,y0,w,h,'',0,0);
+}
+
+// cerchio inscritto (con margine) nel rettangolo del nodo
+function fragCircleOf(path){
+  const r = fragGeom[path];
+  if(!r) return null;
+  return { cx:r.x0+r.w/2, cy:r.y0+r.h/2, raggio:Math.min(r.w,r.h)/2*0.84 };
+}
+
+// massa di Jeans locale nel punto (T,n) attuale: la massa per cui quel punto
+// starebbe esattamente sulla soglia. Oltre questa massa una porzione di nube
+// a quel (T,n) è instabile.
+function massaJeansLocale(){
+  const logMJ = (3*puntoLogT + 4 - puntoLogN)/2;
+  return Math.pow(10, logMJ);
+}
+
+// generazione "continua": non intera, segue istante per istante N=Mnube/M_J,
+// senza alcun orologio proprio — qualunque sia la velocità con cui il punto
+// si muove (drag manuale o animazione "Evolvi"), la suddivisione resta sempre
+// sincronizzata con la fisica, non con un timer scollegato da essa.
+function fragGenContinua(){
+  const n = Math.pow(10, logM) / massaJeansLocale(); // Mnube / M_J,locale
+  const g = Math.log2(Math.max(n,1));
+  return Math.max(0, Math.min(MAX_GEN, g));
+}
+function smoothstep(x){ return x*x*(3-2*x); }
+
+let fragHitList = [];      // {path,cx,cy,raggio,massa} per l'hover — ricalcolata ad ogni frame
+let hoverFragPath = null;  // path del frammento attualmente "spazzolato"
+
+// La frammentazione è irreversibile: un frammento già staccato non si "rifonde"
+// solo perché M_J risale nella fase adiabatica. Teniamo quindi il massimo
+// raggiunto durante l'esplorazione corrente; si azzera solo quando si comincia
+// un nuovo scenario (nuovo trascinamento, Evolvi, cambio massa, reset).
+let fragMaxG = 0;
+function resetFragMax(){ fragMaxG = fragGenContinua(); }
+
+function pathsAtDepth(g){
+  if(g<=0) return [''];
+  let out=[''];
+  for(let d=0;d<g;d++){ const next=[]; out.forEach(p=>{ next.push(p+'0'); next.push(p+'1'); }); out=next; }
+  return out;
+}
 
 const regioni = [
   { nome: T("Nuclei densi freddi","Cold dense cores"), logT: [0.3, 1.3], logN: [6, 9], colore: "rgba(255,179,71,0.08)" },
@@ -249,7 +415,7 @@ function drawStatic(){
   bctx.fillStyle = axisCol;
   bctx.font = (13*DPR)+"px sans-serif";
   bctx.textAlign = "center";
-  bctx.fillText(T("Temperatura T (K)","Temperature T (K)"), margin.left+plotW/2, H-10*DPR);
+  bctx.fillText(T("Temperatura T (K)","Temperature T (K)"), margin.left+plotW/2, margin.top+plotH+68*DPR);
   bctx.save();
   bctx.translate(18*DPR, margin.top+plotH/2);
   bctx.rotate(-Math.PI/2);
@@ -286,38 +452,51 @@ function drawStatic(){
   });
   bctx.setLineDash([]);
 
-  // Freccia traiettoria di collasso (indicativa)
+  // Percorso evolutivo di collasso (indicativo): isoterma poi adiabatica
+  const evolV = evolVertices(EVOL_ANCHOR.T, EVOL_ANCHOR.N);
   bctx.strokeStyle = "rgba(255,92,92,0.85)";
   bctx.fillStyle = "rgba(255,92,92,0.85)";
   bctx.lineWidth = 2.5*DPR;
   bctx.setLineDash([6*DPR,4*DPR]);
-  const a0T=2.3, a0N=2.0, a1T=1.75, a1N=7.0;
   bctx.beginPath();
-  bctx.moveTo(xToPx(a0T), yToPx(a0N));
-  bctx.lineTo(xToPx(a1T), yToPx(a1N));
+  bctx.moveTo(xToPx(evolV[0].T), yToPx(evolV[0].N));
+  for(let i=1;i<evolV.length;i++) bctx.lineTo(xToPx(evolV[i].T), yToPx(evolV[i].N));
   bctx.stroke();
   bctx.setLineDash([]);
-  drawArrowhead(bctx, xToPx(a0T), yToPx(a0N), xToPx(a1T), yToPx(a1N));
+  const last = evolV[evolV.length-1], prev = evolV[evolV.length-2];
+  drawArrowhead(bctx, xToPx(prev.T), yToPx(prev.N), xToPx(last.T), yToPx(last.N));
 
-  const segX0=xToPx(a0T), segY0=yToPx(a0N), segX1=xToPx(a1T), segY1=yToPx(a1N);
-  let segAngle = Math.atan2(segY1-segY0, segX1-segX0);
-  if (segAngle > Math.PI/2 || segAngle < -Math.PI/2) segAngle += Math.PI;
+  const labels = [
+    T("fase isoterma (raffreddamento)","isothermal phase (cooling)"),
+    T("fase adiabatica (T~ρ^(2/3))","adiabatic phase (T~ρ^(2/3))")
+  ];
+  for(let i=0;i<evolV.length-1;i++){
+    const x0=xToPx(evolV[i].T), y0=yToPx(evolV[i].N), x1=xToPx(evolV[i+1].T), y1=yToPx(evolV[i+1].N);
+    let segAngle = Math.atan2(y1-y0, x1-x0);
+    if (segAngle > Math.PI/2 || segAngle < -Math.PI/2) segAngle += Math.PI;
+    bctx.save();
+    bctx.font = "italic "+(9.5*DPR)+"px serif";
+    bctx.fillStyle = "rgba(255,92,92,0.9)";
+    bctx.translate((x0+x1)/2, (y0+y1)/2);
+    bctx.rotate(segAngle);
+    bctx.textAlign = "center";
+    bctx.fillText(labels[i], 0, -9*DPR);
+    bctx.restore();
+  }
+
+  /* ===== PANNELLO B: frammentazione gerarchica ===== */
+  bctx.strokeStyle = lineCol; bctx.lineWidth = 1.5*DPR;
+  bctx.strokeRect(margin.left, panelB.top, plotW, panelB.height);
   bctx.save();
-  bctx.font = "italic "+(10*DPR)+"px serif";
-  bctx.fillStyle = "rgba(255,92,92,0.9)";
-  bctx.translate((segX0+segX1)/2, (segY0+segY1)/2);
-  bctx.rotate(segAngle);
-  bctx.textAlign = "center";
-  bctx.fillText(T("Evoluzione verso il collasso (raffreddamento)","Evolution towards collapse (cooling)"), 0, -10*DPR);
+  bctx.font = "bold "+(12*DPR)+"px sans-serif";
+  bctx.fillStyle = axisCol;
+  bctx.textAlign = "left";
+  bctx.fillText(T("Frammentazione della nube","Cloud fragmentation"), margin.left+8*DPR, panelB.top+16*DPR);
   bctx.restore();
 }
 
 /* ---------- Primo piano: retta corrente + punto draggabile + guide ---------- */
-function draw(){
-  if(!plotW) return;
-  drawStatic();
-  ctx.clearRect(0,0,W,H);
-
+function drawPanelADynamic(){
   // Retta corrente (massa selezionata)
   ctx.strokeStyle = "#ffb347";
   ctx.lineWidth = 3*DPR;
@@ -396,6 +575,109 @@ function draw(){
     box.textContent = T("STABILE: la pressione termica sostiene la nube","STABLE: thermal pressure supports the cloud");
     box.className = "stabile";
   }
+
+  // Curva evidenziata del frammento "spazzolato" nel pannello B
+  if(hoverFragPath!==null){
+    const hit = fragHitList.find(c=>c.path===hoverFragPath);
+    if(hit){
+      const logMfrag = Math.log10(hit.massa);
+      ctx.save();
+      ctx.setLineDash([3*DPR,3*DPR]);
+      ctx.strokeStyle = "#4fd1ff";
+      ctx.lineWidth = 2.4*DPR;
+      ctx.beginPath();
+      let f0=true;
+      for(let logT=T_MIN; logT<=T_MAX; logT+=0.05){
+        const logN = logN_soglia(logT, logMfrag);
+        if(logN < N_MIN-1 || logN > N_MAX+1) continue;
+        const x=xToPx(logT), y=yToPx(logN);
+        if(f0){ ctx.moveTo(x,y); f0=false; } else ctx.lineTo(x,y);
+      }
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      const fragInstabile = puntoLogN > logN_soglia(puntoLogT, logMfrag);
+      const lab = "M≈"+fmtSmart(hit.massa)+" M☉ — "+(fragInstabile
+        ? T("questo frammento collassa","this clump collapses")
+        : T("questo frammento è stabile","this clump is stable"));
+      ctx.font = "bold "+(11*DPR)+"px sans-serif";
+      const lw = ctx.measureText(lab).width;
+      const lx = margin.left+plotW-lw-14*DPR, ly = margin.top+14*DPR;
+      ctx.fillStyle = "rgba(13,18,32,0.88)";
+      ctx.fillRect(lx-8*DPR, ly-13*DPR, lw+16*DPR, 20*DPR);
+      ctx.fillStyle = "#4fd1ff";
+      ctx.textAlign = "left";
+      ctx.fillText(lab, lx, ly);
+      ctx.restore();
+    }
+  }
+}
+
+/* ---------- Pannello B: cerchi dei frammenti, con animazione di scissione ---------- */
+function fragColor(depth){
+  const t = Math.min(1, depth/MAX_GEN);
+  const c0=[255,107,53], c1=[255,92,92]; // accent2 -> bad
+  const r = Math.round(c0[0]+(c1[0]-c0[0])*t);
+  const g = Math.round(c0[1]+(c1[1]-c0[1])*t);
+  const b = Math.round(c0[2]+(c1[2]-c0[2])*t);
+  return "rgb("+r+","+g+","+b+")";
+}
+
+function drawPanelBDynamic(){
+  fragMaxG = Math.max(fragMaxG, fragGenContinua());
+  const gReale = fragMaxG; // ratchet: non scende entro lo stesso scenario
+  const atTop = gReale >= MAX_GEN;
+  const depthFrom = atTop ? MAX_GEN : Math.floor(gReale);
+  const depthTo   = atTop ? MAX_GEN : depthFrom+1;
+  const blend     = atTop ? 0 : smoothstep(gReale - depthFrom);
+
+  const leaves = pathsAtDepth(depthTo);
+  fragHitList = [];
+  leaves.forEach(path=>{
+    const target = fragCircleOf(path);
+    const start = fragCircleOf(path.slice(0, depthFrom));
+    const cx = start.cx + (target.cx-start.cx)*blend;
+    const cy = start.cy + (target.cy-start.cy)*blend;
+    const r  = start.raggio + (target.raggio-start.raggio)*blend;
+    ctx.beginPath();
+    ctx.arc(cx,cy,Math.max(r,1),0,2*Math.PI);
+    ctx.fillStyle = fragColor(path.length);
+    ctx.globalAlpha = 0.82;
+    ctx.fill();
+    ctx.globalAlpha = 1;
+    ctx.lineWidth = (path===hoverFragPath ? 2.6 : 1)*DPR;
+    ctx.strokeStyle = path===hoverFragPath ? "#ffffff" : "rgba(13,18,32,0.6)";
+    ctx.stroke();
+    fragHitList.push({ path, cx, cy, raggio:r, massa: massaDiPath(path, logM) });
+  });
+
+  // readout
+  const MJ = massaJeansLocale();
+  const Napprox = Math.pow(2, gReale);
+  const genMostrata = Math.round(gReale);
+  ctx.save();
+  ctx.font = (10.5*DPR)+"px sans-serif";
+  ctx.textAlign = "right";
+  ctx.fillStyle = "rgba(13,18,32,0.82)";
+  const txt = "M_J≈"+fmtSmart(MJ)+" M☉ · N≈"+fmtSmart(Napprox)+" ("+genMostrata+"ᵃ gen.)";
+  const tw = ctx.measureText(txt).width;
+  ctx.fillRect(margin.left+plotW-tw-14*DPR, panelB.top+4*DPR, tw+10*DPR, 16*DPR);
+  ctx.fillStyle = "#e8ecf5";
+  ctx.fillText(txt, margin.left+plotW-6*DPR, panelB.top+16*DPR);
+  ctx.restore();
+}
+
+function renderDynamic(){
+  if(!plotW) return;
+  ctx.clearRect(0,0,W,H);
+  drawPanelADynamic();
+  drawPanelBDynamic();
+}
+
+function draw(){
+  if(!plotW) return;
+  drawStatic();
+  renderDynamic();
 }
 
 /* ---------- Legenda ---------- */
@@ -406,6 +688,8 @@ function buildLegend(){
     ['#8b95ac', T('Soglie di riferimento (1,10,100,1000 M☉)','Reference thresholds (1,10,100,1000 M☉)')],
     ['#ff5c5c', T('Percorso evolutivo di collasso','Collapse evolutionary path')],
     ['#3ddc84', T('Punto stabile','Stable point')],
+    ['#ff6b35', T('Frammenti (in basso): colore più intenso = generazione più profonda','Clumps (below): deeper color = deeper generation')],
+    ['#4fd1ff', T('Soglia del frammento sotto il mouse','Threshold of the clump under the pointer')],
   ];
   legend.innerHTML = items.map(function(it){
     return '<span class="item"><span class="dot" style="background:'+it[0]+'"></span>'+it[1]+'</span>';
@@ -422,6 +706,7 @@ function aggiornaMassaLabel(){
 massaSlider.addEventListener('input', (e)=>{
   logM = parseFloat(e.target.value);
   aggiornaMassaLabel();
+  resetFragMax();
   draw();
 });
 
@@ -441,7 +726,7 @@ function isNearPoint(mx,my){
 }
 function startDrag(evt){
   const pos = getMousePos(evt);
-  if(isNearPoint(pos.x,pos.y)) dragging = true;
+  if(isNearPoint(pos.x,pos.y)){ dragging = true; stopEvolve(); resetFragMax(); }
 }
 function moveDrag(evt){
   if(!dragging) return;
@@ -456,21 +741,95 @@ function moveDrag(evt){
 }
 function endDrag(){ dragging = false; }
 
+/* ---------- Pulsante "Evolvi": avanza il punto lungo il percorso di collasso ---------- */
+const velEvolSlider = document.getElementById('velEvol');
+const velEvolVal = document.getElementById('velEvolVal');
+function aggiornaVelEvolLabel(){
+  velEvolVal.textContent = velEvolSlider.value + " " + T("s","s");
+}
+velEvolSlider.addEventListener('input', aggiornaVelEvolLabel);
+
+function startEvolve(){
+  dragging = false;
+  resetFragMax();
+  // parte da dove si trova il punto ORA, seguendo la STESSA FORMA del percorso
+  // di riferimento (isoterma poi adiabatica), semplicemente traslata lì
+  const v = evolVertices(puntoLogT, puntoLogN);
+  const {lens, tot} = evolSegLengths(v);
+  const durata = parseFloat(velEvolSlider.value)*1000; // ms, letta al momento dell'avvio
+  evolveAnim = { t0: performance.now(), vertices: v, lens, tot, durata };
+  if(!evolveRAF) evolveRAF = requestAnimationFrame(evolveTick);
+  const btn = document.getElementById('evolveBtn');
+  btn.disabled = true;
+  btn.textContent = T("⏸ Evoluzione in corso…","⏸ Evolving…");
+}
+function stopEvolve(){
+  if(!evolveAnim) return;
+  evolveAnim = null;
+  const btn = document.getElementById('evolveBtn');
+  btn.disabled = false;
+  btn.textContent = T("▶ Evolvi (raffreddamento)","▶ Evolve (cooling/compression)");
+}
+function evolveTick(now){
+  evolveRAF = null;
+  if(!evolveAnim) return;
+  const t = Math.min(1, (now-evolveAnim.t0)/evolveAnim.durata);
+  const p = evolPointAt(evolveAnim.vertices, evolveAnim.lens, evolveAnim.tot, t);
+  let logT = p.T, logN = p.N;
+  const fuoriScala = logT < T_MIN || logT > T_MAX || logN < N_MIN || logN > N_MAX;
+  puntoLogT = Math.min(Math.max(logT, T_MIN), T_MAX);
+  puntoLogN = Math.min(Math.max(logN, N_MIN), N_MAX);
+  draw();
+  if(t<1 && evolveAnim && !fuoriScala){
+    evolveRAF = requestAnimationFrame(evolveTick);
+  } else {
+    stopEvolve();
+  }
+}
+
+// "Spazzolata" sui frammenti del pannello B: aggiorna hoverFragPath e ridisegna
+// solo lo strato dinamico (niente drawStatic, resta leggero)
+function updateHoverFrag(evt){
+  const pos = getMousePos(evt);
+  let found = null;
+  for(const c of fragHitList){
+    if(Math.hypot(pos.x-c.cx, pos.y-c.cy) <= c.raggio){ found = c.path; break; }
+  }
+  if(found !== hoverFragPath){
+    hoverFragPath = found;
+    renderDynamic();
+  }
+}
+function clearHoverFrag(){
+  if(hoverFragPath !== null){ hoverFragPath = null; renderDynamic(); }
+}
+
+function onMove(evt){
+  moveDrag(evt);
+  updateHoverFrag(evt);
+}
+
 canvas.addEventListener('mousedown', startDrag);
-canvas.addEventListener('mousemove', moveDrag);
+canvas.addEventListener('mousemove', onMove);
 canvas.addEventListener('mouseup', endDrag);
-canvas.addEventListener('mouseleave', endDrag);
-canvas.addEventListener('touchstart', startDrag, {passive:false});
-canvas.addEventListener('touchmove', moveDrag, {passive:false});
-canvas.addEventListener('touchend', endDrag);
+canvas.addEventListener('mouseleave', ()=>{ endDrag(); clearHoverFrag(); });
+canvas.addEventListener('touchstart', (evt)=>{ startDrag(evt); updateHoverFrag(evt); }, {passive:false});
+canvas.addEventListener('touchmove', onMove, {passive:false});
+canvas.addEventListener('touchend', ()=>{ endDrag(); clearHoverFrag(); });
+
+document.getElementById('evolveBtn').addEventListener('click', startEvolve);
 
 document.getElementById('resetBtn').addEventListener('click', ()=>{
+  stopEvolve();
   puntoLogT = 1.3; puntoLogN = 3.5;
+  resetFragMax();
   draw();
 });
 
 /* ---------- Avvio ---------- */
 aggiornaMassaLabel();
+aggiornaVelEvolLabel();
+resetFragMax();
 buildLegend();
 if(window.ResizeObserver){ new ResizeObserver(resize).observe(canvas.parentElement); }
 window.addEventListener('resize', resize);
