@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<!--
+  © 2026 Carlo Casoli — "Il Sole: Osservazione e Fisica"
+  Licenza CC BY-NC-ND 4.0: https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it
+  Vietati l'uso commerciale e la distribuzione di versioni modificate senza autorizzazione scritta dell'autore.
+-->
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title data-en="Photodissociation Front / PDR Region">Fronte di fotodissociazione / regione PDR</title>
+<style>
+ :root{--bg:#05070d;--text:#e8ecf5;--muted:#8b95ac;--panel:#0d1220;--panel2:#141b30;--line:#232c47;--accent:#ffb347;--accent2:#ff6b35;--shield:#4fd1ff;--ok:#3ddc84;}
+ @media (prefers-color-scheme: light){ :root:not([data-theme="dark"]){--bg:#eef1f8;--text:#11141c;--muted:#5b6478;--panel:#ffffff;--panel2:#e6eaf4;--line:#cfd6e6;} }
+ :root[data-theme="dark"]{--bg:#05070d;--text:#e8ecf5;--muted:#8b95ac;--panel:#0d1220;--panel2:#141b30;--line:#232c47;}
+ :root[data-theme="light"]{--bg:#eef1f8;--text:#11141c;--muted:#5b6478;--panel:#ffffff;--panel2:#e6eaf4;--line:#cfd6e6;}
+ *{box-sizing:border-box;}
+ body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,Segoe UI,Roboto,sans-serif;padding:10px;min-height:100vh;}
+ #app{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;align-items:flex-start;width:100%;max-width:1300px;margin:0 auto;}
+ .left{flex:1 1 640px;min-width:0;display:flex;flex-direction:column;align-items:center;}
+ .stage{position:relative;width:min(100%,900px);aspect-ratio:7/8;}
+ canvas{width:100%;height:100%;display:block;border-radius:14px;position:absolute;top:0;left:0;}
+ #bgcv{background:var(--panel);}
+ .legend{display:flex;flex-wrap:wrap;gap:8px 18px;justify-content:center;margin-top:14px;max-width:700px;font-size:.78rem;color:var(--muted);}
+ .legend span.item{display:inline-flex;align-items:center;gap:6px;}
+ .dot{width:10px;height:10px;border-radius:50%;display:inline-block;flex:none;}
+ #panel{width:300px;flex:none;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:14px;}
+ #panel h1{font-size:15px;margin:0;font-weight:600;}
+ #panel p.sub{margin:0;color:var(--muted);font-size:12px;line-height:1.5;}
+ .ctrl{display:flex;flex-direction:column;gap:4px;}
+ .ctrl label{font-size:12px;color:var(--muted);display:flex;justify-content:space-between;}
+ .ctrl label b{color:var(--text);font-weight:600;}
+ input[type=range]{width:100%;accent-color:var(--accent);}
+ button{border-radius:8px;padding:9px;font-size:13px;cursor:pointer;font-weight:600;}
+ #viewBtn{width:100%;background:var(--accent2);color:#1a0d05;border:none;}
+ #viewBtn:hover{filter:brightness(1.08);}
+ .chk{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);}
+ .info{background:var(--panel2);border-radius:8px;padding:10px 12px;font-size:11.5px;line-height:1.55;color:var(--muted);}
+ .info strong{color:var(--text);}
+ hr{border:none;border-top:1px solid var(--line);margin:0;}
+ .tools{margin:6px 0 8px;display:flex;flex-wrap:wrap;gap:6px}
+ .tools .cc-badge{margin-left:0}
+ @media (max-width:640px){ #panel{width:100%;} }
+</style>
+</head>
+<body>
+<div id="app">
+ <div class="left">
+  <div class="stage"><canvas id="bgcv"></canvas><canvas id="c"></canvas></div>
+  <div class="legend" id="legend"></div>
+ </div>
+ <div id="panel">
+  <div>
+   <h1><span data-en="☀ PDR region">☀ Regione PDR</span><span class="cc-badge"><span class="cc-n">© 2026 Carlo Casoli ·</span> <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it" target="_blank" rel="license noopener">CC BY-NC-ND 4.0</a></span></h1>
+   <div class="tools"><a class="cc-badge cc-doc" href="#scheda" data-scheda data-en="📖 Animation description">📖 Scheda dell'animazione</a> <span data-lang-switch></span></div>
+   <p class="sub" data-en="A cross-section of the cloud, from the UV-exposed surface to the protected interior. Watch UV photons arriving from outside and being absorbed with depth, and the two chemical fronts (H→H₂, C⁺→CO) that define the photodissociation region.">Sezione della nube, dalla superficie esposta all'UV fino all'interno protetto. Osserva i fotoni UV che arrivano da fuori e vengono assorbiti con la profondità, e i due fronti chimici (H→H₂, C⁺→CO) che definiscono la regione di fotodissociazione.</p>
+  </div>
+
+  <div class="ctrl">
+   <label><span data-en="UV field intensity (G₀)">Intensità campo UV (G₀)</span> <b id="g0Val"></b></label>
+   <input id="g0" type="range" min="-1" max="4" step="0.01" value="1">
+  </div>
+
+  <div class="ctrl">
+   <label><span data-en="Cloud density (n)">Densità della nube (n)</span> <b id="nVal"></b></label>
+   <input id="dens" type="range" min="-1" max="4" step="0.01" value="2">
+  </div>
+
+  <label class="chk"><input type="checkbox" id="showShield" checked> <span data-en="Show H₂-dissociating photons (self-shielding)">Mostra fotoni che dissociano H₂ (autoschermatura)</span></label>
+
+  <button id="viewBtn" data-en="📈 A_V vs physical depth">📈 A_V vs profondità fisica</button>
+
+  <hr>
+
+  <div class="info">
+   <strong data-en="How to read it">Come leggere il grafico</strong><br>
+   <span data-en="Top: orange dots are UV photons arriving from outside in every direction; most fade smoothly with depth following the dust extinction law. Cyan dots are specifically the photons able to dissociate H₂ (Lyman-Werner bands): once enough H₂ accumulates near the H→H₂ front, it absorbs those photons itself and blocks them abruptly right there — this is H₂ self-shielding, which is why cyan dots stop sharply at the front instead of fading gradually.">In alto: i punti arancioni sono fotoni UV che arrivano da fuori in ogni direzione; la maggior parte si attenua gradualmente con la profondità secondo la legge di estinzione da polvere. I punti ciano sono invece specificamente i fotoni capaci di dissociare l'H₂ (bande di Lyman-Werner): appena si accumula abbastanza H₂ vicino al fronte H→H₂, questo assorbe da solo quei fotoni e li blocca bruscamente proprio lì — è l'auto-schermatura dell'H₂, per cui i punti ciano si fermano di netto al fronte invece di attenuarsi gradualmente.</span>
+   <br><br>
+   <span data-en="Bottom: abundance of H, H₂, C⁺ and CO as a function of optical depth A_V — press the button to switch to the A_V vs physical depth relation instead.">In basso: abbondanza di H, H₂, C⁺ e CO in funzione della profondità ottica A_V — premi il pulsante per passare invece alla relazione A_V–profondità fisica.</span>
+   <br><br>
+   <em data-en="Qualitative, illustrative diagram: it is not a radiative-transfer or chemical-network simulation.">Diagramma qualitativo e illustrativo: non è una simulazione di trasporto radiativo o di rete chimica.</em>
+  </div>
+ </div>
+</div>
+<script src="lingua.js"></script>
+<script>
+(function(){
+const T=window.T||(it=>it);
+const NUM=window.NUM||(s=>s);
+
+const canvas=document.getElementById('c');
+const ctx=canvas.getContext('2d');
+const bgc=document.getElementById('bgcv');
+const bctx=bgc.getContext('2d');
+let W,H,DPR=1;
+let margin, plotW=0;
+let panelA, panelB; // {top,height}
+
+const AV_MIN=0, AV_MAX=10;
+
+function resize(){
+  const rect=canvas.parentElement.getBoundingClientRect();
+  if(!rect.width) return;
+  DPR=Math.min(window.devicePixelRatio||1,2);
+  W=canvas.width=bgc.width=rect.width*DPR;
+  H=canvas.height=bgc.height=rect.height*DPR;
+  canvas.style.width=bgc.style.width=rect.width+'px';
+  canvas.style.height=bgc.style.height=rect.height+'px';
+
+  margin = { left: 70*DPR, right: 20*DPR, top: 26*DPR, bottom: 46*DPR };
+  plotW = W - margin.left - margin.right;
+  const gap = 56*DPR;
+  const totH = H - margin.top - margin.bottom - gap;
+  panelA = { top: margin.top, height: totH*0.52 };
+  panelB = { top: panelA.top + panelA.height + gap, height: totH*0.48 };
+
+  // geometria della nube (ellissoide irregolare, pannello A)
+  cx = margin.left + plotW/2;
+  cy = panelA.top + panelA.height/2;
+  rx = plotW*0.44;
+  ry = panelA.height*0.42;
+
+  drawStatic();
+}
+
+function xAV(av){ return margin.left + (av-AV_MIN)/(AV_MAX-AV_MIN)*plotW; }
+
+/* ---------- Forma della nube: ellissoide irregolare a strati concentrici ---------- */
+let cx=0, cy=0, rx=0, ry=0;
+
+// perturbazione deterministica (multi-armonica), stabile ad ogni ridisegno/resize
+function shapeRadiusFactor(theta){
+  return 1
+    + 0.12*Math.sin(2*theta + 0.6)
+    + 0.08*Math.sin(3*theta + 2.1)
+    + 0.05*Math.sin(5*theta + 1.2)
+    - 0.04*Math.sin(7*theta + 4.0);
+}
+
+// av=0 -> scale=1 (bordo esterno esposto); av=AV_MAX -> scale=0 (centro protetto)
+function avToScale(av){ return 1 - Math.min(av,AV_MAX)/AV_MAX; }
+
+function blobPoint(theta, scale){
+  const f = shapeRadiusFactor(theta);
+  return {
+    x: cx + scale*rx*Math.cos(theta)*f,
+    y: cy + scale*ry*Math.sin(theta)*f
+  };
+}
+
+function blobPath(c, scale, steps){
+  steps = steps||80;
+  c.beginPath();
+  for(let i=0;i<=steps;i++){
+    const theta = (i/steps)*2*Math.PI;
+    const p = blobPoint(theta, scale);
+    if(i===0) c.moveTo(p.x,p.y); else c.lineTo(p.x,p.y);
+  }
+  c.closePath();
+}
+
+/* ---------- Fisica illustrativa (non una vera rete chimica) ---------- */
+let logG0 = 1.0;   // slider: -1..4  -> G0 da 0.1 a 10000 (unità di Habing)
+let logN  = 2.0;   // slider: -1..4  -> n da 0.1 a 10000 cm^-3
+
+// la radiazione (G0) spinge i fronti più in profondità (serve più colonna per schermare);
+// la densità (n) li porta più vicino alla superficie (si autoschermano con meno colonna) — effetto opposto
+function avH2(){
+  const v = 0.3 + 0.6*(logG0+1) - 0.35*(logN+1);
+  return Math.max(0.15, v);
+}
+function avCO(){
+  const h2 = avH2();
+  const v = h2 + 1.0 + 0.4*(logG0+1) - 0.25*(logN+1);
+  return Math.max(h2+0.4, v);
+}
+
+function sigmoid(av, front, width){ return 1/(1+Math.exp(-(av-front)/width)); }
+
+/* ---------- Zone colorate (sfondo pannello A) ---------- */
+function zone(){
+  const h2=avH2(), co=avCO();
+  return [
+    { nome: T("Zona esterna: H atomico, C⁺","Outer zone: atomic H, C⁺"), a0:AV_MIN, a1:h2, colore:"rgba(255,107,53,0.26)" },
+    { nome: T("Zona PDR: H₂, C⁺","PDR zone: H₂, C⁺"), a0:h2, a1:co, colore:"rgba(255,179,71,0.30)" },
+    { nome: T("Interno protetto: H₂, CO","Protected interior: H₂, CO"), a0:co, a1:AV_MAX, colore:"rgba(79,209,255,0.22)" }
+  ];
+}
+
+/* ---------- Vista pannello B: abbondanze oppure A_V-profondità ---------- */
+let viewMode = 'abbond'; // 'abbond' | 'avdepth'
+
+function drawStatic(){
+  bctx.clearRect(0,0,W,H);
+  const isLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches
+    && document.documentElement.getAttribute('data-theme')!=='dark';
+  const lineCol = isLight ? "rgba(17,20,28,0.12)" : "rgba(232,236,245,0.14)";
+  const textCol = isLight ? "#5b6478" : "#8b95ac";
+  const axisCol = isLight ? "#11141c" : "#e8ecf5";
+
+  /* ===== PANNELLO A: nube a strati (ellissoide irregolare) ===== */
+  const yA0 = panelA.top, yA1 = panelA.top+panelA.height;
+  const zz = zone();
+  const sH2 = avToScale(avH2()), sCO = avToScale(avCO());
+
+  // bagliore ambientale attorno al bordo esterno: illuminazione UV simmetrica, da ogni direzione
+  for(let i=5;i>=1;i--){
+    const s = 1 + i*0.03;
+    blobPath(bctx, s);
+    bctx.strokeStyle = "rgba(255,180,80,"+(0.20 - i*0.03)+")";
+    bctx.lineWidth = (12 - i*1.6)*DPR;
+    bctx.stroke();
+  }
+
+  // strati concentrici, dipinti dal più esterno al più interno (ognuno coprendo il precedente)
+  blobPath(bctx, 1);
+  bctx.fillStyle = zz[0].colore; bctx.fill();
+  blobPath(bctx, sH2);
+  bctx.fillStyle = zz[1].colore; bctx.fill();
+  blobPath(bctx, sCO);
+  bctx.fillStyle = zz[2].colore; bctx.fill();
+
+  // contorno esterno della nube
+  blobPath(bctx, 1);
+  bctx.strokeStyle = lineCol; bctx.lineWidth = 1.5*DPR; bctx.stroke();
+
+  // fronti chimici come curve chiuse tratteggiate
+  [[sH2, T("H → H₂","H → H₂"), "#4fd1ff"], [sCO, T("C⁺ → CO","C⁺ → CO"), "#ffb347"]].forEach(f=>{
+    bctx.save();
+    blobPath(bctx, f[0]);
+    bctx.setLineDash([5*DPR,4*DPR]);
+    bctx.strokeStyle = f[2]; bctx.lineWidth = 2*DPR;
+    bctx.stroke();
+    bctx.setLineDash([]);
+    const p = blobPoint(-Math.PI/2, f[0]);
+    bctx.fillStyle = f[2];
+    bctx.font = "bold "+(11*DPR)+"px sans-serif";
+    bctx.textAlign = "center";
+    bctx.fillText(f[1], p.x, p.y-8*DPR);
+    bctx.restore();
+  });
+
+  // etichette delle zone, posizionate lungo la verticale superiore a raggi crescenti
+  const zoneScale = [ (1+sH2)/2, (sH2+sCO)/2, sCO/2 ];
+  zz.forEach((z,i)=>{
+    const p = blobPoint(-Math.PI/2, zoneScale[i]);
+    bctx.save();
+    bctx.font = "bold "+(12.5*DPR)+"px sans-serif";
+    bctx.textAlign = "center";
+    const parole = z.nome.split(' ');
+    const boxW = plotW*0.5;
+    let righe=[], riga='';
+    parole.forEach(w=>{
+      const prova = riga? riga+' '+w : w;
+      if(bctx.measureText(prova).width > boxW-16*DPR && riga){ righe.push(riga); riga=w; } else riga=prova;
+    });
+    if(riga) righe.push(riga);
+    const lineH=15*DPR;
+    const startY = p.y - ((righe.length-1)*lineH)/2;
+    const maxW = Math.max(...righe.map(r=>bctx.measureText(r).width));
+    bctx.fillStyle = "rgba(5,7,13,0.55)";
+    bctx.fillRect(p.x - maxW/2 - 8*DPR, startY - lineH*0.75, maxW+16*DPR, righe.length*lineH + 6*DPR);
+    bctx.fillStyle = "#ffffff";
+    righe.forEach((r,j)=> bctx.fillText(r, p.x, startY+j*lineH));
+    bctx.restore();
+  });
+
+  // etichetta campo UV (ambientale, non più legata a una parete)
+  bctx.save();
+  bctx.font = "bold "+(13*DPR)+"px sans-serif";
+  const uvLabel = "☀ "+T("CAMPO UV (da ogni direzione)","UV FIELD (from every direction)");
+  const uvW = bctx.measureText(uvLabel).width;
+  bctx.fillStyle = "rgba(5,7,13,0.6)";
+  bctx.fillRect(margin.left+plotW/2-uvW/2-7*DPR, yA0+2*DPR, uvW+14*DPR, 20*DPR);
+  bctx.fillStyle = "#ffb347";
+  bctx.textAlign = "center";
+  bctx.fillText(uvLabel, margin.left+plotW/2, yA0+17*DPR);
+  bctx.restore();
+
+  /* ===== PANNELLO B ===== */
+  const yB0 = panelB.top, yB1 = panelB.top+panelB.height;
+  bctx.strokeStyle = lineCol; bctx.lineWidth = 1.5*DPR;
+  bctx.strokeRect(margin.left, yB0, plotW, panelB.height);
+
+  if(viewMode==='abbond'){
+    drawAbbondanze(yB0,yB1,textCol,axisCol,lineCol);
+  } else {
+    drawAVDepth(yB0,yB1,textCol,axisCol,lineCol);
+  }
+}
+
+function yInPanel(frac, y0, y1){ return y1 - frac*(y1-y0); } // frac 0..1
+
+function drawAbbondanze(y0,y1,textCol,axisCol,lineCol){
+  const h2f=avH2(), cof=avCO(), width=0.25;
+  bctx.save();
+  bctx.font = "bold "+(11*DPR)+"px sans-serif";
+  bctx.fillStyle = axisCol;
+  bctx.textAlign = "left";
+  bctx.fillText(T("Abbondanza relativa delle specie chimiche","Relative abundance of chemical species"), margin.left, y0-8*DPR);
+  bctx.restore();
+
+  const curve = [
+    { nome:"H", col:"#8b95ac", f:(av)=>1-sigmoid(av,h2f,width) },
+    { nome:"H₂", col:"#4fd1ff", f:(av)=>sigmoid(av,h2f,width) },
+    { nome:"C⁺", col:"#ff6b35", f:(av)=>1-sigmoid(av,cof,width) },
+    { nome:"CO", col:"#3ddc84", f:(av)=>sigmoid(av,cof,width) },
+  ];
+  curve.forEach(c=>{
+    bctx.beginPath();
+    let first=true;
+    for(let av=AV_MIN; av<=AV_MAX; av+=0.05){
+      const x=xAV(av), y=yInPanel(c.f(av), y0, y1);
+      if(first){bctx.moveTo(x,y); first=false;} else bctx.lineTo(x,y);
+    }
+    bctx.strokeStyle=c.col; bctx.lineWidth=2.4*DPR; bctx.stroke();
+  });
+  // fronti anche qui
+  [h2f,cof].forEach((av,i)=>{
+    bctx.save();
+    bctx.setLineDash([4*DPR,3*DPR]);
+    bctx.strokeStyle = i===0? "#4fd1ff":"#ffb347";
+    bctx.lineWidth=1.3*DPR;
+    bctx.beginPath(); bctx.moveTo(xAV(av),y0); bctx.lineTo(xAV(av),y1); bctx.stroke();
+    bctx.restore();
+  });
+
+  bctx.fillStyle=textCol; bctx.font=(10*DPR)+"px sans-serif"; bctx.textAlign="center";
+  for(let a=0;a<=AV_MAX;a+=2) bctx.fillText("A_V="+a, xAV(a), y1+14*DPR);
+}
+
+function drawAVDepth(y0,y1,textCol,axisCol,lineCol){
+  const n = Math.pow(10, logN);
+  const DEPTH_MAX = 1000; // unità arbitrarie
+  const k = 0.01;
+  bctx.save();
+  bctx.font = "bold "+(11*DPR)+"px sans-serif";
+  bctx.fillStyle = axisCol;
+  bctx.textAlign = "left";
+  bctx.fillText(T("Estinzione A_V in funzione della profondità fisica","A_V vs physical depth"), margin.left, y0-8*DPR);
+  bctx.restore();
+
+  function depthToPx(d){ return margin.left + (d/DEPTH_MAX)*plotW; }
+  function avToY(av){ return yInPanel(Math.min(av,AV_MAX)/AV_MAX, y0, y1); }
+
+  bctx.beginPath();
+  let first=true;
+  for(let d=0; d<=DEPTH_MAX; d+=5){
+    const av = k*n*d/100;
+    const x=depthToPx(d), y=avToY(av);
+    if(first){bctx.moveTo(x,y); first=false;} else bctx.lineTo(x,y);
+    if(av>AV_MAX) break;
+  }
+  bctx.strokeStyle="#ffb347"; bctx.lineWidth=2.6*DPR; bctx.stroke();
+
+  bctx.fillStyle=textCol; bctx.font=(10*DPR)+"px sans-serif"; bctx.textAlign="center";
+  for(let d=0; d<=DEPTH_MAX; d+=200) bctx.fillText(d, depthToPx(d), y1+14*DPR);
+  bctx.fillText(T("Profondità fisica (unità arbitrarie) →","Physical depth (arbitrary units) →"), margin.left+plotW/2, y1+28*DPR);
+
+  bctx.save();
+  bctx.textAlign="right";
+  bctx.fillStyle=textCol;
+  bctx.fillText("A_V="+AV_MAX, margin.left-6*DPR, y0+6*DPR);
+  bctx.fillText("A_V=0", margin.left-6*DPR, y1);
+  bctx.restore();
+}
+
+/* ---------- Legenda ---------- */
+function buildLegend(){
+  const legend = document.getElementById('legend');
+  const items = [
+    ['#ff6b35', T("Fotoni UV incidenti (dall'esterno)","Incoming UV photons (from outside)")],
+    ['#4fd1ff', T("Fotoni dissocianti H₂, bloccati al fronte per autoschermatura","H₂-dissociating photons, blocked at the front by self-shielding")],
+    ['#ffb347', T('Fronte C⁺→CO / curva CO','C⁺→CO front / CO curve')],
+    ['#8b95ac', T('Curva H atomico','Atomic H curve')],
+    ['#3ddc84', T('Curva CO','CO curve')],
+  ];
+  legend.innerHTML = items.map(it=>'<span class="item"><span class="dot" style="background:'+it[0]+'"></span>'+it[1]+'</span>').join('');
+}
+
+/* ---------- Particelle (pannello A, canvas in primo piano) ---------- */
+let particles = [];
+let showShield = true;
+let lastT = performance.now();
+
+// i fotoni nascono fuori dalla nube (av negativo = al di là del bordo) e viaggiano verso il centro:
+// si vedono arrivare dall'esterno prima di penetrare ed essere assorbiti
+function spawnUV(){
+  particles.push({
+    av: -(0.4 + Math.random()*1.1),
+    theta: Math.random()*2*Math.PI,
+    speed: 1.0 + Math.random()*0.4,
+    type: 'uv',
+    thresh: -2.5*Math.log10(Math.max(Math.random(),1e-6))
+  });
+}
+function spawnShield(){
+  const h2f = avH2();
+  particles.push({
+    av: -(0.4 + Math.random()*1.1),
+    theta: Math.random()*2*Math.PI,
+    speed: 1.2 + Math.random()*0.4,
+    type: 'shield',
+    thresh: h2f + (Math.random()-0.5)*0.4
+  });
+}
+
+let frameCount=0;
+function frame(now){
+  const dt = Math.min((now-lastT)/1000, 0.05);
+  lastT = now;
+  frameCount++;
+
+  // generazione molto più fitta: il fascio deve leggersi come un flusso continuo, non puntini isolati
+  spawnUV(); spawnUV();
+  if(showShield && frameCount%3===0) spawnShield();
+
+  particles.forEach(p=>{ p.av += p.speed*dt*1.3; });
+  // la soglia di estinzione vale solo come profondità percorsa DENTRO la nube (av>=0): il tratto fuori non "consuma" fotoni
+  particles = particles.filter(p=> Math.max(p.av,0) < p.thresh && p.av < AV_MAX+0.3);
+  if(particles.length>900) particles = particles.slice(particles.length-900);
+
+  // dissolvenza invece di cancellazione netta: lascia una scia breve che rende visibile il "flusso"
+  ctx.save();
+  ctx.globalCompositeOperation = 'destination-out';
+  ctx.fillStyle = 'rgba(0,0,0,0.30)';
+  ctx.fillRect(0,0,W,H);
+  ctx.restore();
+
+  particles.forEach(p=>{
+    const pos = blobPoint(p.theta, avToScale(p.av));
+    ctx.beginPath();
+    ctx.arc(pos.x, pos.y, (p.type==='uv'?3.2:2.8)*DPR, 0, 2*Math.PI);
+    ctx.fillStyle = p.type==='uv' ? "rgba(255,130,70,0.95)" : "rgba(100,220,255,0.95)";
+    ctx.fill();
+  });
+
+  requestAnimationFrame(frame);
+}
+
+/* ---------- Controlli ---------- */
+const g0Slider=document.getElementById('g0'), g0Val=document.getElementById('g0Val');
+const densSlider=document.getElementById('dens'), nVal=document.getElementById('nVal');
+function fmtExp(v){
+  if(v>=0.01 && v<10000){
+    const cifre = v<1?2:(v<100?1:0);
+    return NUM(v.toLocaleString('it-IT',{maximumFractionDigits:cifre}));
+  }
+  const esp=v.toExponential(1).split('e');
+  return NUM(esp[0])+"×10^"+parseInt(esp[1],10);
+}
+function updateLabels(){
+  g0Val.textContent = fmtExp(Math.pow(10,logG0));
+  nVal.textContent = fmtExp(Math.pow(10,logN)) + " cm⁻³";
+}
+g0Slider.addEventListener('input', e=>{ logG0=parseFloat(e.target.value); updateLabels(); drawStatic(); });
+densSlider.addEventListener('input', e=>{ logN=parseFloat(e.target.value); updateLabels(); drawStatic(); });
+document.getElementById('showShield').addEventListener('change', e=>{ showShield=e.target.checked; });
+document.getElementById('viewBtn').addEventListener('click', ()=>{
+  viewMode = viewMode==='abbond' ? 'avdepth' : 'abbond';
+  document.getElementById('viewBtn').textContent = viewMode==='abbond'
+    ? T('📈 A_V vs profondità fisica','📈 A_V vs physical depth')
+    : T('📊 Abbondanze chimiche','📊 Chemical abundances');
+  drawStatic();
+});
+
+/* ---------- Avvio ---------- */
+updateLabels();
+buildLegend();
+if(window.ResizeObserver){ new ResizeObserver(resize).observe(canvas.parentElement); }
+window.addEventListener('resize', resize);
+resize();
+requestAnimationFrame(frame);
+})();
+</script>
+<style id="cc-copyright">
+.cc-badge{display:inline-block;vertical-align:middle;margin:0 0 0 .5em;padding:2px 8px;border:1px solid currentColor;border-radius:999px;font:400 11.5px/1.35 -apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;letter-spacing:0;text-transform:none;white-space:normal;max-width:100%;box-sizing:border-box;opacity:.8;color:inherit;text-shadow:none;pointer-events:auto}
+.cc-n,.cc-badge a{white-space:nowrap}
+.cc-badge a{color:inherit;text-decoration:underline;text-underline-offset:2px}
+.cc-badge.cc-doc{text-decoration:none;opacity:1;font-weight:600;margin-left:.4em}
+.cc-badge.lang-sw{opacity:1;margin-left:.4em}.cc-badge.lang-sw a{cursor:pointer}
+.cc-badge.cc-fixed{position:fixed;top:10px;right:10px;margin:0;z-index:2147483000;background:rgba(10,10,18,.62);color:#f2efe6;border-color:rgba(242,239,230,.45);opacity:1;backdrop-filter:blur(4px)}
+@media (max-width:520px){.cc-badge{font-size:11px;padding:2px 7px}}
+</style>
+<script src="regione_pdr_scheda.js"></script>
+<script src="regione_pdr_scheda_en.js"></script>
+<script src="scheda.js"></script>
+</body>
+</html>
