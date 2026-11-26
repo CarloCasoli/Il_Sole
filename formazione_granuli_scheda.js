@@ -18,7 +18,8 @@ L'animazione è *qualitativa* e non è una simulazione fisica del plasma: non ca
 
 ## Comandi e parametri personalizzabili
 
-- **Pausa / Riprendi**: unico comando dell'interfaccia (in basso a destra). Sospende il disegno e lo riprende. Il tempo interno continua a scorrere durante la pausa, quindi alla ripresa i granuli sono più avanti nel loro ciclo.
+- **Pausa / Riprendi**: in basso a destra. Sospende il disegno e lo riprende. Il tempo interno continua a scorrere durante la pausa, quindi alla ripresa i granuli sono più avanti nel loro ciclo.
+- **Velocità**: cursore sopra il pulsante pausa, da $0,15\times$ (molto più lento) a $1,5\times$; valore iniziale $1\times$. Rallenta o accelera il ritmo con cui i granuli nascono, crescono e si affievoliscono, senza cambiarne l'aspetto.
 - **Distanza tra i centri** (*SPACING*, in pixel; valore iniziale $46$): controlla la dimensione media dei granuli e quindi il loro numero sullo schermo. Valori più grandi producono granuli più grandi e meno numerosi.
 - **Dimensione massima**: il raggio massimo di ogni granulo è estratto a caso tra $0,85$ e $1,15$ volte la distanza tra i centri, quindi tra circa $39$ e $53$ pixel con il valore iniziale.
 - **Durata del ciclo**: intervallo da $3200$ a $7200$ millisecondi, da cui è estratta a caso la vita di ogni granulo. Intervalli più brevi rendono il ricambio più rapido e la scena più agitata.
@@ -26,7 +27,7 @@ L'animazione è *qualitativa* e non è una simulazione fisica del plasma: non ca
 - **Irregolarità del contorno**: ampiezza dell'ondulazione del bordo, estratta a caso tra $0,12$ e $0,24$ del raggio.
 - **Fasi del ciclo**: le soglie del $22\%$ e del $72\%$ separano crescita, massimo e decadimento.
 
-Tutti i parametri, tranne il pulsante, si modificano direttamente nel sorgente della pagina.
+Tutti i parametri, tranne il pulsante e il cursore della velocità, si modificano direttamente nel sorgente della pagina.
 
 ## Contatori
 

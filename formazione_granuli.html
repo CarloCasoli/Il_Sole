@@ -20,12 +20,21 @@
   .btn:hover{border-color:rgba(233,201,138,.55);}
   .btn:focus-visible{outline:2px solid var(--ink);outline-offset:2px;}
   .tools{position:fixed;top:10px;left:10px;z-index:2147483000;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+  .speed{position:fixed;right:16px;bottom:52px;display:flex;align-items:center;gap:6px;background:rgba(20,12,6,.55);border:1px solid rgba(233,201,138,.25);color:var(--ink);
+       font-family:inherit;font-size:11px;padding:6px 10px;border-radius:3px;backdrop-filter:blur(2px);}
+  .speed input[type=range]{width:90px;accent-color:var(--ink);}
+  .speed span{min-width:34px;text-align:right;}
 </style>
 </head>
 <body>
 <canvas id="c"></canvas>
 <div class="hud" data-en="&lt;b&gt;Simulated photosphere&lt;/b&gt; — granules in convection, viewed from above"><b>Fotosfera simulata</b> — granuli in convezione, vista dall'alto</div>
 <button class="btn" id="toggle" data-en="pause">pausa</button>
+<div class="speed">
+  <label for="speed" data-en="speed">velocità</label>
+  <input type="range" id="speed" min="15" max="150" value="100" step="5" aria-label="Velocità" data-en-aria="Speed">
+  <span id="speedval">1.00×</span>
+</div>
 <div class="tools">
   <a class="cc-badge cc-doc" href="#scheda" data-scheda data-en="📖 Animation description">📖 Scheda dell'animazione</a>
   <span data-lang-switch></span>
@@ -51,6 +60,7 @@ const ease=t=>t<0.5 ? 4*t*t*t : 1-Math.pow(-2*t+2,3)/2;
 
 let granules=[];
 const SPACING = 46; // px tra centri, definisce dimensione media dei granuli
+let simTime=0, speedFactor=1, lastReal=performance.now();
 
 let base = document.createElement('canvas');
 let baseCtx = base.getContext('2d');
@@ -94,7 +104,7 @@ function initField(){
   buildBase();
   granules=[];
   const cols = Math.ceil(W/SPACING)+2, rows = Math.ceil(H/SPACING)+2;
-  const t0 = performance.now();
+  const t0 = simTime;
   for(let i=-1;i<cols;i++){
     for(let j=-1;j<rows;j++){
       const x = i*SPACING + rand(-SPACING*0.35,SPACING*0.35);
@@ -146,9 +156,11 @@ function drawGranule(g,t){
 }
 
 let running=true;
-let last=performance.now();
 
-function frame(t){
+function frame(real){
+  const dtReal = real - lastReal;
+  lastReal = real;
+  simTime += dtReal * speedFactor;
   if(running){
     ctx.fillStyle='#0e0704';
     ctx.fillRect(0,0,W,H);
@@ -156,13 +168,13 @@ function frame(t){
 
     // rigenera i granuli morti in prossimità della loro posizione originale
     for(let g of granules){
-      if(t-g.birth > g.life){
+      if(simTime-g.birth > g.life){
         const nx = g.x + rand(-SPACING*0.3,SPACING*0.3);
         const ny = g.y + rand(-SPACING*0.3,SPACING*0.3);
-        Object.assign(g, newGranule(nx,ny,t,true));
+        Object.assign(g, newGranule(nx,ny,simTime,true));
       }
     }
-    for(let g of granules) drawGranule(g,t);
+    for(let g of granules) drawGranule(g,simTime);
 
     // leggera vignettatura per profondità
     const vg = ctx.createRadialGradient(W/2,H/2,Math.min(W,H)*0.3,W/2,H/2,Math.max(W,H)*0.75);
@@ -178,6 +190,12 @@ requestAnimationFrame(frame);
 document.getElementById('toggle').addEventListener('click', e=>{
   running = !running;
   e.target.textContent = running ? T('pausa','pause') : T('riprendi','resume');
+});
+
+const speedInput = document.getElementById('speed'), speedVal = document.getElementById('speedval');
+speedInput.addEventListener('input', ()=>{
+  speedFactor = speedInput.value/100;
+  speedVal.textContent = speedFactor.toFixed(2)+'×';
 });
 </script>
 <span class="cc-badge cc-fixed"><span class="cc-n">© 2026 Carlo Casoli ·</span> <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it" target="_blank" rel="license noopener">CC BY-NC-ND 4.0</a></span>

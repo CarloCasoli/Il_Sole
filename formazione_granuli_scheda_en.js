@@ -18,7 +18,8 @@ The animation is *qualitative* and is not a physical simulation of the plasma: i
 
 ## Controls and customizable parameters
 
-- **Pause / Resume**: the only interface control (bottom right). Suspends the drawing and resumes it. Internal time keeps running during the pause, so upon resuming the granules are further along in their cycle.
+- **Pause / Resume**: bottom right. Suspends the drawing and resumes it. Internal time keeps running during the pause, so upon resuming the granules are further along in their cycle.
+- **Speed**: slider above the pause button, from $0.15\times$ (much slower) to $1.5\times$; initial value $1\times$. Slows down or speeds up the pace at which granules are born, grow, and fade, without changing their appearance.
 - **Distance between centers** (*SPACING*, in pixels; initial value $46$): controls the average size of the granules and therefore their number on screen. Larger values produce larger and fewer granules.
 - **Maximum size**: the maximum radius of each granule is drawn at random between $0.85$ and $1.15$ times the distance between centers, that is, between about $39$ and $53$ pixels with the initial value.
 - **Cycle duration**: range from $3200$ to $7200$ milliseconds, from which the lifetime of each granule is drawn at random. Shorter intervals make the turnover faster and the scene more agitated.
@@ -26,7 +27,7 @@ The animation is *qualitative* and is not a physical simulation of the plasma: i
 - **Outline irregularity**: amplitude of the edge waviness, drawn at random between $0.12$ and $0.24$ of the radius.
 - **Cycle phases**: the thresholds of $22\%$ and $72\%$ separate growth, maximum, and decay.
 
-All parameters, except the button, are modified directly in the source of the page.
+All parameters, except the button and the speed slider, are modified directly in the source of the page.
 
 ## Counters
 
