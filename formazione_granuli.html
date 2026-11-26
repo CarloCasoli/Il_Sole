@@ -8,7 +8,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Granulazione solare — simulazione</title>
+<title data-en="Solar granulation — simulation">Granulazione solare — simulazione</title>
 <style>
   :root{ --bg:#0e0704; --ink:#e9c98a; --dim:#8a6a3f; }
   html,body{margin:0;height:100%;background:var(--bg);overflow:hidden;font-family:Georgia,'Times New Roman',serif;}
@@ -19,12 +19,18 @@
        font-family:inherit;font-size:12px;padding:7px 12px;border-radius:3px;cursor:pointer;backdrop-filter:blur(2px);}
   .btn:hover{border-color:rgba(233,201,138,.55);}
   .btn:focus-visible{outline:2px solid var(--ink);outline-offset:2px;}
+  .tools{position:fixed;top:10px;left:10px;z-index:2147483000;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 </style>
 </head>
 <body>
 <canvas id="c"></canvas>
-<div class="hud"><b>Fotosfera simulata</b> — granuli in convezione, vista dall'alto</div>
-<button class="btn" id="toggle">pausa</button>
+<div class="hud" data-en="&lt;b&gt;Simulated photosphere&lt;/b&gt; — granules in convection, viewed from above"><b>Fotosfera simulata</b> — granuli in convezione, vista dall'alto</div>
+<button class="btn" id="toggle" data-en="pause">pausa</button>
+<div class="tools">
+  <a class="cc-badge cc-doc" href="#scheda" data-scheda data-en="📖 Animation description">📖 Scheda dell'animazione</a>
+  <span data-lang-switch></span>
+</div>
+<script src="lingua.js"></script>
 <script>
 const cv = document.getElementById('c');
 const ctx = cv.getContext('2d');
@@ -171,7 +177,7 @@ requestAnimationFrame(frame);
 
 document.getElementById('toggle').addEventListener('click', e=>{
   running = !running;
-  e.target.textContent = running ? 'pausa' : 'riprendi';
+  e.target.textContent = running ? T('pausa','pause') : T('riprendi','resume');
 });
 </script>
 <span class="cc-badge cc-fixed"><span class="cc-n">© 2026 Carlo Casoli ·</span> <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it" target="_blank" rel="license noopener">CC BY-NC-ND 4.0</a></span>
@@ -180,7 +186,13 @@ document.getElementById('toggle').addEventListener('click', e=>{
 .cc-n,.cc-badge a{white-space:nowrap}
 .cc-badge a{color:inherit;text-decoration:underline;text-underline-offset:2px}
 .cc-badge.cc-fixed{position:fixed;top:10px;right:10px;margin:0;z-index:2147483000;background:rgba(10,10,18,.62);color:#f2efe6;border-color:rgba(242,239,230,.45);opacity:1;backdrop-filter:blur(4px)}
+.tools .cc-badge{margin-left:0;background:rgba(10,10,18,.62);color:#f2efe6;border-color:rgba(242,239,230,.45);opacity:1;backdrop-filter:blur(4px)}
+.cc-badge.cc-doc{text-decoration:none;font-weight:600}
+.cc-badge.lang-sw a{cursor:pointer}
 @media (max-width:520px){.cc-badge{font-size:11px;padding:2px 7px}}
 </style>
+<script src="formazione_granuli_scheda.js"></script>
+<script src="formazione_granuli_scheda_en.js"></script>
+<script src="scheda.js"></script>
 </body>
 </html>

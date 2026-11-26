@@ -6,7 +6,7 @@
 -->
 <html lang="it"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Evoluzione delle macchie solari: leading, trailing e ciclo 35°→5°</title>
+<title data-en="Evolution of sunspots: leading, trailing and the 35°→5° cycle">Evoluzione delle macchie solari: leading, trailing e ciclo 35°→5°</title>
 <style>
 :root{--bg:#fbf8f2;--fg:#231f1a;--mut:#6b6358;--card:#fff;--line:#ddd3c2;--acc:#d9531e;
 box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -25,35 +25,39 @@ button{font:inherit;font-size:.85rem;border:1px solid var(--line);background:var
 button.on{background:var(--acc);border-color:var(--acc);color:#fff}
 input[type=range]{flex:1;min-width:160px;accent-color:var(--acc)}
 h2{font-size:1.15rem;margin:0 0 6px}
+.tools{margin:6px 0 8px;display:flex;flex-wrap:wrap;gap:6px}
+.tools .cc-badge{margin-left:0}
 </style></head><body><main>
-<h1>Evoluzione delle macchie: leading, trailing e ciclo solare<span class="cc-badge"><span class="cc-n">© 2026 Carlo Casoli ·</span> <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it" target="_blank" rel="license noopener">CC BY-NC-ND 4.0</a></span></h1>
-<p class="sub">Il Sole visto di fronte, asse verticale, una coppia bipolare per emisfero. La rotazione solare porta le macchie da sinistra verso destra, e l'evoluzione si esaurisce dopo circa tre quarti del percorso. Muovi il cursore o lascia andare l'animazione.</p>
+<h1><span data-en="Evolution of sunspots: leading, trailing and solar cycle">Evoluzione delle macchie: leading, trailing e ciclo solare</span><span class="cc-badge"><span class="cc-n">© 2026 Carlo Casoli ·</span> <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.it" target="_blank" rel="license noopener">CC BY-NC-ND 4.0</a></span></h1>
+<div class="tools"><a class="cc-badge cc-doc" href="#scheda" data-scheda data-en="📖 Animation description">📖 Scheda dell'animazione</a> <span data-lang-switch></span></div>
+<p class="sub" data-en="The Sun seen face-on, vertical axis, one bipolar pair per hemisphere. Solar rotation carries the spots from left to right, and the evolution runs its course after about three quarters of the path. Move the slider or let the animation run.">Il Sole visto di fronte, asse verticale, una coppia bipolare per emisfero. La rotazione solare porta le macchie da sinistra verso destra, e l'evoluzione si esaurisce dopo circa tre quarti del percorso. Muovi il cursore o lascia andare l'animazione.</p>
 
 <div class="card">
-<svg viewBox="0 0 600 600" role="img" aria-label="Evoluzione di una coppia di macchie solari">
+<svg viewBox="0 0 600 600" role="img" aria-label="Evoluzione di una coppia di macchie solari" data-en-aria="Evolution of a pair of sunspots">
 <defs><clipPath id="disk"><circle cx="300" cy="300" r="250"/></clipPath>
 <filter id="bl2" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur id="bs2" stdDeviation="0.3"/></filter>
 <filter id="bl" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur id="bs" stdDeviation="0.5"/></filter></defs>
 <circle cx="300" cy="300" r="250" fill="#ffd93a" opacity=".6" stroke="#e0b400" stroke-width="2"/>
 <g id="grid" stroke="var(--mut)" stroke-opacity=".5" stroke-dasharray="3 5" fill="none"></g>
 <g id="dyn"></g>
-<text x="300" y="22" text-anchor="middle" fill="var(--mut)" font-size="13">Polo nord</text>
-<text x="300" y="590" text-anchor="middle" fill="var(--mut)" font-size="13">Polo sud</text>
-<text x="565" y="294" text-anchor="end" fill="var(--mut)" font-size="12">equatore</text>
+<text x="300" y="22" text-anchor="middle" fill="var(--mut)" font-size="13" data-en="North pole">Polo nord</text>
+<text x="300" y="590" text-anchor="middle" fill="var(--mut)" font-size="13" data-en="South pole">Polo sud</text>
+<text x="565" y="294" text-anchor="end" fill="var(--mut)" font-size="12" data-en="equator">equatore</text>
 </svg>
 <div class="legend">
-<span><i style="background:#e2572b"></i>polarità +</span>
-<span><i style="background:#2f78c4"></i>polarità −</span>
-<span>Nei due emisferi la polarità della macchia precedente (leading) è opposta.</span></div>
-<div class="row"><button id="pp">Pausa</button><input id="sl" type="range" min="0" max="1000" value="0" aria-label="Tempo">
+<span><i style="background:#e2572b"></i><span data-en="polarity +">polarità +</span></span>
+<span><i style="background:#2f78c4"></i><span data-en="polarity −">polarità −</span></span>
+<span data-en="In the two hemispheres the polarity of the leading spot is opposite.">Nei due emisferi la polarità della macchia precedente (leading) è opposta.</span></div>
+<div class="row"><button id="pp" data-en="Pause">Pausa</button><input id="sl" type="range" min="0" max="1000" value="0" aria-label="Tempo" data-en-aria="Time">
 <span id="yr" style="font-size:.85rem;color:var(--mut);min-width:90px;text-align:right"></span></div>
-<div class="row"><label style="flex:1;min-width:220px">Ciclo solare: dall'inizio (35°) alla fine (5°) <input id="cyc" type="range" min="0" max="100" value="67" style="width:100%"></label>
-<span id="lat" style="font-size:.85rem;color:var(--mut);min-width:110px;text-align:right">emersione a 15°</span></div>
+<div class="row"><label style="flex:1;min-width:220px"><span data-en="Solar cycle: from the start (35°) to the end (5°)">Ciclo solare: dall'inizio (35°) alla fine (5°)</span> <input id="cyc" type="range" min="0" max="100" value="67" style="width:100%"></label>
+<span id="lat" style="font-size:.85rem;color:var(--mut);min-width:110px;text-align:right" data-en="emergence at 15°">emersione a 15°</span></div>
 <div class="row" id="jumps"></div>
 </div>
 
 <div class="card"><h2 id="t"></h2><p id="d" style="margin:0"></p></div>
 
+<script src="lingua.js"></script>
 <script>
 let LAT=15,flip=1,freezeUntil=0;const NS='http://www.w3.org/2000/svg',cx=300,cy=300,R=250,POS='#e2572b',NEG='#2f78c4',rad=x=>x*Math.PI/180;
 // griglia: parallelli (a B0=0 sono rette) e meridiano centrale
@@ -65,13 +69,13 @@ document.getElementById('grid').innerHTML=g;
 const sm=x=>{x=Math.max(0,Math.min(1,x));return x*x*(3-2*x)};
 const P=(lat,lon,s)=>[cx+R*Math.cos(rad(lat))*Math.sin(rad(lon)),cy-s*R*Math.sin(rad(lat))];
 const stages=[
-[0,'Emergenza: una coppia inclinata','Il tubo di flusso sale e la forza di Coriolis lo deforma: la macchia precedente (leading, a destra, nel verso della rotazione) finisce un po\' più vicina all\'equatore, la seguente (trailing) un po\' più verso il polo. È la legge di Joy. Ai poli c\'è ancora il campo vecchio, di segno uguale alla leading.'],
-[0.35,'La coppia matura','Per settimane le due macchie restano compatte e ben definite, scure e con un campo intenso, mentre la rotazione le porta lungo il disco. Ai loro lati la convezione comincia però a erodere piano piano i bordi.'],
-[0.65,'Inizia la dispersione: due destini diversi','La leading, vicina all\'equatore, incontra la leading dell\'altro emisfero, che ha polarità opposta: i due flussi si annullano a vicenda. La trailing, invece, si diffonde e viene trascinata verso il polo dal flusso meridiano superficiale.'],
-[0.85,'Il campo seguente arriva ai poli','Il flusso trailing, di segno opposto al campo polare vecchio, comincia a neutralizzarlo. È il risultato netto dell\'inclinazione: a livello dell\'equatore si cancella tutto, verso i poli resta un eccesso di un solo segno.'],
-[1,'Inversione del campo polare','Il campo polare cambia segno e ora ha la polarità della trailing. Il campo verticale (poloidale) è stato ricostruito con segno invertito, pronto a essere portato in profondità e riavvolto dalla rotazione differenziale.']];
+[0,window.T('Emergenza: una coppia inclinata','Emergence: a tilted pair'),window.T('Il tubo di flusso sale e la forza di Coriolis lo deforma: la macchia precedente (leading, a destra, nel verso della rotazione) finisce un po\' più vicina all\'equatore, la seguente (trailing) un po\' più verso il polo. È la legge di Joy. Ai poli c\'è ancora il campo vecchio, di segno uguale alla leading.','The flux tube rises and the Coriolis force deforms it: the leading spot (on the right, in the direction of rotation) ends up a bit closer to the equator, the trailing spot a bit closer to the pole. This is Joy\'s law. At the poles the old field, of the same sign as the leading spot, is still present.')],
+[0.35,window.T('La coppia matura','The mature pair'),window.T('Per settimane le due macchie restano compatte e ben definite, scure e con un campo intenso, mentre la rotazione le porta lungo il disco. Ai loro lati la convezione comincia però a erodere piano piano i bordi.','For weeks the two spots remain compact and well defined, dark and with an intense field, while rotation carries them across the disk. At their edges, however, convection slowly begins to erode the borders.')],
+[0.65,window.T('Inizia la dispersione: due destini diversi','Dispersal begins: two different fates'),window.T('La leading, vicina all\'equatore, incontra la leading dell\'altro emisfero, che ha polarità opposta: i due flussi si annullano a vicenda. La trailing, invece, si diffonde e viene trascinata verso il polo dal flusso meridiano superficiale.','The leading spot, near the equator, meets the leading spot of the other hemisphere, which has opposite polarity: the two fluxes cancel each other out. The trailing spot, instead, spreads out and is carried toward the pole by the surface meridional flow.')],
+[0.85,window.T('Il campo seguente arriva ai poli','The following field arrives at the poles'),window.T('Il flusso trailing, di segno opposto al campo polare vecchio, comincia a neutralizzarlo. È il risultato netto dell\'inclinazione: a livello dell\'equatore si cancella tutto, verso i poli resta un eccesso di un solo segno.','The trailing flux, of opposite sign to the old polar field, begins to neutralize it. This is the net result of the tilt: at the equator everything cancels out, toward the poles an excess of a single sign remains.')],
+[1,window.T('Inversione del campo polare','Reversal of the polar field'),window.T('Il campo polare cambia segno e ora ha la polarità della trailing. Il campo verticale (poloidale) è stato ricostruito con segno invertito, pronto a essere portato in profondità e riavvolto dalla rotazione differenziale.','The polar field changes sign and now has the polarity of the trailing spot. The vertical (poloidal) field has been rebuilt with reversed sign, ready to be carried into depth and rewound by differential rotation.')]];
 const jl=document.getElementById('jumps');
-stages.forEach((s,i)=>{const b=document.createElement('button');b.textContent=['1 Emergenza','2 Maturità','3 Dispersione','4 Verso i poli','5 Inversione'][i];b.onclick=i===4?()=>{flip*=-1;b.classList.toggle('on',flip<0);freezeUntil=performance.now()+1000;draw(T)}:()=>{playing=false;pp.textContent='Riprendi';setT(s[0])};jl.appendChild(b)});
+stages.forEach((s,i)=>{const b=document.createElement('button');b.textContent=[window.T('1 Emergenza','1 Emergence'),window.T('2 Maturità','2 Maturity'),window.T('3 Dispersione','3 Dispersal'),window.T('4 Verso i poli','4 Toward the poles'),window.T('5 Inversione','5 Reversal')][i];b.onclick=i===4?()=>{flip*=-1;freezeUntil=performance.now()+1000;draw(T)}:()=>{playing=false;pp.textContent=window.T('Riprendi','Resume');setT(s[0])};jl.appendChild(b)});
 
 function circ(x,y,r,fill,op,stroke){return `<circle cx="${x}" cy="${y}" r="${r}" fill="${fill}" fill-opacity="${op}" ${stroke?`stroke="#1a1612" stroke-width="2"`:''}/>`}
 function blob(x,y,r,seed,irr,N=14,sq=0.85){const p=[];
@@ -87,7 +91,7 @@ function draw(t){document.getElementById('bs').setAttribute('stdDeviation',(0.3+
   o+=`<rect x="0" y="${s>0?0:600-ph}" width="600" height="${ph}" fill="${col}" fill-opacity="${Math.abs(val)*0.55}"/>`});
  o+='</g>';
  const Lg=-75+115*t,flash=Math.exp(-Math.pow((t-0.83)/0.09,2));
- if(flash>0.05)o+=`<ellipse cx="${cx+R*Math.sin(rad(Lg+6))}" cy="${cy}" rx="34" ry="20" fill="#fff" fill-opacity="${flash*0.7}" stroke="var(--fg)" stroke-dasharray="3 3" stroke-opacity="${flash}"/><text x="${cx+R*Math.sin(rad(Lg+6))}" y="${cy+40}" font-size="12" text-anchor="middle" fill="var(--fg)" fill-opacity="${flash}">cancellazione</text>`;
+ if(flash>0.05)o+=`<ellipse cx="${cx+R*Math.sin(rad(Lg+6))}" cy="${cy}" rx="34" ry="20" fill="#fff" fill-opacity="${flash*0.7}" stroke="var(--fg)" stroke-dasharray="3 3" stroke-opacity="${flash}"/><text x="${cx+R*Math.sin(rad(Lg+6))}" y="${cy+40}" font-size="12" text-anchor="middle" fill="var(--fg)" fill-opacity="${flash}">${window.T('cancellazione','cancellation')}</text>`;
  [1,-1].forEach(s=>{
   const q=s*flip,lc=q>0?POS:NEG,tc=q>0?NEG:POS;
   const f=sm((t-0.65)/0.33),L=-75+115*t;
@@ -125,19 +129,24 @@ let T=0,playing=true,last=performance.now(),hold=0;
 function setT(x){T=x;sl.value=Math.round(x*1000);draw(x);
  let s=stages[0];stages.forEach(z=>{if(x>=z[0]-0.12)s=z});
  document.getElementById('t').textContent=s[1];document.getElementById('d').textContent=s[2];
- document.getElementById('yr').textContent='mese '+Math.round(x*24)+' di ~24'}
-sl.oninput=()=>{playing=false;pp.textContent='Riprendi';setT(sl.value/1000)};
-pp.onclick=()=>{playing=!playing;pp.textContent=playing?'Pausa':'Riprendi'};
+ document.getElementById('yr').textContent=window.T('mese ','month ')+Math.round(x*24)+window.T(' di ~24',' of ~24')}
+sl.oninput=()=>{playing=false;pp.textContent=window.T('Riprendi','Resume');setT(sl.value/1000)};
+pp.onclick=()=>{playing=!playing;pp.textContent=playing?window.T('Pausa','Pause'):window.T('Riprendi','Resume')};
 function tick(n){const dt=(n-last)/1000;last=n;
  if(playing&&n>=freezeUntil){if(T>=1){hold+=dt;if(hold>2){hold=0;setT(0)}}else setT(Math.min(1,T+dt/16))}
  requestAnimationFrame(tick)}
-document.getElementById('cyc').oninput=e=>{LAT=Math.round(35-30*e.target.value/100);document.getElementById('lat').textContent='emersione a '+LAT+'°';draw(T)};
+document.getElementById('cyc').oninput=e=>{LAT=Math.round(35-30*e.target.value/100);document.getElementById('lat').textContent=window.T('emersione a ','emergence at ')+LAT+'°';draw(T)};
 setT(0);requestAnimationFrame(tick);
 </script></main><style id="cc-copyright">
 .cc-badge{display:inline-block;vertical-align:middle;margin:0 0 0 .5em;padding:2px 8px;border:1px solid currentColor;border-radius:999px;font:400 11.5px/1.35 -apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;letter-spacing:0;text-transform:none;white-space:normal;max-width:100%;box-sizing:border-box;opacity:.8;color:inherit;text-shadow:none;pointer-events:auto}
 .cc-n,.cc-badge a{white-space:nowrap}
 .cc-badge a{color:inherit;text-decoration:underline;text-underline-offset:2px}
 .cc-badge.cc-fixed{position:fixed;top:10px;right:10px;margin:0;z-index:2147483000;background:rgba(10,10,18,.62);color:#f2efe6;border-color:rgba(242,239,230,.45);opacity:1;backdrop-filter:blur(4px)}
+.cc-badge.cc-doc{text-decoration:none;opacity:1;font-weight:600;margin-left:.4em}
+.cc-badge.lang-sw{opacity:1;margin-left:.4em}.cc-badge.lang-sw a{cursor:pointer}
 @media (max-width:520px){.cc-badge{font-size:11px;padding:2px 7px}}
 </style>
+<script src="evoluzione_macchie_scheda.js"></script>
+<script src="evoluzione_macchie_scheda_en.js"></script>
+<script src="scheda.js"></script>
 </body></html>
